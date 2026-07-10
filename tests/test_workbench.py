@@ -276,3 +276,14 @@ def test_workbench_page_is_chat_first():
     assert html.index("msgs") < html.index('id="term"'), \
         "chat renders before the terminal"
     assert 'value="claude"' in html
+
+
+def test_workbench_page_playthrough_upgrades():
+    html = wb.render_workbench_page("tok", wb.TERMINAL_CLIS, 40,
+                                    [], wb.CHAT_CLIS)
+    assert "autofocus" in html, "composer must autofocus (playthrough #1)"
+    assert "mdlite" in html and "<code>$1</code>" in html, \
+        "agent bubbles render markdown-lite (playthrough #2)"
+    assert 'id="chips"' in html, "suggestion chips (playthrough #3)"
+    # Escaping happens before markup insertion — the order in source.
+    assert html.index("&amp;") < html.index("<code>$1</code>")

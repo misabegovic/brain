@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.12.1: persona-playthrough upgrades.** Three
+  personas driven through the live UI (newcomer / operator / PM);
+  fixes: composer autofocus, markdown-lite bubbles, suggestion
+  chips. Chat continuity verified across turns; the agent in the
+  chat flagged the session's own uncommitted diff unprompted.
 - **2026-07-10** — **0.12.0 shipped: the chat-first app.** Bare
   `brain` opens one window: conversation (print-mode bridge, on
   your subscription — [ADR](brain/adrs/chat-print-mode-bridge.md)),

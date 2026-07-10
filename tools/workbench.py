@@ -303,6 +303,12 @@ def render_workbench_page(token: str, harnesses: list[dict],
  .agent {{ align-self: flex-start;
           background: color-mix(in srgb, currentColor 6%, transparent); }}
  .agent.busy {{ opacity: .6; font-style: italic; }}
+ .agent code {{ background: color-mix(in srgb, currentColor 10%, transparent);
+               padding: 0 .25em; border-radius: 3px; font-size: .92em; }}
+ .agent a {{ color: inherit; }}
+ #chips {{ display: flex; gap: .4rem; flex-wrap: wrap; }}
+ #chips button {{ padding: .2rem .6rem; border-radius: 1rem;
+                 cursor: pointer; opacity: .85; }}
  #composer {{ display: flex; gap: .4rem; padding: .6rem;
              border-top: 1px solid #8884; }}
  #input {{ flex: 1; resize: none; padding: .45rem .6rem;
@@ -336,10 +342,18 @@ def render_workbench_page(token: str, harnesses: list[dict],
    <div class="msg agent">Ask me anything about this brain — or tell
 me what to do. I can tend the queue, capture decisions, search,
 and shape work. The knowledge pane updates as I change things.</div>
+   <div id="chips">
+     <button onclick="ask('What needs attention right now?')">what
+needs attention?</button>
+     <button onclick="ask('What changed recently, in a few bullets?')">what
+changed?</button>
+     <button onclick="ask('Give me a quick tour of what this brain knows.')">give
+me a tour</button>
+   </div>
  </div>
  <div id="composer">
-   <textarea id="input" rows="2"
-     placeholder="e.g. what needs attention?"></textarea>
+   <textarea id="input" rows="2" autofocus
+     placeholder="ask or instruct — Enter to send, Shift+Enter for a new line"></textarea>
    <button id="send" onclick="send()">send</button>
  </div>
  <div id="termbar"><span>open in:</span>{term_buttons}</div>
@@ -361,6 +375,18 @@ and shape work. The knowledge pane updates as I change things.</div>
    msgs.scrollTop = msgs.scrollHeight;
    return d;
  }}
+ // markdown-lite for agent replies: escape first, then bold /
+ // inline-code / links. Structure survives via pre-wrap.
+ function mdlite(text) {{
+   const esc = text.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                   .replace(/>/g, '&gt;');
+   return esc
+     .replace(/`([^`\\n]+)`/g, '<code>$1</code>')
+     .replace(/\\*\\*([^*\\n]+)\\*\\*/g, '<b>$1</b>')
+     .replace(/\\[([^\\]\\n]+)\\]\\((https?:[^)\\s]+)\\)/g,
+              '<a href="$2" target="_blank">$1</a>');
+ }}
+ function ask(text) {{ input.value = text; send(); }}
  async function send() {{
    const text = input.value.trim();
    if (!text) return;
@@ -378,7 +404,7 @@ and shape work. The knowledge pane updates as I change things.</div>
      }});
      const data = await r.json();
      busy.classList.remove('busy');
-     busy.textContent = data.reply || '(no reply)';
+     busy.innerHTML = mdlite(data.reply || '(no reply)');
    }} catch (e) {{
      busy.classList.remove('busy');
      busy.textContent = '(request failed: ' + e + ')';
@@ -389,6 +415,7 @@ and shape work. The knowledge pane updates as I change things.</div>
  input.addEventListener('keydown', (e) => {{
    if (e.key === 'Enter' && !e.shiftKey) {{ e.preventDefault(); send(); }}
  }});
+ window.addEventListener('load', () => input.focus());
  // ---- ambient strip + live reload ----
  let last = 0;
  async function tick() {{

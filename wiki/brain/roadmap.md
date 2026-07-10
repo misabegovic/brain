@@ -298,7 +298,15 @@ terminal demoted to an advanced toggle (PTY connects lazily), an
 ambient attention strip replacing tables (health + queue + reload
 signal in one poll), and the surface collapsed: bare `brain` opens
 the app; the README leads with the conversation. Named follow-ups:
-streaming replies, transcript capture, chat-led onboarding.
+streaming replies, transcript capture. **0.12.1** (same day): persona
+playthroughs through the real UI — a newcomer, an operator, a PM —
+drove three upgrades: composer autofocus (the first playthrough lost
+its first message to a focus miss), markdown-lite rendering in agent
+bubbles (escape-then-markup), and one-click suggestion chips (the
+chat-led onboarding follow-up, delivered early). The playthrough's
+best moment: the chat's own agent flagged the uncommitted upgrade
+diff in its "what changed?" answer — the mechanism reviewing its
+author in real time.
 
 ## Standing ideas (unversioned)
 
