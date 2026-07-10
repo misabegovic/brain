@@ -77,3 +77,7 @@
 2026-07-10 commit — 03f2565: 0.8.0 shipped — work-inside-the-brain UX (/ui, workbench nav, sidebar, VERSION)
    diff: 13 files changed, 216 insertions(+), 15 deletions(-)
    restricted-paths: true
+2026-07-10 commit — 168a85e: 0.9.0 shipped — briefing reads + write-time lint + attribution + root-mounted wiki
+   diff: 12 files changed, 278 insertions(+), 28 deletions(-)
+   restricted-paths: true
+   by: claude (fable 5), directed by operator
