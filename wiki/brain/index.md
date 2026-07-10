@@ -14,6 +14,7 @@ This shelf tracks how the brain itself operates: schema, conventions,
 tooling, governance.
 
 - [State](state.md) — past / now / perceived / target for the brain itself.
+- [Roadmap](roadmap.md) — the 0.x arc toward a self-maintaining, servable brain.
 - [Authoring ADRs and PRDs](authoring-adrs-and-prds.md) — the writing
   discipline behind `/shape` artefacts.
 

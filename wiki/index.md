@@ -18,6 +18,10 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — operator intent for the 0.x arc captured
+  (self-maintenance, connectors, pruning/deepening, external chat) —
+  see [brain/roadmap.md](brain/roadmap.md); the open-knowledge study
+  is snapshotted in `sources/conversations/`.
 - **2026-07-10** — kernel hardening from the ADR review: the
   client-specific compliance countdown became a generic
   `deadline-countdown` op over `wiki/_state/deadlines.json`, the
@@ -65,8 +69,11 @@ start filling in as the slash-command surface runs.
 
 ## Brain trajectory
 
-<!-- home-section: empty; maintained-by: /groom -->
-*(empty — no /groom run yet)*
+<!-- home-section; maintained-by: /groom -->
+- The 0.x arc is recorded at [brain/roadmap.md](brain/roadmap.md):
+  scheduled autonomy → connectors (Slack / Notion / GitHub) →
+  pruning + deepening → read-only chat plane → self-hosting profile.
+  Governance rail unchanged throughout; local-first stays default.
 
 [See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
 

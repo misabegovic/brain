@@ -46,6 +46,12 @@ into the sections below.
 
 - Adopt for a project: fill `brain.config.yml`, author team/user
   personas, run the first `/in` ingest.
+- The 0.x arc per [roadmap.md](roadmap.md) (operator intent captured
+  2026-07-10): scheduled autonomy (0.2) → connector snapshot-writers
+  for Slack / Notion / GitHub (0.3) → pruning + deepening with a
+  research loop (0.4) → a read-only grounded chat plane for people
+  outside the product (0.5) → the self-hosting profile that carries
+  it (0.6). Local-first stays the default operating mode throughout.
 
 ## Open threads
 
