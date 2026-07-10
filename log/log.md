@@ -71,3 +71,6 @@
 2026-07-10 commit — 9a0da54: serve threading+reuse-addr fix (found via test self-diagnosis)
    diff: 2 files changed, 22 insertions(+), 4 deletions(-)
    restricted-paths: true
+2026-07-10 commit — 1998d47: 0.7.0 shipped — hosting profile + instance isolation + codeplain intel
+   diff: 22 files changed, 490 insertions(+), 49 deletions(-)
+   restricted-paths: true
