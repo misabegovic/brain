@@ -7,6 +7,11 @@ confidence: medium
 sources:
   - ../../../sources/conversations/2026-07-10--composable-views-idea.md
   - ../../../sources/conversations/2026-07-10--sqlite-substrate-musing.md
+  - ../../../sources/research/2026-07-10--sqlite-fts5-derived-index.md
+  - ../../../sources/research/2026-07-10--composable-views-prior-art.md
+  - ../../../sources/research/2026-07-10--datasette-serving-surface.md
+  - ../../../sources/research/2026-07-10--datadog-langfuse-apis.md
+  - ../../../sources/research/2026-07-10--sqlite-index-prototype.md
   - ../adrs/connector-snapshot-contract.md
   - ../../../brain-schedule.yml
 ---
@@ -30,6 +35,44 @@ categories of role-critical context (observability state from
 Datadog, prompt/eval state from Langfuse) have no connector at all.
 The brain holds or could hold everything a role needs to prime a
 session; nothing composes it per role.
+
+## Deepdive findings (2026-07-10)
+
+The load-bearing points were researched before any bet (five
+research notes under `sources/research/`, cited above):
+
+- **Feasibility is proven, not presumed.** A prototype index over
+  the live corpus built in 19 ms (304 KB); a 50k-row benchmark on
+  this machine rebuilt full FTS5 in ~1.5 s. System Python ships
+  SQLite 3.45.1 with FTS5 and JSON core. The 0.4 research picker
+  reproduced as five lines of SQL returning the same rows the
+  Python producer queues.
+- **The design shape is validated twice by prior art.** Obsidian's
+  official Bases format is a YAML view spec (shared filters +
+  multiple named views with local overrides — the anatomy to copy);
+  Datasette's canned queries are SQL-in-YAML rendered as pages and
+  APIs. Steampipe validates schema-per-connector tables
+  (`github.*`, `datadog.*`) with cross-connector joins as the
+  payoff. Logseq's Datalog is the cautionary tale — familiarity
+  beats power; ship two tiers (simple filter shorthand + full SQL),
+  never three.
+- **Index mechanics are settled**: external-content FTS5 rebuilt in
+  one statement, `unicode61 tokenchars '-_'` so code identifiers
+  survive, build-to-temp + atomic `os.replace()`, readers open
+  read-only URIs, user search tokens quoted against MATCH-syntax
+  injection, links table indexed on both endpoints.
+- **Datasette is the near-free serving tier**: immutable mode over
+  the same index behind an identity-aware proxy is its canonical
+  deployment; pilot on stable 0.65.x; it is the power-user/API
+  surface, not a branded product UI.
+- **Connector specifics**: Datadog — monitor state (not logs) is
+  the daily production-state primitive (logs quota ~300 req/hr;
+  opt-in only); scoped app keys (`monitors_read`, `slos_read`) +
+  required `DD_SITE`. Langfuse — **no read-only key type exists**;
+  keys are project-scoped and write-capable, so the credential
+  guidance is dedicated-project keys or self-host. Durable cursors
+  are last-run timestamps (server cursors expire across runs);
+  overlap windows ~5 min and dedupe by id.
 
 ## Appetite
 
@@ -67,12 +110,15 @@ Fat-marker sketch (details are the build's call):
   priming context; the home dashboard stays the one canonical
   primer.
 - **Two new connectors under the existing snapshot contract**:
-  `datadog-pull` (monitor states, recent error patterns → snapshots
-  + a `wiki/_state/datadog.json` extract) and `langfuse-pull`
-  (prompt versions, eval summaries → snapshots + extract). Both
-  no-op until configured; read-only tokens in `.env`; plain REST,
-  no vendor SDKs. The connector contract gains one optional clause:
-  a connector MAY maintain a compact state extract for view tiles.
+  `datadog-pull` (daily monitor states + SLOs + incremental events;
+  logs search opt-in only — quota-scarce) and `langfuse-pull`
+  (prompt inventory + production-labeled versions, incremental
+  traces/scores). Both no-op until configured; plain REST, no
+  vendor SDKs; scoped credentials in `.env` (Datadog app keys
+  scoped to `monitors_read`/`slos_read` + `DD_SITE`; Langfuse has
+  no read-only keys — document dedicated-project keys or
+  self-host). The connector contract gains one optional clause: a
+  connector MAY maintain a compact state extract for view tiles.
 - **Role fit is convention, not accounts**: a view is a file; a
   persona field on the spec documents who it serves; individuals
   pin or copy the specs that fit their work. Example specs ship in

@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — views pitch **deepdived**: five research notes
+  in `sources/research/` (SQLite/FTS5 mechanics incl. a live
+  prototype at 19 ms / 304 KB, Datasette pilot recommendation,
+  prior-art lessons from Obsidian Bases / Steampipe / Logseq,
+  Datadog + Langfuse API specifics) woven into the
+  [pitch](brain/pitches/composable-role-views.md) — decision-ready.
 - **2026-07-10** — pitch captured:
   [composable role-fit views](brain/pitches/composable-role-views.md)
   — per-role view assemblies over connector data (incl. proposed

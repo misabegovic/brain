@@ -266,10 +266,15 @@
       "sources": [
         "../../../sources/conversations/2026-07-10--composable-views-idea.md",
         "../../../sources/conversations/2026-07-10--sqlite-substrate-musing.md",
+        "../../../sources/research/2026-07-10--sqlite-fts5-derived-index.md",
+        "../../../sources/research/2026-07-10--composable-views-prior-art.md",
+        "../../../sources/research/2026-07-10--datasette-serving-surface.md",
+        "../../../sources/research/2026-07-10--datadog-langfuse-apis.md",
+        "../../../sources/research/2026-07-10--sqlite-index-prototype.md",
         "../adrs/connector-snapshot-contract.md",
         "../../../brain-schedule.yml"
       ],
-      "tokens": 1075
+      "tokens": 1638
     },
     {
       "path": "brain/roadmap.md",
