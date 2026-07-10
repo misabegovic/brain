@@ -7,3 +7,6 @@
 2026-07-10 commit — 6b0013c: Kernel hardening from the ADR review
    diff: 10 files changed, 303 insertions(+), 62 deletions(-)
    restricted-paths: true
+2026-07-10 commit — f6d436f: 0.x roadmap captured (self-maintenance, connectors, serving)
+   diff: 7 files changed, 179 insertions(+), 5 deletions(-)
+   restricted-paths: false
