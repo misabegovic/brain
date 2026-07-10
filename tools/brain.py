@@ -5277,6 +5277,11 @@ def cmd_reflection_check(args) -> int:
                     truly_modified.append(path)
         else:
             truly_modified = modified
+        # README.md files document the shelf's conventions; they are
+        # maintained docs, not source material — exempt from the
+        # additive-only guarantee.
+        truly_modified = [p for p in truly_modified
+                          if Path(p).name != "README.md"]
         n = 0
         for path in truly_modified:
             findings.append(
