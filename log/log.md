@@ -65,3 +65,6 @@
 2026-07-10 commit — 619161d: /shape phases 1+2 — harness-workbench PRD + ADR; pitch superseded
    diff: 10 files changed, 236 insertions(+), 17 deletions(-)
    restricted-paths: false
+2026-07-10 commit — 43cdace: /shape phase 3 — harness workbench shipped; tend sweep closed the queue
+   diff: 20 files changed, 756 insertions(+), 17 deletions(-)
+   restricted-paths: true
