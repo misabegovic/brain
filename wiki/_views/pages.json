@@ -190,6 +190,21 @@
       "tokens": 1199
     },
     {
+      "path": "brain/adrs/sql-views-over-derived-index.md",
+      "title": "View specs are SQL over a derived, disposable SQLite index; shorthands compile to SQL; the index rides the views pipeline",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../prds/composable-role-views.md",
+        "../../../sources/research/2026-07-10--sqlite-fts5-derived-index.md",
+        "../../../sources/research/2026-07-10--composable-views-prior-art.md",
+        "../../../sources/research/2026-07-10--sqlite-index-prototype.md"
+      ],
+      "tokens": 1420
+    },
+    {
       "path": "brain/adrs/successor-ssg-for-ui.md",
       "title": "Adopt Astro + Starlight + Pagefind as the successor SSG for the UI",
       "kind": "decision",
@@ -254,7 +269,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 630
+      "tokens": 674
     },
     {
       "path": "brain/pitches/composable-role-views.md",

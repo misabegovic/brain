@@ -36,6 +36,7 @@ sanitized to organisation-agnostic form:
 - [Competitor intel ingestion](adrs/competitor-intel-ingestion.md) — public competitor info routing.
 - [Queue-and-tend inbox](adrs/queue-and-tend-inbox.md) — deterministic producers accumulate; `/tend` digests in-session; no scheduled LLM runs.
 - [Connector snapshot contract](adrs/connector-snapshot-contract.md) — connectors are pull-only snapshot-writers: immutable dedup files, cursors, inbox items out, never a wiki write.
+- [SQL views over a derived index](adrs/sql-views-over-derived-index.md) — view specs are SQL over a disposable SQLite index; shorthands compile to SQL; the index rides the views pipeline.
 
 ## Pitches (pre-bet)
 

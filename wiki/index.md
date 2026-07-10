@@ -18,6 +18,10 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — the views bet's
+  [ADR](brain/adrs/sql-views-over-derived-index.md) landed: SQL over
+  a derived disposable index, shorthands compile to SQL, index rides
+  the views pipeline.
 - **2026-07-10** — views pitch **graduated on the operator's bet**:
   [PRD](brain/prds/composable-role-views.md) landed; ADR + build
   follow in the same cycle.
@@ -91,6 +95,8 @@ start filling in as the slash-command surface runs.
 ## Recent decisions
 
 <!-- home-section; maintained-by: /shape -->
+- [SQL views over a derived index](brain/adrs/sql-views-over-derived-index.md)
+  — the composable-views bet, decided 2026-07-10.
 - [Kernel ADR trail](brain/index.md#adrs) — 11 mechanism decisions
   (shape pitches, epics, deepdive pre-flight, parallelism, zoom-out,
   home shape, UI substrate, operator lessons, competitor intel)
