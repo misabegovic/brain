@@ -68,3 +68,6 @@
 2026-07-10 commit — 43cdace: /shape phase 3 — harness workbench shipped; tend sweep closed the queue
    diff: 20 files changed, 756 insertions(+), 17 deletions(-)
    restricted-paths: true
+2026-07-10 commit — 9a0da54: serve threading+reuse-addr fix (found via test self-diagnosis)
+   diff: 2 files changed, 22 insertions(+), 4 deletions(-)
+   restricted-paths: true
