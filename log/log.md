@@ -116,3 +116,7 @@
    diff: 19 files changed, 283 insertions(+), 8 deletions(-)
    restricted-paths: true
    by: claude chat session (nested), verified + committed by claude (fable 5)
+2026-07-10 commit — 31e8c93: 0.13.1 — market-readiness (Apache-2.0, releases, packaging, community files)
+   diff: 19 files changed, 408 insertions(+), 70 deletions(-)
+   restricted-paths: true
+   by: claude (fable 5), operator picked Apache-2.0 + name-deferred
