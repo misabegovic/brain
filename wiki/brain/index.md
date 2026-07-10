@@ -37,13 +37,12 @@ sanitized to organisation-agnostic form:
 - [Queue-and-tend inbox](adrs/queue-and-tend-inbox.md) — deterministic producers accumulate; `/tend` digests in-session; no scheduled LLM runs.
 - [Connector snapshot contract](adrs/connector-snapshot-contract.md) — connectors are pull-only snapshot-writers: immutable dedup files, cursors, inbox items out, never a wiki write.
 - [SQL views over a derived index](adrs/sql-views-over-derived-index.md) — view specs are SQL over a disposable SQLite index; shorthands compile to SQL; the index rides the views pipeline.
+- [Workbench PTY bridge](adrs/workbench-pty-bridge.md) — loopback browser page over a stdlib PTY bridge; harness launches + config adapters as data tables; never in serving mode.
 
 ## Pitches (pre-bet)
 
-- [Harness workbench](pitches/harness-workbench.md) — a terminal in
-  the brain's local UI, per-harness launch + config adapters, live
-  reload beside it. Deepdived against the open-knowledge
-  implementation; awaiting a bet.
+- [Harness workbench](pitches/harness-workbench.md) — **superseded**
+  2026-07-10: graduated on the operator's bet.
 
 - [Composable role-fit views](pitches/composable-role-views.md) —
   **superseded** 2026-07-10: graduated on the operator's bet into
@@ -54,6 +53,9 @@ sanitized to organisation-agnostic form:
 - [Composable role-fit views](prds/composable-role-views.md) — SQL
   view specs over a derived index, with Datadog / Langfuse
   connectors. Bet 2026-07-10.
+- [Harness workbench](prds/harness-workbench.md) — the local surface
+  runs your harness terminal beside the rendered results. Bet
+  2026-07-10.
 
 ## AI suggestions (drafts for human review)
 

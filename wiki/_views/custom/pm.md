@@ -20,12 +20,11 @@ Committed work, proposals awaiting a bet, patterns from feedback, and what's que
 | path | title | status | confidence | updated |
 |---|---|---|---|---|
 | brain/prds/composable-role-views.md | Composable role-fit views — SQL view specs over a derived index, with observability connectors | living | medium | 2026-07-10 |
+| brain/prds/harness-workbench.md | Harness workbench — the brain's local surface runs your harness terminal beside the rendered results | living | medium | 2026-07-10 |
 
 ## Pitches awaiting a bet
 
-| path | title | status | confidence | updated |
-|---|---|---|---|---|
-| brain/pitches/harness-workbench.md | Harness workbench — a terminal in the brain's local UI, per-harness launch + config adapters, live-reloading results bes | draft | medium | 2026-07-10 |
+*(no rows)*
 
 ## Insights
 

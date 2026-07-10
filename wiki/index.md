@@ -119,6 +119,8 @@ start filling in as the slash-command surface runs.
 <!-- home-section; maintained-by: /shape -->
 - [SQL views over a derived index](brain/adrs/sql-views-over-derived-index.md)
   — the composable-views bet, decided 2026-07-10.
+- [Workbench PTY bridge](brain/adrs/workbench-pty-bridge.md) — the
+  harness-workbench bet, decided 2026-07-10.
 - [Kernel ADR trail](brain/index.md#adrs) — 11 mechanism decisions
   (shape pitches, epics, deepdive pre-flight, parallelism, zoom-out,
   home shape, UI substrate, operator lessons, competitor intel)

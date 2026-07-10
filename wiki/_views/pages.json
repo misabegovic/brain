@@ -235,6 +235,19 @@
       "tokens": 1197
     },
     {
+      "path": "brain/adrs/workbench-pty-bridge.md",
+      "title": "The workbench is a loopback browser page over a stdlib PTY bridge; harness launches and config adapters are data tables; it never ships in serving mode",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../prds/harness-workbench.md",
+        "../../../sources/research/2026-07-10--openknowledge-terminal-architecture.md"
+      ],
+      "tokens": 1282
+    },
+    {
       "path": "brain/adrs/zoom-out-on-current-work.md",
       "title": "zoom-out is a skill called as a step inside /shape and /continue, with conversation-first output and opt-in persistence as an aside-rendered Big-picture fit section",
       "kind": "decision",
@@ -271,7 +284,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 731
+      "tokens": 795
     },
     {
       "path": "brain/pitches/composable-role-views.md",
@@ -298,7 +311,8 @@
       "path": "brain/pitches/harness-workbench.md",
       "title": "Harness workbench \u2014 a terminal in the brain's local UI, per-harness launch + config adapters, live-reloading results beside it",
       "kind": "pitch",
-      "status": "draft",
+      "status": "superseded",
+      "superseded_by": "brain/prds/harness-workbench.md",
       "updated": "2026-07-10",
       "confidence": "medium",
       "sources": [
@@ -325,6 +339,21 @@
       "tokens": 697
     },
     {
+      "path": "brain/prds/harness-workbench.md",
+      "title": "Harness workbench \u2014 the brain's local surface runs your harness terminal beside the rendered results",
+      "kind": "initiative",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/harness-workbench.md",
+      "sources": [
+        "../pitches/harness-workbench.md",
+        "../../../sources/conversations/2026-07-10--harness-workbench-intent.md",
+        "../../../sources/research/2026-07-10--openknowledge-terminal-architecture.md"
+      ],
+      "tokens": 585
+    },
+    {
       "path": "brain/roadmap.md",
       "title": "Brain roadmap \u2014 0.x arc toward a self-maintaining, servable brain",
       "kind": "meta",
@@ -348,7 +377,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1082
+      "tokens": 1040
     },
     {
       "path": "org/index.md",

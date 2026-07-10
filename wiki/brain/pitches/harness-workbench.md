@@ -1,7 +1,8 @@
 ---
 title: "Harness workbench — a terminal in the brain's local UI, per-harness launch + config adapters, live-reloading results beside it"
 kind: pitch
-status: draft
+status: superseded
+superseded_by: brain/prds/harness-workbench.md
 updated: 2026-07-10
 confidence: medium
 sources:
