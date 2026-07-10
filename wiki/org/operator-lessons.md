@@ -3,8 +3,9 @@ title: "Operator lessons"
 kind: reference
 status: living
 updated: 2026-07-10
-confidence: medium
+confidence: high
 sources:
+  - ../../sources/research/2026-07-10--tend-sweep-2-verification.md
   - ../../.claude/skills/capture/SKILL.md
 ---
 

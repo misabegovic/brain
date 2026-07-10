@@ -4918,11 +4918,27 @@ def _schedule_run_inbox_refresh() -> int:
         }
 
     # Deepening picker: low-confidence pages that the graph leans on.
+    # Damping (first dogfooding amendment, 2026-07-10): kinds whose
+    # medium/low confidence is policy-correct are excluded — topics
+    # and pitches live at their tier by design, and initiative bumps
+    # are human-gated — and pages get a 7-day grace period: nothing
+    # deserves a deepening demand the week it was written.
     picks = []
+    grace_cutoff = today - dt.timedelta(days=7)
     for rel, meta in page_meta.items():
         if meta.get("status") in ("superseded", "archived"):
             continue
+        if meta.get("kind") in ("topic", "pitch", "initiative"):
+            continue
         if meta.get("confidence") not in ("low", "medium"):
+            continue
+        updated = meta.get("updated")
+        if isinstance(updated, str):
+            try:
+                updated = dt.date.fromisoformat(updated)
+            except ValueError:
+                updated = None
+        if isinstance(updated, dt.date) and updated > grace_cutoff:
             continue
         degree = len(inbound.get(rel, ()))
         if degree >= 2:

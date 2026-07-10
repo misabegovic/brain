@@ -99,8 +99,9 @@
       "kind": "decision",
       "status": "accepted",
       "updated": "2026-07-10",
-      "confidence": "medium",
+      "confidence": "high",
       "sources": [
+        "../../../sources/research/2026-07-10--tend-sweep-2-verification.md",
         "../../../AGENTS.md",
         ".claude/skills/shape/SKILL.md",
         ".claude/skills/zoom-out/SKILL.md"
@@ -161,7 +162,7 @@
         ".claude/skills/tend/SKILL.md",
         "../../../brain-schedule.yml"
       ],
-      "tokens": 1400
+      "tokens": 1553
     },
     {
       "path": "brain/adrs/shape-deepdive-pre-flight.md",
@@ -376,8 +377,9 @@
       "kind": "meta",
       "status": "living",
       "updated": "2026-07-10",
-      "confidence": "medium",
+      "confidence": "high",
       "sources": [
+        "../../sources/research/2026-07-10--tend-sweep-2-verification.md",
         "../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
         "../../AGENTS.md",
         "../../brain-schedule.yml"
@@ -394,7 +396,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1449
+      "tokens": 1525
     },
     {
       "path": "brain/topics/regenerative-schema-extensions.md",
@@ -505,8 +507,9 @@
       "kind": "reference",
       "status": "living",
       "updated": "2026-07-10",
-      "confidence": "medium",
+      "confidence": "high",
       "sources": [
+        "../../sources/research/2026-07-10--tend-sweep-2-verification.md",
         "../../.claude/skills/capture/SKILL.md"
       ],
       "tokens": 419

@@ -3,8 +3,9 @@ title: "Epics are single-page umbrella artifacts with parent_epic linkage, valid
 kind: decision
 status: accepted
 updated: 2026-07-10
-confidence: medium
+confidence: high
 sources:
+  - ../../../sources/research/2026-07-10--tend-sweep-2-verification.md
   - ../../../AGENTS.md
   - .claude/skills/shape/SKILL.md
   - .claude/skills/zoom-out/SKILL.md

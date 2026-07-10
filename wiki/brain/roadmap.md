@@ -3,8 +3,9 @@ title: "Brain roadmap — 0.x arc toward a self-maintaining, servable brain"
 kind: meta
 status: living
 updated: 2026-07-10
-confidence: medium
+confidence: high
 sources:
+  - ../../sources/research/2026-07-10--tend-sweep-2-verification.md
   - ../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md
   - ../../AGENTS.md
   - ../../brain-schedule.yml

@@ -18,6 +18,15 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — tend sweep 2: the epic ADR, the roadmap, and the
+  operator-lessons shelf verified against the shipped mechanism and
+  promoted to `confidence: high`; queue cleared. Standing constraint
+  recorded: this repo is the tool's own project, permanently — real
+  adoption happens in separate instances. The sweep also earned the
+  mechanism's **first dogfooding amendment**: the research picker now
+  skips policy-tier kinds (topics, pitches, initiatives) and gives
+  pages a 7-day grace period — recorded on the
+  [queue-and-tend ADR](brain/adrs/queue-and-tend-inbox.md).
 - **2026-07-10** — **0.10.0 shipped: topics + the regenerative
   schema.** `kind: topic` discussion threads (dated, attributed,
   graduating into ADRs), Fowler's

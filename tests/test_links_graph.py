@@ -52,9 +52,9 @@ def test_half_life_table_matches_groom_skill():
 
 
 def test_refresh_research_picker_targets_hubs():
-    """On the live corpus the picker queues at most 3 research items,
-    each naming a page with >=2 inbound links and low/medium
-    confidence."""
+    """The picker queues at most 3 items, each a >=2-inbound page of
+    an eligible kind past the 7-day grace period — so on a corpus
+    written today it queues nothing (the damping amendment)."""
     assert brain._schedule_run_inbox_refresh() == 0
     _outbound, inbound = brain._link_graph()
     research = [i for i in brain._inbox_items()
@@ -64,3 +64,10 @@ def test_refresh_research_picker_targets_hubs():
     for item in research:
         rel = item["source"].removeprefix("wiki/")
         assert len(inbound.get(rel, ())) >= 2, item["id"]
+    import datetime as dt
+    fresh = brain.today_utc() - dt.timedelta(days=7)
+    for item in research:
+        rel = item["source"].removeprefix("wiki/")
+        meta = brain.parse(brain.WIKI / rel)[0]
+        updated = dt.date.fromisoformat(str(meta["updated"]))
+        assert updated <= fresh, f"{item['id']} inside grace period"

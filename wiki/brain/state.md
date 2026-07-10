@@ -26,6 +26,12 @@ into the sections below.
 
 ## Now
 
+- **Standing constraint (operator, 2026-07-10):** this repository is
+  the tool's own project, permanently — `active_repos` stays empty
+  here; the brain dogfoods itself. Adoption for real projects
+  happens in separate instances of this kernel. The doctor's
+  "unconfigured shell" warning is expected here forever.
+
 - **Topics + regenerative schema live (0.10.0, 2026-07-10).**
   Discussion threads as first-class pages; constraints +
   implementation-memory in the permanent layer; Fowler synthesis on

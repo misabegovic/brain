@@ -117,3 +117,17 @@ fallback); a documented producer template at
 copy. The one refinement over the sketch: refresh-owned items are
 reconciled as a *set* (added, refreshed, and cleared each run) rather
 than only appended, so machine items never go stale in the queue.
+
+## Amendments
+
+- **2026-07-10 — research-picker damping** (first dogfooding-earned
+  refinement; direction unchanged). Working the queue on the brain's
+  own corpus showed the deepening picker nagging about pages whose
+  medium or low confidence is policy-correct — living topics,
+  pre-bet pitches, initiatives whose promotion is human-gated — and
+  about pages written the same day. The picker now excludes those
+  kinds and applies a seven-day grace period from a page's
+  `updated:` date: deepening is demanded of settled, load-bearing
+  knowledge, never of ink that is still wet. Verification-driven
+  promotion to high remains the clearing mechanism for everything
+  else.

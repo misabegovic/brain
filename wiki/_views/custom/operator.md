@@ -17,11 +17,7 @@ Everything pending, every cursor, every tracked deadline — the maintenance pic
 
 ## Tend queue (all)
 
-| id | kind | priority | summary |
-|---|---|---|---|
-| research-brain-adrs-multi-prd-epic-shape-md | research | normal | brain/adrs/multi-prd-epic-shape.md: confidence:medium but 4 pages link to it — deepen with cited research |
-| research-brain-roadmap-md | research | normal | brain/roadmap.md: confidence:medium but 3 pages link to it — deepen with cited research |
-| research-org-operator-lessons-md | research | normal | org/operator-lessons.md: confidence:medium but 4 pages link to it — deepen with cited research |
+*(no rows)*
 
 ## Deadlines
 
@@ -38,7 +34,7 @@ Everything pending, every cursor, every tracked deadline — the maintenance pic
 | brain/adrs/competitor-intel-ingestion.md | decision | medium | 2026-07-10 |
 | brain/adrs/connector-snapshot-contract.md | decision | medium | 2026-07-10 |
 | brain/adrs/home-content-shape.md | decision | medium | 2026-07-10 |
-| brain/adrs/multi-prd-epic-shape.md | decision | medium | 2026-07-10 |
+| brain/adrs/multi-prd-epic-shape.md | decision | high | 2026-07-10 |
 | brain/adrs/operator-lesson-pattern.md | decision | medium | 2026-07-10 |
 | brain/adrs/parallel-efforts-on-request.md | decision | medium | 2026-07-10 |
 | brain/adrs/parallel-execution-agent-teams.md | decision | medium | 2026-07-10 |

@@ -22,7 +22,7 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 | brain/adrs/competitor-intel-ingestion.md | Competitor intel lives at wiki/org/competitors/<competitor>/index.md, ingested via the existing wiki-ingest classifier w | accepted | medium | 2026-07-10 |
 | brain/adrs/connector-snapshot-contract.md | Connectors are pull-only snapshot-writers: immutable dedup-keyed files under sources/, cursors in state, inbox items out | accepted | medium | 2026-07-10 |
 | brain/adrs/home-content-shape.md | Home page is the wiki index as an agent-maintained dashboard | accepted | medium | 2026-07-10 |
-| brain/adrs/multi-prd-epic-shape.md | Epics are single-page umbrella artifacts with parent_epic linkage, validator-enforced no-umbrella-ADR, epic-aware briefs | accepted | medium | 2026-07-10 |
+| brain/adrs/multi-prd-epic-shape.md | Epics are single-page umbrella artifacts with parent_epic linkage, validator-enforced no-umbrella-ADR, epic-aware briefs | accepted | high | 2026-07-10 |
 | brain/adrs/operator-lesson-pattern.md | Operator lessons live as Lessons subsections on conventions pages plus one cross-cutting org page | accepted | medium | 2026-07-10 |
 | brain/adrs/parallel-efforts-on-request.md | Opt-in parallel efforts via a /spawn skill that creates per-effort worktrees and a wiki/_state/efforts/ registry, with e | accepted | medium | 2026-07-10 |
 | brain/adrs/parallel-execution-agent-teams.md | Parallel-first execution: every /spawn dispatches a background owner subagent (opt-out via --no-owner), helper fan-out i | accepted | medium | 2026-07-10 |
@@ -32,20 +32,16 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 
 ## Research queue (deepening picks)
 
-| id | kind | priority | summary |
-|---|---|---|---|
-| research-brain-adrs-multi-prd-epic-shape-md | research | normal | brain/adrs/multi-prd-epic-shape.md: confidence:medium but 4 pages link to it — deepen with cited research |
-| research-brain-roadmap-md | research | normal | brain/roadmap.md: confidence:medium but 3 pages link to it — deepen with cited research |
-| research-org-operator-lessons-md | research | normal | org/operator-lessons.md: confidence:medium but 4 pages link to it — deepen with cited research |
+*(no rows)*
 
 ## Load-bearing pages by inbound links
 
 | path | confidence | inbound |
 |---|---|---|
-| brain/adrs/multi-prd-epic-shape.md | medium | 4 |
+| brain/adrs/multi-prd-epic-shape.md | high | 4 |
 | brain/adrs/queue-and-tend-inbox.md | high | 4 |
 | brain/adrs/successor-ssg-for-ui.md | high | 4 |
-| org/operator-lessons.md | medium | 4 |
+| org/operator-lessons.md | high | 4 |
 | brain/adrs/connector-snapshot-contract.md | medium | 3 |
 | brain/adrs/home-content-shape.md | medium | 3 |
 | brain/adrs/operator-lesson-pattern.md | medium | 3 |
