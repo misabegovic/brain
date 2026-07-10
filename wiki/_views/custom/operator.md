@@ -17,11 +17,7 @@ Everything pending, every cursor, every tracked deadline — the maintenance pic
 
 ## Tend queue (all)
 
-| id | kind | priority | summary |
-|---|---|---|---|
-| research-brain-adrs-queue-and-tend-inbox-md | research | normal | brain/adrs/queue-and-tend-inbox.md: confidence:medium but 4 pages link to it — deepen with cited research |
-| research-brain-adrs-successor-ssg-for-ui-md | research | normal | brain/adrs/successor-ssg-for-ui.md: confidence:medium but 4 pages link to it — deepen with cited research |
-| research-brain-pitches-harness-workbench-md | research | normal | brain/pitches/harness-workbench.md: confidence:medium but 4 pages link to it — deepen with cited research |
+*(no rows)*
 
 ## Deadlines
 
@@ -42,6 +38,6 @@ Everything pending, every cursor, every tracked deadline — the maintenance pic
 | brain/adrs/operator-lesson-pattern.md | decision | medium | 2026-07-10 |
 | brain/adrs/parallel-efforts-on-request.md | decision | medium | 2026-07-10 |
 | brain/adrs/parallel-execution-agent-teams.md | decision | medium | 2026-07-10 |
-| brain/adrs/queue-and-tend-inbox.md | decision | medium | 2026-07-10 |
+| brain/adrs/queue-and-tend-inbox.md | decision | high | 2026-07-10 |
 | brain/adrs/shape-deepdive-pre-flight.md | decision | medium | 2026-07-10 |
 | brain/adrs/shape-up-pitches.md | decision | medium | 2026-07-10 |

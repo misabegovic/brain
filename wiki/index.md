@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — tend sweep: the deepening picker's three research
+  items digested — both hub ADRs verified against the shipped
+  mechanism and promoted to `confidence: high` (verification note in
+  `sources/research/`); the workbench-pitch item cleared as moot by
+  its graduation.
 - **2026-07-10** — pitch captured + deepdived:
   [harness workbench](brain/pitches/harness-workbench.md) — terminal
   in the brain's local UI with per-harness launch/config adapters,

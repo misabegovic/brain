@@ -3,8 +3,9 @@ title: "Self-maintenance is queue-and-tend: deterministic producers accumulate a
 kind: decision
 status: accepted
 updated: 2026-07-10
-confidence: medium
+confidence: high
 sources:
+  - ../../../sources/research/2026-07-10--hub-adr-verification.md
   - ../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md
   - .claude/skills/tend/SKILL.md
   - ../../../brain-schedule.yml

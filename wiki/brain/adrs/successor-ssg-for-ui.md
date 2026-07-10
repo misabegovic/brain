@@ -3,8 +3,9 @@ title: "Adopt Astro + Starlight + Pagefind as the successor SSG for the UI"
 kind: decision
 status: accepted
 updated: 2026-07-10
-confidence: medium
+confidence: high
 sources:
+  - ../../../sources/research/2026-07-10--hub-adr-verification.md
   - ../../../AGENTS.md
   - ../../../ui/astro.config.mjs
   - ../../../ui/README.md

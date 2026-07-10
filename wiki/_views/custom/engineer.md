@@ -26,25 +26,21 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 | brain/adrs/operator-lesson-pattern.md | Operator lessons live as Lessons subsections on conventions pages plus one cross-cutting org page | accepted | medium | 2026-07-10 |
 | brain/adrs/parallel-efforts-on-request.md | Opt-in parallel efforts via a /spawn skill that creates per-effort worktrees and a wiki/_state/efforts/ registry, with e | accepted | medium | 2026-07-10 |
 | brain/adrs/parallel-execution-agent-teams.md | Parallel-first execution: every /spawn dispatches a background owner subagent (opt-out via --no-owner), helper fan-out i | accepted | medium | 2026-07-10 |
-| brain/adrs/queue-and-tend-inbox.md | Self-maintenance is queue-and-tend: deterministic producers accumulate a per-item inbox; synthesis digests in-session vi | accepted | medium | 2026-07-10 |
+| brain/adrs/queue-and-tend-inbox.md | Self-maintenance is queue-and-tend: deterministic producers accumulate a per-item inbox; synthesis digests in-session vi | accepted | high | 2026-07-10 |
 | brain/adrs/shape-deepdive-pre-flight.md | Deepdive on load-bearing points lands as a /shape pre-flight step; pace lands on the binding authoring playbook; the top | accepted | medium | 2026-07-10 |
 | brain/adrs/shape-up-pitches.md | Adopt Shape Up pitches as a pre-bet brain artifact kind | accepted | medium | 2026-07-10 |
 
 ## Research queue (deepening picks)
 
-| id | kind | priority | summary |
-|---|---|---|---|
-| research-brain-adrs-queue-and-tend-inbox-md | research | normal | brain/adrs/queue-and-tend-inbox.md: confidence:medium but 4 pages link to it — deepen with cited research |
-| research-brain-adrs-successor-ssg-for-ui-md | research | normal | brain/adrs/successor-ssg-for-ui.md: confidence:medium but 4 pages link to it — deepen with cited research |
-| research-brain-pitches-harness-workbench-md | research | normal | brain/pitches/harness-workbench.md: confidence:medium but 4 pages link to it — deepen with cited research |
+*(no rows)*
 
 ## Load-bearing pages by inbound links
 
 | path | confidence | inbound |
 |---|---|---|
 | brain/adrs/multi-prd-epic-shape.md | medium | 4 |
-| brain/adrs/queue-and-tend-inbox.md | medium | 4 |
-| brain/adrs/successor-ssg-for-ui.md | medium | 4 |
+| brain/adrs/queue-and-tend-inbox.md | high | 4 |
+| brain/adrs/successor-ssg-for-ui.md | high | 4 |
 | brain/pitches/harness-workbench.md | medium | 4 |
 | brain/adrs/connector-snapshot-contract.md | medium | 3 |
 | brain/adrs/home-content-shape.md | medium | 3 |
