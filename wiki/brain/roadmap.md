@@ -116,6 +116,19 @@ snapshots findings into `sources/research/`, and lands the commit
 that earns the confidence bump with citations. The brain studies its
 weakest load-bearing knowledge first.
 
+## Proposed — composable role-fit views (pitch, pre-bet)
+
+Captured 2026-07-10 at
+[pitches/composable-role-views.md](pitches/composable-role-views.md):
+declarative YAML view specs composing blocks (wiki-page filters,
+state tiles, snapshot excerpts, inbox, link health) into generated
+`wiki/_views/custom/<name>.md` pages, plus Datadog and Langfuse
+connectors under the existing snapshot contract with optional state
+extracts. Ships example specs per role (engineer / pm / operator).
+On a bet it takes the next version slot and the serving/hosting
+slices shift accordingly — served consumers would get role views
+for free, since views are just pages.
+
 ## 0.5.0 — the serving plane (access for people outside the product)
 
 **MCP-first.** The stdio MCP grows an HTTP transport behind SSO

@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — pitch captured:
+  [composable role-fit views](brain/pitches/composable-role-views.md)
+  — per-role view assemblies over connector data (incl. proposed
+  Datadog / Langfuse connectors). Pre-bet; awaiting the operator's
+  call.
 - **2026-07-10** — **0.4.0 shipped: pruning + deepening.**
   `brain.py links` link-graph health, per-kind half-life scanning,
   orphan detection, the research picker (low confidence × high

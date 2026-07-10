@@ -72,6 +72,10 @@ into the sections below.
 
 ## Target
 
+- **Pending bet:** [composable role-fit
+  views](pitches/composable-role-views.md) — the layer that lets an
+  individual configure the brain to fit their role.
+
 - Adopt for a project: fill `brain.config.yml`, author team/user
   personas, run the first `/in` ingest.
 - The 0.x arc per [roadmap.md](roadmap.md) (operator intent captured

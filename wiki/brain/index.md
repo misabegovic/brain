@@ -37,6 +37,13 @@ sanitized to organisation-agnostic form:
 - [Queue-and-tend inbox](adrs/queue-and-tend-inbox.md) — deterministic producers accumulate; `/tend` digests in-session; no scheduled LLM runs.
 - [Connector snapshot contract](adrs/connector-snapshot-contract.md) — connectors are pull-only snapshot-writers: immutable dedup files, cursors, inbox items out, never a wiki write.
 
+## Pitches (pre-bet)
+
+- [Composable role-fit views](pitches/composable-role-views.md) —
+  declarative view assemblies over wiki synthesis, connector state,
+  and observability data (Datadog / Langfuse connectors). Awaiting
+  a bet.
+
 ## PRDs
 
 *(none yet — `/shape brain <pitch>` to author)*

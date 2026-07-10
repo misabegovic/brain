@@ -254,7 +254,21 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 541
+      "tokens": 601
+    },
+    {
+      "path": "brain/pitches/composable-role-views.md",
+      "title": "Composable role-fit views \u2014 declarative assemblies over wiki synthesis, connector state, and observability data",
+      "kind": "pitch",
+      "status": "draft",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--composable-views-idea.md",
+        "../adrs/connector-snapshot-contract.md",
+        "../../../brain-schedule.yml"
+      ],
+      "tokens": 891
     },
     {
       "path": "brain/roadmap.md",
@@ -268,7 +282,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 2130
+      "tokens": 2283
     },
     {
       "path": "brain/state.md",
@@ -280,7 +294,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 851
+      "tokens": 891
     },
     {
       "path": "org/index.md",
