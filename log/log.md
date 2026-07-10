@@ -104,3 +104,7 @@
    diff: 11 files changed, 328 insertions(+), 62 deletions(-)
    restricted-paths: true
    by: claude (fable 5), operator picked registry/toggle/full-collapse
+2026-07-10 commit — 0bbf7b3: 0.12.1 — persona-playthrough upgrades (autofocus, mdlite, chips); continuity verified
+   diff: 6 files changed, 57 insertions(+), 6 deletions(-)
+   restricted-paths: true
+   by: claude (fable 5), directed by operator
