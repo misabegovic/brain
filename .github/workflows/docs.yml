@@ -1,0 +1,31 @@
+# Publish the rendered wiki (Astro build) to GitHub Pages.
+# workflow_dispatch only: Pages on a private repository requires a
+# paid plan — trigger manually once the repo is public (or the plan
+# allows it), then switch `on:` to pushes to main if wanted.
+# See wiki/brain/topics/market-readiness-gaps.md.
+name: docs
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: ui/package-lock.json }
+      - run: cd ui && npm ci --no-audit --no-fund && npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: ui/dist }
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

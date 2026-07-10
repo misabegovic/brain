@@ -17,14 +17,7 @@ Everything pending, every cursor, every tracked deadline — the maintenance pic
 
 ## Tend queue (all)
 
-| id | kind | priority | summary |
-|---|---|---|---|
-| market-gap-community-files | custom | normal | No CHANGELOG, CONTRIBUTING, SECURITY, or CODE_OF_CONDUCT files in the repo root |
-| market-gap-license | custom | normal | No LICENSE file — default copyright blocks any external adoption; operator must pick a license |
-| market-gap-name | custom | normal | Product name 'brain' is generic — not ownable, not searchable; operator must pick a name |
-| market-gap-packaging | custom | normal | No install artifact — no pyproject/setup.py/package.json; install is a hand-made symlink of tools/brain |
-| market-gap-public-docs | custom | normal | No public docs/site — the Astro UI and onboarding deck render only on machines that already cloned the repo |
-| market-gap-releases | custom | normal | No git tags or releases despite VERSION 0.12.2 — distribution is clone-HEAD of one personal remote |
+*(no rows)*
 
 ## Deadlines
 

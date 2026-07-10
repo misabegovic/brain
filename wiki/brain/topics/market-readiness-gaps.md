@@ -53,6 +53,18 @@ this machine at the kernel.
   Gaps 1 and 2 are pure operator decisions; 3–6 are mechanical once
   1–2 are settled.
 
+- **2026-07-10** (`by: claude (fable 5)`) — five of six gaps
+  closed the same day on the operator's picks: **Apache-2.0**
+  adopted (LICENSE + NOTICE; the adoption-as-moat argument won),
+  CHANGELOG/CONTRIBUTING/SECURITY landed, packaging via
+  `pyproject.toml` (editable installs provide the `brain` script
+  per checkout — the repo is the artifact by design), first release
+  tagged, and the docs-publish workflow is ready but
+  **gated on repository visibility** (Pages on a private repo needs
+  a paid plan). The **name** is explicitly deferred by the operator
+  — 'brain' stays the working name and the CLI command; rename
+  remains cheap until the first public release.
+
 ## Outcome
 
 `(open)` — the license and the name are operator decisions; the rest

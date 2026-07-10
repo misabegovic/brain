@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.13.1: market-readiness.** Apache-2.0 adopted
+  (operator pick); CHANGELOG / CONTRIBUTING / SECURITY / NOTICE;
+  `pyproject.toml` packaging; first tagged release; docs-publish
+  workflow ready (gated on repo visibility). Name deferred by the
+  operator — [topic](brain/topics/market-readiness-gaps.md)
+  partially settled.
 - **2026-07-10** — **market-readiness gaps opened as a topic.** Six
   repo-verified gaps between the kernel and a credible market entry
   ([topic](brain/topics/market-readiness-gaps.md)): no LICENSE, a
