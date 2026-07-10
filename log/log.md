@@ -112,3 +112,7 @@
    diff: 9 files changed, 112 insertions(+), 5 deletions(-)
    restricted-paths: true
    by: claude (fable 5), directed by operator
+2026-07-10 commit — d2b5dd9: 0.13.0 — the chat builds (positioning page + market-gaps topic authored via chat)
+   diff: 19 files changed, 283 insertions(+), 8 deletions(-)
+   restricted-paths: true
+   by: claude chat session (nested), verified + committed by claude (fable 5)
