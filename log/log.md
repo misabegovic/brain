@@ -49,3 +49,6 @@
 2026-07-10 commit — 315d1e2: /shape phase 2 — sql-views-over-derived-index ADR
    diff: 5 files changed, 151 insertions(+), 1 deletion(-)
    restricted-paths: false
+2026-07-10 commit — 4731b56: /shape phase 3 — 0.5.0 composable views shipped (index + specs + connectors)
+   diff: 20 files changed, 877 insertions(+), 34 deletions(-)
+   restricted-paths: true
