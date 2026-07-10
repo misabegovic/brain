@@ -1,0 +1,10 @@
+{
+  "id": "market-gap-name",
+  "kind": "custom",
+  "summary": "Product name 'brain' is generic — not ownable, not searchable; operator must pick a name",
+  "route": "wiki/brain/topics/market-readiness-gaps.md",
+  "priority": "normal",
+  "source": "",
+  "produced_by": "chat-session",
+  "produced_at": "2026-07-10"
+}

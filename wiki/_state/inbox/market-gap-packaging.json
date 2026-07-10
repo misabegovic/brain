@@ -1,0 +1,10 @@
+{
+  "id": "market-gap-packaging",
+  "kind": "custom",
+  "summary": "No install artifact — no pyproject/setup.py/package.json; install is a hand-made symlink of tools/brain",
+  "route": "wiki/brain/topics/market-readiness-gaps.md",
+  "priority": "normal",
+  "source": "",
+  "produced_by": "chat-session",
+  "produced_at": "2026-07-10"
+}

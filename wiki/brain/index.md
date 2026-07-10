@@ -54,6 +54,9 @@ sanitized to organisation-agnostic form:
   — which further Fowler concepts earn schema weight. Open.
 - [1.0 criteria](topics/one-point-oh-criteria.md) — the five-point
   gate for instancing elsewhere. **Settled 2026-07-10.**
+- [Market-readiness gaps](topics/market-readiness-gaps.md) — what
+  stands between this repo and a credible market entrant: license,
+  name, releases, public docs, packaging, community files. Open.
 
 ## Pitches (pre-bet)
 

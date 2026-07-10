@@ -26,6 +26,12 @@ into the sections below.
 
 ## Now
 
+- **The chat builds (0.13.0, 2026-07-10).** Chat turns can author
+  (acceptEdits); the positioning page and the market-gaps topic
+  were built through the chat by the nested agent, gates-clean.
+  Six market-readiness items queued; license + name await the
+  operator.
+
 - **The chat-first app is live (0.12.0, 2026-07-10).** Conversation
   as the interface on the operator's picks (registry / toggle /
   full collapse); a real turn verified end-to-end. The mechanism's

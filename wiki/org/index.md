@@ -19,6 +19,9 @@ cross-product synthesis, org-level decisions and initiatives.
   operator teaches the agent.
 - [Competitors](competitors/codeplain/index.md) — landscape shelf;
   first entry: Codeplain (spec-driven code regeneration, $3M seed).
+- [Competitive positioning](competitive-positioning.md) — where the
+  kernel sits vs open-knowledge, Codeplain, and plain wikis/Notion;
+  the defensible differentiators.
 
 ## ADRs
 

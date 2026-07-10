@@ -308,6 +308,20 @@ best moment: the chat's own agent flagged the uncommitted upgrade
 diff in its "what changed?" answer — the mechanism reviewing its
 author in real time.
 
+## 0.13.0 — the chat builds — **shipped 2026-07-10**
+
+The chat interface graduated from answering to authoring: the claude
+chat row gained edit permission (acceptEdits — operator-initiated
+turns in the operator's own repo; bash stays allowlist-gated), and
+the first two product artifacts were built *through the chat* by the
+brain's own nested agent: the competitive-positioning page
+(category, positioning table vs open-knowledge / Codeplain / plain
+wikis, defensible differentiators) and the market-readiness-gaps
+topic — six gaps verified against the repo (license, name,
+releases, packaging, public docs, community files), each queued as
+an inbox item. The license and name are operator decisions,
+deliberately left open on the topic.
+
 ## Standing ideas (unversioned)
 
 Deliberately not adopted from the open-knowledge direction: a vector

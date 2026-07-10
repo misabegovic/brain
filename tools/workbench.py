@@ -49,8 +49,13 @@ SESSION_TOKEN = secrets.token_urlsafe(24)
 # conversation drives the same mechanism the terminal would. A
 # harness without a print mode gets no chat row, never TUI scraping.
 CHAT_CLIS = [
+    # acceptEdits: chat turns are operator-initiated work in the
+    # operator's own repo — file edits auto-accept so the chat can
+    # build; bash stays gated by the project allowlist.
     {"name": "claude", "bin": "claude",
-     "first_args": ["-p"], "continue_args": ["-p", "--continue"]},
+     "first_args": ["--permission-mode", "acceptEdits", "-p"],
+     "continue_args": ["--permission-mode", "acceptEdits", "-p",
+                       "--continue"]},
     {"name": "codex", "bin": "codex",
      "first_args": ["exec"], "continue_args": ["exec"]},
     {"name": "cursor", "bin": "cursor-agent",

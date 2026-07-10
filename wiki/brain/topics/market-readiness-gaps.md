@@ -1,0 +1,59 @@
+---
+title: "What stands between this repo and being a credible market entrant?"
+kind: topic
+status: draft
+updated: 2026-07-10
+confidence: low
+sources:
+  - ../../../README.md
+  - ../../org/competitive-positioning.md
+---
+
+# What stands between this repo and being a credible market entrant?
+
+## Question
+
+The positioning page names the category and the moat; this topic asks
+the unglamorous complement: what does the repo *itself* still lack to
+be adoptable by a stranger? The 1.0 criteria (see
+[1.0 topic](one-point-oh-criteria.md)) gate mechanism readiness;
+market readiness is a different axis — legal, naming, distribution,
+and discoverability. Resolving it unblocks pointing anyone outside
+this machine at the kernel.
+
+## Discussion
+
+- **2026-07-10** (`by: claude chat session`) — six gaps, each
+  verified against the repo state today:
+  1. **No LICENSE file** — the repo root has none (`ls` verified).
+     Default copyright means no one may legally use, copy, or
+     instance the kernel. Blocks all adoption; operator decision.
+  2. **The name `brain` is not ownable** — a generic English word;
+     the remote is a personal namespace (`misabegovic/brain`), the
+     CLI installs as `brain`, the config is `brain.config.yml`. Not
+     trademarkable, not searchable, collides with everything.
+     Operator decision.
+  3. **No releases or tags** — `git tag -l` returns nothing despite
+     `VERSION` reading 0.12.2; the whole 0.x arc exists only as
+     commits on `main`. Distribution today is "clone HEAD of one
+     personal remote" (repo visibility unverified — `gh` unavailable
+     in this session).
+  4. **No public docs or site** — the Astro UI is local-first by
+     design; the only workflows are `validate.yml` and
+     `scheduled.yml` (no pages deploy), so the onboarding deck
+     renders only on machines that already cloned the repo.
+  5. **No install artifact** — no `pyproject.toml`, `setup.py`, or
+     root `package.json`; installation is a hand-made symlink of
+     `tools/brain`. No pip / npm / homebrew path for a newcomer.
+  6. **No community scaffolding** — `CHANGELOG`, `CONTRIBUTING`,
+     `SECURITY`, and `CODE_OF_CONDUCT` are all absent (the home
+     § What-changed serves as a changelog, but only inside a live
+     instance).
+  Each gap is queued as an inbox item (`market-gap-*`) for `/tend`.
+  Gaps 1 and 2 are pure operator decisions; 3–6 are mechanical once
+  1–2 are settled.
+
+## Outcome
+
+`(open)` — the license and the name are operator decisions; the rest
+sequence behind them.

@@ -18,6 +18,21 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **market-readiness gaps opened as a topic.** Six
+  repo-verified gaps between the kernel and a credible market entry
+  ([topic](brain/topics/market-readiness-gaps.md)): no LICENSE, a
+  generic un-ownable name, no releases/tags, no public docs, no
+  install artifact, no community files. Each queued as a
+  `market-gap-*` inbox item; license and name are operator
+  decisions, the rest sequence behind them.
+- **2026-07-10** — **competitive positioning drawn.** The kernel's
+  market position synthesised at
+  [org/competitive-positioning.md](org/competitive-positioning.md):
+  LLM-maintained knowledge substrates as the category, positioned
+  against open-knowledge (editor-first), Codeplain (codegen
+  platform), and plain wikis/Notion (no agent mechanism) — the
+  governance rail, queue-and-tend economics, instance birth,
+  harness independence, and chat-as-interface named as the moat.
 - **2026-07-10** — **0.12.2: the billing guard.** Harness
   subprocesses (chat + terminal) have API-key env vars stripped by
   construction — a turn can only bill the logged-in subscription;

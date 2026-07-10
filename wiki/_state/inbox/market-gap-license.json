@@ -1,0 +1,10 @@
+{
+  "id": "market-gap-license",
+  "kind": "custom",
+  "summary": "No LICENSE file — default copyright blocks any external adoption; operator must pick a license",
+  "route": "wiki/brain/topics/market-readiness-gaps.md",
+  "priority": "normal",
+  "source": "",
+  "produced_by": "chat-session",
+  "produced_at": "2026-07-10"
+}
