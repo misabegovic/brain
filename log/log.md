@@ -28,3 +28,6 @@
 2026-07-10 commit — fb5f18a: 0.3.0 shipped — connectors (GitHub / Notion / Slack snapshot-writers)
    diff: 13 files changed, 553 insertions(+), 7 deletions(-)
    restricted-paths: true
+2026-07-10 commit — bcc2695: 0.4.0 shipped — pruning + deepening (links health + research picker)
+   diff: 13 files changed, 320 insertions(+), 12 deletions(-)
+   restricted-paths: true
