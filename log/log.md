@@ -108,3 +108,7 @@
    diff: 6 files changed, 57 insertions(+), 6 deletions(-)
    restricted-paths: true
    by: claude (fable 5), directed by operator
+2026-07-10 commit — 56378e4: 0.12.2 — billing guard (API keys stripped from harness subprocesses)
+   diff: 9 files changed, 112 insertions(+), 5 deletions(-)
+   restricted-paths: true
+   by: claude (fable 5), directed by operator
