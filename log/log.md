@@ -97,3 +97,6 @@
 2026-07-10 commit — 644edfe: chat-first-app pitch captured (pre-bet)
    diff: 7 files changed, 141 insertions(+), 2 deletions(-)
    by: claude (fable 5), directed by operator
+2026-07-10 commit — c30748f: /shape phases 1+2 — chat-first-app PRD + ADR (operator picks recorded)
+   diff: 9 files changed, 202 insertions(+), 12 deletions(-)
+   by: claude (fable 5), operator picked registry/toggle/full-collapse
