@@ -23,7 +23,9 @@ Committed work, proposals awaiting a bet, patterns from feedback, and what's que
 
 ## Pitches awaiting a bet
 
-*(no rows)*
+| path | title | status | confidence | updated |
+|---|---|---|---|---|
+| brain/pitches/harness-workbench.md | Harness workbench — a terminal in the brain's local UI, per-harness launch + config adapters, live-reloading results bes | draft | medium | 2026-07-10 |
 
 ## Insights
 

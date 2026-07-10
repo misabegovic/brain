@@ -85,6 +85,11 @@ into the sections below.
 
 ## Target
 
+- **Pending bet:** [harness
+  workbench](pitches/harness-workbench.md) — one local surface:
+  harness terminal beside the rendered brain, plus `install-agent`
+  adapters.
+
 
 - Adopt for a project: fill `brain.config.yml`, author team/user
   personas, run the first `/in` ingest.

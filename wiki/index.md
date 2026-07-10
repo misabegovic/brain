@@ -18,6 +18,10 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — pitch captured + deepdived:
+  [harness workbench](brain/pitches/harness-workbench.md) — terminal
+  in the brain's local UI with per-harness launch/config adapters,
+  studied against open-knowledge's implementation. Pre-bet.
 - **2026-07-10** — **0.6 software half shipped: the serving plane.**
   MCP streamable-HTTP transport, `BRAIN_SERVING=1` guardrails
   (ai-suggestions excluded, query audit log), and the Datasette

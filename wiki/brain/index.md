@@ -40,6 +40,11 @@ sanitized to organisation-agnostic form:
 
 ## Pitches (pre-bet)
 
+- [Harness workbench](pitches/harness-workbench.md) — a terminal in
+  the brain's local UI, per-harness launch + config adapters, live
+  reload beside it. Deepdived against the open-knowledge
+  implementation; awaiting a bet.
+
 - [Composable role-fit views](pitches/composable-role-views.md) —
   **superseded** 2026-07-10: graduated on the operator's bet into
   the PRD below.

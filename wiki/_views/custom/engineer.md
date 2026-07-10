@@ -34,9 +34,9 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 
 | id | kind | priority | summary |
 |---|---|---|---|
-| research-brain-adrs-multi-prd-epic-shape-md | research | normal | brain/adrs/multi-prd-epic-shape.md: confidence:medium but 4 pages link to it — deepen with cited research |
 | research-brain-adrs-queue-and-tend-inbox-md | research | normal | brain/adrs/queue-and-tend-inbox.md: confidence:medium but 4 pages link to it — deepen with cited research |
 | research-brain-adrs-successor-ssg-for-ui-md | research | normal | brain/adrs/successor-ssg-for-ui.md: confidence:medium but 4 pages link to it — deepen with cited research |
+| research-brain-pitches-harness-workbench-md | research | normal | brain/pitches/harness-workbench.md: confidence:medium but 4 pages link to it — deepen with cited research |
 
 ## Load-bearing pages by inbound links
 
@@ -45,13 +45,13 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 | brain/adrs/multi-prd-epic-shape.md | medium | 4 |
 | brain/adrs/queue-and-tend-inbox.md | medium | 4 |
 | brain/adrs/successor-ssg-for-ui.md | medium | 4 |
+| brain/pitches/harness-workbench.md | medium | 4 |
 | brain/adrs/connector-snapshot-contract.md | medium | 3 |
 | brain/adrs/home-content-shape.md | medium | 3 |
 | brain/adrs/operator-lesson-pattern.md | medium | 3 |
 | brain/adrs/parallel-efforts-on-request.md | medium | 3 |
 | brain/adrs/shape-deepdive-pre-flight.md | medium | 3 |
 | brain/adrs/sql-views-over-derived-index.md | medium | 3 |
-| brain/prds/composable-role-views.md | medium | 3 |
 
 ## Production state (Datadog)
 

@@ -159,6 +159,18 @@ with no agent of their own, added only if demand shows up, with
 per-query cost capped by construction. Local-first is unchanged —
 serving is an optional deployment profile, not the default mode.
 
+## Proposed — harness workbench (pitch, pre-bet)
+
+Captured 2026-07-10 at
+[pitches/harness-workbench.md](pitches/harness-workbench.md): the
+open-knowledge workbench shape on this substrate — an embedded
+terminal (xterm.js + a loopback PTY bridge) beside the rendered
+brain with live reload, a harness launch registry as data, and the
+`install-agent` config adapters the agent-independence principle
+names. Grounded in a study of open-knowledge's actual
+implementation (research note in sources). On a bet it takes the
+next version slot.
+
 ## 0.7.0 — self-hosting hardening
 
 One compose profile: static UI and MCP-HTTP against the git remote

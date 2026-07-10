@@ -19,9 +19,9 @@ Everything pending, every cursor, every tracked deadline — the maintenance pic
 
 | id | kind | priority | summary |
 |---|---|---|---|
-| research-brain-adrs-multi-prd-epic-shape-md | research | normal | brain/adrs/multi-prd-epic-shape.md: confidence:medium but 4 pages link to it — deepen with cited research |
 | research-brain-adrs-queue-and-tend-inbox-md | research | normal | brain/adrs/queue-and-tend-inbox.md: confidence:medium but 4 pages link to it — deepen with cited research |
 | research-brain-adrs-successor-ssg-for-ui-md | research | normal | brain/adrs/successor-ssg-for-ui.md: confidence:medium but 4 pages link to it — deepen with cited research |
+| research-brain-pitches-harness-workbench-md | research | normal | brain/pitches/harness-workbench.md: confidence:medium but 4 pages link to it — deepen with cited research |
 
 ## Deadlines
 

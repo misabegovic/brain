@@ -269,7 +269,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 674
+      "tokens": 731
     },
     {
       "path": "brain/pitches/composable-role-views.md",
@@ -291,6 +291,20 @@
         "../../../brain-schedule.yml"
       ],
       "tokens": 1638
+    },
+    {
+      "path": "brain/pitches/harness-workbench.md",
+      "title": "Harness workbench \u2014 a terminal in the brain's local UI, per-harness launch + config adapters, live-reloading results beside it",
+      "kind": "pitch",
+      "status": "draft",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--harness-workbench-intent.md",
+        "../../../sources/research/2026-07-10--openknowledge-terminal-architecture.md",
+        "../adrs/sql-views-over-derived-index.md"
+      ],
+      "tokens": 951
     },
     {
       "path": "brain/prds/composable-role-views.md",
@@ -320,7 +334,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 2472
+      "tokens": 2603
     },
     {
       "path": "brain/state.md",
@@ -332,7 +346,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1040
+      "tokens": 1082
     },
     {
       "path": "org/index.md",
