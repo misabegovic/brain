@@ -16,3 +16,6 @@
 2026-07-10 commit — c637fc3: Inbox producer contract + agent-independence recorded
    diff: 3 files changed, 38 insertions(+), 5 deletions(-)
    restricted-paths: false
+2026-07-10 commit — 1170f54: 0.2.0 shipped — queue-and-tend (inbox + /tend + timer + producers)
+   diff: 17 files changed, 769 insertions(+), 8 deletions(-)
+   restricted-paths: true
