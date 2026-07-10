@@ -90,3 +90,7 @@
    diff: 16 files changed, 135 insertions(+), 55 deletions(-)
    restricted-paths: true
    by: claude (fable 5), directed by operator
+2026-07-10 commit — b6d06d4: 0.11.0 shipped — instance birth (kernel manifest) + 1.0 gate settled
+   diff: 19 files changed, 597 insertions(+), 7 deletions(-)
+   restricted-paths: true
+   by: claude (fable 5), directed by operator
