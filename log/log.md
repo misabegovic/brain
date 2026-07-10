@@ -100,3 +100,7 @@
 2026-07-10 commit — c30748f: /shape phases 1+2 — chat-first-app PRD + ADR (operator picks recorded)
    diff: 9 files changed, 202 insertions(+), 12 deletions(-)
    by: claude (fable 5), operator picked registry/toggle/full-collapse
+2026-07-10 commit — c9d9106: 0.12.0 shipped — chat-first app (print-mode bridge, terminal toggled, bare-brain entry)
+   diff: 11 files changed, 328 insertions(+), 62 deletions(-)
+   restricted-paths: true
+   by: claude (fable 5), operator picked registry/toggle/full-collapse
