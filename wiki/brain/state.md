@@ -28,6 +28,15 @@ into the sections below.
 
 - Empty shell awaiting an organisation's content. `brain.config.yml`
   declares no active repos yet.
+- Every scheduled operation degrades to a clean no-op on the empty
+  shell; the state-refresh ops (`security-scan`, `issues-pull`)
+  bootstrap their repo maps from `brain.config.yml` on first run.
+- `reflection-check internal-refs` enforces the standalone
+  guarantee: every repo-path reference in the kernel surface must
+  resolve inside the repo.
+- Deadline tracking is generic: `wiki/_state/deadlines.json` holds
+  named dates (compliance, renewals, launches); the weekly
+  `deadline-countdown` op refreshes days-left.
 
 ## Perceived
 

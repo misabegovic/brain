@@ -1,6 +1,5 @@
 # brain-schedule.yml — declarative recurring operations.
 #
-# Per `wiki/brain/ai-suggestions/prds/scheduled-operations-and-tracking.md`.
 # This config is portable (cron / GitHub Actions / Claude Code's
 # ScheduleWakeup all consume the same shape). The runtime that
 # executes is separate; v1 ships the config + listing only.
@@ -18,7 +17,7 @@ operations:
   # ---- Sync + grooming (mechanical) ------------------------------
 
   - name: reflection-check
-    description: Run all 9 reflection-check sub-checks; surface findings.
+    description: Run every reflection-check detector; surface findings.
     cadence: daily
     handler: python3 tools/brain.py reflection-check
     output: stdout
@@ -47,11 +46,11 @@ operations:
     output: wiki/_state/security.json
     enabled: true
 
-  - name: eu-ai-act-countdown
-    description: Recompute days-to-deadline + per-Article readiness; refresh wiki/_state/eu-ai-act.json.
+  - name: deadline-countdown
+    description: Recompute days-left for every tracked deadline; refresh wiki/_state/deadlines.json (no-op when none tracked).
     cadence: weekly
-    handler: python3 tools/brain.py schedule run eu-ai-act-countdown 
-    output: wiki/_state/eu-ai-act.json
+    handler: python3 tools/brain.py schedule run deadline-countdown
+    output: wiki/_state/deadlines.json
     enabled: true
 
   - name: issues-pull

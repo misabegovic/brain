@@ -103,8 +103,9 @@ REQUIRED_FIELDS = {"title", "kind", "status", "updated", "sources"}
 # sibling repos are registered yet.
 
 
-def _load_repo_config() -> tuple[set, set]:
-    config_path = REPO / "brain.config.yml"
+def _load_repo_config(config_path: Path | None = None) -> tuple[set, set]:
+    if config_path is None:
+        config_path = REPO / "brain.config.yml"
     if not config_path.exists():
         return set(), set()
     try:
@@ -2623,7 +2624,6 @@ def cmd_verify_claims(args) -> int:
     manifest the consumer (agent / operator / LLM) can verify against
     the cited sibling-repo source.
 
-    Per `wiki/brain/ai-suggestions/prds/scheduled-operations-and-tracking.md`
     open question §4 + the operator's 2026-05-08 directive on brain↔repo
     semantic verification.
 
@@ -2841,10 +2841,9 @@ def cmd_status(_args) -> int:
     """Brain-wide status dashboard.
 
     Reads every wiki/_state/*.json + computes corpus stats; surfaces
-    one-line health line per dimension (security / EU AI Act /
+    one-line health line per dimension (security / deadlines /
     issues / sync / reflection / efforts).
 
-    Per `wiki/brain/ai-suggestions/prds/scheduled-operations-and-tracking.md`.
     """
     state_dir = WIKI / "_state"
     today = today_utc()
@@ -2880,32 +2879,34 @@ def cmd_status(_args) -> int:
             total = len(sec.get("repos", {}))
             print(f"security: last full sweep = {sweep}; {scanned}/{total} repos scanned")
             if scanned == 0:
-                print(f"  (bootstrap pending — see wiki/brain/ai-suggestions/prds/scheduled-operations-and-tracking.md)")
+                print(f"  (bootstrap pending — run `brain.py schedule run --target security-scan`)")
         except json.JSONDecodeError:
             print(f"security: wiki/_state/security.json unparseable")
     else:
         print("security: wiki/_state/security.json absent")
     print()
 
-    # EU AI Act
-    eu_path = state_dir / "eu-ai-act.json"
-    if eu_path.exists():
+    # Deadlines — named external dates the org tracks (compliance
+    # dates, contract renewals, launch commitments). Optional surface:
+    # an absent file means the org tracks none.
+    dl_path = state_dir / "deadlines.json"
+    if dl_path.exists():
         try:
-            eu = json.loads(eu_path.read_text())
-            deadline = dt.date.fromisoformat(eu.get("deadline", "2026-08-02"))
-            days_left = (deadline - today).days
-            print(f"eu-ai-act: deadline {deadline.isoformat()} ({days_left} days)")
-            print(f"  last assessment: {eu.get('last_assessment')}")
-            articles = eu.get("articles", {})
-            low = sum(1 for a in articles.values() if a.get("readiness") == "low")
-            medium = sum(1 for a in articles.values() if a.get("readiness") == "medium")
-            high = sum(1 for a in articles.values() if a.get("readiness") == "high")
-            print(f"  per-Article: low={low} medium={medium} high={high}")
-            print(f"  verdict: {eu.get('verdict', '(no verdict)')}")
-        except (json.JSONDecodeError, ValueError):
-            print(f"eu-ai-act: wiki/_state/eu-ai-act.json unparseable")
+            dl = json.loads(dl_path.read_text())
+            entries = dl.get("deadlines", [])
+            print(f"deadlines: {len(entries)} tracked; "
+                  f"last assessment: {dl.get('last_assessment', '(never)')}")
+            for entry in sorted(entries, key=lambda e: e.get("date", "")):
+                date = dt.date.fromisoformat(entry["date"])
+                days_left = (date - today).days
+                readiness = entry.get("readiness", "")
+                suffix = f", readiness {readiness}" if readiness else ""
+                print(f"  {entry.get('name', '(unnamed)')}: "
+                      f"{date.isoformat()} ({days_left} days{suffix})")
+        except (json.JSONDecodeError, ValueError, KeyError):
+            print(f"deadlines: wiki/_state/deadlines.json unparseable")
     else:
-        print("eu-ai-act: wiki/_state/eu-ai-act.json absent")
+        print("deadlines: wiki/_state/deadlines.json absent (none tracked)")
     print()
 
     # Issues
@@ -2969,6 +2970,15 @@ def _schedule_run_security_scan() -> int:
     """
     state_path = WIKI / "_state" / "security.json"
     state = json.loads(state_path.read_text()) if state_path.exists() else {"_schema": "v1", "repos": {}}
+    # Bootstrap the repo map from the registry so the op is
+    # config-driven on a fresh shell; repos added to brain.config.yml
+    # later join the map on the next run.
+    for repo in sorted(ACTIVE_REPOS):
+        state.setdefault("repos", {}).setdefault(repo, {})
+    if not state.get("repos"):
+        print("security-scan: no active repos declared in brain.config.yml "
+              "— nothing to scan")
+        return 0
     today = today_utc().isoformat()
     scanned = 0
     for repo, entry in state.get("repos", {}).items():
@@ -3091,36 +3101,44 @@ def _count_go_mod(p: Path) -> int:
     return n
 
 
-def _schedule_run_eu_ai_act_countdown() -> int:
-    """Refresh `wiki/_state/eu-ai-act.json` last_assessment + recompute days-to-deadline."""
-    state_path = WIKI / "_state" / "eu-ai-act.json"
+def _schedule_run_deadline_countdown() -> int:
+    """Refresh `wiki/_state/deadlines.json` last_assessment + per-deadline days-left.
+
+    The file is optional — an org with no tracked deadlines has no
+    file, and the op is a clean no-op rather than a failure. Each
+    entry needs `name` + `date` (ISO); `readiness` (low|medium|high)
+    and `note` are operator-maintained fields the op never touches.
+    """
+    state_path = WIKI / "_state" / "deadlines.json"
     if not state_path.exists():
-        print(f"eu-ai-act-countdown: {state_path.relative_to(REPO)} absent", file=sys.stderr)
-        return 1
+        print("deadline-countdown: no deadlines tracked "
+              "(wiki/_state/deadlines.json absent)")
+        return 0
     state = json.loads(state_path.read_text())
     today = today_utc()
-    deadline = dt.date.fromisoformat(state.get("deadline", "2026-08-02"))
-    days_left = (deadline - today).days
     state["last_assessment"] = today.isoformat()
-    state["_days_left"] = days_left
-    articles = state.get("articles", {})
-    low = sum(1 for a in articles.values() if a.get("readiness") == "low")
-    medium = sum(1 for a in articles.values() if a.get("readiness") == "medium")
-    high = sum(1 for a in articles.values() if a.get("readiness") == "high")
-    state["_summary"] = {"low": low, "medium": medium, "high": high}
+    lines = []
+    for entry in state.get("deadlines", []):
+        date = dt.date.fromisoformat(entry["date"])
+        entry["_days_left"] = (date - today).days
+        lines.append(f"{entry.get('name', '(unnamed)')}: "
+                     f"{entry['_days_left']} days to {date.isoformat()}")
     state_path.write_text(json.dumps(state, indent=2) + "\n")
-    print(f"eu-ai-act-countdown: {days_left} days to {deadline}; "
-          f"per-Article readiness low={low} medium={medium} high={high}")
+    print(f"deadline-countdown: {len(lines)} deadline(s) refreshed"
+          + "".join(f"\n  {ln}" for ln in lines))
     return 0
 
 
 def _schedule_run_issues_pull() -> int:
     """Pull issue counts via `gh issue list` per active sibling repo on disk."""
     state_path = WIKI / "_state" / "issues.json"
-    if not state_path.exists():
-        print(f"issues-pull: {state_path.relative_to(REPO)} absent", file=sys.stderr)
-        return 1
-    state = json.loads(state_path.read_text())
+    state = json.loads(state_path.read_text()) if state_path.exists() else {"repos": {}}
+    for repo in sorted(ACTIVE_REPOS):
+        state.setdefault("repos", {}).setdefault(repo, {})
+    if not state.get("repos"):
+        print("issues-pull: no active repos declared in brain.config.yml "
+              "— nothing to pull")
+        return 0
     today = today_utc().isoformat()
     populated = 0
     if not shutil.which("gh"):
@@ -3178,8 +3196,9 @@ def _schedule_run_notion_walk() -> int:
     """Walk sources/notion/ + flag snapshots older than 30 days."""
     notion_dir = REPO / "sources" / "notion"
     if not notion_dir.exists():
-        print(f"notion-walk: {notion_dir.relative_to(REPO)} absent", file=sys.stderr)
-        return 1
+        print("notion-walk: no planning-source snapshots yet "
+              "(sources/notion/ absent)")
+        return 0
     today = today_utc()
     snapshots = list(notion_dir.glob("*.md"))
     stale = []
@@ -3364,7 +3383,7 @@ def _schedule_run_ai_suggestion_grooming() -> int:
 
 SCHEDULE_HANDLERS = {
     "security-scan": _schedule_run_security_scan,
-    "eu-ai-act-countdown": _schedule_run_eu_ai_act_countdown,
+    "deadline-countdown": _schedule_run_deadline_countdown,
     "issues-pull": _schedule_run_issues_pull,
     "notion-walk": _schedule_run_notion_walk,
     "overlap-refresh": _schedule_run_overlap_refresh,
@@ -3376,7 +3395,6 @@ SCHEDULE_HANDLERS = {
 def cmd_schedule(args) -> int:
     """Manage the declarative schedule at brain-schedule.yml.
 
-    Per `wiki/brain/ai-suggestions/prds/scheduled-operations-and-tracking.md`.
     This v1 ships the config + listing only; the runner is a
     separate decision.
     """
@@ -3879,9 +3897,7 @@ def cmd_search(args) -> int:
 def cmd_reflection_check(args) -> int:
     """Detect drift between brain claims and target-repo state.
 
-    Mechanical-only checks (deterministic, offline-safe). The
-    full reflection-validator suite is described in
-    `wiki/brain/ai-suggestions/prds/reflection-validator-suite.md`.
+    Mechanical-only checks (deterministic, offline-safe).
 
     Each sub-check prints findings to stdout (one per line) and
     contributes to the exit code. Exit 0 if every requested
@@ -4234,7 +4250,6 @@ def cmd_reflection_check(args) -> int:
         if the sibling repo is on disk, verifies the path resolves.
         Skips claims about lines (`:42`) and ranges.
 
-        Per `wiki/brain/ai-suggestions/prds/scheduled-operations-and-tracking.md`.
         Mechanical-only — no LLM verification of code semantics.
         """
         load_pages()
@@ -4267,6 +4282,58 @@ def cmd_reflection_check(args) -> int:
                     n += 1
         return n
 
+    def check_internal_refs() -> int:
+        """Every repo-path reference in docs/skills/templates resolves.
+
+        The standalone guarantee: no file in the kernel surface may
+        reference a repo path that doesn't exist. Complements
+        check_links (wiki-internal markdown links) by covering the
+        non-wiki surface — AGENTS.md, README.md, skills, commands,
+        personas, templates, UI docs — and path mentions outside
+        markdown link syntax (backticked paths, prose). Placeholder
+        paths (`<repo>`, globs, YYYY dates) are skipped.
+        """
+        ref_re = re.compile(
+            r'(?:\]\(|`|^|\s|"|\')'
+            r'((?:\.\./)*(?:wiki|sources|tools|log|ui|\.claude|\.github)/'
+            r'[A-Za-z0-9_./<>-]+?\.(?:md|py|sh|json|yml|mjs|astro))'
+            r'(?:#[^)\s`]*)?(?:\)|`|\s|$|"|\')',
+            re.M,
+        )
+        scan: set[Path] = {REPO / "AGENTS.md", REPO / "README.md"}
+        for pattern in (".claude/**/*.md", "tools/**/*.md", "ui/*.md",
+                        "ui/*.mjs", "wiki/**/*.md"):
+            scan.update(REPO.glob(pattern))
+        n = 0
+        seen: set[tuple[str, str]] = set()
+        for f in sorted(scan):
+            rel_f = str(f.relative_to(REPO))
+            if "node_modules" in rel_f or "_views" in rel_f or not f.exists():
+                continue
+            text = f.read_text(errors="ignore")
+            for m in ref_re.finditer(text):
+                raw = m.group(1)
+                if "<" in raw or "*" in raw or "YYYY" in raw:
+                    continue
+                stripped = re.sub(r"^(\.\./)+", "", raw)
+                # Tooling-managed surfaces (wiki/_state/, wiki/_views/,
+                # wiki/_overlaps/, log/archive/) are created at runtime;
+                # a documented path there is a contract, not a dangling
+                # reference.
+                if re.match(r"(wiki/_|log/archive/)", stripped):
+                    continue
+                if (f.parent / raw).resolve().exists() or (REPO / stripped).exists():
+                    continue
+                if (rel_f, raw) in seen:
+                    continue
+                seen.add((rel_f, raw))
+                findings.append(
+                    f"internal-refs: {rel_f} references {raw} which does "
+                    f"not resolve inside the repo"
+                )
+                n += 1
+        return n
+
     runners = {
         "links": check_links,
         "confidence-floor": check_confidence_floor,
@@ -4278,6 +4345,7 @@ def cmd_reflection_check(args) -> int:
         "epic-children": check_epic_children,
         "sources-immutability": check_sources_immutability,
         "repo-claims": check_repo_claims,
+        "internal-refs": check_internal_refs,
     }
 
     if which == "all":

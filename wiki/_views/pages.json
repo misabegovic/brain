@@ -238,7 +238,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 183
+      "tokens": 306
     },
     {
       "path": "org/index.md",
@@ -312,7 +312,7 @@
       "sources": [
         "../../.claude/skills/capture/SKILL.md"
       ],
-      "tokens": 111
+      "tokens": 187
     }
   ]
 }

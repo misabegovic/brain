@@ -256,7 +256,7 @@ TOOL_SCHEMAS = [
         "name": "brain_status",
         "description": (
             "Brain-wide status dashboard. Surfaces corpus stats + security / "
-            "EU AI Act / issues / sync-cursors / efforts / AI-suggestion "
+            "deadlines / issues / sync-cursors / efforts / AI-suggestion "
             "backlog from wiki/_state/. Useful for one-shot health check."
         ),
         "inputSchema": {"type": "object", "properties": {}},

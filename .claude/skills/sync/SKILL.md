@@ -84,6 +84,9 @@ Runs the deterministic drift detectors:
 - `sync-drift` — sibling-repo HEAD vs cursor commit-count delta.
 - `epic-children` — `parent_epic:` claims resolve and the epic
   page mentions the child by slug.
+- `internal-refs` — every repo-path reference in docs, skills,
+  commands, personas, and templates resolves inside the repo (the
+  standalone guarantee).
 - `sources-immutability` — `sources/` tree has no modifications
   vs git baseline.
 

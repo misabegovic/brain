@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — kernel hardening from the ADR review: the
+  client-specific compliance countdown became a generic
+  `deadline-countdown` op over `wiki/_state/deadlines.json`, the
+  state-refresh schedule ops now bootstrap from `brain.config.yml`
+  and no-op cleanly on an empty shell, and a new `internal-refs`
+  reflection detector enforces the standalone guarantee.
 - **2026-07-10** — kernel decision trail ported: 11 brain-meta ADRs,
   the authoring guidance page, and the org methodology shelf
   (way-of-working, development playbook, superpowers) landed in
