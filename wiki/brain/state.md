@@ -26,6 +26,14 @@ into the sections below.
 
 ## Now
 
+- **Hosting profile is live (0.7.0, 2026-07-10).** `deploy/`
+  (Dockerfile, entrypoint, compose on non-default ports) +
+  `railway.toml`; per-instance isolation (env ports, hashed timer
+  units — this checkout's timer migrated). Emulated locally beside
+  the client brain with zero contention. Codeplain captured on the
+  competitor shelf ($3M seed; spec-regeneration thesis = the
+  brain's mission #1, validated commercially).
+
 - **The workbench is live (0.6.x, 2026-07-10).** `brain workbench`:
   terminal beside the rendered brain, harness launches, live
   reload; `install-agent` registered all four harnesses in this

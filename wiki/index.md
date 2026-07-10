@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.7.0 shipped: hosting.** One infra-agnostic
+  image (`deploy/`), Railway reference config, env-selected public
+  surface; instance isolation (env ports + hashed timer units)
+  verified by emulation beside the client brain. Codeplain ($3M
+  seed, spec-regeneration) captured on the
+  [competitor shelf](org/competitors/codeplain/index.md).
 - **2026-07-10** — **harness workbench shipped (0.6.x).**
   `brain workbench` puts your harness terminal beside the rendered
   brain (loopback PTY bridge, one-click launches, live reload);
@@ -115,9 +121,9 @@ start filling in as the slash-command surface runs.
 ## Open initiatives
 
 <!-- home-section; maintained-by: /shape -->
-- [Brain roadmap — the 0.x arc](brain/roadmap.md) — 0.2 through 0.5
-  shipped; next up: 0.6 the MCP-first serving plane (incl. the
-  Datasette pilot).
+- [Brain roadmap — the 0.x arc](brain/roadmap.md) — **0.2 through
+  0.7 shipped**; the arc from the operator's original intent is
+  complete. What remains is adoption: point it at a project.
 
 [See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
 

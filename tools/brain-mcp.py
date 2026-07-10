@@ -450,7 +450,8 @@ def main() -> int:
     ap.add_argument("--http", action="store_true",
                     help="streamable-HTTP transport instead of stdio")
     ap.add_argument("--host", default="127.0.0.1")
-    ap.add_argument("--port", type=int, default=8766)
+    ap.add_argument("--port", type=int,
+                    default=int(os.environ.get("BRAIN_MCP_PORT", 8766)))
     opts = ap.parse_args()
     if opts.http:
         return serve_http(opts.host, opts.port)

@@ -38,6 +38,7 @@ sanitized to organisation-agnostic form:
 - [Connector snapshot contract](adrs/connector-snapshot-contract.md) — connectors are pull-only snapshot-writers: immutable dedup files, cursors, inbox items out, never a wiki write.
 - [SQL views over a derived index](adrs/sql-views-over-derived-index.md) — view specs are SQL over a disposable SQLite index; shorthands compile to SQL; the index rides the views pipeline.
 - [Workbench PTY bridge](adrs/workbench-pty-bridge.md) — loopback browser page over a stdlib PTY bridge; harness launches + config adapters as data tables; never in serving mode.
+- [Single-image serving profile](adrs/single-image-serving-profile.md) — one infra-agnostic image, env-selected surface; instance isolation via env ports + hashed timer units; Railway as reference, not dependency.
 
 ## Pitches (pre-bet)
 

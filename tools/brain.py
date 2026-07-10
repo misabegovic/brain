@@ -2231,15 +2231,19 @@ def _doctor_checks() -> list[dict]:
             "not installed — validate/views run only in CI",
             "ln -s ../../tools/git-hooks/pre-commit .git/hooks/pre-commit")
 
+    import hashlib as _hashlib
+    instance = (re.sub(r"[^a-zA-Z0-9-]", "", REPO.name) + "-"
+                + _hashlib.sha1(str(REPO).encode()).hexdigest()[:6])
+    timer_unit = f"brain-{instance}-schedule.timer"
     timer_state = ""
     if shutil.which("systemctl"):
         res = subprocess.run(
-            ["systemctl", "--user", "is-active", "brain-schedule.timer"],
+            ["systemctl", "--user", "is-active", timer_unit],
             capture_output=True, text=True)
         timer_state = res.stdout.strip()
     if timer_state == "active":
         add("timer", "accumulation timer", "ok",
-            "brain-schedule.timer active (daily run-due)")
+            f"{timer_unit} active (daily run-due)")
     else:
         add("timer", "accumulation timer", "warn",
             "no local timer — producers only run when invoked by hand",
@@ -2350,10 +2354,14 @@ def cmd_setup(args) -> int:
         step("local venv", True, lambda: subprocess.run(
             ["bash", str(REPO / "tools" / "setup-local.sh")], check=False))
 
+    import hashlib as _hashlib
+    instance = (re.sub(r"[^a-zA-Z0-9-]", "", REPO.name) + "-"
+                + _hashlib.sha1(str(REPO).encode()).hexdigest()[:6])
     timer_active = False
     if shutil.which("systemctl"):
         timer_active = subprocess.run(
-            ["systemctl", "--user", "is-active", "brain-schedule.timer"],
+            ["systemctl", "--user", "is-active",
+             f"brain-{instance}-schedule.timer"],
             capture_output=True, text=True).stdout.strip() == "active"
     if not timer_active and confirm("install the daily accumulation timer?"):
         step("accumulation timer", True, lambda: subprocess.run(
@@ -6086,7 +6094,8 @@ def main() -> int:
 
     ap_serve = sub.add_parser("serve", help="read-only HTTP API")
     ap_serve.add_argument("--host", default="127.0.0.1")
-    ap_serve.add_argument("--port", type=int, default=8765)
+    ap_serve.add_argument("--port", type=int,
+                          default=int(os.environ.get("BRAIN_PORT", 8765)))
     ap_serve.add_argument("--workbench", action="store_true",
                           help="mount the PTY workbench (loopback only; "
                                "never in serving mode)")

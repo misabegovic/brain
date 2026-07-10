@@ -60,13 +60,13 @@ case "${1:-}" in
     exit 1
     ;;
   dash)
-    ( sleep 1; xdg-open "http://localhost:8765/dash" 2>/dev/null \
-        || open "http://localhost:8765/dash" 2>/dev/null || true ) &
+    ( sleep 1; xdg-open "http://localhost:${BRAIN_PORT:-8765}/dash" 2>/dev/null \
+        || open "http://localhost:${BRAIN_PORT:-8765}/dash" 2>/dev/null || true ) &
     exec python3 "$BRAIN_HOME/tools/brain.py" serve
     ;;
   workbench)
-    ( sleep 1; xdg-open "http://localhost:8765/workbench" 2>/dev/null \
-        || open "http://localhost:8765/workbench" 2>/dev/null || true ) &
+    ( sleep 1; xdg-open "http://localhost:${BRAIN_PORT:-8765}/workbench" 2>/dev/null \
+        || open "http://localhost:${BRAIN_PORT:-8765}/workbench" 2>/dev/null || true ) &
     exec python3 "$BRAIN_HOME/tools/brain.py" serve --workbench
     ;;
 esac

@@ -172,7 +172,21 @@ brain with change-driven reload; one-click harness launches
 table — the agent-independence adapters delivered. Structurally
 excluded from serving deployments.
 
-## 0.7.0 — self-hosting hardening
+## 0.7.0 — self-hosting hardening — **shipped 2026-07-10**
+
+Decision at
+[adrs/single-image-serving-profile.md](adrs/single-image-serving-profile.md):
+one infra-agnostic image (two-stage build; UI + MCP-serving +
+Datasette; `BRAIN_SURFACE` picks which binds the platform's `$PORT`),
+Railway as the reference target via root `railway.toml` — but the
+entrypoint runs unchanged on any host. Instance isolation shipped
+with it: `BRAIN_PORT`/`BRAIN_MCP_PORT` envs and per-path-hashed
+timer unit names, so multiple brains coexist on one machine.
+Verified by local emulation: all three container surfaces up on
+non-default ports while the client brain's server ran on its
+default port simultaneously, working tree untouched.
+
+### Original slice definition
 
 One compose profile: static UI and MCP-HTTP against the git remote
 as the single source of truth (backups are git); the deterministic

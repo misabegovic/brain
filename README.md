@@ -183,6 +183,15 @@ rules in `AGENTS.md` § Governance.
 | Datasette         | ✅ pilot             | `tools/serve-datasette.sh` — faceted browse + SQL + JSON API over the derived index (immutable mode). |
 | mempalace         | optional             | Verbatim / semantic-recall layer.                              |
 
+## Deploy
+
+One infra-agnostic image (`deploy/`): `BRAIN_SURFACE` selects the
+public surface (ui / mcp / datasette) on the platform's `$PORT`.
+Railway: root `railway.toml` points at it. Local emulation beside a
+development brain: `docker compose -f deploy/docker-compose.yml up`
+(ports 9080–9082). Multiple brains per machine: `BRAIN_PORT` /
+`BRAIN_MCP_PORT` + per-instance timer units. See `deploy/README.md`.
+
 ## Browse (UI)
 
 ```bash

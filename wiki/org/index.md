@@ -17,6 +17,8 @@ cross-product synthesis, org-level decisions and initiatives.
   playbook, the superpowers methodology.
 - [Operator lessons](operator-lessons.md) — durable lessons the
   operator teaches the agent.
+- [Competitors](competitors/codeplain/index.md) — landscape shelf;
+  first entry: Codeplain (spec-driven code regeneration, $3M seed).
 
 ## ADRs
 

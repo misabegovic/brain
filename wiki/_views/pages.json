@@ -191,6 +191,20 @@
       "tokens": 1199
     },
     {
+      "path": "brain/adrs/single-image-serving-profile.md",
+      "title": "Deployment is one infra-agnostic image with an env-selected surface; instances isolate by env ports and hashed unit names; Railway is a reference target, not a dependency",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../prds/composable-role-views.md",
+        "../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
+        "../roadmap.md"
+      ],
+      "tokens": 1203
+    },
+    {
       "path": "brain/adrs/sql-views-over-derived-index.md",
       "title": "View specs are SQL over a derived, disposable SQLite index; shorthands compile to SQL; the index rides the views pipeline",
       "kind": "decision",
@@ -284,7 +298,10 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 795
+      "tokens": 838,
+      "affected_by": [
+        "org/competitors/codeplain/index.md"
+      ]
     },
     {
       "path": "brain/pitches/composable-role-views.md",
@@ -365,7 +382,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 2637
+      "tokens": 2805
     },
     {
       "path": "brain/state.md",
@@ -377,7 +394,22 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1117
+      "tokens": 1229
+    },
+    {
+      "path": "org/competitors/codeplain/index.md",
+      "title": "Codeplain \u2014 spec-driven code regeneration platform",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "affects": [
+        "brain"
+      ],
+      "confidence": "low",
+      "sources": [
+        "../../../../sources/web/competitors/codeplain/seed-round-jun-2026--a1b2c3.md"
+      ],
+      "tokens": 474
     },
     {
       "path": "org/index.md",
@@ -389,7 +421,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 116
+      "tokens": 149
     },
     {
       "path": "org/methodology/development-playbook.md",
