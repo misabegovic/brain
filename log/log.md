@@ -25,3 +25,6 @@
 2026-07-10 commit — 67e02a3: Doctor venv-aware tiktoken check
    diff: 1 file changed, 14 insertions(+), 4 deletions(-)
    restricted-paths: true
+2026-07-10 commit — fb5f18a: 0.3.0 shipped — connectors (GitHub / Notion / Slack snapshot-writers)
+   diff: 13 files changed, 553 insertions(+), 7 deletions(-)
+   restricted-paths: true
