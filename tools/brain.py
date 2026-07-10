@@ -1261,7 +1261,7 @@ def cmd_serve(args) -> int:
             path = url.path.rstrip("/") or "/"
             qs = urllib.parse.parse_qs(url.query)
 
-            if path == "/":
+            if path == "/api":
                 self._send_json(200, {
                     "endpoints": [
                         "/dash",
@@ -1282,9 +1282,19 @@ def cmd_serve(args) -> int:
                                 "text/html; charset=utf-8")
                 return
 
+            # The rendered wiki serves at ROOT as the fallback for any
+            # path the JSON API doesn't own — the Astro build links
+            # assets and pages absolutely (/_astro/…, /brain/…), so a
+            # prefix mount breaks styling and navigation. /ui redirects
+            # for the older bookmark shape. Stress-test finding,
+            # 2026-07-10.
             if path == "/ui" or path.startswith("/ui/"):
-                # The rendered wiki, from the freshest static build
-                # (the ui-build hook's sandbox, else ui/dist).
+                self.send_response(302)
+                self.send_header("Location", path[len("/ui"):] or "/")
+                self.end_headers()
+                return
+
+            def serve_static(rel_path: str) -> bool:
                 site = None
                 for candidate in (REPO / "ui" / ".build-cache",
                                   REPO / "ui" / "dist"):
@@ -1292,17 +1302,13 @@ def cmd_serve(args) -> int:
                         site = candidate
                         break
                 if site is None:
-                    self._send_json(503, {
-                        "error": "no UI build — run tools/ui-build.sh "
-                                 "or cd ui && npm run build"})
-                    return
-                rel = path[len("/ui"):].lstrip("/")
+                    return False
+                rel = rel_path.lstrip("/")
                 target = (site / rel).resolve() if rel else site / "index.html"
                 try:
                     target.relative_to(site)
                 except ValueError:
-                    self._send_json(403, {"error": "path escapes site"})
-                    return
+                    return False
                 if target.is_dir():
                     target = target / "index.html"
                 if not target.exists() and not target.suffix:
@@ -1310,8 +1316,7 @@ def cmd_serve(args) -> int:
                 if not target.exists():
                     target = site / "404.html"
                     if not target.exists():
-                        self._send_json(404, {"error": "not found"})
-                        return
+                        return False
                 ctypes = {".html": "text/html; charset=utf-8",
                           ".css": "text/css",
                           ".js": "application/javascript",
@@ -1328,7 +1333,8 @@ def cmd_serve(args) -> int:
                 self.send_header("Cache-Control", "no-cache")
                 self.end_headers()
                 self.wfile.write(data)
-                return
+                return True
+
 
             if workbench and path.startswith("/workbench"):
                 host_hdr = (self.headers.get("Host") or "").split(":")[0]
@@ -1474,7 +1480,13 @@ def cmd_serve(args) -> int:
                 self._send_json(200, {"refreshed": len(entries_cache)})
                 return
 
-            self._send_json(404, {"error": "unknown endpoint"})
+            # Everything the API doesn't own falls through to the
+            # rendered wiki — including "/" (the home dashboard page).
+            if serve_static(url.path):
+                return
+            self._send_json(404, {"error": "unknown endpoint "
+                                           "(and no UI build to serve — "
+                                           "run tools/ui-build.sh)"})
 
         def do_POST(self):  # noqa: N802
             self._send_json(405, {"error": "read-only"})
@@ -4176,6 +4188,130 @@ def _link_graph() -> tuple[dict[str, set[str]], dict[str, set[str]]]:
     return outbound, inbound
 
 
+def page_context(rel: str) -> dict:
+    """Graph context for one wiki page — the open-knowledge lesson
+    that every read should be a briefing: backlinks, outbound links,
+    computed reverse edges, and recent audit-log lines that mention
+    the page. Used by `brain.py page`, the MCP get_page tool, and
+    anything else that reads pages for an agent."""
+    outbound, inbound = _link_graph()
+    ctx = {
+        "backlinks": sorted(inbound.get(rel, ())),
+        "outbound": sorted(outbound.get(rel, ())),
+        "affected_by": [], "consumed_by": [], "recent_log": [],
+    }
+    pages_json = WIKI / "_views" / "pages.json"
+    if pages_json.exists():
+        try:
+            data = json.loads(pages_json.read_text())
+            for entry in data.get("pages", []):
+                if entry.get("path") == rel:
+                    ctx["affected_by"] = entry.get("affected_by", [])
+                    ctx["consumed_by"] = entry.get("consumed_by", [])
+                    break
+        except json.JSONDecodeError:
+            pass
+    log_path = REPO / "log" / "log.md"
+    if log_path.exists():
+        slug = Path(rel).stem
+        ctx["recent_log"] = [
+            line.strip() for line in
+            log_path.read_text().splitlines()[-200:]
+            if slug in line][-5:]
+    return ctx
+
+
+def render_page_context(rel: str) -> str:
+    ctx = page_context(rel)
+    lines = [f"<!-- graph context for {rel} -->"]
+    if ctx["backlinks"]:
+        lines.append("backlinks: " + ", ".join(ctx["backlinks"]))
+    if ctx["outbound"]:
+        lines.append("links to: " + ", ".join(ctx["outbound"]))
+    if ctx["affected_by"]:
+        lines.append("affected by: " + ", ".join(ctx["affected_by"]))
+    if ctx["consumed_by"]:
+        lines.append("consumed by: " + ", ".join(ctx["consumed_by"]))
+    if ctx["recent_log"]:
+        lines.append("recent activity:")
+        lines.extend(f"  {ln}" for ln in ctx["recent_log"])
+    if len(lines) == 1:
+        lines.append("(no inbound/outbound edges recorded)")
+    return "\n".join(lines)
+
+
+def cmd_page(args) -> int:
+    """Read one page WITH its graph context — a briefing, not a cat."""
+    rel = args.path
+    target = (WIKI / rel).resolve()
+    try:
+        target.relative_to(WIKI)
+    except ValueError:
+        print(f"page: path escapes wiki/: {rel}", file=sys.stderr)
+        return 2
+    if not target.exists():
+        print(f"page: not found: {rel}", file=sys.stderr)
+        return 1
+    if getattr(args, "context_only", False):
+        print(render_page_context(rel))
+        return 0
+    print(target.read_text())
+    print()
+    print(render_page_context(rel))
+    return 0
+
+
+def cmd_lint_page(args) -> int:
+    """Fast single-page check for write-time feedback: frontmatter
+    parses with required fields, wiki-internal links resolve,
+    supersedes/superseded_by targets exist. Warnings, not gates —
+    the PostToolUse hook prints these into the writing agent's
+    transcript the moment a page is saved; CI stays the enforcement.
+    """
+    rel = args.path
+    target = Path(rel)
+    if not target.is_absolute():
+        target = (REPO / rel).resolve()
+    try:
+        wiki_rel = target.relative_to(WIKI)
+    except ValueError:
+        return 0  # not a wiki page — nothing to say
+    if not target.exists():
+        return 0
+    warnings = []
+    parsed = parse(target)
+    if parsed is None:
+        warnings.append("no parseable YAML frontmatter")
+    else:
+        meta, _body = parsed
+        for field in sorted(REQUIRED_FIELDS - set(meta)):
+            warnings.append(f"missing required frontmatter field: {field}")
+        kind = meta.get("kind")
+        if kind and kind not in VALID_KINDS:
+            warnings.append(f"unknown kind: {kind}")
+        for field in ("supersedes", "superseded_by"):
+            ref = meta.get(field)
+            if ref and not (WIKI / ref).exists():
+                warnings.append(f"{field} target missing: {ref}")
+    for href in re.findall(r"\]\(([^)]+)\)", target.read_text()):
+        href = href.split("#", 1)[0].strip()
+        if (not href or not href.endswith(".md")
+                or href.startswith(("http://", "https://", "mailto:", "~/"))):
+            continue
+        link_target = (target.parent / href).resolve()
+        try:
+            link_target.relative_to(REPO)
+        except ValueError:
+            continue
+        if not link_target.exists():
+            warnings.append(f"broken link: {href}")
+    if warnings:
+        print(f"lint-page {wiki_rel}:")
+        for w in warnings:
+            print(f"  ! {w}")
+    return 0
+
+
 def cmd_links(args) -> int:
     """Link-graph health views: orphans / hubs / dead-ends / suggest.
 
@@ -6219,6 +6355,20 @@ def main() -> int:
     ap_q.add_argument("--limit", type=int, default=200)
     ap_q.add_argument("--json", action="store_true")
     ap_q.set_defaults(func=cmd_query)
+
+    ap_page = sub.add_parser("page",
+                             help="read a page WITH its graph context "
+                                  "(backlinks, edges, recent activity)")
+    ap_page.add_argument("path", help="wiki-relative path")
+    ap_page.add_argument("--context-only", dest="context_only",
+                         action="store_true")
+    ap_page.set_defaults(func=cmd_page)
+
+    ap_lint = sub.add_parser("lint-page",
+                             help="fast single-page warnings for "
+                                  "write-time feedback (hook-invoked)")
+    ap_lint.add_argument("path")
+    ap_lint.set_defaults(func=cmd_lint_page)
 
     ap_links = sub.add_parser("links",
                               help="link-graph health: orphans / hubs / "

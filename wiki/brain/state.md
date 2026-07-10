@@ -26,6 +26,12 @@ into the sections below.
 
 ## Now
 
+- **Every read is a briefing (0.9.0, 2026-07-10).** Page reads
+  carry graph context; wiki saves get instant lint feedback; audit
+  lines carry `by:` attribution; the rendered wiki owns the local
+  server root (stress-test fix) and works styled inside the
+  workbench — verified in a real browser session.
+
 - **Work happens inside the brain (0.8.0, 2026-07-10).** The
   rendered wiki serves at `/ui` on the local server; the workbench
   navigates dashboard/wiki/views beside the terminal; stale builds

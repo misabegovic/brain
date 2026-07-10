@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.9.0 shipped: every read is a briefing.**
+  Graph-context page reads (`brain.py page` + MCP), write-time
+  lint feedback on wiki saves, `by:` attribution in the audit log —
+  and the UI stress test's structural fix: the rendered wiki now
+  owns the local server's root, styled and navigable inside the
+  workbench.
 - **2026-07-10** — **0.8.0 shipped: work happens inside the brain.**
   Rendered wiki at `/ui`, workbench navigation
   (dashboard ↔ wiki ↔ views), self-healing UI rebuilds, a sidebar

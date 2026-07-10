@@ -210,7 +210,7 @@ def render_workbench_page(token: str, harnesses: list[dict],
         f'<button onclick="spawn(\'{h["name"]}\')">{h["name"]}</button>'
         for h in harnesses)
     view_links = "".join(
-        f'<button onclick="nav(\'/ui/_views/custom/{v}/\')">{v}</button>'
+        f'<button onclick="nav(\'/_views/custom/{v}/\')">{v}</button>'
         for v in (views or []))
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <title>brain · workbench</title>
@@ -236,7 +236,7 @@ def render_workbench_page(token: str, harnesses: list[dict],
 <div id="leftwrap">
  <div id="nav">
    <button onclick="nav('/dash')">dashboard</button>
-   <button onclick="nav('/ui/')">wiki</button>
+   <button onclick="nav('/')">wiki</button>
    {view_links}
  </div>
  <iframe id="left" src="/dash"></iframe>

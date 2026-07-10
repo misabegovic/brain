@@ -122,7 +122,19 @@ def tool_brain_get_page(args: dict) -> str:
         raise ValueError(f"path escapes wiki/: {path}")
     if not candidate.exists():
         raise ValueError(f"page not found: {path}")
-    return candidate.read_text()
+    body = candidate.read_text()
+    # Every read is a briefing (per the open-knowledge study): append
+    # the page's graph context via brain.py, so agents see backlinks,
+    # edges, and recent activity without extra calls.
+    ctx = subprocess.run(
+        [sys.executable, str(BRAIN_PY), "page", path, "--context-only"],
+        capture_output=True, text=True, timeout=10, cwd=BRAIN_DIR)
+    context = ctx.stdout.strip()
+    if serving_mode() and context:
+        context = "\n".join(
+            ln for ln in context.splitlines()
+            if "ai-suggestions/" not in ln)
+    return body + ("\n\n" + context if context else "")
 
 
 def tool_brain_stats(_args: dict) -> str:

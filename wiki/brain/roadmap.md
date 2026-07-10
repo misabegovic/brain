@@ -231,13 +231,26 @@ brain state/roadmap/ADRs/PRDs/pitches, org). Project hygiene:
 operating principle is recorded as the first operator lesson
 (develop-the-brain-inside-the-brain).
 
+## 0.9.0 — every read is a briefing — **shipped 2026-07-10**
+
+The open-knowledge study's standing ideas, implemented, plus the
+stress-test findings from working the brain through its own UI.
+`brain.py page <path>` (and the MCP get_page tool) return the page
+*with* its graph context — backlinks, outbound links, computed
+reverse edges, recent audit-log activity. `brain.py lint-page` gives
+write-time feedback: a PostToolUse hook prints frontmatter and
+broken-link warnings into the writing agent's transcript the moment
+a wiki page is saved (CI stays the gate). The audit log gains
+per-author attribution (`by:` line — operator vs named agent). And
+the stress test's structural fix: the rendered wiki serves at the
+local server's **root** (the Astro build links absolutely; a prefix
+mount broke styling and navigation), with `/api` hosting the old
+endpoint listing and `/ui` redirecting. Verified end-to-end in a
+real browser: styled wiki beside a live terminal, in-iframe
+navigation, commands executed in the workbench terminal.
+
 ## Standing ideas (unversioned)
 
-From the open-knowledge study (see the captured source): page reads
-that return graph context (backlinks, reverse edges, recent log
-lines) so every read is a briefing; per-author attribution (operator
-vs named agent) in the audit log; write-time broken-link warnings
-surfaced to the writing agent, not just CI. Deliberately not adopted:
-a vector store (the agentic retrieval loop over live files stays),
-and a WYSIWYG editor (the UI is a reading surface; editors are
-agents).
+Deliberately not adopted from the open-knowledge direction: a vector
+store (the agentic retrieval loop over live files stays), and a
+WYSIWYG editor (the UI is a reading surface; editors are agents).

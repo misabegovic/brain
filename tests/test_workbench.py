@@ -209,3 +209,31 @@ def test_version_flag():
     assert out.returncode == 0
     assert out.stdout.strip() == \
         f"brain {(REPO / 'VERSION').read_text().strip()}"
+
+
+def test_page_context_briefing():
+    ctx = brain.page_context("brain/roadmap.md")
+    assert "brain/index.md" in ctx["backlinks"]
+    assert any("adrs" in o for o in ctx["outbound"])
+    rendered = brain.render_page_context("brain/roadmap.md")
+    assert "backlinks:" in rendered
+
+
+def test_lint_page_flags_broken_link(tmp_path):
+    class _Args:
+        path = ""
+
+    rogue = REPO / "wiki" / "_test_lint_page.md"
+    rogue.write_text("---\ntitle: t\nkind: meta\nstatus: draft\n"
+                     "updated: 2026-07-10\nsources: []\n---\n"
+                     "[bad](./no-such-page.md)\n")
+    try:
+        _Args.path = str(rogue)
+        import contextlib
+        import io
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            assert brain.cmd_lint_page(_Args()) == 0
+        assert "broken link" in buf.getvalue()
+    finally:
+        rogue.unlink()

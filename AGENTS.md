@@ -381,7 +381,13 @@ appends a parallel-shape line keyed on the short SHA:
 YYYY-MM-DD commit — <short-sha>: <title>
    diff: <files> files, +<insertions>/-<deletions>
    restricted-paths: <true|false>
+   by: <author — operator | agent name>
 ```
+
+The `by:` line attributes the change to the operator or the named
+agent (per the open-knowledge study: history should distinguish
+human from named-agent authorship). Optional on lines predating
+2026-07-10; expected on new lines.
 
 The `merge` and `commit` keywords share the date prefix and the
 indented `diff:` / `restricted-paths:` shape, so `sync-siblings.sh`
