@@ -44,7 +44,14 @@ empty shell; they *observe and flag* but do not synthesise. Ingestion
 local-only: stdio MCP (read-only tools) + static Astro UI.
 Sibling-diff ingestion is already incremental via `sync-cursor diff`.
 
-## 0.2.0 — queue-and-tend (the self-maintenance loop)
+## 0.2.0 — queue-and-tend (the self-maintenance loop) — **shipped 2026-07-10**
+
+Decision recorded at [adrs/queue-and-tend-inbox.md](adrs/queue-and-tend-inbox.md);
+built the same day (`brain.py inbox`, the `inbox-refresh` op, the
+`/tend` skill, session-start surfacing, `tools/install-timer.sh`, a
+producer template). Remaining operator step: run
+`tools/install-timer.sh` once on the machine that has the sibling
+repos.
 
 No scheduled LLM runs. A **local timer** (cron / systemd — local
 because the sibling repos only exist on the operator's machine) runs

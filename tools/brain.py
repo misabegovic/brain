@@ -66,6 +66,7 @@ PROJECTS = Path(
 ).expanduser()
 SYNC_CURSORS = WIKI / "_state" / "sync-cursors.json"
 EFFORTS_DIR = WIKI / "_state" / "efforts"
+INBOX_DIR = WIKI / "_state" / "inbox"
 
 
 def today_utc() -> dt.date:
@@ -1956,6 +1957,137 @@ def _write_cursors(data: dict) -> None:
     SYNC_CURSORS.write_text(json.dumps(data, indent=2) + "\n")
 
 
+INBOX_KINDS = {"ingest", "groom", "research", "custom"}
+INBOX_PRIORITIES = {"high", "normal", "low"}
+
+
+def _inbox_items() -> list[dict]:
+    if not INBOX_DIR.exists():
+        return []
+    items = []
+    for f in sorted(INBOX_DIR.glob("*.json")):
+        try:
+            items.append(json.loads(f.read_text()))
+        except json.JSONDecodeError:
+            print(f"inbox: skipping unparseable {f.name}", file=sys.stderr)
+    return items
+
+
+def _inbox_write(item: dict) -> Path:
+    INBOX_DIR.mkdir(parents=True, exist_ok=True)
+    path = INBOX_DIR / f"{item['id']}.json"
+    path.write_text(json.dumps(item, indent=2) + "\n")
+    return path
+
+
+def inbox_add(id: str, kind: str, summary: str, route: str = "",
+              priority: str = "normal", source: str = "",
+              produced_by: str = "operator", update: bool = False) -> bool:
+    """Add (or, with update=True, upsert) one inbox item.
+
+    Returns True when the item was written, False when an item with
+    the same id already exists and update is False — the dedup
+    contract that makes producer re-runs idempotent.
+    """
+    if not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", id):
+        raise ValueError(f"inbox id must be a lowercase slug, got {id!r}")
+    if kind not in INBOX_KINDS:
+        raise ValueError(f"kind must be one of {sorted(INBOX_KINDS)}")
+    if priority not in INBOX_PRIORITIES:
+        raise ValueError(f"priority must be one of {sorted(INBOX_PRIORITIES)}")
+    path = INBOX_DIR / f"{id}.json"
+    if path.exists() and not update:
+        return False
+    item = {
+        "id": id,
+        "kind": kind,
+        "summary": summary,
+        "route": route,
+        "priority": priority,
+        "source": source,
+        "produced_by": produced_by,
+        "produced_at": today_utc().isoformat(),
+    }
+    if path.exists():
+        # Preserve the original arrival date on upsert.
+        try:
+            item["produced_at"] = json.loads(path.read_text()).get(
+                "produced_at", item["produced_at"])
+        except json.JSONDecodeError:
+            pass
+    _inbox_write(item)
+    return True
+
+
+def cmd_inbox(args) -> int:
+    """The tend queue at wiki/_state/inbox/ — one JSON file per item.
+
+    The inbox is the seam between the deterministic accumulation loop
+    (cron-run producers) and in-session digestion (the /tend skill).
+    Subcommands:
+      add      — queue an item; idempotent on --id unless --update.
+      list     — pending items, priority-then-age ordered (--json).
+      summary  — one line for session-start surfacing; always exits 0.
+      done     — clear an item (the file's removal is git-audited).
+    """
+    op = args.op
+
+    if op == "add":
+        try:
+            written = inbox_add(
+                id=args.id, kind=args.kind, summary=args.summary,
+                route=args.route or "", priority=args.priority,
+                source=args.source or "",
+                produced_by=args.produced_by or "operator",
+                update=args.update,
+            )
+        except ValueError as exc:
+            print(f"inbox add: {exc}", file=sys.stderr)
+            return 2
+        print(f"inbox: {'wrote' if written else 'exists (skipped)'} {args.id}")
+        return 0
+
+    if op == "list":
+        items = _inbox_items()
+        order = {"high": 0, "normal": 1, "low": 2}
+        items.sort(key=lambda i: (order.get(i.get("priority"), 1),
+                                  i.get("produced_at", ""), i.get("id", "")))
+        if args.json:
+            print(json.dumps(items, indent=2))
+            return 0
+        if not items:
+            print("inbox: empty")
+            return 0
+        for i in items:
+            route = f"  → {i['route']}" if i.get("route") else ""
+            print(f"[{i.get('priority', 'normal'):>6}] {i.get('kind', '?'):>8}  "
+                  f"{i['id']}  ({i.get('produced_at', '?')})\n"
+                  f"         {i.get('summary', '')}{route}")
+        return 0
+
+    if op == "summary":
+        items = _inbox_items()
+        if not items:
+            print("brain inbox: empty")
+            return 0
+        by_kind = collections.Counter(i.get("kind", "?") for i in items)
+        parts = ", ".join(f"{n} {k}" for k, n in sorted(by_kind.items()))
+        print(f"brain inbox: {len(items)} pending ({parts}) — run /tend to digest")
+        return 0
+
+    if op == "done":
+        path = INBOX_DIR / f"{args.id}.json"
+        if not path.exists():
+            print(f"inbox done: no item {args.id!r}", file=sys.stderr)
+            return 1
+        path.unlink()
+        print(f"inbox: cleared {args.id}")
+        return 0
+
+    print(f"unknown inbox op: {op!r}", file=sys.stderr)
+    return 2
+
+
 def cmd_sync_cursor(args) -> int:
     """Manage per-sibling-repo sync cursors at wiki/_state/sync-cursors.json.
 
@@ -3101,6 +3233,113 @@ def _count_go_mod(p: Path) -> int:
     return n
 
 
+def _schedule_run_inbox_refresh() -> int:
+    """Recompute the deterministic slice of the tend queue.
+
+    Producers owned by this op (produced_by == "inbox-refresh") are
+    fully reconciled on every run: items are upserted while their
+    trigger holds and removed once it clears, so the queue never
+    shows stale machine-generated work. Operator- and
+    connector-produced items are never touched.
+
+      cursor-diff-<repo>   sibling repo changed since its sync cursor
+      half-life-<slug>     confidence:high page not updated in >30d
+      link-health          broken wiki-internal links exist
+    """
+    current: dict[str, dict] = {}
+
+    data = _read_cursors()
+    for repo in sorted(ACTIVE_REPOS):
+        entry = data.get("cursors", {}).get(repo)
+        sibling = PROJECTS / repo
+        if not entry or not sibling.exists():
+            continue
+        try:
+            changed = _git(["diff", entry["sha"] + "..HEAD", "--name-only"],
+                           sibling).splitlines()
+        except Exception:
+            continue
+        if changed:
+            current[f"cursor-diff-{repo}"] = {
+                "kind": "ingest",
+                "summary": f"{repo}: {len(changed)} file(s) changed since "
+                           f"cursor {entry['sha'][:8]}",
+                "route": f"/in {repo} (walk `brain.py sync-cursor diff {repo}`)",
+                "source": f"~/projects/{repo}",
+                "priority": "normal",
+            }
+
+    cutoff = today_utc() - dt.timedelta(days=30)
+    for p in wiki_pages():
+        parsed = parse(p)
+        if parsed is None:
+            continue
+        meta, _body = parsed
+        if meta.get("confidence") != "high":
+            continue
+        updated = meta.get("updated")
+        if isinstance(updated, str):
+            try:
+                updated = dt.date.fromisoformat(updated)
+            except ValueError:
+                continue
+        if isinstance(updated, dt.date) and updated < cutoff:
+            rel = str(p.relative_to(WIKI))
+            slug = re.sub(r"[^a-z0-9]+", "-", rel.lower()).strip("-")
+            current[f"half-life-{slug}"] = {
+                "kind": "groom",
+                "summary": f"{rel} is confidence:high but updated "
+                           f"{updated.isoformat()} (>30d) — refresh or demote",
+                "route": "/groom",
+                "source": f"wiki/{rel}",
+                "priority": "low",
+            }
+
+    broken = 0
+    for page in WIKI.rglob("*.md"):
+        rel = page.relative_to(WIKI)
+        if any(part.startswith("_") for part in rel.parts):
+            continue
+        for href in re.findall(r"\]\(([^)]+)\)", page.read_text()):
+            href = href.split("#", 1)[0].strip()
+            if (not href or href.endswith("/") or not href.endswith(".md")
+                    or href.startswith(("http://", "https://", "mailto:", "~/"))):
+                continue
+            target = (page.parent / href).resolve()
+            try:
+                target.relative_to(WIKI)
+            except ValueError:
+                continue
+            if not target.exists():
+                broken += 1
+    if broken:
+        current["link-health"] = {
+            "kind": "groom",
+            "summary": f"{broken} broken wiki-internal link(s) — "
+                       f"run `brain.py reflection-check links` for the list",
+            "route": "/groom",
+            "source": "wiki/",
+            "priority": "high",
+        }
+
+    added = updated_n = 0
+    for id, fields in current.items():
+        existed = (INBOX_DIR / f"{id}.json").exists()
+        inbox_add(id=id, produced_by="inbox-refresh", update=True, **fields)
+        added += 0 if existed else 1
+        updated_n += 1 if existed else 0
+
+    removed = 0
+    for item in _inbox_items():
+        if item.get("produced_by") == "inbox-refresh" and item["id"] not in current:
+            (INBOX_DIR / f"{item['id']}.json").unlink(missing_ok=True)
+            removed += 1
+
+    print(f"inbox-refresh: {added} added, {updated_n} refreshed, "
+          f"{removed} cleared; {len(_inbox_items())} pending total")
+    return 0
+
+
 def _schedule_run_deadline_countdown() -> int:
     """Refresh `wiki/_state/deadlines.json` last_assessment + per-deadline days-left.
 
@@ -3384,6 +3623,7 @@ def _schedule_run_ai_suggestion_grooming() -> int:
 SCHEDULE_HANDLERS = {
     "security-scan": _schedule_run_security_scan,
     "deadline-countdown": _schedule_run_deadline_countdown,
+    "inbox-refresh": _schedule_run_inbox_refresh,
     "issues-pull": _schedule_run_issues_pull,
     "notion-walk": _schedule_run_notion_walk,
     "overlap-refresh": _schedule_run_overlap_refresh,
@@ -4431,6 +4671,35 @@ def main() -> int:
     ap_crf.add_argument("--base", default="origin/main",
                         help="base ref for the diff (default: origin/main)")
     ap_crf.set_defaults(func=cmd_check_readme_fresh)
+
+    ap_ib = sub.add_parser("inbox",
+                           help="the tend queue at wiki/_state/inbox/ — "
+                                "producers add items, /tend digests them")
+    ib_sub = ap_ib.add_subparsers(dest="op", required=True)
+    ib_add = ib_sub.add_parser("add", help="queue an item (idempotent on --id)")
+    ib_add.add_argument("--id", required=True,
+                        help="dedup key (lowercase slug); re-adding is a no-op")
+    ib_add.add_argument("--kind", required=True,
+                        choices=sorted(INBOX_KINDS))
+    ib_add.add_argument("--summary", required=True,
+                        help="one line: what needs tending and why")
+    ib_add.add_argument("--route", default="",
+                        help="suggested skill invocation (e.g. '/in <source>')")
+    ib_add.add_argument("--priority", default="normal",
+                        choices=sorted(INBOX_PRIORITIES))
+    ib_add.add_argument("--source", default="",
+                        help="path or URL the item is about")
+    ib_add.add_argument("--produced-by", dest="produced_by", default="",
+                        help="producer name (defaults to 'operator')")
+    ib_add.add_argument("--update", action="store_true",
+                        help="upsert: refresh summary/route on an existing id")
+    ib_list = ib_sub.add_parser("list", help="pending items, priority-ordered")
+    ib_list.add_argument("--json", action="store_true")
+    ib_sub.add_parser("summary",
+                      help="one-line count for session-start surfacing")
+    ib_done = ib_sub.add_parser("done", help="clear a digested item")
+    ib_done.add_argument("id")
+    ap_ib.set_defaults(func=cmd_inbox)
 
     ap_sc = sub.add_parser("sync-cursor",
                            help="manage sibling-repo sync cursors "

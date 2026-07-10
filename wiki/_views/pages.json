@@ -17,7 +17,7 @@
       "anchor": "open-initiatives",
       "name": "Open initiatives",
       "maintained_by": "/shape",
-      "empty": true
+      "empty": false
     },
     {
       "anchor": "recent-decisions",
@@ -135,6 +135,20 @@
       "tokens": 1774
     },
     {
+      "path": "brain/adrs/queue-and-tend-inbox.md",
+      "title": "Self-maintenance is queue-and-tend: deterministic producers accumulate a per-item inbox; synthesis digests in-session via /tend \u2014 never on a schedule",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
+        ".claude/skills/tend/SKILL.md",
+        "../../../brain-schedule.yml"
+      ],
+      "tokens": 1400
+    },
+    {
       "path": "brain/adrs/shape-deepdive-pre-flight.md",
       "title": "Deepdive on load-bearing points lands as a /shape pre-flight step; pace lands on the binding authoring playbook; the top-level schema is not extended",
       "kind": "decision",
@@ -226,7 +240,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 460
+      "tokens": 499
     },
     {
       "path": "brain/roadmap.md",
@@ -240,7 +254,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 1796
+      "tokens": 1900
     },
     {
       "path": "brain/state.md",
@@ -252,7 +266,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 422
+      "tokens": 552
     },
     {
       "path": "org/index.md",

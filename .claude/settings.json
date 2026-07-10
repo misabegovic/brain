@@ -41,7 +41,9 @@
       "mcp__claude_ai_Notion__notion-move-pages"
     ]
   },
-  "enabledMcpjsonServers": ["brain"],
+  "enabledMcpjsonServers": [
+    "brain"
+  ],
   "hooks": {
     "PreToolUse": [
       {
@@ -80,6 +82,16 @@
           {
             "type": "command",
             "command": "bash tools/home-staleness.sh stop"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 tools/brain.py inbox summary 2>/dev/null || true"
           }
         ]
       }

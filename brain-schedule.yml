@@ -60,6 +60,22 @@ operations:
     output: wiki/_state/issues.json
     enabled: true
 
+  - name: inbox-refresh
+    description: Reconcile the deterministic slice of the tend queue (cursor diffs, half-life crossings, link health) at wiki/_state/inbox/.
+    cadence: daily
+    handler: python3 tools/brain.py schedule run inbox-refresh
+    output: wiki/_state/inbox/
+    enabled: true
+
+  # Template for operator-defined producers — copy, point handler at
+  # your script (anything that calls `brain.py inbox add`), enable.
+  - name: example-producer
+    description: Example custom producer; see tools/producers/example-producer.sh.
+    cadence: daily
+    handler: bash tools/producers/example-producer.sh
+    output: wiki/_state/inbox/
+    enabled: false
+
   # ---- Ingestion + intersection-finding -------------------------
 
   - name: notion-walk

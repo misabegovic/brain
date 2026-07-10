@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.2.0 shipped: queue-and-tend.**
+  `brain.py inbox` (per-item queue at `wiki/_state/inbox/`), the
+  `inbox-refresh` producer op, the [`/tend`](brain/adrs/queue-and-tend-inbox.md)
+  skill, session-start surfacing, a local-timer installer, and a
+  custom-producer template. Decision recorded as an accepted ADR.
 - **2026-07-10** — roadmap detail: the inbox is an open producer
   contract (per-item JSON + `brain.py inbox add`, operator-defined
   cron producers welcome), and agent-independence is a cross-cutting
@@ -48,8 +53,9 @@ start filling in as the slash-command surface runs.
 
 ## Open initiatives
 
-<!-- home-section: empty; maintained-by: /shape -->
-*(empty — no /shape run yet)*
+<!-- home-section; maintained-by: /shape -->
+- [Brain roadmap — the 0.x arc](brain/roadmap.md) — 0.2.0 shipped;
+  next up: 0.3 connector snapshot-writers (Slack / Notion / GitHub).
 
 [See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
 

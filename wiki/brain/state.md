@@ -26,6 +26,15 @@ into the sections below.
 
 ## Now
 
+- **Queue-and-tend is live (0.2.0, 2026-07-10).** Deterministic
+  producers accumulate per-item JSON into `wiki/_state/inbox/`
+  (`inbox-refresh` op: cursor diffs, half-life crossings, link
+  health; operator-defined producers via
+  `tools/producers/example-producer.sh` + a `brain-schedule.yml`
+  entry). `/tend` digests in-session; a session-start hook surfaces
+  the one-line summary. The local timer installs via
+  `tools/install-timer.sh` — not yet installed on any machine.
+
 - Empty shell awaiting an organisation's content. `brain.config.yml`
   declares no active repos yet.
 - Every scheduled operation degrades to a clean no-op on the empty

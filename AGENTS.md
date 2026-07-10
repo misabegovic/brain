@@ -682,6 +682,7 @@ authoritative copy.
 | `/capture <scope>`   | Capture in-flight signal (conversation, design discussion) — no source URL needed.      | `capture` skill. Snapshots to `sources/conversations/`. |
 | `/ask <question>`    | Query the brain.                                                                        | `wiki-query` (default), `wiki-plan`, `wiki-overlap`, `wiki-coverage`. |
 | `/sync`              | One-shot **mechanical** health sweep.                                                   | `sync` skill (siblings + lint + check + validate + views + log rotation). |
+| `/tend [<budget>]`   | Digest the inbox — the queue of pending synthesis work accumulated at `wiki/_state/inbox/` by the deterministic producers (cursor diffs, half-life crossings, link health, connector batches, operator-defined producers). Budget bounds the sweep: item count, time-box, kind, or a single id. The in-session half of queue-and-tend; never runs on a schedule. | `tend` skill. |
 | `/groom`             | Periodic **judgement** sweep — knowledge GC.                                            | `groom` skill (confidence demotion, insight decay, supersede→archive). |
 | `/shape <scope> <pitch>` | Shape Up workflow: pitch → PRD → ADR → build. **Manual by default** — pauses at every load-bearing in-phase decision and lets the user pick. `--auto` to run autonomously (phase-end gates still apply). `--pitch` for a pre-bet pitch page. `--rfc` for an RFC pass between PRD and ADR. `--epic` for an umbrella `kind: epic` page (children spawn via regular forward `/shape` with `parent_epic:` linkage). | `shape` skill (chains `rfc` if `--rfc`). |
 | `/continue <slug-or-PR#>` | Resume in-flight `/shape` work. Detect phase, ingest new context (PR comments / new sources), pre-push verify per § Working inside a sibling repo rules 4+5. | `continue` skill. |
@@ -723,6 +724,7 @@ the agent applies on every turn:
 | Sharing context, design discussion, customer interaction               | `/capture <scope>` (scope: `brain` / `org` / `<repo>`)      |
 | "this looks stale / outdated"                                          | `/groom`                                                    |
 | "is the brain healthy?" / "sweep please"                               | `/sync`                                                     |
+| "tend the brain" / "do the inbox" / "digest the queue" / "catch the brain up" | `/tend [<budget>]`                                    |
 | "this insight should become a project"                                 | `/promote <insight>`                                        |
 | "ingest this URL / repo / file"                                        | `/in <source>`                                              |
 | "review / merge this PR"                                               | `/review <PR#>`                                             |
@@ -1120,6 +1122,28 @@ python3 tools/brain.py status
 Reads every `wiki/_state/*.json` and surfaces one-line health
 across corpus / security / issues / sync-cursors / in-flight
 efforts / AI-suggestion backlog.
+
+### `brain.py inbox` — the tend queue
+
+```bash
+python3 tools/brain.py inbox add --id <slug> --kind ingest|groom|research|custom \
+    --summary "..." [--route "/in <source>"] [--priority high|normal|low]
+python3 tools/brain.py inbox list [--json]
+python3 tools/brain.py inbox summary     # one line; wired to session start
+python3 tools/brain.py inbox done <id>
+```
+
+One JSON file per item at `wiki/_state/inbox/<id>.json` — merge-safe,
+committed (arrival and clearing are git-audited), idempotent on the
+producer-chosen `--id`. The `inbox-refresh` schedule op reconciles
+the deterministic slice (cursor diffs, half-life crossings, link
+health) on every run; operator-defined producers are any script that
+calls `inbox add`, registered as one more `brain-schedule.yml` entry
+(template: `tools/producers/example-producer.sh`). `/tend` digests.
+The local timer is installed by `tools/install-timer.sh` (systemd
+user timer; prints a crontab fallback). Per
+`wiki/brain/adrs/queue-and-tend-inbox.md`: no LLM ever runs on the
+schedule — the timer accumulates, sessions digest.
 
 ### `brain.py schedule` — declarative recurring operations
 

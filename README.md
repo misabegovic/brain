@@ -115,6 +115,8 @@ python3 tools/brain.py stats        # corpus shape
 python3 tools/brain.py views        # regen wiki/_views/ (by-kind, by-team, by-repo, pages.json, ai-suggestions)
 python3 tools/brain.py search '<q>' # hybrid keyword search
 python3 tools/brain.py status       # single-pane health dashboard
+python3 tools/brain.py inbox summary # the tend queue in one line
+tools/install-timer.sh              # daily accumulation timer (systemd user / cron)
 pytest tests/                       # kernel invariants
 ```
 
@@ -135,6 +137,7 @@ Gates: `brain.py validate` + auto-stages `wiki/_views/` regen +
 | `/capture <scope>`           | Capture in-flight signal (conversation, design discussion) without a source URL.                  |
 | `/ask <question>`            | Query. Default factual lookup; escalates to plan / overlap / coverage by phrasing.                |
 | `/sync`                      | Mechanical health sweep: sibling-repo fetch, lint, source-link check, schema validate, regen views. |
+| `/tend [<budget>]`           | Digest the inbox — pending synthesis work queued by the deterministic producers. Budget = count / time-box / kind / id. |
 | `/groom`                     | Judgement sweep: confidence demotion, insight decay, supersede→archive transitions.                |
 | `/shape <scope> <pitch>`     | **The only path to ADRs/PRDs.** Manual by default — pauses at every load-bearing decision. `--auto`, `--pitch`, `--record`, `--epic`, `--rfc` modes. |
 | `/continue <slug-or-PR#>`    | Resume in-flight `/shape` work; detects phase from artifact state.                                |

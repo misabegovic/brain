@@ -34,6 +34,7 @@ sanitized to organisation-agnostic form:
 - [UI auto-refresh hook](adrs/ui-auto-refresh-hook.md) — smoke-build the UI on wiki edits.
 - [Operator lesson pattern](adrs/operator-lesson-pattern.md) — durable operator lessons shelf.
 - [Competitor intel ingestion](adrs/competitor-intel-ingestion.md) — public competitor info routing.
+- [Queue-and-tend inbox](adrs/queue-and-tend-inbox.md) — deterministic producers accumulate; `/tend` digests in-session; no scheduled LLM runs.
 
 ## PRDs
 
