@@ -42,12 +42,12 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 | brain/adrs/queue-and-tend-inbox.md | high | 4 |
 | brain/adrs/successor-ssg-for-ui.md | high | 4 |
 | org/operator-lessons.md | high | 4 |
+| brain/adrs/chat-print-mode-bridge.md | medium | 3 |
 | brain/adrs/connector-snapshot-contract.md | medium | 3 |
 | brain/adrs/home-content-shape.md | medium | 3 |
 | brain/adrs/operator-lesson-pattern.md | medium | 3 |
 | brain/adrs/parallel-efforts-on-request.md | medium | 3 |
 | brain/adrs/shape-deepdive-pre-flight.md | medium | 3 |
-| brain/adrs/sql-views-over-derived-index.md | medium | 3 |
 
 ## Production state (Datadog)
 

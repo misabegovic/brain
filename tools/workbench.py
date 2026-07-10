@@ -42,6 +42,64 @@ TERMINAL_CLIS = [
 
 SESSION_TOKEN = secrets.token_urlsafe(24)
 
+# Chat rows (per wiki/brain/adrs/chat-print-mode-bridge.md): one data
+# row per harness naming its print-mode invocation and continuation
+# form. Print modes bill to the operator's existing subscription and
+# honour the repo's project config (skills, permissions, MCP) — the
+# conversation drives the same mechanism the terminal would. A
+# harness without a print mode gets no chat row, never TUI scraping.
+CHAT_CLIS = [
+    {"name": "claude", "bin": "claude",
+     "first_args": ["-p"], "continue_args": ["-p", "--continue"]},
+    {"name": "codex", "bin": "codex",
+     "first_args": ["exec"], "continue_args": ["exec"]},
+    {"name": "cursor", "bin": "cursor-agent",
+     "first_args": ["-p"], "continue_args": ["-p"]},
+    {"name": "opencode", "bin": "opencode",
+     "first_args": ["run"], "continue_args": ["run", "--continue"]},
+]
+
+_chat_continuing: set = set()
+
+
+def run_chat_message(harness: str, message: str, cwd: str,
+                     timeout: int = 600,
+                     registry: list | None = None) -> dict:
+    """One chat turn: spawn the harness's print mode with the message.
+
+    Blocking by design in v1 (an agent turn legitimately runs
+    minutes); the caller shows progress. Continuation state is
+    per-server-lifetime: the first turn opens a session in the repo,
+    later turns continue it where the harness supports that.
+    """
+    import shutil
+    rows = registry if registry is not None else CHAT_CLIS
+    row = next((r for r in rows if r["name"] == harness), None)
+    if row is None:
+        return {"ok": False, "reply": f"unknown chat harness: {harness}"}
+    if not shutil.which(row["bin"]):
+        return {"ok": False,
+                "reply": f"{row['bin']} is not on PATH — install the "
+                         f"harness or pick another"}
+    args = (row["continue_args"] if harness in _chat_continuing
+            else row["first_args"])
+    try:
+        res = subprocess.run(
+            [row["bin"], *args, message],
+            cwd=cwd, capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return {"ok": False,
+                "reply": "(the agent is taking too long — the turn was "
+                         "stopped; the terminal toggle handles long "
+                         "operations better)"}
+    if res.returncode == 0:
+        _chat_continuing.add(harness)
+        return {"ok": True,
+                "reply": res.stdout.strip() or "(empty reply)"}
+    return {"ok": False,
+            "reply": (res.stderr.strip() or res.stdout.strip()
+                      or f"harness exited {res.returncode}")[:4000]}
+
 
 class PtySession:
     """One terminal: the operator's login shell on a PTY pair."""
@@ -205,88 +263,180 @@ def handle_ws_connection(handler) -> None:
 
 def render_workbench_page(token: str, harnesses: list[dict],
                           page_count: int,
-                          views: list[str] | None = None) -> str:
-    buttons = "".join(
+                          views: list | None = None,
+                          chat_rows: list | None = None) -> str:
+    chat_rows = chat_rows if chat_rows is not None else CHAT_CLIS
+    chat_options = "".join(
+        f'<option value="{r["name"]}">{r["name"]}</option>'
+        for r in chat_rows)
+    term_buttons = "".join(
         f'<button onclick="spawn(\'{h["name"]}\')">{h["name"]}</button>'
         for h in harnesses)
     view_links = "".join(
         f'<button onclick="nav(\'/_views/custom/{v}/\')">{v}</button>'
         for v in (views or []))
     return f"""<!doctype html><html><head><meta charset="utf-8">
-<title>brain · workbench</title>
+<title>brain</title>
 <link rel="stylesheet" href="/workbench/assets/xterm.css">
 <style>
  :root {{ color-scheme: light dark; }}
- body {{ margin: 0; font: 14px system-ui, sans-serif; display: flex;
-        height: 100vh; }}
+ body {{ margin: 0; font: 14px/1.45 system-ui, sans-serif;
+        display: flex; height: 100vh; }}
+ button, select, textarea {{ font: inherit; }}
  #leftwrap {{ flex: 1 1 55%; display: flex; flex-direction: column;
               min-width: 20rem; }}
  #nav {{ padding: .35rem .6rem; display: flex; gap: .4rem;
-        border-bottom: 1px solid #8884; }}
- #nav button {{ font: inherit; padding: .15rem .6rem; cursor: pointer; }}
+        align-items: center; border-bottom: 1px solid #8884; }}
+ #nav button {{ padding: .15rem .6rem; cursor: pointer; }}
+ #strip {{ margin-left: auto; opacity: .75; font-size: .85em; }}
  #left {{ flex: 1; border: 0; }}
  #right {{ flex: 1 1 45%; display: flex; flex-direction: column;
-          border-left: 1px solid #8884; }}
- #bar {{ padding: .4rem .6rem; display: flex; gap: .4rem;
-        align-items: center; border-bottom: 1px solid #8884; }}
- #bar button {{ font: inherit; padding: .15rem .6rem; cursor: pointer; }}
- #bar .hint {{ opacity: .6; margin-left: auto; font-size: .85em; }}
- #term {{ flex: 1; min-height: 0; padding: .3rem; background: #000; }}
+          border-left: 1px solid #8884; min-width: 22rem; }}
+ #chatbar {{ padding: .4rem .6rem; display: flex; gap: .4rem;
+            align-items: center; border-bottom: 1px solid #8884; }}
+ #msgs {{ flex: 1; overflow-y: auto; padding: .8rem; display: flex;
+         flex-direction: column; gap: .6rem; }}
+ .msg {{ max-width: 92%; padding: .5rem .7rem; border-radius: .6rem;
+        white-space: pre-wrap; overflow-wrap: anywhere; }}
+ .me {{ align-self: flex-end;
+       background: color-mix(in srgb, currentColor 12%, transparent); }}
+ .agent {{ align-self: flex-start;
+          background: color-mix(in srgb, currentColor 6%, transparent); }}
+ .agent.busy {{ opacity: .6; font-style: italic; }}
+ #composer {{ display: flex; gap: .4rem; padding: .6rem;
+             border-top: 1px solid #8884; }}
+ #input {{ flex: 1; resize: none; padding: .45rem .6rem;
+          border-radius: .5rem; border: 1px solid #8886;
+          background: transparent; color: inherit; }}
+ #term {{ display: none; height: 45%; min-height: 12rem;
+         padding: .3rem; background: #000;
+         border-top: 1px solid #8884; }}
+ #termbar {{ display: none; padding: .3rem .6rem; gap: .4rem;
+            border-top: 1px solid #8884; align-items: center; }}
+ body.termon #term, body.termon #termbar {{ display: flex; }}
 </style></head><body>
 <div id="leftwrap">
  <div id="nav">
-   <button onclick="nav('/dash')">dashboard</button>
-   <button onclick="nav('/')">wiki</button>
+   <button onclick="nav('/')">knowledge</button>
+   <button onclick="nav('/dash')">status</button>
    {view_links}
+   <span id="strip">…</span>
  </div>
- <iframe id="left" src="/dash"></iframe>
+ <iframe id="left" src="/"></iframe>
 </div>
 <div id="right">
- <div id="bar">
-   <span>open in:</span>{buttons}
-   <span class="hint">{page_count} pages · auto-reloads on wiki changes</span>
+ <div id="chatbar">
+   <select id="harness">{chat_options}</select>
+   <span style="opacity:.6">chat runs in this brain, on your
+   subscription</span>
+   <button style="margin-left:auto" onclick="toggleTerm()"
+           title="advanced: raw terminal">⌄ terminal</button>
  </div>
+ <div id="msgs">
+   <div class="msg agent">Ask me anything about this brain — or tell
+me what to do. I can tend the queue, capture decisions, search,
+and shape work. The knowledge pane updates as I change things.</div>
+ </div>
+ <div id="composer">
+   <textarea id="input" rows="2"
+     placeholder="e.g. what needs attention?"></textarea>
+   <button id="send" onclick="send()">send</button>
+ </div>
+ <div id="termbar"><span>open in:</span>{term_buttons}</div>
  <div id="term"></div>
 </div>
 <script src="/workbench/assets/xterm.js"></script>
 <script src="/workbench/assets/addon-fit.js"></script>
 <script>
- const term = new Terminal({{fontSize: 13, scrollback: 5000}});
- const fit = new FitAddon.FitAddon();
- term.loadAddon(fit);
- term.open(document.getElementById('term'));
- fit.fit();
- const ws = new WebSocket(
-   `ws://${{location.host}}/workbench/pty?token={token}`);
- ws.onmessage = (e) => {{
-   const m = JSON.parse(e.data);
-   if (m.type === 'data') term.write(m.data);
-   if (m.type === 'exit') term.write('\\r\\n[session ended]\\r\\n');
- }};
- ws.onopen = () => {{
-   ws.send(JSON.stringify({{type: 'resize', cols: term.cols,
-                            rows: term.rows}}));
-   term.focus();
- }};
- term.onData(d => ws.send(JSON.stringify({{type: 'input', data: d}})));
- new ResizeObserver(() => {{
+ const TOKEN = "{token}";
+ function nav(url) {{ document.getElementById('left').src = url; }}
+ // ---- chat ----
+ const msgs = document.getElementById('msgs');
+ const input = document.getElementById('input');
+ function bubble(cls, text) {{
+   const d = document.createElement('div');
+   d.className = 'msg ' + cls;
+   d.textContent = text;
+   msgs.appendChild(d);
+   msgs.scrollTop = msgs.scrollHeight;
+   return d;
+ }}
+ async function send() {{
+   const text = input.value.trim();
+   if (!text) return;
+   input.value = '';
+   bubble('me', text);
+   const busy = bubble('agent busy', 'thinking…');
+   document.getElementById('send').disabled = true;
+   try {{
+     const r = await fetch('/workbench/chat?token=' + TOKEN, {{
+       method: 'POST',
+       headers: {{'Content-Type': 'application/json'}},
+       body: JSON.stringify({{
+         harness: document.getElementById('harness').value,
+         message: text }}),
+     }});
+     const data = await r.json();
+     busy.classList.remove('busy');
+     busy.textContent = data.reply || '(no reply)';
+   }} catch (e) {{
+     busy.classList.remove('busy');
+     busy.textContent = '(request failed: ' + e + ')';
+   }}
+   document.getElementById('send').disabled = false;
+   input.focus();
+ }}
+ input.addEventListener('keydown', (e) => {{
+   if (e.key === 'Enter' && !e.shiftKey) {{ e.preventDefault(); send(); }}
+ }});
+ // ---- ambient strip + live reload ----
+ let last = 0;
+ async function tick() {{
+   try {{
+     const r = await fetch('/workbench/status');
+     const s = await r.json();
+     document.getElementById('strip').textContent =
+       (s.fails ? '✗ ' + s.fails + ' failing · ' :
+        s.warns ? '− ' + s.warns + ' notice · ' : '✓ healthy · ')
+       + (s.inbox ? s.inbox + ' to tend' : 'queue clear');
+     if (last && s.mtime > last) nav(document.getElementById('left').src);
+     last = s.mtime;
+   }} catch (e) {{}}
+ }}
+ tick(); setInterval(tick, 8000);
+ // ---- terminal (advanced toggle; PTY connects lazily) ----
+ let term = null, ws = null;
+ function toggleTerm() {{
+   document.body.classList.toggle('termon');
+   if (term || !document.body.classList.contains('termon')) return;
+   term = new Terminal({{fontSize: 13, scrollback: 5000}});
+   const fit = new FitAddon.FitAddon();
+   term.loadAddon(fit);
+   term.open(document.getElementById('term'));
    fit.fit();
-   if (ws.readyState === 1)
+   ws = new WebSocket(
+     `ws://${{location.host}}/workbench/pty?token={token}`);
+   ws.onmessage = (e) => {{
+     const m = JSON.parse(e.data);
+     if (m.type === 'data') term.write(m.data);
+     if (m.type === 'exit') term.write('\\r\\n[session ended]\\r\\n');
+   }};
+   ws.onopen = () => {{
      ws.send(JSON.stringify({{type: 'resize', cols: term.cols,
                               rows: term.rows}}));
- }}).observe(document.getElementById('term'));
- function spawn(name) {{
-   ws.send(JSON.stringify({{type: 'spawn', harness: name}}));
-   term.focus();
+     term.focus();
+   }};
+   term.onData(d => ws.send(JSON.stringify({{type: 'input', data: d}})));
+   new ResizeObserver(() => {{
+     fit.fit();
+     if (ws && ws.readyState === 1)
+       ws.send(JSON.stringify({{type: 'resize', cols: term.cols,
+                                rows: term.rows}}));
+   }}).observe(document.getElementById('term'));
  }}
- function nav(url) {{ document.getElementById('left').src = url; }}
- let last = 0;
- setInterval(async () => {{
-   try {{
-     const r = await fetch('/workbench/changed');
-     const t = (await r.json()).mtime;
-     if (last && t > last) document.getElementById('left').src += '';
-     last = t;
-   }} catch (e) {{}}
- }}, 2000);
+ function spawn(name) {{
+   if (ws && ws.readyState === 1)
+     ws.send(JSON.stringify({{type: 'spawn', harness: name}}));
+   if (term) term.focus();
+ }}
 </script></body></html>"""

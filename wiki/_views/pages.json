@@ -467,7 +467,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 3651
+      "tokens": 3816
     },
     {
       "path": "brain/state.md",
@@ -479,7 +479,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1590
+      "tokens": 1655
     },
     {
       "path": "brain/topics/one-point-oh-criteria.md",

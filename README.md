@@ -43,6 +43,22 @@ The **kernel** — mechanism, no content:
 The **content** is yours: `wiki/` starts as an empty three-level
 skeleton, `sources/` starts empty, `log/log.md` starts empty.
 
+## The app
+
+```bash
+brain        # that's it — serves and opens the app
+```
+
+One window: a **chat** wired to your agent harness (Claude Code,
+Codex, Cursor, OpenCode — print modes, on your existing
+subscription), the **rendered knowledge** beside it (live-reloading
+as the agent works), and an ambient strip showing health and what's
+waiting. Ask "what needs attention?" and the agent tends the queue;
+say "note this decision" and it lands where the mechanism says it
+should. A raw terminal hides behind the `terminal` toggle for power
+use. Everything below this section is the machinery the chat drives
+for you.
+
 ## Adopting the shell for a project
 
 This repository is the tool's own project — real adoptions get their

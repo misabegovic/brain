@@ -18,11 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
-- **2026-07-10** — pitch captured:
-  [chat-first app](brain/pitches/chat-first-app.md) — simplify by
-  making the conversation the interface; per-harness print-mode
-  chat bridge on the operator's subscription; terminal demoted to a
-  power toggle. Pre-bet.
+- **2026-07-10** — **0.12.0 shipped: the chat-first app.** Bare
+  `brain` opens one window: conversation (print-mode bridge, on
+  your subscription — [ADR](brain/adrs/chat-print-mode-bridge.md)),
+  live knowledge beside it, ambient status, terminal behind a
+  toggle. Verified with a real chat turn driving the mechanism.
 - **2026-07-10** — **0.11.0 shipped: instance birth.** `init --full`
   births a working instance from the kernel manifest (mechanism +
   kernel trail cross; dogfood never does), verified by its own gates

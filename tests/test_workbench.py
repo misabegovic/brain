@@ -237,3 +237,42 @@ def test_lint_page_flags_broken_link(tmp_path):
         assert "broken link" in buf.getvalue()
     finally:
         rogue.unlink()
+
+
+def test_run_chat_message_with_stub_registry():
+    stub = [{"name": "echo", "bin": "echo",
+             "first_args": ["first:"], "continue_args": ["cont:"]}]
+    wb._chat_continuing.discard("echo")
+    r1 = wb.run_chat_message("echo", "hello", cwd=str(REPO), registry=stub)
+    assert r1["ok"] and r1["reply"] == "first: hello"
+    r2 = wb.run_chat_message("echo", "again", cwd=str(REPO), registry=stub)
+    assert r2["ok"] and r2["reply"] == "cont: again", \
+        "second turn must use the continuation form"
+    wb._chat_continuing.discard("echo")
+
+
+def test_run_chat_message_rejects_unknown_and_missing():
+    r = wb.run_chat_message("nope", "x", cwd=str(REPO), registry=[])
+    assert not r["ok"] and "unknown" in r["reply"]
+    r = wb.run_chat_message(
+        "ghost", "x", cwd=str(REPO),
+        registry=[{"name": "ghost", "bin": "no-such-bin-xyz",
+                   "first_args": [], "continue_args": []}])
+    assert not r["ok"] and "PATH" in r["reply"]
+
+
+def test_chat_rows_shape():
+    names = [r["name"] for r in wb.CHAT_CLIS]
+    assert names == sorted(set(names))
+    for row in wb.CHAT_CLIS:
+        assert row["bin"] and isinstance(row["first_args"], list)
+        assert isinstance(row["continue_args"], list)
+
+
+def test_workbench_page_is_chat_first():
+    html = wb.render_workbench_page("tok", wb.TERMINAL_CLIS, 40,
+                                    ["engineer"], wb.CHAT_CLIS)
+    assert "composer" in html and "toggleTerm" in html
+    assert html.index("msgs") < html.index('id="term"'), \
+        "chat renders before the terminal"
+    assert 'value="claude"' in html

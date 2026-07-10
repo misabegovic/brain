@@ -26,6 +26,11 @@ into the sections below.
 
 ## Now
 
+- **The chat-first app is live (0.12.0, 2026-07-10).** Conversation
+  as the interface on the operator's picks (registry / toggle /
+  full collapse); a real turn verified end-to-end. The mechanism's
+  vocabulary is now a power-user concern.
+
 - **Instance birth is live (0.11.0, 2026-07-10).** One command
   births a gate-passing instance; the contamination boundary is an
   explicit manifest; 1.0 criteria settled (birth passes; the rest

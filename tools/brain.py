@@ -1354,8 +1354,23 @@ def cmd_serve(args) -> int:
                         200,
                         wb.render_workbench_page(
                             wb.SESSION_TOKEN, wb.TERMINAL_CLIS,
-                            len(entries_cache), view_names),
+                            len(entries_cache), view_names,
+                            wb.CHAT_CLIS),
                         "text/html; charset=utf-8")
+                    return
+                if path == "/workbench/status":
+                    checks = _doctor_checks()
+                    latest = max(
+                        (pp.stat().st_mtime for pp in WIKI.rglob("*.md")),
+                        default=0)
+                    self._send_json(200, {
+                        "inbox": len(_inbox_items()),
+                        "fails": sum(1 for c in checks
+                                     if c["status"] == "fail"),
+                        "warns": sum(1 for c in checks
+                                     if c["status"] == "warn"),
+                        "mtime": latest,
+                    })
                     return
                 if path.startswith("/workbench/assets/"):
                     asset = xterm_assets.get(path.rsplit("/", 1)[-1])
@@ -1494,6 +1509,28 @@ def cmd_serve(args) -> int:
                                            "run tools/ui-build.sh)"})
 
         def do_POST(self):  # noqa: N802
+            url = urllib.parse.urlparse(self.path)
+            if workbench and url.path == "/workbench/chat":
+                qs = urllib.parse.parse_qs(url.query)
+                host_hdr = (self.headers.get("Host") or "").split(":")[0]
+                if host_hdr not in ("localhost", "127.0.0.1", "::1", ""):
+                    self._send_json(403, {"error": "host not allowed"})
+                    return
+                if qs.get("token", [""])[0] != wb.SESSION_TOKEN:
+                    self._send_json(403, {"error": "bad token"})
+                    return
+                try:
+                    length = int(self.headers.get("Content-Length", 0))
+                    body = json.loads(self.rfile.read(length))
+                except (ValueError, json.JSONDecodeError):
+                    self._send_json(400, {"error": "bad JSON body"})
+                    return
+                result = wb.run_chat_message(
+                    str(body.get("harness", "")),
+                    str(body.get("message", ""))[:20000],
+                    cwd=str(REPO))
+                self._send_json(200, result)
+                return
             self._send_json(405, {"error": "read-only"})
 
     class Server(socketserver.ThreadingTCPServer):

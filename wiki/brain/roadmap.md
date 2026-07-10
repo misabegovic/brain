@@ -287,6 +287,19 @@ Settled at [topics/one-point-oh-criteria.md](topics/one-point-oh-criteria.md):
 (4) cold-start onboarding by a non-operator; (5) all-green at tag
 time. Criteria 2–4 need calendar time and a real adoption.
 
+## 0.12.0 — chat-first app — **shipped 2026-07-10**
+
+The operator's simplification bet, delivered on their three picks
+([ADR](adrs/chat-print-mode-bridge.md)): the conversation is the
+interface (per-harness print-mode chat rows beside the launch
+registry — subscription-billed, project-config-honouring; verified
+live with a real turn answering from `brain.py stats`), the
+terminal demoted to an advanced toggle (PTY connects lazily), an
+ambient attention strip replacing tables (health + queue + reload
+signal in one poll), and the surface collapsed: bare `brain` opens
+the app; the README leads with the conversation. Named follow-ups:
+streaming replies, transcript capture, chat-led onboarding.
+
 ## Standing ideas (unversioned)
 
 Deliberately not adopted from the open-knowledge direction: a vector
