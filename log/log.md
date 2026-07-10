@@ -40,3 +40,6 @@
 2026-07-10 commit — 4604c36: views pitch amended (SQLite derived-index substrate)
    diff: 3 files changed, 47 insertions(+), 11 deletions(-)
    restricted-paths: false
+2026-07-10 commit — 1924f5d: views pitch deepdived (5 research notes + prototype)
+   diff: 8 files changed, 284 insertions(+), 7 deletions(-)
+   restricted-paths: false
