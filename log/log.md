@@ -22,3 +22,6 @@
 2026-07-10 commit — d2af62a: Hands-off surface (setup / doctor / dash / wrapper verbs)
    diff: 9 files changed, 488 insertions(+), 15 deletions(-)
    restricted-paths: true
+2026-07-10 commit — 67e02a3: Doctor venv-aware tiktoken check
+   diff: 1 file changed, 14 insertions(+), 4 deletions(-)
+   restricted-paths: true
