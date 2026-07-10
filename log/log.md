@@ -37,3 +37,6 @@
 2026-07-10 commit — 736795c: composable role-fit views pitch captured (pre-bet)
    diff: 10 files changed, 177 insertions(+), 13 deletions(-)
    restricted-paths: false
+2026-07-10 commit — 4604c36: views pitch amended (SQLite derived-index substrate)
+   diff: 3 files changed, 47 insertions(+), 11 deletions(-)
+   restricted-paths: false
