@@ -95,7 +95,14 @@ issue counts (releases, discussions, PR narratives where useful). A
 `*-walk` op flags new batches; the 0.2 ingest loop digests them
 through the existing `/in` routing tables.
 
-## 0.4.0 — pruning + deepening (knowledge GC and R&D)
+## 0.4.0 — pruning + deepening (knowledge GC and R&D) — **shipped 2026-07-10**
+
+Shipped as producers + a health view: `brain.py links` (orphans /
+hubs / dead-ends / suggested links) and four new `inbox-refresh`
+producers — per-kind half-life crossings (the groom table encoded),
+an orphans item, the research picker (low confidence × ≥2 inbound
+links, top 3), and per-repo coverage gaps. The picker queued its
+first three real items the moment it ran.
 
 Grooming gets teeth: the half-life table becomes a deterministic
 scan emitting inbox items; `/tend` executes demotions / supersedes /

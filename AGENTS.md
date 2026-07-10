@@ -1113,6 +1113,20 @@ the home links resolve. The new shell is `BRAIN_DIR`-aware — all
 `brain.py` commands honour `$BRAIN_DIR` so the existing tools work
 against the new shell without copying `tools/` over.
 
+### `brain.py links` — link-graph health
+
+```bash
+python3 tools/brain.py links [--json]
+```
+
+Orphans (no inbound links — link or archive), hubs (most-linked;
+keep freshest), dead ends (no outbound), and suggested links
+(unlinked pages sharing `repos:`/`affects:`). The deterministic
+input to pruning and to the deepening picker: `inbox-refresh`
+queues an orphans item, and pages where **low confidence crosses
+high centrality** (≥2 inbound links) become `research` inbox items
+digested by `/tend` (findings snapshot to `sources/research/`).
+
 ### `brain.py setup` / `doctor` / `serve /dash` — the hands-off surface
 
 ```bash

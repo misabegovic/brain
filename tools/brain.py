@@ -3580,6 +3580,110 @@ def _count_go_mod(p: Path) -> int:
     return n
 
 
+# --- link graph (0.4) — pruning + deepening inputs -----------------------
+
+# Stale thresholds (days) per page kind — the groom skill's half-life
+# table, "Stale" column. Kinds not listed use the reference default.
+HALF_LIFE_STALE_DAYS = {
+    "reference": 180, "initiative": 60, "decision": 730,
+    "entity": 365, "insight": 90, "overlap": 120,
+}
+
+
+def _link_graph() -> tuple[dict[str, set[str]], dict[str, set[str]]]:
+    """(outbound, inbound) maps over wiki pages, keyed by
+    wiki-relative path. Edges are resolved relative markdown links;
+    tooling folders (_views etc.) are excluded on both sides."""
+    outbound: dict[str, set[str]] = {}
+    inbound: dict[str, set[str]] = {}
+    for page in WIKI.rglob("*.md"):
+        rel = page.relative_to(WIKI)
+        if any(part.startswith("_") for part in rel.parts):
+            continue
+        rel_s = str(rel)
+        outbound.setdefault(rel_s, set())
+        inbound.setdefault(rel_s, set())
+    for rel_s in list(outbound):
+        page = WIKI / rel_s
+        for href in re.findall(r"\]\(([^)]+)\)", page.read_text()):
+            href = href.split("#", 1)[0].strip()
+            if (not href or not href.endswith(".md")
+                    or href.startswith(("http://", "https://", "mailto:", "~/"))):
+                continue
+            target = (page.parent / href).resolve()
+            try:
+                target_rel = str(target.relative_to(WIKI))
+            except ValueError:
+                continue
+            if target_rel in outbound and target_rel != rel_s:
+                outbound[rel_s].add(target_rel)
+                inbound[target_rel].add(rel_s)
+    return outbound, inbound
+
+
+def cmd_links(args) -> int:
+    """Link-graph health views: orphans / hubs / dead-ends / suggest.
+
+    The deterministic input to pruning (orphans want linking or
+    archiving) and deepening (hubs are the load-bearing pages whose
+    confidence matters most).
+    """
+    outbound, inbound = _link_graph()
+    is_index = lambda p: Path(p).name == "index.md"  # noqa: E731
+
+    orphans = sorted(p for p, src in inbound.items()
+                     if not src and not is_index(p))
+    hubs = sorted(((p, len(src)) for p, src in inbound.items() if src),
+                  key=lambda x: (-x[1], x[0]))[:15]
+    dead_ends = sorted(p for p, dst in outbound.items()
+                       if not dst and not is_index(p))
+
+    suggestions = []
+    metas = {}
+    for p in outbound:
+        parsed = parse(WIKI / p)
+        if parsed:
+            m = parsed[0]
+            metas[p] = set(m.get("repos") or []) | set(m.get("affects") or [])
+    paths = sorted(metas)
+    for i, a in enumerate(paths):
+        for b in paths[i + 1:]:
+            if not metas[a] or is_index(a) or is_index(b):
+                continue
+            shared = metas[a] & metas[b]
+            if shared and b not in outbound[a] and a not in outbound[b]:
+                suggestions.append((a, b, sorted(shared)))
+    suggestions = suggestions[:15]
+
+    if getattr(args, "json", False):
+        print(json.dumps({
+            "orphans": orphans, "dead_ends": dead_ends,
+            "hubs": [{"path": p, "inbound": n} for p, n in hubs],
+            "suggestions": [{"a": a, "b": b, "shared": s}
+                            for a, b, s in suggestions],
+        }, indent=2))
+        return 0
+
+    print(f"# link graph — {len(outbound)} pages\n")
+    print(f"orphans ({len(orphans)}) — no inbound links; link or archive:")
+    for p in orphans or ["  (none)"]:
+        print(f"  {p}" if p != "  (none)" else p)
+    print(f"\nhubs (top {len(hubs)}) — most-linked; keep these freshest:")
+    for p, n in hubs or []:
+        print(f"  {n:>3}← {p}")
+    if not hubs:
+        print("  (none)")
+    print(f"\ndead ends ({len(dead_ends)}) — no outbound links:")
+    for p in dead_ends or ["  (none)"]:
+        print(f"  {p}" if p != "  (none)" else p)
+    print(f"\nsuggested links ({len(suggestions)}) — shared repos, not linked:")
+    for a, b, s in suggestions:
+        print(f"  {a} ↔ {b}  (shared: {', '.join(s)})")
+    if not suggestions:
+        print("  (none)")
+    return 0
+
+
 # --- connectors (0.3) — pull-only snapshot-writers ----------------------
 #
 # Contract per wiki/brain/adrs/connector-snapshot-contract.md: a
@@ -3904,13 +4008,16 @@ def _schedule_run_inbox_refresh() -> int:
                 "priority": "normal",
             }
 
-    cutoff = today_utc() - dt.timedelta(days=30)
+    today = today_utc()
+    page_meta: dict[str, dict] = {}
     for p in wiki_pages():
         parsed = parse(p)
         if parsed is None:
             continue
         meta, _body = parsed
-        if meta.get("confidence") != "high":
+        rel = str(p.relative_to(WIKI))
+        page_meta[rel] = meta
+        if meta.get("status") in ("superseded", "archived"):
             continue
         updated = meta.get("updated")
         if isinstance(updated, str):
@@ -3918,16 +4025,74 @@ def _schedule_run_inbox_refresh() -> int:
                 updated = dt.date.fromisoformat(updated)
             except ValueError:
                 continue
-        if isinstance(updated, dt.date) and updated < cutoff:
-            rel = str(p.relative_to(WIKI))
+        if not isinstance(updated, dt.date):
+            continue
+        age = (today - updated).days
+        reasons = []
+        if meta.get("confidence") == "high" and age > 30:
+            reasons.append(f"confidence:high but {age}d since update "
+                           f"(30d refresh rule)")
+        stale_days = HALF_LIFE_STALE_DAYS.get(
+            meta.get("kind", "reference"),
+            HALF_LIFE_STALE_DAYS["reference"])
+        if age > stale_days:
+            reasons.append(f"kind:{meta.get('kind')} stale at {age}d "
+                           f"(>{stale_days}d half-life)")
+        if reasons:
             slug = re.sub(r"[^a-z0-9]+", "-", rel.lower()).strip("-")
             current[f"half-life-{slug}"] = {
                 "kind": "groom",
-                "summary": f"{rel} is confidence:high but updated "
-                           f"{updated.isoformat()} (>30d) — refresh or demote",
+                "summary": f"{rel}: {'; '.join(reasons)} — refresh or demote",
                 "route": "/groom",
                 "source": f"wiki/{rel}",
                 "priority": "low",
+            }
+
+    outbound, inbound = _link_graph()
+    orphans = [p for p, src in inbound.items()
+               if not src and Path(p).name != "index.md"]
+    if orphans:
+        current["link-orphans"] = {
+            "kind": "groom",
+            "summary": f"{len(orphans)} orphan page(s) with no inbound "
+                       f"links — link or archive "
+                       f"(`brain.py links` for the list)",
+            "route": "/groom",
+            "source": "wiki/",
+            "priority": "low",
+        }
+
+    # Deepening picker: low-confidence pages that the graph leans on.
+    picks = []
+    for rel, meta in page_meta.items():
+        if meta.get("status") in ("superseded", "archived"):
+            continue
+        if meta.get("confidence") not in ("low", "medium"):
+            continue
+        degree = len(inbound.get(rel, ()))
+        if degree >= 2:
+            picks.append((degree, rel, meta.get("confidence")))
+    for degree, rel, conf in sorted(picks, reverse=True)[:3]:
+        slug = re.sub(r"[^a-z0-9]+", "-", rel.lower()).strip("-")
+        current[f"research-{slug}"] = {
+            "kind": "research",
+            "summary": f"{rel}: confidence:{conf} but {degree} pages "
+                       f"link to it — deepen with cited research",
+            "route": f"deepdive wiki/{rel}, snapshot findings to "
+                     f"sources/research/, earn the confidence bump",
+            "source": f"wiki/{rel}",
+            "priority": "normal",
+        }
+
+    for repo in sorted(ACTIVE_REPOS):
+        if not (WIKI / repo / "index.md").exists():
+            current[f"coverage-gap-{repo}"] = {
+                "kind": "research",
+                "summary": f"{repo} is in active scope but has no "
+                           f"wiki/{repo}/ shelf yet — first-pass ingest",
+                "route": f"/in {repo}",
+                "source": f"~/projects/{repo}",
+                "priority": "normal",
             }
 
     broken = 0
@@ -5309,6 +5474,12 @@ def main() -> int:
     ap_crf.add_argument("--base", default="origin/main",
                         help="base ref for the diff (default: origin/main)")
     ap_crf.set_defaults(func=cmd_check_readme_fresh)
+
+    ap_links = sub.add_parser("links",
+                              help="link-graph health: orphans / hubs / "
+                                   "dead-ends / suggested links")
+    ap_links.add_argument("--json", action="store_true")
+    ap_links.set_defaults(func=cmd_links)
 
     ap_setup = sub.add_parser("setup",
                               help="one-command bootstrap for a fresh "

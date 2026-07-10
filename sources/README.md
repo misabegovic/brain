@@ -11,3 +11,6 @@ Conventional subfolders (created on first use, not preemptively):
 - `conversations/` — `/capture` snapshots
 - `ai_user_feedback/` — summarised feedback batches
 - `web/` — web captures, including `web/competitors/<competitor>/`
+- `research/` — deepening-run findings (`/tend` research items)
+- `github/`, `slack/` — connector snapshots (releases, PR batches,
+  channel transcripts)

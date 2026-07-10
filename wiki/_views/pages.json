@@ -268,7 +268,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 2026
+      "tokens": 2130
     },
     {
       "path": "brain/state.md",
@@ -280,7 +280,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 767
+      "tokens": 851
     },
     {
       "path": "org/index.md",

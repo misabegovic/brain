@@ -26,6 +26,12 @@ into the sections below.
 
 ## Now
 
+- **Pruning + deepening are live (0.4.0, 2026-07-10).**
+  `brain.py links` health views; `inbox-refresh` now queues
+  per-kind half-life crossings, orphans, research picks (low
+  confidence × high centrality), and coverage gaps. Three research
+  items are pending on the shell's own hub ADRs.
+
 - **Connectors are live (0.3.0, 2026-07-10).** GitHub (releases +
   merged-PR batches, sibling-remote auto-discovery), Notion
   (watched-page re-snapshots on `last_edited`), Slack (per-channel

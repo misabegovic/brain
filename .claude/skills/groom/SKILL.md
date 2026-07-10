@@ -28,6 +28,12 @@ doubt, **flag for human review** rather than acting silently.
 Plus: a page's clock resets on a *content* edit (not a frontmatter-only
 bump). Use git blame / `git log -p` to confirm if unsure.
 
+`brain.py links` is the deterministic pre-read: orphans and
+dead-ends are pruning candidates, hubs are where demotions hurt
+most. The daily `inbox-refresh` op queues half-life crossings and
+an orphans item automatically — a groom pass often starts as
+`/tend groom`.
+
 ## Protocol
 
 ### 1. Load the corpus

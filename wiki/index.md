@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.4.0 shipped: pruning + deepening.**
+  `brain.py links` link-graph health, per-kind half-life scanning,
+  orphan detection, the research picker (low confidence × high
+  centrality), and coverage-gap items — all deterministic
+  `inbox-refresh` producers feeding `/tend`.
 - **2026-07-10** — **0.3.0 shipped: connectors.** GitHub / Notion /
   Slack pull connectors under one
   [snapshot-writer contract](brain/adrs/connector-snapshot-contract.md) —
@@ -64,9 +69,8 @@ start filling in as the slash-command surface runs.
 ## Open initiatives
 
 <!-- home-section; maintained-by: /shape -->
-- [Brain roadmap — the 0.x arc](brain/roadmap.md) — 0.2 and 0.3
-  shipped; next up: 0.4 pruning + deepening (link-graph health,
-  research picker).
+- [Brain roadmap — the 0.x arc](brain/roadmap.md) — 0.2 through 0.4
+  shipped; next up: 0.5 the MCP-first serving plane.
 
 [See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
 

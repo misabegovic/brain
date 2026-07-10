@@ -1,0 +1,66 @@
+"""Tests for the 0.4 link-graph health + deepening producers."""
+
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO / "tools"))
+
+import brain  # noqa: E402
+
+INBOX = REPO / "wiki" / "_state" / "inbox"
+
+
+def test_link_graph_shape():
+    outbound, inbound = brain._link_graph()
+    assert outbound.keys() == inbound.keys()
+    assert "index.md" in outbound
+    # Edges are symmetric between the two maps.
+    for src, dsts in outbound.items():
+        for dst in dsts:
+            assert src in inbound[dst], f"{src}→{dst} missing reverse edge"
+    # The home page links into the corpus.
+    assert outbound["index.md"], "home page should have outbound links"
+
+
+def test_links_cmd_runs_clean():
+    class _Args:
+        json = True
+
+    import contextlib
+    import io
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        assert brain.cmd_links(_Args()) == 0
+    data = json.loads(buf.getvalue())
+    for key in ("orphans", "hubs", "dead_ends", "suggestions"):
+        assert key in data
+    # The live shell keeps zero orphans (everything is indexed/linked).
+    assert data["orphans"] == []
+
+
+def test_half_life_table_matches_groom_skill():
+    """The encoded thresholds mirror the groom skill's Stale column."""
+    text = (REPO / ".claude" / "skills" / "groom" / "SKILL.md").read_text()
+    for kind, days in brain.HALF_LIFE_STALE_DAYS.items():
+        assert f"`{kind}`" in text, f"groom table missing kind {kind}"
+    assert brain.HALF_LIFE_STALE_DAYS["initiative"] == 60
+    assert brain.HALF_LIFE_STALE_DAYS["decision"] == 730
+
+
+def test_refresh_research_picker_targets_hubs():
+    """On the live corpus the picker queues at most 3 research items,
+    each naming a page with >=2 inbound links and low/medium
+    confidence."""
+    assert brain._schedule_run_inbox_refresh() == 0
+    _outbound, inbound = brain._link_graph()
+    research = [i for i in brain._inbox_items()
+                if i["id"].startswith("research-")
+                and i.get("produced_by") == "inbox-refresh"]
+    assert len(research) <= 3
+    for item in research:
+        rel = item["source"].removeprefix("wiki/")
+        assert len(inbound.get(rel, ())) >= 2, item["id"]

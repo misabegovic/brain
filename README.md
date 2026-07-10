@@ -126,6 +126,7 @@ python3 tools/brain.py views        # regen wiki/_views/ (by-kind, by-team, by-r
 python3 tools/brain.py search '<q>' # hybrid keyword search
 python3 tools/brain.py status       # single-pane health dashboard
 python3 tools/brain.py inbox summary # the tend queue in one line
+python3 tools/brain.py links        # link-graph health (orphans / hubs / suggestions)
 python3 tools/brain.py setup        # one-command bootstrap (idempotent)
 python3 tools/brain.py doctor       # health checklist
 tools/brain dash                    # local ops dashboard (serve + open /dash)

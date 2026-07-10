@@ -1,0 +1,10 @@
+{
+  "id": "research-brain-adrs-successor-ssg-for-ui-md",
+  "kind": "research",
+  "summary": "brain/adrs/successor-ssg-for-ui.md: confidence:medium but 4 pages link to it \u2014 deepen with cited research",
+  "route": "deepdive wiki/brain/adrs/successor-ssg-for-ui.md, snapshot findings to sources/research/, earn the confidence bump",
+  "priority": "normal",
+  "source": "wiki/brain/adrs/successor-ssg-for-ui.md",
+  "produced_by": "inbox-refresh",
+  "produced_at": "2026-07-10"
+}
