@@ -40,13 +40,14 @@ sanitized to organisation-agnostic form:
 ## Pitches (pre-bet)
 
 - [Composable role-fit views](pitches/composable-role-views.md) —
-  declarative view assemblies over wiki synthesis, connector state,
-  and observability data (Datadog / Langfuse connectors). Awaiting
-  a bet.
+  **superseded** 2026-07-10: graduated on the operator's bet into
+  the PRD below.
 
 ## PRDs
 
-*(none yet — `/shape brain <pitch>` to author)*
+- [Composable role-fit views](prds/composable-role-views.md) — SQL
+  view specs over a derived index, with Datadog / Langfuse
+  connectors. Bet 2026-07-10.
 
 ## AI suggestions (drafts for human review)
 

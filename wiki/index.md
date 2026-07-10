@@ -18,6 +18,9 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — views pitch **graduated on the operator's bet**:
+  [PRD](brain/prds/composable-role-views.md) landed; ADR + build
+  follow in the same cycle.
 - **2026-07-10** — views pitch **deepdived**: five research notes
   in `sources/research/` (SQLite/FTS5 mechanics incl. a live
   prototype at 19 ms / 304 KB, Datasette pilot recommendation,

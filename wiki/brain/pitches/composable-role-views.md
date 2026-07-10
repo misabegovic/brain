@@ -1,7 +1,8 @@
 ---
 title: "Composable role-fit views — declarative assemblies over wiki synthesis, connector state, and observability data"
 kind: pitch
-status: draft
+status: superseded
+superseded_by: brain/prds/composable-role-views.md
 updated: 2026-07-10
 confidence: medium
 sources:

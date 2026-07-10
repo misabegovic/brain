@@ -254,13 +254,14 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 601
+      "tokens": 630
     },
     {
       "path": "brain/pitches/composable-role-views.md",
       "title": "Composable role-fit views \u2014 declarative assemblies over wiki synthesis, connector state, and observability data",
       "kind": "pitch",
-      "status": "draft",
+      "status": "superseded",
+      "superseded_by": "brain/prds/composable-role-views.md",
       "updated": "2026-07-10",
       "confidence": "medium",
       "sources": [
@@ -275,6 +276,22 @@
         "../../../brain-schedule.yml"
       ],
       "tokens": 1638
+    },
+    {
+      "path": "brain/prds/composable-role-views.md",
+      "title": "Composable role-fit views \u2014 SQL view specs over a derived index, with observability connectors",
+      "kind": "initiative",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/composable-role-views.md",
+      "sources": [
+        "../pitches/composable-role-views.md",
+        "../../../sources/conversations/2026-07-10--composable-views-idea.md",
+        "../../../sources/research/2026-07-10--composable-views-prior-art.md",
+        "../../../sources/research/2026-07-10--sqlite-index-prototype.md"
+      ],
+      "tokens": 697
     },
     {
       "path": "brain/roadmap.md",
