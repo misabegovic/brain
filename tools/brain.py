@@ -2071,13 +2071,20 @@ def _doctor_checks() -> list[dict]:
         add("git", "git repository", "fail", "no .git — history and the "
             "audit trail need git", "git init")
 
+    venv_python = Path.home() / ".local/share/mempalace-venv/bin/python3"
     try:
         import tiktoken  # noqa: F401
         add("tiktoken", "token counting", "ok", "tiktoken available")
     except ImportError:
-        add("tiktoken", "token counting", "warn",
-            "tiktoken missing — pages.json token counts drift vs CI",
-            "tools/setup-local.sh")
+        if venv_python.exists() and subprocess.run(
+                [str(venv_python), "-c", "import tiktoken"],
+                capture_output=True).returncode == 0:
+            add("tiktoken", "token counting", "ok",
+                f"tiktoken available in the local venv ({venv_python})")
+        else:
+            add("tiktoken", "token counting", "warn",
+                "tiktoken missing — pages.json token counts drift vs CI",
+                "tools/setup-local.sh")
 
     env_path = REPO / ".env"
     if env_path.exists():
@@ -2245,7 +2252,10 @@ def cmd_setup(args) -> int:
         import tiktoken  # noqa: F401
         has_tiktoken = True
     except ImportError:
-        has_tiktoken = False
+        venv_python = Path.home() / ".local/share/mempalace-venv/bin/python3"
+        has_tiktoken = venv_python.exists() and subprocess.run(
+            [str(venv_python), "-c", "import tiktoken"],
+            capture_output=True).returncode == 0
     if not has_tiktoken and confirm("create the local venv (tiktoken, pytest)?"):
         step("local venv", True, lambda: subprocess.run(
             ["bash", str(REPO / "tools" / "setup-local.sh")], check=False))
