@@ -52,3 +52,6 @@
 2026-07-10 commit — 4731b56: /shape phase 3 — 0.5.0 composable views shipped (index + specs + connectors)
    diff: 20 files changed, 877 insertions(+), 34 deletions(-)
    restricted-paths: true
+2026-07-10 commit — b086acc: 0.6 software half — MCP-HTTP + serving mode + Datasette pilot
+   diff: 11 files changed, 310 insertions(+), 5 deletions(-)
+   restricted-paths: true
