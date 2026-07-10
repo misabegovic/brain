@@ -13,3 +13,6 @@
 2026-07-10 commit — 57f6374: Roadmap revised to queue-and-tend (no scheduled LLM runs)
    diff: 3 files changed, 68 insertions(+), 45 deletions(-)
    restricted-paths: false
+2026-07-10 commit — c637fc3: Inbox producer contract + agent-independence recorded
+   diff: 3 files changed, 38 insertions(+), 5 deletions(-)
+   restricted-paths: false
