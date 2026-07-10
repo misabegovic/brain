@@ -85,3 +85,8 @@
    diff: 16 files changed, 302 insertions(+), 8 deletions(-)
    restricted-paths: true
    by: claude (fable 5), directed by operator
+2026-07-10 tend — sweep 2: 3 items verified → high; picker damped (ADR amendment); queue empty
+2026-07-10 commit — 9bdfa50: tend sweep 2 + research-picker damping amendment
+   diff: 16 files changed, 135 insertions(+), 55 deletions(-)
+   restricted-paths: true
+   by: claude (fable 5), directed by operator
