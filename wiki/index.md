@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — roadmap detail: the inbox is an open producer
+  contract (per-item JSON + `brain.py inbox add`, operator-defined
+  cron producers welcome), and agent-independence is a cross-cutting
+  principle — gates in git/CI, credential-scoped connectors,
+  per-harness adapters over one canonical protocol set.
 - **2026-07-10** — 0.x arc revised to the **queue-and-tend** model
   per operator constraint: no scheduled LLM invocation — cron
   accumulates deterministic work into an inbox, the operator's normal

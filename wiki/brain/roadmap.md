@@ -49,10 +49,17 @@ Sibling-diff ingestion is already incremental via `sync-cursor diff`.
 No scheduled LLM runs. A **local timer** (cron / systemd — local
 because the sibling repos only exist on the operator's machine) runs
 the deterministic ops and accumulates pending synthesis work into a
-persistent inbox at `wiki/_state/inbox.json`: per-repo cursor-diff
-summaries, new connector batches, half-life crossings, link-health
-findings, coverage gaps. A session-start hook surfaces one line
-(`brain inbox: N pending`); a **`/tend` skill** digests the queue
+persistent inbox: per-repo cursor-diff summaries, new connector
+batches, half-life crossings, link-health findings, coverage gaps.
+**The inbox is an open contract, not a closed pipeline**: one JSON
+file per item at `wiki/_state/inbox/<id>.json` (merge-safe per the
+efforts-registry precedent; committed, so arrival and clearing are
+git-audited), written via `brain.py inbox add` with a
+producer-chosen dedup id so re-runs are idempotent. Operator-defined
+producers are first-class — any script that calls `inbox add`,
+registered as one more `brain-schedule.yml` entry (the `handler:`
+field is already arbitrary shell). A session-start hook surfaces one
+line (`brain inbox: N pending`); a **`/tend` skill** digests the queue
 inside the operator's normal interactive session — priority-ordered,
 budget-bounded, landing `LOCAL_FIRST` commits and clearing items.
 Latency is "next time the operator sits down", which matches the
@@ -112,6 +119,27 @@ accumulation loop stays on the operator's machine where the sibling
 repos live. Health is `brain.py status` exposed. Tenancy stays
 isolation-shaped: one brain, one deployment, per organisation — no
 cross-brain sharing.
+
+## Cross-cutting — agent-independence
+
+The brain's agent contract is deliberately harness-neutral: *read
+`AGENTS.md`, follow the skill protocols, call `brain.py`, edit
+files* — anything that can do that is a valid agent, and with no
+agent at all the brain degrades to a validated markdown wiki.
+Already independent: the validator/CLI, CI gates, the pre-commit
+hook, the UI, the MCP server (an open standard — any MCP-aware
+client queries the brain today), and the corpus itself (plain
+markdown + git, directly compatible with open-knowledge-style
+editors). The three genuinely Claude-Code-specific pieces and their
+neutral counterparts: harness hooks are ergonomics only (the
+load-bearing gates stay in pre-commit + CI, never only in a
+harness); permission deny-lists are backstopped by **credential
+scoping** (connectors carry read-only tokens, so no harness can
+write regardless of its permission model); and the `.claude/`
+layout gets thin generated adapters per harness via a future
+`brain.py install-agent <harness>` (mirroring `install-sibling`),
+pointing at canonical protocol files rather than maintaining copies
+that drift.
 
 ## Standing ideas (unversioned)
 
