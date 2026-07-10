@@ -94,3 +94,6 @@
    diff: 19 files changed, 597 insertions(+), 7 deletions(-)
    restricted-paths: true
    by: claude (fable 5), directed by operator
+2026-07-10 commit — 644edfe: chat-first-app pitch captured (pre-bet)
+   diff: 7 files changed, 141 insertions(+), 2 deletions(-)
+   by: claude (fable 5), directed by operator
