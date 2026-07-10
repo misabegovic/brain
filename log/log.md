@@ -46,3 +46,6 @@
 2026-07-10 commit — 3ee02b9: /shape phase 1 — composable-role-views PRD; pitch superseded
    diff: 6 files changed, 117 insertions(+), 8 deletions(-)
    restricted-paths: false
+2026-07-10 commit — 315d1e2: /shape phase 2 — sql-views-over-derived-index ADR
+   diff: 5 files changed, 151 insertions(+), 1 deletion(-)
+   restricted-paths: false
