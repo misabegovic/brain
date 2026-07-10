@@ -18,15 +18,21 @@ its own knowledge — and eventually offers safe, read-only chat access
 to people outside the product, while staying local-first for the
 operator's own work. Nothing urgent; this page holds the ordering.
 
-The load-bearing observation: **the governance rail is the
-enterprise-safety substrate, and it already exists.** PR-required,
+Two load-bearing observations. First, **the governance rail is the
+enterprise-safety substrate, and it already exists** — PR-required,
 CI gates, the confidence floor, the `ai-suggestions/` separation, and
 the `/shape` human gates were designed for unsupervised agent runs.
-What "self-maintaining" adds is the *invocation* — moving the agent
-itself onto the schedule — not a new safety model. Ordering follows
-from that: autonomy first (0.2), more inputs only once the loop can
-digest them (0.3), garbage collection before serving (0.4), then the
-chat plane (0.5) and the hosting profile that carries it (0.6).
+Second (operator constraint, 2026-07-10): **no scheduled LLM
+invocation** — the operator works through interactive terminal
+sessions only, and headless per-run billing is out. The consequence
+is the *queue-and-tend* split: everything deterministic (observation,
+collection, connector pulls, health scans) runs on a schedule for
+free; everything that needs a model (synthesis, grooming judgement,
+research) queues into a persistent inbox and is digested inside the
+operator's normal sessions. Ordering: accumulation loop first (0.2),
+more inputs once the loop digests them (0.3), garbage collection
+before serving (0.4), then the serving plane (0.5) and the hosting
+profile that carries it (0.6).
 
 ## 0.1.x — where we are
 
@@ -38,17 +44,22 @@ empty shell; they *observe and flag* but do not synthesise. Ingestion
 local-only: stdio MCP (read-only tools) + static Astro UI.
 Sibling-diff ingestion is already incremental via `sync-cursor diff`.
 
-## 0.2.0 — scheduled autonomy (the self-maintenance loop)
+## 0.2.0 — queue-and-tend (the self-maintenance loop)
 
-A second class of schedule op whose handler is a **headless agent
-run** rather than a deterministic script. Nightly: mechanical `/sync`,
-then per-repo `sync-cursor diff` → `wiki-ingest` → PR. Weekly:
-`/groom` in agent mode producing demotion / supersede / archive PRs.
-Every run lands as a PR on the governance rail — self-merge on green
-for routine synthesis, `ai-suggestions/` for anything
-commitment-shaped, human gates untouched. The runner is CI cron or
-local cron; `LOCAL_FIRST` stays an operator-session mode, never a
-scheduled-run mode.
+No scheduled LLM runs. A **local timer** (cron / systemd — local
+because the sibling repos only exist on the operator's machine) runs
+the deterministic ops and accumulates pending synthesis work into a
+persistent inbox at `wiki/_state/inbox.json`: per-repo cursor-diff
+summaries, new connector batches, half-life crossings, link-health
+findings, coverage gaps. A session-start hook surfaces one line
+(`brain inbox: N pending`); a **`/tend` skill** digests the queue
+inside the operator's normal interactive session — priority-ordered,
+budget-bounded, landing `LOCAL_FIRST` commits and clearing items.
+Latency is "next time the operator sits down", which matches the
+nothing-urgent posture, and every synthesis run is implicitly
+supervised because it happens in a visible session. The PR rail
+remains the mode for multi-agent deployments; tend-mode and PR-mode
+are the same skills under different governance toggles.
 
 ## 0.3.0 — connectors as snapshot-writers (Slack, Notion, GitHub)
 
@@ -65,35 +76,42 @@ through the existing `/in` routing tables.
 ## 0.4.0 — pruning + deepening (knowledge GC and R&D)
 
 Grooming gets teeth: the half-life table becomes a deterministic
-scan emitting a work-list; the weekly agent run executes it as PRs.
-Link-graph health joins the detectors (dead ends / orphans / hubs /
-suggested links) as a pruning input. Deepening: a research op picks
-the pages where **low confidence crosses high centrality** (hub pages
-per reverse edges) or coverage gaps, runs deep research (sibling code
-+ web), snapshots findings into `sources/research/`, and lands an
-ingest PR that earns the confidence bump with citations. The brain
-studies its weakest load-bearing knowledge first.
+scan emitting inbox items; `/tend` executes demotions / supersedes /
+archives when the operator digests. Link-graph health joins the
+detectors (dead ends / orphans / hubs / suggested links) as a pruning
+input. Deepening: a deterministic picker queues the pages where
+**low confidence crosses high centrality** (hub pages per reverse
+edges) or coverage gaps as research items; the research itself runs
+in-session via `/tend` (deep research over sibling code + web),
+snapshots findings into `sources/research/`, and lands the commit
+that earns the confidence bump with citations. The brain studies its
+weakest load-bearing knowledge first.
 
-## 0.5.0 — the serving plane (chat for people outside the product)
+## 0.5.0 — the serving plane (access for people outside the product)
 
-A grounded, **read-only chat surface** over the corpus. The stdio MCP
-grows an HTTP transport; a minimal chat app holds *only* the read
-tools, runs against a read-only checkout, and must cite brain pages
-in every answer (the zoom-out grounding rule, reused). Enterprise
-posture by construction: no write path in the serving process, SSO in
-front (identity-aware proxy), an append-only query audit log,
-`confidence:` and `updated:` surfaced inline so trust is calibrated,
-and `ai-suggestions/` excluded from the serving corpus. Local-first
-is unchanged — serving is an optional deployment profile, not the
-default mode.
+**MCP-first.** The stdio MCP grows an HTTP transport behind SSO
+(identity-aware proxy); people outside the product connect *their
+own* MCP-aware client (Claude, Cursor, ChatGPT connectors) to the
+brain's read-only tools — the operator pays hosting, consumers pay
+their own inference. Enterprise posture by construction: no write
+path exists in the serving process, it runs against a read-only
+checkout, an append-only query audit log records access,
+`confidence:` and `updated:` ride along in tool results so trust is
+calibrated, and `ai-suggestions/` is excluded from the serving
+corpus. A minimal grounded chat app (answers must cite brain pages —
+the zoom-out grounding rule, reused) is optional sugar for consumers
+with no agent of their own, added only if demand shows up, with
+per-query cost capped by construction. Local-first is unchanged —
+serving is an optional deployment profile, not the default mode.
 
 ## 0.6.0 — self-hosting hardening
 
-One compose profile: static UI, chat/MCP-HTTP, and a scheduler
-container running the 0.2 agent ops, all against the git remote as
-the single source of truth (backups are git). Health is
-`brain.py status` exposed. Tenancy stays isolation-shaped: one brain,
-one deployment, per organisation — no cross-brain sharing.
+One compose profile: static UI and MCP-HTTP against the git remote
+as the single source of truth (backups are git); the deterministic
+accumulation loop stays on the operator's machine where the sibling
+repos live. Health is `brain.py status` exposed. Tenancy stays
+isolation-shaped: one brain, one deployment, per organisation — no
+cross-brain sharing.
 
 ## Standing ideas (unversioned)
 

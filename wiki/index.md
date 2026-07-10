@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — 0.x arc revised to the **queue-and-tend** model
+  per operator constraint: no scheduled LLM invocation — cron
+  accumulates deterministic work into an inbox, the operator's normal
+  terminal sessions digest it via a `/tend` skill; external access
+  goes MCP-first (consumers bring their own agent and inference).
 - **2026-07-10** — operator intent for the 0.x arc captured
   (self-maintenance, connectors, pruning/deepening, external chat) —
   see [brain/roadmap.md](brain/roadmap.md); the open-knowledge study
