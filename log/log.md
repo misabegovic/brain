@@ -55,3 +55,6 @@
 2026-07-10 commit — b086acc: 0.6 software half — MCP-HTTP + serving mode + Datasette pilot
    diff: 11 files changed, 310 insertions(+), 5 deletions(-)
    restricted-paths: true
+2026-07-10 commit — 698ab16: harness-workbench pitch captured + deepdived (pre-bet)
+   diff: 13 files changed, 219 insertions(+), 11 deletions(-)
+   restricted-paths: false
