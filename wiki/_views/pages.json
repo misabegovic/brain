@@ -265,10 +265,11 @@
       "confidence": "medium",
       "sources": [
         "../../../sources/conversations/2026-07-10--composable-views-idea.md",
+        "../../../sources/conversations/2026-07-10--sqlite-substrate-musing.md",
         "../adrs/connector-snapshot-contract.md",
         "../../../brain-schedule.yml"
       ],
-      "tokens": 891
+      "tokens": 1075
     },
     {
       "path": "brain/roadmap.md",

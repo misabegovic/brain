@@ -6,6 +6,7 @@ updated: 2026-07-10
 confidence: medium
 sources:
   - ../../../sources/conversations/2026-07-10--composable-views-idea.md
+  - ../../../sources/conversations/2026-07-10--sqlite-substrate-musing.md
   - ../adrs/connector-snapshot-contract.md
   - ../../../brain-schedule.yml
 ---
@@ -44,14 +45,21 @@ Fat-marker sketch (details are the build's call):
   root — operator-editable, git-versioned, shareable. A spec names
   the view, an optional audience persona, and an ordered list of
   **blocks**.
-- **Blocks are deterministic queries with fixed parameters**, one
-  renderer each. The v1 set: `pages` (filter wiki pages by kind /
-  repo / status / confidence, sort, limit), `state` (render one
-  `wiki/_state/*.json` extract as a tile — deadlines, issues,
-  security, connector states), `snapshots` (latest N files matching
-  a `sources/<connector>/...` glob, with title + excerpt), `inbox`
-  (pending tend items, filterable by kind), and `links` (a
-  link-graph health slice).
+- **A derived SQLite index is the query substrate** (operator
+  direction 2026-07-10). A `brain.py index` step, riding the views
+  pipeline, deterministically rebuilds a **gitignored, disposable**
+  database from the three data planes: `pages` (frontmatter +
+  computed edges), `links`, `state` (flattened extracts),
+  `snapshots` (connector files parsed to rows where tabular),
+  `inbox`. Single writer (the indexer), read-only consumers, FTS5
+  over page and snapshot text. Files remain the only source of
+  truth — the db can be deleted and regenerated at any time.
+- **Blocks are named SQL queries** over that documented schema —
+  no invented filter language. Shipped example specs carry
+  readable starter queries; a spec author edits SQL, the one
+  language every operator and agent already knows. Convenience
+  shorthands (a `pages:` filter block) can compile to SQL, not
+  bypass it.
 - **Rendering rides the existing views pipeline**: `brain.py views`
   additionally emits `wiki/_views/custom/<name>.md` per spec, with
   the standard auto-generated banner. The Astro UI renders them
@@ -73,14 +81,22 @@ Fat-marker sketch (details are the build's call):
 
 ## Rabbit holes
 
-- **A query language.** Block parameters stay a fixed enum of
-  filters; the moment a spec wants expressions, stop and rethink.
+- **Inventing a query language.** Resolved by the SQLite direction
+  — blocks are SQL over the derived index. The remaining hole to
+  avoid: query builders / DSLs *on top of* SQL.
+- **The db becoming load-bearing.** It is an index, never a store:
+  no writes from anything but the indexer, no data that exists
+  only in the db, delete-and-rebuild always safe.
 - **Live dashboards.** Views are regenerated markdown on the
   existing cadence (timer + on-demand), not a websocket product.
 - **LLM-composed blocks.** v1 is fully deterministic; a synthesised
   "digest" block is a `/tend` product for a later pitch.
 - **Per-user state.** No accounts, no server-side preferences — the
   file is the preference.
+
+Datasette over the same index is a candidate read-only browse/API
+surface for the serving slice — noted for that pitch, not bet on
+here.
 
 ## No-gos
 
