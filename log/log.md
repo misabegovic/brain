@@ -58,3 +58,7 @@
 2026-07-10 commit — 698ab16: harness-workbench pitch captured + deepdived (pre-bet)
    diff: 13 files changed, 219 insertions(+), 11 deletions(-)
    restricted-paths: false
+2026-07-10 tend — 3 research items digested: 2 hub ADRs verified → high; 1 moot (graduating)
+2026-07-10 commit — 3eba6fe: tend sweep (hub-ADR verification)
+   diff: 10 files changed, 65 insertions(+), 48 deletions(-)
+   restricted-paths: false
