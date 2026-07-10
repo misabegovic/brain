@@ -31,3 +31,6 @@
 2026-07-10 commit — bcc2695: 0.4.0 shipped — pruning + deepening (links health + research picker)
    diff: 13 files changed, 320 insertions(+), 12 deletions(-)
    restricted-paths: true
+2026-07-10 commit — 85d0e65: sources-immutability README exemption
+   diff: 1 file changed, 5 insertions(+)
+   restricted-paths: true
