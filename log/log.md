@@ -19,3 +19,6 @@
 2026-07-10 commit — 1170f54: 0.2.0 shipped — queue-and-tend (inbox + /tend + timer + producers)
    diff: 17 files changed, 769 insertions(+), 8 deletions(-)
    restricted-paths: true
+2026-07-10 commit — d2af62a: Hands-off surface (setup / doctor / dash / wrapper verbs)
+   diff: 9 files changed, 488 insertions(+), 15 deletions(-)
+   restricted-paths: true
