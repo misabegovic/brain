@@ -34,3 +34,6 @@
 2026-07-10 commit — 85d0e65: sources-immutability README exemption
    diff: 1 file changed, 5 insertions(+)
    restricted-paths: true
+2026-07-10 commit — 736795c: composable role-fit views pitch captured (pre-bet)
+   diff: 10 files changed, 177 insertions(+), 13 deletions(-)
+   restricted-paths: false
