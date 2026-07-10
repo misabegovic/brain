@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.10.0 shipped: topics + the regenerative
+  schema.** `kind: topic` discussion threads (dated, attributed,
+  graduating into ADRs), Fowler's
+  [Phoenix Architecture ingested](org/methodology/regenerative-software.md),
+  and two new permanent pages per repo: `constraints.md` and
+  `implementation-memory.md`. First
+  [topic](brain/topics/regenerative-schema-extensions.md) is open.
 - **2026-07-10** — **0.9.0 shipped: every read is a briefing.**
   Graph-context page reads (`brain.py page` + MCP), write-time
   lint feedback on wiki saves, `by:` attribution in the audit log —

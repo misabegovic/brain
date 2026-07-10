@@ -249,6 +249,24 @@ endpoint listing and `/ui` redirecting. Verified end-to-end in a
 real browser: styled wiki beside a live terminal, in-iframe
 navigation, commands executed in the workbench terminal.
 
+## 0.10.0 — topics + the regenerative schema — **shipped 2026-07-10**
+
+Two operator-directed evolutions. **Topics** (`kind: topic`,
+`wiki/<scope>/topics/`): a running discussion thread on one question
+— dated, attributed entries; an Outcome that either records a small
+resolution or links the ADR/PRD it graduates into. The lightweight
+decision-and-discussion tracker below the ADR ceremony threshold,
+and the brain's provenance log in Fowler's sense (the rationale is
+the unit of change). **The regenerative schema**: Chad Fowler's
+Phoenix Architecture ingested (snapshot + synthesis at
+`org/methodology/regenerative-software.md`) and folded into the
+permanent layer — `constraints.md` (the architectural-primitives
+registry: what cannot be deleted or violated) and
+`implementation-memory.md` (the runtime's undocumented lessons,
+catalogued with causes) join the structure-emergent set, with
+routing rows in `/in` and `/capture`. First topic opened on adoption
+depth for the remaining Fowler concepts.
+
 ## Standing ideas (unversioned)
 
 Deliberately not adopted from the open-knowledge direction: a vector

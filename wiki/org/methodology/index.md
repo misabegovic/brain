@@ -30,3 +30,5 @@ These pages live in a `methodology/` subfolder per AGENTS.md
   standards on code quality, three-layer testing, AI usage, and PR
   reviews. Required reading for `/shape` phase 2 (Tech Lead → ADR)
   and phase 3 (Developer → code).
+
+- [Regenerative software (Phoenix Architecture)](regenerative-software.md) — Fowler's framework and the brain's mapping onto it.

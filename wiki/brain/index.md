@@ -40,6 +40,11 @@ sanitized to organisation-agnostic form:
 - [Workbench PTY bridge](adrs/workbench-pty-bridge.md) — loopback browser page over a stdlib PTY bridge; harness launches + config adapters as data tables; never in serving mode.
 - [Single-image serving profile](adrs/single-image-serving-profile.md) — one infra-agnostic image, env-selected surface; instance isolation via env ports + hashed timer units; Railway as reference, not dependency.
 
+## Topics (discussions in flight)
+
+- [Phoenix-Architecture adoption depth](topics/regenerative-schema-extensions.md)
+  — which further Fowler concepts earn schema weight. Open.
+
 ## Pitches (pre-bet)
 
 - [Harness workbench](pitches/harness-workbench.md) — **superseded**

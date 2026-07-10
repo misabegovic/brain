@@ -26,6 +26,11 @@ into the sections below.
 
 ## Now
 
+- **Topics + regenerative schema live (0.10.0, 2026-07-10).**
+  Discussion threads as first-class pages; constraints +
+  implementation-memory in the permanent layer; Fowler synthesis on
+  the methodology shelf; one topic open.
+
 - **Every read is a briefing (0.9.0, 2026-07-10).** Page reads
   carry graph context; wiki saves get instant lint feedback; audit
   lines carry `by:` attribution; the rendered wiki owns the local

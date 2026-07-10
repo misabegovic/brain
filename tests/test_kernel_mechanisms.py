@@ -142,3 +142,10 @@ def test_internal_refs_catches_planted_violation():
         )
     finally:
         rogue.unlink()
+
+
+def test_topic_kind_validates():
+    assert "topic" in brain.VALID_KINDS
+    assert brain.REQUIRED_SECTIONS_BY_KIND["topic"] == [
+        "Question", "Discussion", "Outcome"]
+    assert (REPO / "tools" / "templates" / "topic.md").exists()

@@ -42,6 +42,16 @@ before running.**
 - The scope (`brain` / `org` / `<repo>`).
 - (Optional) explicit text the user wants captured verbatim.
 
+**Topic routing.** Discussion-shaped captures — an open question,
+positions being traded, a decision-in-the-making that isn't ready
+for `/shape` — land as `kind: topic` pages at
+`wiki/<scope>/topics/<slug>.md` (template:
+`tools/templates/topic.md`): create the page on the first capture,
+append a dated `## Discussion` entry (with `by:` attribution) on
+every subsequent one. When a topic resolves into commitment-class
+work, hand off to `/shape` and mark the topic superseded; small
+resolutions are recorded in `## Outcome` directly.
+
 ## Protocol
 
 ### 1. Snapshot

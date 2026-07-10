@@ -298,7 +298,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 838,
+      "tokens": 875,
       "affected_by": [
         "org/competitors/codeplain/index.md"
       ]
@@ -382,7 +382,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 3189
+      "tokens": 3418
     },
     {
       "path": "brain/state.md",
@@ -394,7 +394,20 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1394
+      "tokens": 1449
+    },
+    {
+      "path": "brain/topics/regenerative-schema-extensions.md",
+      "title": "How far should the brain adopt Phoenix-Architecture concepts into its schema?",
+      "kind": "topic",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/web/aicoding-fowler-phoenix--f0e11r.md",
+        "../../../sources/conversations/2026-07-10--openknowledge-direction-and-ui-stress.md"
+      ],
+      "tokens": 193
     },
     {
       "path": "org/competitors/codeplain/index.md",
@@ -445,7 +458,20 @@
       "sources": [
         "../../../AGENTS.md"
       ],
-      "tokens": 240
+      "tokens": 268
+    },
+    {
+      "path": "org/methodology/regenerative-software.md",
+      "title": "Regenerative software \u2014 the Phoenix Architecture and how the brain maps to it",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/web/aicoding-fowler-phoenix--f0e11r.md",
+        "https://aicoding.leaflet.pub/"
+      ],
+      "tokens": 552
     },
     {
       "path": "org/methodology/superpowers.md",

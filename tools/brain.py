@@ -84,7 +84,7 @@ def today_utc() -> dt.date:
 
 VALID_KINDS = {
     "reference", "initiative", "decision", "entity", "meta", "overlap",
-    "insight", "epic", "idea", "pitch",
+    "insight", "epic", "idea", "pitch", "topic",
 }
 # `draft | living | superseded | archived` is the brain's general
 # lifecycle. `proposed | accepted | deprecated` is Nygard's canonical
@@ -143,6 +143,11 @@ REQUIRED_SECTIONS_BY_KIND = {
     # distinct from the formal AI-suggestion ADR/PRD pipeline. Per
     # `wiki/brain/ai-suggestions/adrs/ideas-vs-suggestions-vs-permanent-separation.md`.
     "idea": ["What", "Why interesting", "Maturity"],
+    # `kind: topic` — a running discussion thread on one question,
+    # below the ADR ceremony threshold. Provenance-over-diffs (per
+    # the Fowler ingest): the discussion trail IS the record; the
+    # Outcome section links the decision it graduates into.
+    "topic": ["Question", "Discussion", "Outcome"],
 }
 DECISION_SECTION_SETS = [
     # Legacy (pre-2026-05-03 templates).

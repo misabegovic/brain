@@ -493,8 +493,11 @@ wiki/<repo>/
 │   ├── architecture.md       # structural shape, components, principles
 │   ├── conventions.md        # how code is written here
 │   ├── interfaces.md         # external contracts (HTTP / events / SDK)
+│   ├── constraints.md        # what cannot be deleted or violated, and why
+│   ├── implementation-memory.md  # lessons encoded in the runtime (timeouts, retries, workarounds)
 │   └── domain.md             # vocabulary, entities, concepts
 ├── state.md            # past / now / perceived / target
+├── topics/             # running discussion threads — kind: topic (graduate → adrs/prds when commitment-class)
 ├── pitches/            # pre-bet Shape Up pitches — kind: pitch (graduate → epics/prds on a bet)
 ├── adrs/               # human-approved decision records — kind: decision
 ├── prds/               # human-approved (post-bet) initiatives — kind: initiative
@@ -524,8 +527,17 @@ agent-authored proposals that haven't passed human review — see
 ### Permanent layer is structure-emergent
 
 Start with `purpose.md` + `architecture.md`. Add the others
-(`conventions.md`, `interfaces.md`, `domain.md`) when content earns
-them. **Promote `permanent/<topic>.md` → `permanent/<topic>/index.md`
+(`conventions.md`, `interfaces.md`, `constraints.md`,
+`implementation-memory.md`, `domain.md`) when content earns them.
+The two regenerative pages (per the Phoenix-Architecture ingest,
+`wiki/org/methodology/regenerative-software.md`): **constraints.md**
+is the architectural-primitives registry — the invariants, contracts,
+and evaluations that must survive any regeneration ("what you can't
+delete, and why"); **implementation-memory.md** catalogues the
+lessons the running system encodes that were never written down —
+each timeout, retry policy, validation, and workaround with the
+incident or constraint that put it there. Both make a codebase
+regenerable: an agent rebuilding a component reads them first. **Promote `permanent/<topic>.md` → `permanent/<topic>/index.md`
 + specialised sub-aspect pages** once 2+ specialisations exist. Don't
 promote preemptively.
 
@@ -548,6 +560,9 @@ directly** — those are populated exclusively by `/shape`.
 | Style + pattern observations                                        | `wiki/<repo>/permanent/conventions.md` (edit)          |
 | Domain vocabulary / entities / concepts                             | `wiki/<repo>/permanent/domain.md` (edit / promote)     |
 | "What's true today" observation; new shipped capability             | `wiki/<repo>/state.md` § Now (edit)                    |
+| Open question / ongoing discussion / positions being traded         | `wiki/<scope>/topics/<slug>.md` (create or append a dated entry) |
+| Runtime lesson spotted in code (timeout, retry, workaround + why)   | `wiki/<repo>/permanent/implementation-memory.md` (edit)|
+| Invariant / non-negotiable contract / evaluation-class asset        | `wiki/<repo>/permanent/constraints.md` (edit)          |
 | New gap / risk surfaced (Now-vs-Perceived divergence)               | `wiki/<repo>/state.md` § Perceived (edit)              |
 | Future intent / strategic shift                                     | `wiki/<repo>/state.md` § Target (edit)                 |
 | Planning-tool **pitch / RFC** targeting a repo (forward-looking)    | Hand off to `/shape <repo>` (forward mode)             |
@@ -670,6 +685,7 @@ Set `kind:` in frontmatter. The kind determines the expected structure.
 | `insight`    | A pattern derived from user feedback / data.         | `## Pattern`, `## Evidence`, `## Affected personas`, `## Implications`, `## Status`. |
 | `epic`       | Umbrella over multi-PRD/ADR work.                    | `## Objective`, `## Background`, `## Affected personas`, `## Scope`, `## No-gos`, `## Children`, `## Success metrics`. |
 | `idea`       | Raw scratchpad / "potentially useful" content.       | `## What`, `## Why interesting`, `## Maturity`.    |
+| `topic`      | A running discussion thread on one question — decisions-in-the-making, below the ADR ceremony threshold. Lives at `wiki/<scope>/topics/`. Provenance over diffs: the dated discussion trail is the record; the Outcome links what it graduated into. | `## Question`, `## Discussion`, `## Outcome`. |
 
 Reference pages don't need Now/Perceived/Target. Initiative and
 decision pages do. Insights graduate into initiatives once a team
@@ -728,6 +744,7 @@ the agent applies on every turn:
 | "any overlap on X?" / "anyone else doing X?"                           | `/ask overlap: <topic>`                                     |
 | "how much do we know about repo X?"                                    | `/ask coverage: <repo>`                                     |
 | Sharing context, design discussion, customer interaction               | `/capture <scope>` (scope: `brain` / `org` / `<repo>`)      |
+| "let's discuss X" / "what do we think about X" / "add to the X discussion" / an unresolved question worth a trail | `/capture` → `wiki/<scope>/topics/<slug>.md` (new or dated append) |
 | "this looks stale / outdated"                                          | `/groom`                                                    |
 | "is the brain healthy?" / "sweep please"                               | `/sync`                                                     |
 | "tend the brain" / "do the inbox" / "digest the queue" / "catch the brain up" | `/tend [<budget>]`                                    |
