@@ -35,6 +35,7 @@ sanitized to organisation-agnostic form:
 - [Operator lesson pattern](adrs/operator-lesson-pattern.md) — durable operator lessons shelf.
 - [Competitor intel ingestion](adrs/competitor-intel-ingestion.md) — public competitor info routing.
 - [Queue-and-tend inbox](adrs/queue-and-tend-inbox.md) — deterministic producers accumulate; `/tend` digests in-session; no scheduled LLM runs.
+- [Connector snapshot contract](adrs/connector-snapshot-contract.md) — connectors are pull-only snapshot-writers: immutable dedup files, cursors, inbox items out, never a wiki write.
 
 ## PRDs
 

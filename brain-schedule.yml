@@ -76,6 +76,33 @@ operations:
     output: wiki/_state/inbox/
     enabled: false
 
+  # ---- Connectors (0.3 — snapshot-writers) -----------------------
+  # Pull-only; each no-ops until configured in brain.config.yml
+  # `connectors:` (+ read-only tokens in .env). New batches land as
+  # immutable snapshots under sources/<connector>/ and queue inbox
+  # items for /tend.
+
+  - name: github-pull
+    description: Snapshot new releases + merged-PR batches per watched GitHub repo.
+    cadence: daily
+    handler: python3 tools/brain.py schedule run github-pull
+    output: sources/github/
+    enabled: true
+
+  - name: notion-pull
+    description: Re-snapshot watched Notion pages whose last_edited moved.
+    cadence: daily
+    handler: python3 tools/brain.py schedule run notion-pull
+    output: sources/notion/
+    enabled: true
+
+  - name: slack-pull
+    description: Snapshot new messages per watched Slack channel as daily transcripts.
+    cadence: daily
+    handler: python3 tools/brain.py schedule run slack-pull
+    output: sources/slack/
+    enabled: true
+
   # ---- Ingestion + intersection-finding -------------------------
 
   - name: notion-walk

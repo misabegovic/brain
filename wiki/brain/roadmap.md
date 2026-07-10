@@ -76,7 +76,14 @@ supervised because it happens in a visible session. The PR rail
 remains the mode for multi-agent deployments; tend-mode and PR-mode
 are the same skills under different governance toggles.
 
-## 0.3.0 — connectors as snapshot-writers (Slack, Notion, GitHub)
+## 0.3.0 — connectors as snapshot-writers (Slack, Notion, GitHub) — **shipped 2026-07-10**
+
+Decision recorded at
+[adrs/connector-snapshot-contract.md](adrs/connector-snapshot-contract.md);
+three built-ins ship in the kernel and no-op until configured
+(`connectors:` in `brain.config.yml` + read-only tokens in `.env`).
+Verified end-to-end against a public GitHub repository. Remaining
+operator steps: add watch-lists and tokens when a project wants them.
 
 One connector contract: a connector is a pull-only, read-only-scoped
 tool that writes **immutable, dedup-keyed snapshots** into

@@ -3580,6 +3580,294 @@ def _count_go_mod(p: Path) -> int:
     return n
 
 
+# --- connectors (0.3) — pull-only snapshot-writers ----------------------
+#
+# Contract per wiki/brain/adrs/connector-snapshot-contract.md: a
+# connector observes one external system with read-only-scoped
+# credentials, writes immutable dedup-keyed snapshots into
+# sources/<connector>/, advances a cursor at
+# wiki/_state/connector-cursors.json, queues an inbox item per new
+# batch, and NEVER touches wiki/. Unconfigured connectors no-op.
+
+CONNECTOR_CURSORS = WIKI / "_state" / "connector-cursors.json"
+
+
+def _connector_config(name: str) -> dict:
+    config_path = REPO / "brain.config.yml"
+    if not config_path.exists():
+        return {}
+    try:
+        cfg = yaml.safe_load(config_path.read_text()) or {}
+    except yaml.YAMLError:
+        return {}
+    return (cfg.get("connectors") or {}).get(name) or {}
+
+
+def _env(key: str) -> str:
+    if os.environ.get(key):
+        return os.environ[key]
+    env_path = REPO / ".env"
+    if env_path.exists():
+        for line in env_path.read_text().splitlines():
+            line = line.strip()
+            if line.startswith(f"{key}=") and not line.startswith("#"):
+                return line.split("=", 1)[1].strip().strip('"').strip("'")
+    return ""
+
+
+def _read_connector_cursors() -> dict:
+    if CONNECTOR_CURSORS.exists():
+        try:
+            return json.loads(CONNECTOR_CURSORS.read_text())
+        except json.JSONDecodeError:
+            pass
+    return {}
+
+
+def _write_connector_cursors(data: dict) -> None:
+    CONNECTOR_CURSORS.parent.mkdir(parents=True, exist_ok=True)
+    CONNECTOR_CURSORS.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+
+
+def _snapshot_write(connector: str, rel: str, title: str, body: str,
+                    extra_fm: dict | None = None) -> Path | None:
+    """Write one immutable snapshot; returns None when it already
+    exists (the additive-only guarantee doubles as dedup)."""
+    path = REPO / "sources" / connector / rel
+    if path.exists():
+        return None
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fm = {"title": title, "connector": connector,
+          "pulled": today_utc().isoformat(), **(extra_fm or {})}
+    fm_text = yaml.safe_dump(fm, sort_keys=False, allow_unicode=True).strip()
+    path.write_text(f"---\n{fm_text}\n---\n\n{body}\n")
+    return path
+
+
+def _github_watched_repos() -> list[str]:
+    """Configured owner/repo slugs plus auto-discovered origins of the
+    active sibling checkouts."""
+    slugs = list(_connector_config("github").get("repos") or [])
+    for repo in sorted(ACTIVE_REPOS):
+        sibling = PROJECTS / repo
+        if not (sibling / ".git").exists():
+            continue
+        res = subprocess.run(["git", "-C", str(sibling), "remote",
+                              "get-url", "origin"],
+                             capture_output=True, text=True)
+        m = re.search(r"github\.com[:/]([^/]+/[^/.]+)", res.stdout.strip())
+        if m and m.group(1) not in slugs:
+            slugs.append(m.group(1))
+    return slugs
+
+
+def _connector_github_pull() -> int:
+    """Snapshot new releases + merged-PR batches per watched repo via gh."""
+    slugs = _github_watched_repos()
+    if not slugs:
+        print("github-pull: no repos watched (active_repos empty and "
+              "connectors.github.repos unset) — nothing to pull")
+        return 0
+    if not shutil.which("gh"):
+        print("github-pull: gh CLI not available; skipping", file=sys.stderr)
+        return 0
+    cursors = _read_connector_cursors()
+    gh_cursors = cursors.setdefault("github", {})
+    today = today_utc().isoformat()
+    batches = 0
+    for slug in slugs:
+        safe = slug.replace("/", "--")
+        since = gh_cursors.get(slug, {}).get("last_pull", "1970-01-01")
+
+        res = subprocess.run(
+            ["gh", "release", "list", "--repo", slug, "--limit", "10",
+             "--json", "tagName,name,publishedAt"],
+            capture_output=True, text=True, timeout=30)
+        releases = json.loads(res.stdout) if res.returncode == 0 and res.stdout else []
+        new_releases = [r for r in releases
+                        if (r.get("publishedAt") or "")[:10] > since]
+        for rel in new_releases:
+            tag = re.sub(r"[^A-Za-z0-9._-]+", "-", rel["tagName"])
+            body = subprocess.run(
+                ["gh", "release", "view", rel["tagName"], "--repo", slug,
+                 "--json", "body", "--jq", ".body"],
+                capture_output=True, text=True, timeout=30).stdout
+            _snapshot_write("github", f"{safe}/release--{tag}.md",
+                            f"{slug} release {rel['tagName']}",
+                            body or "(no release notes)",
+                            {"repo": slug, "tag": rel["tagName"],
+                             "published": rel.get("publishedAt", "")})
+
+        res = subprocess.run(
+            ["gh", "pr", "list", "--repo", slug, "--state", "merged",
+             "--limit", "50", "--json", "number,title,mergedAt,url",
+             "--search", f"merged:>{since}"],
+            capture_output=True, text=True, timeout=30)
+        prs = json.loads(res.stdout) if res.returncode == 0 and res.stdout else []
+        wrote = None
+        if prs:
+            lines = "".join(
+                f"- #{p['number']} {p['title']} "
+                f"({(p.get('mergedAt') or '')[:10]}) — {p['url']}\n"
+                for p in sorted(prs, key=lambda p: p.get("mergedAt") or ""))
+            wrote = _snapshot_write(
+                "github", f"{safe}/prs--{today}.md",
+                f"{slug} merged PRs since {since}",
+                lines, {"repo": slug, "since": since, "count": len(prs)})
+
+        if new_releases or wrote:
+            batches += 1
+            inbox_add(
+                id=f"github-{safe}-{today}", kind="ingest",
+                summary=f"{slug}: {len(new_releases)} release(s), "
+                        f"{len(prs)} merged PR(s) since {since}",
+                route=f"/in sources/github/{safe}/",
+                source=f"sources/github/{safe}/",
+                produced_by="github-pull", update=True)
+        gh_cursors[slug] = {"last_pull": today}
+    _write_connector_cursors(cursors)
+    print(f"github-pull: {len(slugs)} repo(s) checked, {batches} new batch(es)")
+    return 0
+
+
+def _connector_notion_pull() -> int:
+    """Re-snapshot watched Notion pages whose last_edited moved."""
+    pages = _connector_config("notion").get("pages") or []
+    if not pages:
+        print("notion-pull: no pages watched (connectors.notion.pages "
+              "unset) — nothing to pull")
+        return 0
+    token = _env("NOTION_TOKEN")
+    if not token:
+        print("notion-pull: NOTION_TOKEN not set in .env; skipping",
+              file=sys.stderr)
+        return 0
+    cursors = _read_connector_cursors()
+    notion_cursors = cursors.setdefault("notion", {})
+    changed = []
+    for ref in pages:
+        m = re.search(r"([0-9a-fA-F]{32})", str(ref).replace("-", ""))
+        if not m:
+            print(f"notion-pull: cannot parse page id from {ref!r}",
+                  file=sys.stderr)
+            continue
+        raw = m.group(1).lower()
+        pid = f"{raw[0:8]}-{raw[8:12]}-{raw[12:16]}-{raw[16:20]}-{raw[20:32]}"
+        req = urllib.request.Request(
+            f"https://api.notion.com/v1/pages/{pid}",
+            headers={"Authorization": f"Bearer {token}",
+                     "Notion-Version": "2022-06-28"})
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                meta = json.loads(resp.read())
+        except (urllib.error.URLError, json.JSONDecodeError) as exc:
+            print(f"notion-pull: {pid}: {exc}", file=sys.stderr)
+            continue
+        last_edited = meta.get("last_edited_time", "")
+        if last_edited and last_edited > notion_cursors.get(pid, ""):
+            venv_python = Path.home() / ".local/share/mempalace-venv/bin/python3"
+            interpreter = str(venv_python) if venv_python.exists() else sys.executable
+            res = subprocess.run(
+                [interpreter, str(REPO / "tools" / "notion-export.py"), pid],
+                capture_output=True, text=True, timeout=120,
+                env={**os.environ, "NOTION_TOKEN": token})
+            if res.returncode == 0:
+                notion_cursors[pid] = last_edited
+                changed.append(pid)
+            else:
+                print(f"notion-pull: export failed for {pid}: "
+                      f"{res.stderr.strip()[:200]}", file=sys.stderr)
+    if changed:
+        inbox_add(id=f"notion-{today_utc().isoformat()}", kind="ingest",
+                  summary=f"{len(changed)} Notion page(s) changed and "
+                          f"re-snapshotted",
+                  route="/in sources/notion/", source="sources/notion/",
+                  produced_by="notion-pull", update=True)
+    _write_connector_cursors(cursors)
+    print(f"notion-pull: {len(pages)} page(s) checked, {len(changed)} changed")
+    return 0
+
+
+def _slack_api(method: str, token: str, **params) -> dict:
+    qs = urllib.parse.urlencode(params)
+    req = urllib.request.Request(
+        f"https://slack.com/api/{method}?{qs}",
+        headers={"Authorization": f"Bearer {token}"})
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        return json.loads(resp.read())
+
+
+def _connector_slack_pull() -> int:
+    """Snapshot new messages per watched channel as daily transcripts."""
+    channels = _connector_config("slack").get("channels") or []
+    if not channels:
+        print("slack-pull: no channels watched (connectors.slack.channels "
+              "unset) — nothing to pull")
+        return 0
+    token = _env("SLACK_TOKEN")
+    if not token:
+        print("slack-pull: SLACK_TOKEN not set in .env; skipping",
+              file=sys.stderr)
+        return 0
+    cursors = _read_connector_cursors()
+    slack_cursors = cursors.setdefault("slack", {})
+    try:
+        listing = _slack_api("conversations.list", token,
+                             types="public_channel,private_channel",
+                             limit=999)
+    except urllib.error.URLError as exc:
+        print(f"slack-pull: conversations.list failed: {exc}", file=sys.stderr)
+        return 1
+    if not listing.get("ok"):
+        print(f"slack-pull: {listing.get('error', 'unknown error')}",
+              file=sys.stderr)
+        return 1
+    by_name = {c["name"]: c["id"] for c in listing.get("channels", [])}
+    today = today_utc().isoformat()
+    pulled = 0
+    for name in channels:
+        cid = by_name.get(name)
+        if not cid:
+            print(f"slack-pull: channel {name!r} not visible to this token",
+                  file=sys.stderr)
+            continue
+        oldest = slack_cursors.get(name, "0")
+        try:
+            history = _slack_api("conversations.history", token,
+                                 channel=cid, oldest=oldest, limit=200)
+        except urllib.error.URLError as exc:
+            print(f"slack-pull: history({name}) failed: {exc}", file=sys.stderr)
+            continue
+        messages = [m for m in history.get("messages", [])
+                    if m.get("type") == "message" and m.get("ts", "0") > oldest]
+        if not messages:
+            continue
+        messages.sort(key=lambda m: m["ts"])
+        latest = messages[-1]["ts"]
+        lines = "".join(
+            f"- **{dt.datetime.fromtimestamp(float(m['ts']), dt.timezone.utc).strftime('%H:%M')}**"
+            f" `{m.get('user', m.get('bot_id', '?'))}`: "
+            f"{(m.get('text') or '').strip()}\n"
+            for m in messages)
+        wrote = _snapshot_write(
+            "slack", f"{name}/{today}--{latest.replace('.', '-')}.md",
+            f"#{name} — {len(messages)} message(s)",
+            lines, {"channel": name, "oldest": oldest, "latest": latest,
+                    "count": len(messages)})
+        if wrote:
+            pulled += 1
+            slack_cursors[name] = latest
+            inbox_add(
+                id=f"slack-{name}-{today}", kind="ingest",
+                summary=f"#{name}: {len(messages)} new message(s)",
+                route=f"/in sources/slack/{name}/",
+                source=f"sources/slack/{name}/",
+                produced_by="slack-pull", update=True)
+    _write_connector_cursors(cursors)
+    print(f"slack-pull: {len(channels)} channel(s) checked, {pulled} batch(es)")
+    return 0
+
+
 def _schedule_run_inbox_refresh() -> int:
     """Recompute the deterministic slice of the tend queue.
 
@@ -3971,6 +4259,9 @@ SCHEDULE_HANDLERS = {
     "security-scan": _schedule_run_security_scan,
     "deadline-countdown": _schedule_run_deadline_countdown,
     "inbox-refresh": _schedule_run_inbox_refresh,
+    "github-pull": _connector_github_pull,
+    "notion-pull": _connector_notion_pull,
+    "slack-pull": _connector_slack_pull,
     "issues-pull": _schedule_run_issues_pull,
     "notion-walk": _schedule_run_notion_walk,
     "overlap-refresh": _schedule_run_overlap_refresh,

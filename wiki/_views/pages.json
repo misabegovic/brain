@@ -66,6 +66,20 @@
       "tokens": 1538
     },
     {
+      "path": "brain/adrs/connector-snapshot-contract.md",
+      "title": "Connectors are pull-only snapshot-writers: immutable dedup-keyed files under sources/, cursors in state, inbox items out \u2014 never a wiki write",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
+        "../../../brain-schedule.yml",
+        ".claude/skills/tend/SKILL.md"
+      ],
+      "tokens": 1211
+    },
+    {
       "path": "brain/adrs/home-content-shape.md",
       "title": "Home page is the wiki index as an agent-maintained dashboard",
       "kind": "decision",
@@ -240,7 +254,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 499
+      "tokens": 541
     },
     {
       "path": "brain/roadmap.md",
@@ -254,7 +268,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 1930
+      "tokens": 2026
     },
     {
       "path": "brain/state.md",
@@ -266,7 +280,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 655
+      "tokens": 767
     },
     {
       "path": "org/index.md",

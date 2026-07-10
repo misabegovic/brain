@@ -15,3 +15,21 @@ active_repos: []
 # Repos that were tracked once and are now archived. Still valid in
 # frontmatter (for history) but excluded from the active corpus.
 archived_repos: []
+
+# Connector configuration (0.3 — snapshot-writers). Each connector is
+# pull-only, no-ops until configured here, and writes immutable
+# dedup-keyed snapshots into sources/<connector>/. Credentials live in
+# .env (read-only-scoped tokens), never in this file.
+connectors:
+  github:
+    # Extra owner/repo slugs to watch. Repos in active_repos are
+    # auto-discovered from their sibling checkouts' origin remotes.
+    repos: []
+  notion:
+    # Page ids or URLs to watch; re-snapshotted when last_edited moves.
+    # Needs NOTION_TOKEN in .env.
+    pages: []
+  slack:
+    # Channel names to pull. Needs SLACK_TOKEN in .env (read-only
+    # scopes: channels:history, channels:read).
+    channels: []

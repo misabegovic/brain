@@ -26,6 +26,13 @@ into the sections below.
 
 ## Now
 
+- **Connectors are live (0.3.0, 2026-07-10).** GitHub (releases +
+  merged-PR batches, sibling-remote auto-discovery), Notion
+  (watched-page re-snapshots on `last_edited`), Slack (per-channel
+  daily transcripts) — all pull-only snapshot-writers per the
+  connector contract ADR, no-ops until `connectors:` +  `.env`
+  tokens are set. New batches queue inbox items for `/tend`.
+
 - **The hands-off surface is live (0.2.x, 2026-07-10).**
   `brain.py setup` (one-command idempotent bootstrap), `brain.py
   doctor` (health checklist with fixing commands), `serve /dash`

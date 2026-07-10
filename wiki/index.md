@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.3.0 shipped: connectors.** GitHub / Notion /
+  Slack pull connectors under one
+  [snapshot-writer contract](brain/adrs/connector-snapshot-contract.md) —
+  immutable dedup snapshots into `sources/`, cursors, inbox items
+  out, never a wiki write; all no-op until configured.
 - **2026-07-10** — **hands-off surface shipped (0.2.x).**
   One-command `brain.py setup`, a `doctor` health checklist, a
   server-rendered ops dashboard at `serve /dash`, and `brain tend` /
@@ -59,8 +64,9 @@ start filling in as the slash-command surface runs.
 ## Open initiatives
 
 <!-- home-section; maintained-by: /shape -->
-- [Brain roadmap — the 0.x arc](brain/roadmap.md) — 0.2.0 shipped;
-  next up: 0.3 connector snapshot-writers (Slack / Notion / GitHub).
+- [Brain roadmap — the 0.x arc](brain/roadmap.md) — 0.2 and 0.3
+  shipped; next up: 0.4 pruning + deepening (link-graph health,
+  research picker).
 
 [See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
 

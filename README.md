@@ -171,7 +171,7 @@ rules in `AGENTS.md` § Governance.
 
 | System            | State                | Notes                                                          |
 |-------------------|----------------------|----------------------------------------------------------------|
-| Planning tool     | bring your own       | Read-only; snapshot before ingest. Notion export tool included. |
+| GitHub / Notion / Slack | ✅ pull connectors | Snapshot-writers: immutable files into `sources/`, inbox items out. Configure `connectors:` in `brain.config.yml` + read-only tokens in `.env`. |
 | GitHub            | via `gh` CLI         | Pre-allowed in `.claude/settings.json`.                        |
 | MCP               | ✅ `tools/brain-mcp.py` | Read-only brain access for any MCP-aware client.            |
 | mempalace         | optional             | Verbatim / semantic-recall layer.                              |
