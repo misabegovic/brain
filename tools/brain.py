@@ -1190,9 +1190,39 @@ def _render_dash(page_count: int) -> str:
 
 
 def cmd_serve(args) -> int:
-    """Read-only HTTP API for the brain. localhost only by default."""
+    """Read-only HTTP API for the brain. localhost only by default.
+
+    --workbench additionally mounts the PTY bridge + workbench page
+    (per wiki/brain/adrs/workbench-pty-bridge.md). The bridge refuses
+    serving mode and non-loopback binds by construction.
+    """
     port = args.port
     host = args.host
+    workbench = getattr(args, "workbench", False)
+    wb = None
+    xterm_assets: dict[str, Path] = {}
+    if workbench:
+        if os.environ.get("BRAIN_SERVING") == "1":
+            print("serve: --workbench is structurally excluded from "
+                  "serving mode (BRAIN_SERVING=1)", file=sys.stderr)
+            return 1
+        if host not in ("127.0.0.1", "localhost", "::1"):
+            print(f"serve: --workbench refuses non-loopback host {host!r}",
+                  file=sys.stderr)
+            return 1
+        sys.path.insert(0, str(REPO / "tools"))
+        import workbench as wb  # noqa: F811
+        xterm_assets = {
+            "xterm.js": REPO / "ui/node_modules/@xterm/xterm/lib/xterm.js",
+            "xterm.css": REPO / "ui/node_modules/@xterm/xterm/css/xterm.css",
+            "addon-fit.js":
+                REPO / "ui/node_modules/@xterm/addon-fit/lib/addon-fit.js",
+        }
+        missing = [n for n, p in xterm_assets.items() if not p.exists()]
+        if missing:
+            print(f"serve: workbench assets missing ({', '.join(missing)}) "
+                  f"— run `cd ui && npm install`", file=sys.stderr)
+            return 1
 
     entries_cache: list[dict] = []
 
@@ -1248,6 +1278,49 @@ def cmd_serve(args) -> int:
             if path == "/dash":
                 self._send_text(200, _render_dash(len(entries_cache)),
                                 "text/html; charset=utf-8")
+                return
+
+            if workbench and path.startswith("/workbench"):
+                host_hdr = (self.headers.get("Host") or "").split(":")[0]
+                if host_hdr not in ("localhost", "127.0.0.1", "::1", ""):
+                    self._send_json(403, {"error": "host not allowed"})
+                    return
+                if path == "/workbench":
+                    self._send_text(
+                        200,
+                        wb.render_workbench_page(
+                            wb.SESSION_TOKEN, wb.TERMINAL_CLIS,
+                            len(entries_cache)),
+                        "text/html; charset=utf-8")
+                    return
+                if path.startswith("/workbench/assets/"):
+                    asset = xterm_assets.get(path.rsplit("/", 1)[-1])
+                    if asset is None:
+                        self._send_json(404, {"error": "unknown asset"})
+                        return
+                    ctype = ("text/css" if asset.suffix == ".css"
+                             else "application/javascript")
+                    self._send_text(200, asset.read_text(), ctype)
+                    return
+                if path == "/workbench/changed":
+                    latest = max(
+                        (p.stat().st_mtime for p in WIKI.rglob("*.md")),
+                        default=0)
+                    self._send_json(200, {"mtime": latest})
+                    return
+                if path == "/workbench/pty":
+                    if qs.get("token", [""])[0] != wb.SESSION_TOKEN:
+                        self._send_json(403, {"error": "bad token"})
+                        return
+                    if (self.headers.get("Upgrade") or "").lower() \
+                            != "websocket":
+                        self._send_json(400, {"error": "websocket upgrade "
+                                                       "required"})
+                        return
+                    wb.handle_ws_connection(self)
+                    self.close_connection = True
+                    return
+                self._send_json(404, {"error": "unknown workbench route"})
                 return
 
             if path == "/pages.json":
@@ -2294,6 +2367,96 @@ def cmd_setup(args) -> int:
         json = False
 
     return cmd_doctor(_DoctorArgs())
+
+
+# One row per harness: where its MCP registration lives and how it
+# nests. Per the workbench-pty-bridge ADR: adapters are data tables,
+# not per-harness code paths; a new harness is one row here (plus a
+# launch row in tools/workbench.py).
+AGENT_TARGETS = {
+    "claude": {"path": ".mcp.json", "format": "json",
+               "nest": ["mcpServers", "brain"],
+               "entry": {"command": "python3",
+                         "args": ["./tools/brain-mcp.py"],
+                         "env": {"BRAIN_DIR": "."}}},
+    "cursor": {"path": ".cursor/mcp.json", "format": "json",
+               "nest": ["mcpServers", "brain"],
+               "entry": {"command": "python3",
+                         "args": ["./tools/brain-mcp.py"],
+                         "env": {"BRAIN_DIR": "."}}},
+    "opencode": {"path": "opencode.json", "format": "json",
+                 "nest": ["mcp", "brain"],
+                 "entry": {"type": "local",
+                           "command": ["python3", "./tools/brain-mcp.py"],
+                           "enabled": True}},
+    "codex": {"path": ".codex/config.toml", "format": "toml-block",
+              "block": ('[mcp_servers.brain]\n'
+                        'command = "python3"\n'
+                        'args = ["./tools/brain-mcp.py"]\n')},
+}
+
+AGENT_SENTINEL_OPEN = "# >>> brain:managed >>>"
+AGENT_SENTINEL_CLOSE = "# <<< brain:managed <<<"
+
+
+def install_agent(harness: str, root: Path) -> str:
+    """Idempotently register the brain's MCP server for one harness.
+
+    JSON targets deep-merge the entry under its nesting keys,
+    preserving everything else in the file. TOML targets append a
+    sentinel-fenced block (stdlib has no TOML writer); content inside
+    the fence is ours, everything outside is never touched.
+    Returns 'wrote' | 'unchanged'.
+    """
+    row = AGENT_TARGETS[harness]
+    target = root / row["path"]
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if row["format"] == "json":
+        data = {}
+        if target.exists():
+            try:
+                data = json.loads(target.read_text())
+            except json.JSONDecodeError:
+                raise ValueError(f"{target} exists but is not valid JSON — "
+                                 f"fix or remove it first")
+        node = data
+        for key in row["nest"][:-1]:
+            node = node.setdefault(key, {})
+        if node.get(row["nest"][-1]) == row["entry"]:
+            return "unchanged"
+        node[row["nest"][-1]] = row["entry"]
+        target.write_text(json.dumps(data, indent=2) + "\n")
+        return "wrote"
+    text = target.read_text() if target.exists() else ""
+    fenced = (f"{AGENT_SENTINEL_OPEN}\n{row['block']}"
+              f"{AGENT_SENTINEL_CLOSE}\n")
+    if AGENT_SENTINEL_OPEN in text:
+        start = text.index(AGENT_SENTINEL_OPEN)
+        end = text.index(AGENT_SENTINEL_CLOSE) + len(AGENT_SENTINEL_CLOSE) + 1
+        new = text[:start] + fenced + text[end:]
+    else:
+        new = text + ("\n" if text and not text.endswith("\n") else "") + fenced
+    if new == text:
+        return "unchanged"
+    target.write_text(new)
+    return "wrote"
+
+
+def cmd_install_agent(args) -> int:
+    """Wire harnesses to the brain (MCP registration), one row each."""
+    names = sorted(AGENT_TARGETS) if args.all else [args.harness]
+    for name in names:
+        if name not in AGENT_TARGETS:
+            print(f"install-agent: unknown harness {name!r} "
+                  f"(known: {', '.join(sorted(AGENT_TARGETS))})",
+                  file=sys.stderr)
+            return 2
+        result = install_agent(name, REPO)
+        print(f"  {'✓' if result == 'wrote' else '−'} {name}: "
+              f"{AGENT_TARGETS[name]['path']} ({result})")
+    print("\nAGENTS.md is the shared schema — every harness reads it "
+          "(CLAUDE.md symlinks it for harnesses that want that name).")
+    return 0
 
 
 def cmd_doctor(args) -> int:
@@ -5916,6 +6079,9 @@ def main() -> int:
     ap_serve = sub.add_parser("serve", help="read-only HTTP API")
     ap_serve.add_argument("--host", default="127.0.0.1")
     ap_serve.add_argument("--port", type=int, default=8765)
+    ap_serve.add_argument("--workbench", action="store_true",
+                          help="mount the PTY workbench (loopback only; "
+                               "never in serving mode)")
     ap_serve.set_defaults(func=cmd_serve)
 
     ap_prom = sub.add_parser("promote", help="scaffold initiative from insight")
@@ -5977,6 +6143,13 @@ def main() -> int:
     ap_setup.add_argument("--dry-run", dest="dry_run", action="store_true",
                           help="print the plan; change nothing")
     ap_setup.set_defaults(func=cmd_setup)
+
+    ap_ia = sub.add_parser("install-agent",
+                           help="register the brain's MCP server for a "
+                                "harness (claude/cursor/codex/opencode)")
+    ap_ia.add_argument("harness", nargs="?", default="")
+    ap_ia.add_argument("--all", action="store_true")
+    ap_ia.set_defaults(func=cmd_install_agent)
 
     ap_doc = sub.add_parser("doctor",
                             help="one-screen health checklist "

@@ -1145,6 +1145,26 @@ Example specs ship for engineer / pm / operator roles. The index is
 never committed and never load-bearing — delete-and-rebuild is
 always safe; consumers open read-only.
 
+### `brain workbench` / `install-agent` — the harness workbench
+
+```bash
+brain workbench                        # serve + open the workbench page
+python3 tools/brain.py serve --workbench
+python3 tools/brain.py install-agent claude|cursor|codex|opencode [--all]
+```
+
+Per `wiki/brain/adrs/workbench-pty-bridge.md`: the workbench page
+puts an embedded terminal (the operator's own login shell, xterm.js
+over a stdlib PTY-websocket bridge at loopback with a per-process
+token + Host check) beside the rendered brain, with one-click
+harness launches from the `TERMINAL_CLIS` registry
+(`tools/workbench.py`) and auto-reload of the rendered side on wiki
+changes. `install-agent` idempotently registers the brain's MCP
+server per harness from the `AGENT_TARGETS` fan-out table — JSON
+deep-merge or sentinel-fenced TOML; a new harness is one row in
+each table. The workbench refuses `BRAIN_SERVING=1` and
+non-loopback binds by construction.
+
 ### `brain.py links` — link-graph health
 
 ```bash

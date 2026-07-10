@@ -17,7 +17,11 @@ Everything pending, every cursor, every tracked deadline — the maintenance pic
 
 ## Tend queue (all)
 
-*(no rows)*
+| id | kind | priority | summary |
+|---|---|---|---|
+| research-brain-adrs-multi-prd-epic-shape-md | research | normal | brain/adrs/multi-prd-epic-shape.md: confidence:medium but 4 pages link to it — deepen with cited research |
+| research-brain-roadmap-md | research | normal | brain/roadmap.md: confidence:medium but 3 pages link to it — deepen with cited research |
+| research-org-operator-lessons-md | research | normal | org/operator-lessons.md: confidence:medium but 3 pages link to it — deepen with cited research |
 
 ## Deadlines
 

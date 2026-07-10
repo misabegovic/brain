@@ -26,6 +26,12 @@ into the sections below.
 
 ## Now
 
+- **The workbench is live (0.6.x, 2026-07-10).** `brain workbench`:
+  terminal beside the rendered brain, harness launches, live
+  reload; `install-agent` registered all four harnesses in this
+  checkout. Verified end-to-end (websocket handshake + PTY echo +
+  serving-mode refusal in tests).
+
 - **Serving software is ready (0.6 software half, 2026-07-10).**
   MCP over streamable HTTP, serving-mode guardrails (suggestion
   exclusion + query audit log), and the Datasette pilot over the

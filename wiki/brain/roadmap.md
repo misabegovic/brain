@@ -159,17 +159,18 @@ with no agent of their own, added only if demand shows up, with
 per-query cost capped by construction. Local-first is unchanged —
 serving is an optional deployment profile, not the default mode.
 
-## Proposed — harness workbench (pitch, pre-bet)
+## 0.6.x — harness workbench — **shipped 2026-07-10**
 
-Captured 2026-07-10 at
-[pitches/harness-workbench.md](pitches/harness-workbench.md): the
-open-knowledge workbench shape on this substrate — an embedded
-terminal (xterm.js + a loopback PTY bridge) beside the rendered
-brain with live reload, a harness launch registry as data, and the
-`install-agent` config adapters the agent-independence principle
-names. Grounded in a study of open-knowledge's actual
-implementation (research note in sources). On a bet it takes the
-next version slot.
+Bet, shaped, and built the same day (pitch →
+[PRD](prds/harness-workbench.md) →
+[ADR](adrs/workbench-pty-bridge.md) → build): `brain workbench`
+serves an embedded terminal (own login shell, xterm.js over a
+loopback stdlib PTY bridge, token + Host check) beside the rendered
+brain with change-driven reload; one-click harness launches
+(claude / codex / cursor-agent / opencode) from a data registry;
+`install-agent` wires each harness's MCP config from a fan-out
+table — the agent-independence adapters delivered. Structurally
+excluded from serving deployments.
 
 ## 0.7.0 — self-hosting hardening
 

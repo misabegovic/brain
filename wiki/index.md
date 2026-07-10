@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **harness workbench shipped (0.6.x).**
+  `brain workbench` puts your harness terminal beside the rendered
+  brain (loopback PTY bridge, one-click launches, live reload);
+  `install-agent` wires claude / cursor / codex / opencode to the
+  brain's MCP. Full trail:
+  [PRD](brain/prds/harness-workbench.md) ·
+  [ADR](brain/adrs/workbench-pty-bridge.md).
 - **2026-07-10** — tend sweep: the deepening picker's three research
   items digested — both hub ADRs verified against the shipped
   mechanism and promoted to `confidence: high` (verification note in

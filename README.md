@@ -132,6 +132,8 @@ python3 tools/brain.py query '<sql>' # read-only SQL over the index
 python3 tools/brain.py setup        # one-command bootstrap (idempotent)
 python3 tools/brain.py doctor       # health checklist
 tools/brain dash                    # local ops dashboard (serve + open /dash)
+tools/brain workbench               # terminal + rendered brain, one page
+python3 tools/brain.py install-agent --all  # wire claude/cursor/codex/opencode to the MCP
 tools/brain tend                    # open the agent with /tend
 tools/install-timer.sh              # daily accumulation timer (systemd user / cron)
 pytest tests/                       # kernel invariants
