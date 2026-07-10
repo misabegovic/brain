@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — pitch captured:
+  [chat-first app](brain/pitches/chat-first-app.md) — simplify by
+  making the conversation the interface; per-harness print-mode
+  chat bridge on the operator's subscription; terminal demoted to a
+  power toggle. Pre-bet.
 - **2026-07-10** — **0.11.0 shipped: instance birth.** `init --full`
   births a working instance from the kernel manifest (mechanism +
   kernel trail cross; dogfood never does), verified by its own gates

@@ -25,7 +25,9 @@ Committed work, proposals awaiting a bet, patterns from feedback, and what's que
 
 ## Pitches awaiting a bet
 
-*(no rows)*
+| path | title | status | confidence | updated |
+|---|---|---|---|---|
+| brain/pitches/chat-first-app.md | Chat-first app — the conversation is the interface; the mechanism disappears behind it | draft | medium | 2026-07-10 |
 
 ## Insights
 

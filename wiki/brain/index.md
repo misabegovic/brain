@@ -41,6 +41,12 @@ sanitized to organisation-agnostic form:
 - [Kernel-manifest instancing](adrs/kernel-manifest-instancing.md) — instances born by explicit manifest: mechanism + kernel trail cross, dogfood never does.
 - [Single-image serving profile](adrs/single-image-serving-profile.md) — one infra-agnostic image, env-selected surface; instance isolation via env ports + hashed timer units; Railway as reference, not dependency.
 
+## Pitches (pre-bet) — awaiting a bet
+
+- [Chat-first app](pitches/chat-first-app.md) — the conversation is
+  the interface; terminal demoted to a power toggle. **Awaiting the
+  operator's picks** (chat-backend shape, terminal's fate).
+
 ## Topics (discussions in flight)
 
 - [Phoenix-Architecture adoption depth](topics/regenerative-schema-extensions.md)
