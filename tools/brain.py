@@ -1408,8 +1408,16 @@ def cmd_serve(args) -> int:
         def do_POST(self):  # noqa: N802
             self._send_json(405, {"error": "read-only"})
 
-    with socketserver.TCPServer((host, port), Handler) as httpd:
-        print(f"brain serving on http://{host}:{port}")
+    class Server(socketserver.ThreadingTCPServer):
+        # Reuse-addr: restarts must not trip over TIME_WAIT sockets.
+        # Threading: a long-lived workbench websocket must not block
+        # the JSON API and the page's change-signal polling.
+        allow_reuse_address = True
+        daemon_threads = True
+
+    with Server((host, port), Handler) as httpd:
+        print(f"brain serving on http://{host}:{port}"
+              + ("  (+ /workbench)" if workbench else ""))
         print(f"  {len(entries_cache)} pages cached; GET /refresh to reload")
         try:
             httpd.serve_forever()

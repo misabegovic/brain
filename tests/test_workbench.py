@@ -92,6 +92,7 @@ def test_pty_round_trip_over_websocket():
         import urllib.error
         import urllib.request
         page = None
+        last_exc = None
         deadline = time.time() + 15
         while time.time() < deadline:
             try:
@@ -99,9 +100,18 @@ def test_pty_round_trip_over_websocket():
                     f"http://127.0.0.1:{port}/workbench",
                     timeout=5).read().decode()
                 break
-            except (urllib.error.URLError, ConnectionError):
+            except (urllib.error.URLError, ConnectionError) as exc:
+                last_exc = exc
+                if proc.poll() is not None:
+                    break
                 time.sleep(0.3)
-        assert page, "serve --workbench never became ready"
+        if page is None:
+            server_err = ""
+            if proc.poll() is not None:
+                server_err = proc.stderr.read().decode()[:1500]
+            raise AssertionError(
+                f"serve --workbench never became ready: {last_exc!r}; "
+                f"server rc={proc.poll()} stderr={server_err!r}")
         import re
         token = re.search(r"token=([A-Za-z0-9_-]+)", page).group(1)
 
