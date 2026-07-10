@@ -127,6 +127,8 @@ python3 tools/brain.py search '<q>' # hybrid keyword search
 python3 tools/brain.py status       # single-pane health dashboard
 python3 tools/brain.py inbox summary # the tend queue in one line
 python3 tools/brain.py links        # link-graph health (orphans / hubs / suggestions)
+python3 tools/brain.py index --schema # the derived-index schema (for view specs)
+python3 tools/brain.py query '<sql>' # read-only SQL over the index
 python3 tools/brain.py setup        # one-command bootstrap (idempotent)
 python3 tools/brain.py doctor       # health checklist
 tools/brain dash                    # local ops dashboard (serve + open /dash)
@@ -172,6 +174,7 @@ rules in `AGENTS.md` § Governance.
 
 | System            | State                | Notes                                                          |
 |-------------------|----------------------|----------------------------------------------------------------|
+| Datadog / Langfuse | ✅ pull connectors | Monitor+SLO state / prompt inventory → snapshots + state extracts for view tiles. |
 | GitHub / Notion / Slack | ✅ pull connectors | Snapshot-writers: immutable files into `sources/`, inbox items out. Configure `connectors:` in `brain.config.yml` + read-only tokens in `.env`. |
 | GitHub            | via `gh` CLI         | Pre-allowed in `.claude/settings.json`.                        |
 | MCP               | ✅ `tools/brain-mcp.py` | Read-only brain access for any MCP-aware client.            |

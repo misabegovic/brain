@@ -103,6 +103,20 @@ operations:
     output: sources/slack/
     enabled: true
 
+  - name: datadog-pull
+    description: Snapshot monitor states + SLO inventory; refresh wiki/_state/datadog.json.
+    cadence: daily
+    handler: python3 tools/brain.py schedule run datadog-pull
+    output: sources/datadog/
+    enabled: true
+
+  - name: langfuse-pull
+    description: Snapshot the prompt inventory + production versions; refresh wiki/_state/langfuse.json.
+    cadence: daily
+    handler: python3 tools/brain.py schedule run langfuse-pull
+    output: sources/langfuse/
+    enabled: true
+
   # ---- Ingestion + intersection-finding -------------------------
 
   - name: notion-walk

@@ -1,0 +1,20 @@
+# Operator view — the whole tend queue and the state surfaces.
+title: "Operator view"
+audience: operator
+description: >
+  Everything pending, every cursor, every tracked deadline —
+  the maintenance picture in one page.
+blocks:
+  - title: "Tend queue (all)"
+    inbox: {}
+    limit: 30
+  - title: "Deadlines"
+    state: deadlines
+  - title: "Connector cursors"
+    state: connector-cursors
+  - title: "Stalest pages"
+    sql: |
+      SELECT path, kind, confidence, updated FROM pages
+      WHERE status NOT IN ('superseded', 'archived')
+      ORDER BY updated ASC, path
+    limit: 10

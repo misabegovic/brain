@@ -33,3 +33,15 @@ connectors:
     # Channel names to pull. Needs SLACK_TOKEN in .env (read-only
     # scopes: channels:history, channels:read).
     channels: []
+  datadog:
+    # Datadog site (e.g. datadoghq.com, datadoghq.eu). Empty = off.
+    # Needs DD_API_KEY + DD_APP_KEY in .env; scope the app key to
+    # monitors_read + slos_read.
+    site: ""
+  langfuse:
+    # Langfuse host (e.g. https://cloud.langfuse.com or self-host).
+    # Empty = off. Needs LANGFUSE_PUBLIC_KEY + LANGFUSE_SECRET_KEY in
+    # .env — Langfuse keys are write-capable (no read-only type):
+    # use a dedicated project's keys or self-host.
+    host: ""
+

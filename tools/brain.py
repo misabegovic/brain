@@ -43,6 +43,7 @@ import shutil
 import socketserver
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -814,6 +815,14 @@ def cmd_views(_args) -> int:
           f"carry computed affected_by edges; "
           f"{sum(1 for e in entries if e.get('ai_suggestion'))} "
           f"AI-suggestion drafts cataloged")
+
+    # Derived index + custom views ride the same regeneration, per
+    # the sql-views-over-derived-index ADR.
+    stats = _build_index()
+    custom = _render_custom_views()
+    print(f"  index: {stats['pages']} pages + {stats['snapshots']} "
+          f"snapshots ({stats['size_kb']} KB)"
+          + (f"; custom views: {', '.join(custom)}" if custom else ""))
     return 0
 
 
@@ -3580,6 +3589,302 @@ def _count_go_mod(p: Path) -> int:
     return n
 
 
+# --- derived index (composable views) ------------------------------------
+#
+# Per wiki/brain/adrs/sql-views-over-derived-index.md: one disposable
+# SQLite index over the three data planes, rebuilt deterministically
+# from files on every views regeneration. Gitignored; single writer
+# (this indexer); every consumer opens read-only. Delete-and-rebuild
+# is always safe — files are the only source of truth.
+
+INDEX_DB = WIKI / "_views" / "index.db"
+
+INDEX_SCHEMA_DOC = """\
+# Derived index schema (wiki/_views/index.db — gitignored, disposable)
+#
+# pages(path PK, title, kind, status, confidence, updated, team,
+#       tokens, repos JSON, affects JSON, body)
+#   -- every wiki page outside _-folders; repos/affects are JSON
+#      arrays: use json_each(pages.repos)
+# links(src, dst)          -- resolved wiki-internal markdown links
+# inbox(id PK, kind, priority, summary, route, source,
+#       produced_by, produced_at)
+# state(surface, key, value)  -- wiki/_state/*.json flattened;
+#                                value is JSON text
+# snapshots(path PK, connector, title, pulled, meta JSON, body)
+#   -- sources/** files with frontmatter; connector = first folder
+# pages_fts, snapshots_fts  -- FTS5 (title, body); query via
+#   MATCH + ORDER BY rank (ascending); quote user tokens.
+"""
+
+
+def _fts_quote(query: str) -> str:
+    """Neutralise FTS5 MATCH syntax: quote each whitespace token."""
+    tokens = [t.replace('"', '""') for t in query.split()]
+    return " ".join(f'"{t}"' for t in tokens)
+
+
+def _build_index() -> dict:
+    """Rebuild the derived index atomically; returns build stats."""
+    import sqlite3
+    tmp = INDEX_DB.with_suffix(".db.tmp")
+    tmp.unlink(missing_ok=True)
+    INDEX_DB.parent.mkdir(parents=True, exist_ok=True)
+    db = sqlite3.connect(tmp)
+    db.executescript("""
+    PRAGMA synchronous=OFF; PRAGMA journal_mode=MEMORY;
+    CREATE TABLE pages(path TEXT PRIMARY KEY, title TEXT, kind TEXT,
+      status TEXT, confidence TEXT, updated TEXT, team TEXT,
+      tokens INTEGER, repos TEXT, affects TEXT, body TEXT);
+    CREATE TABLE links(src TEXT, dst TEXT, PRIMARY KEY(src, dst));
+    CREATE INDEX links_dst ON links(dst);
+    CREATE TABLE inbox(id TEXT PRIMARY KEY, kind TEXT, priority TEXT,
+      summary TEXT, route TEXT, source TEXT, produced_by TEXT,
+      produced_at TEXT);
+    CREATE TABLE state(surface TEXT, key TEXT, value TEXT);
+    CREATE TABLE snapshots(path TEXT PRIMARY KEY, connector TEXT,
+      title TEXT, pulled TEXT, meta TEXT, body TEXT);
+    CREATE VIRTUAL TABLE pages_fts USING fts5(title, body,
+      content='pages', content_rowid='rowid',
+      tokenize="unicode61 tokenchars '-_'");
+    CREATE VIRTUAL TABLE snapshots_fts USING fts5(title, body,
+      content='snapshots', content_rowid='rowid',
+      tokenize="unicode61 tokenchars '-_'");
+    """)
+
+    n_pages = 0
+    with db:
+        for p in wiki_pages():
+            parsed = parse(p)
+            if parsed is None:
+                continue
+            meta, body = parsed
+            db.execute(
+                "INSERT INTO pages VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+                (str(p.relative_to(WIKI)), str(meta.get("title", "")),
+                 meta.get("kind"), meta.get("status"),
+                 meta.get("confidence"), str(meta.get("updated", "")),
+                 meta.get("team"), approx_tokens(body),
+                 json.dumps(meta.get("repos") or []),
+                 json.dumps(meta.get("affects") or []), body))
+            n_pages += 1
+
+        outbound, _inbound = _link_graph()
+        db.executemany("INSERT OR IGNORE INTO links VALUES(?,?)",
+                       [(s, d) for s, ds in outbound.items() for d in ds])
+
+        for item in _inbox_items():
+            db.execute("INSERT OR REPLACE INTO inbox VALUES(?,?,?,?,?,?,?,?)",
+                       (item.get("id"), item.get("kind"),
+                        item.get("priority"), item.get("summary"),
+                        item.get("route"), item.get("source"),
+                        item.get("produced_by"), item.get("produced_at")))
+
+        for f in sorted((WIKI / "_state").glob("*.json")):
+            try:
+                data = json.loads(f.read_text())
+            except json.JSONDecodeError:
+                continue
+            if isinstance(data, dict):
+                db.executemany(
+                    "INSERT INTO state VALUES(?,?,?)",
+                    [(f.stem, k, json.dumps(v)) for k, v in data.items()])
+
+        n_snaps = 0
+        sources_dir = REPO / "sources"
+        if sources_dir.exists():
+            for f in sorted(sources_dir.rglob("*.md")):
+                if f.name == "README.md":
+                    continue
+                parsed = parse(f)
+                if parsed is None:
+                    continue
+                meta, body = parsed
+                rel = f.relative_to(sources_dir)
+                db.execute(
+                    "INSERT OR REPLACE INTO snapshots VALUES(?,?,?,?,?,?)",
+                    (str(rel), rel.parts[0], str(meta.get("title", "")),
+                     str(meta.get("pulled") or meta.get("captured") or ""),
+                     json.dumps({k: str(v) for k, v in meta.items()}),
+                     body))
+                n_snaps += 1
+
+        db.execute("INSERT INTO pages_fts(pages_fts) VALUES('rebuild')")
+        db.execute("INSERT INTO snapshots_fts(snapshots_fts) VALUES('rebuild')")
+
+    db.close()
+    os.replace(tmp, INDEX_DB)
+    return {"pages": n_pages, "snapshots": n_snaps,
+            "size_kb": INDEX_DB.stat().st_size // 1024}
+
+
+def _index_connect():
+    """Read-only connection; None when no index has been built yet."""
+    import sqlite3
+    if not INDEX_DB.exists():
+        return None
+    return sqlite3.connect(f"file:{INDEX_DB}?mode=ro", uri=True)
+
+
+def cmd_index(args) -> int:
+    """Rebuild the derived index (also happens on every `views` run)."""
+    if getattr(args, "schema", False):
+        print(INDEX_SCHEMA_DOC)
+        return 0
+    stats = _build_index()
+    print(f"index: {stats['pages']} pages, {stats['snapshots']} snapshots "
+          f"→ {INDEX_DB.relative_to(REPO)} ({stats['size_kb']} KB)")
+    return 0
+
+
+def cmd_query(args) -> int:
+    """Run one read-only SQL statement against the derived index."""
+    db = _index_connect()
+    if db is None:
+        print("query: no index yet — run `brain.py index` first",
+              file=sys.stderr)
+        return 1
+    try:
+        cur = db.execute(args.sql)
+    except Exception as exc:
+        print(f"query: {exc}", file=sys.stderr)
+        print("(schema: `brain.py index --schema`)", file=sys.stderr)
+        return 1
+    rows = cur.fetchmany(args.limit)
+    cols = [d[0] for d in cur.description or []]
+    if getattr(args, "json", False):
+        print(json.dumps([dict(zip(cols, r)) for r in rows],
+                         indent=2, default=str))
+    else:
+        if cols:
+            print("  " + " | ".join(cols))
+        for r in rows:
+            print("  " + " | ".join(str(v) for v in r))
+        print(f"  ({len(rows)} row(s))", file=sys.stderr)
+    return 0
+
+
+# --- composable view specs ------------------------------------------------
+
+VIEWS_SPEC_DIR = REPO / "views"
+CUSTOM_VIEWS_DIR = WIKI / "_views" / "custom"
+
+
+def _compile_block(block: dict) -> tuple[str, list]:
+    """One spec block → (sql, params). Raw `sql:` is the full tier;
+    the shorthands (`pages:`, `state:`, `inbox:`) compile to SQL —
+    never bypass it (per the sql-views-over-derived-index ADR)."""
+    if block.get("sql"):
+        return block["sql"], []
+    if "pages" in block:
+        f = block["pages"] or {}
+        where, params = [], []
+        for field in ("kind", "status", "confidence"):
+            if f.get(field):
+                where.append(f"{field} = ?")
+                params.append(f[field])
+        if f.get("repo"):
+            where.append(
+                "EXISTS (SELECT 1 FROM json_each(pages.repos) "
+                "WHERE json_each.value = ?)")
+            params.append(f["repo"])
+        clause = (" WHERE " + " AND ".join(where)) if where else ""
+        return (f"SELECT path, title, status, confidence, updated "
+                f"FROM pages{clause} ORDER BY updated DESC, path", params)
+    if "state" in block:
+        return ("SELECT key, value FROM state WHERE surface = ? "
+                "ORDER BY key", [block["state"]])
+    if "inbox" in block:
+        f = block["inbox"] or {}
+        if isinstance(f, str):
+            f = {"kind": f}
+        where, params = [], []
+        if f.get("kind"):
+            where.append("kind = ?")
+            params.append(f["kind"])
+        clause = (" WHERE " + " AND ".join(where)) if where else ""
+        return (f"SELECT id, kind, priority, summary FROM inbox{clause} "
+                f"ORDER BY CASE priority WHEN 'high' THEN 0 "
+                f"WHEN 'normal' THEN 1 ELSE 2 END, produced_at, id", params)
+    raise ValueError(
+        f"block {block.get('title', '?')!r} needs one of: sql, pages, "
+        f"state, inbox")
+
+
+def _render_rows(cols: list[str], rows: list) -> str:
+    if not rows:
+        return "*(no rows)*\n"
+    def esc(v) -> str:
+        return str(v).replace("|", "\\|").replace("\n", " ")[:120]
+    if len(cols) == 1:
+        return "".join(f"- {esc(r[0])}\n" for r in rows)
+    out = "| " + " | ".join(cols) + " |\n"
+    out += "|" + "---|" * len(cols) + "\n"
+    for r in rows:
+        out += "| " + " | ".join(esc(v) for v in r) + " |\n"
+    return out
+
+
+def _render_custom_views() -> list[str]:
+    """Render every spec in views/ to wiki/_views/custom/<name>.md.
+    Deterministic: specs must ORDER BY; rows are capped per block."""
+    if not VIEWS_SPEC_DIR.exists():
+        return []
+    specs = sorted(VIEWS_SPEC_DIR.glob("*.yml")) + sorted(
+        VIEWS_SPEC_DIR.glob("*.yaml"))
+    if not specs:
+        return []
+    db = _index_connect()
+    if db is None:
+        _build_index()
+        db = _index_connect()
+    rendered = []
+    CUSTOM_VIEWS_DIR.mkdir(parents=True, exist_ok=True)
+    for spec_path in specs:
+        try:
+            spec = yaml.safe_load(spec_path.read_text()) or {}
+        except yaml.YAMLError as exc:
+            print(f"views: skipping {spec_path.name}: {exc}", file=sys.stderr)
+            continue
+        name = spec_path.stem
+        parts = [
+            "---",
+            f'title: "{spec.get("title", name)}"',
+            "kind: meta",
+            "status: living",
+            f"updated: {today_utc().isoformat()}",
+            "confidence: high",
+            "sources:",
+            f"  - ../../../views/{spec_path.name}",
+            "---",
+            "",
+            f"# {spec.get('title', name)}",
+            "",
+            f"Auto-generated by `brain.py views` from "
+            f"`views/{spec_path.name}` — edit the spec, not this page."
+            + (f" Audience: {spec['audience']}."
+               if spec.get("audience") else ""),
+            "",
+        ]
+        if spec.get("description"):
+            parts += [spec["description"], ""]
+        for block in spec.get("blocks") or []:
+            parts.append(f"## {block.get('title', '(untitled block)')}")
+            parts.append("")
+            try:
+                sql, params = _compile_block(block)
+                cur = db.execute(sql, params)
+                rows = cur.fetchmany(int(block.get("limit", 20)))
+                cols = [d[0] for d in cur.description or []]
+                parts.append(_render_rows(cols, rows))
+            except Exception as exc:
+                parts.append(f"*(block error: {exc})*\n")
+        out = CUSTOM_VIEWS_DIR / f"{name}.md"
+        out.write_text("\n".join(parts))
+        rendered.append(name)
+    return rendered
+
+
 # --- link graph (0.4) — pruning + deepening inputs -----------------------
 
 # Stale thresholds (days) per page kind — the groom skill's half-life
@@ -3969,6 +4274,165 @@ def _connector_slack_pull() -> int:
                 produced_by="slack-pull", update=True)
     _write_connector_cursors(cursors)
     print(f"slack-pull: {len(channels)} channel(s) checked, {pulled} batch(es)")
+    return 0
+
+
+def _connector_datadog_pull() -> int:
+    """Daily production-state snapshot: monitor states + SLO inventory.
+
+    Per the API research: monitor state, not logs, is the daily
+    primitive (logs search is quota-scarce and stays out of the
+    default pull). Needs connectors.datadog.site in config plus
+    DD_API_KEY + DD_APP_KEY (app key scoped to monitors_read +
+    slos_read) in .env.
+    """
+    site = _connector_config("datadog").get("site") or ""
+    if not site:
+        print("datadog-pull: connectors.datadog.site unset — nothing to pull")
+        return 0
+    api_key, app_key = _env("DD_API_KEY"), _env("DD_APP_KEY")
+    if not api_key or not app_key:
+        print("datadog-pull: DD_API_KEY / DD_APP_KEY not set in .env; "
+              "skipping", file=sys.stderr)
+        return 0
+
+    def dd_get(path: str, params: dict | None = None):
+        qs = ("?" + urllib.parse.urlencode(params)) if params else ""
+        req = urllib.request.Request(
+            f"https://api.{site}{path}{qs}",
+            headers={"DD-API-KEY": api_key, "DD-APPLICATION-KEY": app_key})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read())
+
+    today = today_utc().isoformat()
+    try:
+        monitors = dd_get("/api/v1/monitor",
+                          {"group_states": "all", "with_downtimes": "true",
+                           "page_size": 200})
+        slos = dd_get("/api/v1/slo").get("data", [])
+    except urllib.error.URLError as exc:
+        print(f"datadog-pull: API error: {exc} "
+              f"(check DD_SITE={site!r} and app-key scopes)", file=sys.stderr)
+        return 0
+
+    by_state: dict[str, int] = collections.Counter(
+        m.get("overall_state", "Unknown") for m in monitors)
+    alerting = sorted(m.get("name", "?") for m in monitors
+                      if m.get("overall_state") in ("Alert", "Warn"))
+
+    lines = [f"- **{m.get('overall_state', '?')}** {m.get('name', '?')} "
+             f"(id {m.get('id')})\n" for m in
+             sorted(monitors, key=lambda m: (m.get("overall_state", ""),
+                                             str(m.get("name", ""))))]
+    slo_lines = [f"- {s.get('name', '?')} (type {s.get('type', '?')})\n"
+                 for s in sorted(slos, key=lambda s: str(s.get("name", "")))]
+    _snapshot_write(
+        "datadog", f"monitors--{today}.md",
+        f"Datadog monitors + SLOs — {today}",
+        f"## Monitors ({len(monitors)})\n\n" + "".join(lines)
+        + f"\n## SLOs ({len(slos)})\n\n" + "".join(slo_lines),
+        {"site": site, "monitors": len(monitors), "slos": len(slos),
+         "alerting": len(alerting)})
+
+    state_path = WIKI / "_state" / "datadog.json"
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state_path.write_text(json.dumps({
+        "pulled": today, "site": site,
+        "monitors_total": len(monitors),
+        "by_state": dict(by_state),
+        "alerting": alerting[:25],
+        "slos_total": len(slos),
+    }, indent=2, sort_keys=True) + "\n")
+
+    if alerting:
+        inbox_add(id=f"datadog-alerting-{today}", kind="ingest",
+                  summary=f"Datadog: {len(alerting)} monitor(s) in "
+                          f"Alert/Warn state",
+                  route="/in sources/datadog/",
+                  source=f"sources/datadog/monitors--{today}.md",
+                  produced_by="datadog-pull", update=True)
+    print(f"datadog-pull: {len(monitors)} monitor(s) "
+          f"({dict(by_state)}), {len(slos)} SLO(s)")
+    return 0
+
+
+def _connector_langfuse_pull() -> int:
+    """Daily prompt-state snapshot: inventory + production versions.
+
+    Per the API research: Langfuse has no read-only key type — keys
+    are project-scoped and write-capable, so the documented guidance
+    is dedicated-project keys or self-host. Needs
+    connectors.langfuse.host in config plus LANGFUSE_PUBLIC_KEY +
+    LANGFUSE_SECRET_KEY in .env. Trace/score increments are a
+    follow-up; prompts are the state the views need first.
+    """
+    host = (_connector_config("langfuse").get("host") or "").rstrip("/")
+    if not host:
+        print("langfuse-pull: connectors.langfuse.host unset — "
+              "nothing to pull")
+        return 0
+    pub, sec = _env("LANGFUSE_PUBLIC_KEY"), _env("LANGFUSE_SECRET_KEY")
+    if not pub or not sec:
+        print("langfuse-pull: LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY "
+              "not set in .env; skipping", file=sys.stderr)
+        return 0
+    import base64
+    auth = base64.b64encode(f"{pub}:{sec}".encode()).decode()
+
+    def lf_get(path: str, params: dict | None = None):
+        qs = ("?" + urllib.parse.urlencode(params)) if params else ""
+        req = urllib.request.Request(
+            f"{host}/api/public{path}{qs}",
+            headers={"Authorization": f"Basic {auth}"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read())
+
+    today = today_utc().isoformat()
+    prompts, page = [], 1
+    try:
+        while True:
+            data = lf_get("/v2/prompts", {"page": page, "limit": 100})
+            prompts.extend(data.get("data", []))
+            meta = data.get("meta", {})
+            if page >= int(meta.get("totalPages", 1)):
+                break
+            page += 1
+            time.sleep(3)  # Hobby tier: ~20 req/min
+    except urllib.error.URLError as exc:
+        print(f"langfuse-pull: API error: {exc} (check host + keys)",
+              file=sys.stderr)
+        return 0
+
+    prompts.sort(key=lambda p: str(p.get("name", "")))
+    lines = []
+    for pr in prompts:
+        versions = pr.get("versions") or []
+        labels = pr.get("labels") or []
+        lines.append(f"- **{pr.get('name', '?')}** — "
+                     f"{len(versions)} version(s); labels: "
+                     f"{', '.join(labels) or '(none)'}\n")
+    _snapshot_write(
+        "langfuse", f"prompts--{today}.md",
+        f"Langfuse prompt inventory — {today}",
+        f"## Prompts ({len(prompts)})\n\n" + "".join(lines),
+        {"host": host, "prompts": len(prompts)})
+
+    state_path = WIKI / "_state" / "langfuse.json"
+    state_path.write_text(json.dumps({
+        "pulled": today, "host": host,
+        "prompts_total": len(prompts),
+        "prompts": [{"name": p.get("name"),
+                     "versions": len(p.get("versions") or []),
+                     "labels": p.get("labels") or []}
+                    for p in prompts[:50]],
+    }, indent=2, sort_keys=True) + "\n")
+
+    inbox_add(id=f"langfuse-{today}", kind="ingest",
+              summary=f"Langfuse: {len(prompts)} prompt(s) snapshotted",
+              route="/in sources/langfuse/",
+              source=f"sources/langfuse/prompts--{today}.md",
+              produced_by="langfuse-pull", update=True)
+    print(f"langfuse-pull: {len(prompts)} prompt(s)")
     return 0
 
 
@@ -4427,6 +4891,8 @@ SCHEDULE_HANDLERS = {
     "github-pull": _connector_github_pull,
     "notion-pull": _connector_notion_pull,
     "slack-pull": _connector_slack_pull,
+    "datadog-pull": _connector_datadog_pull,
+    "langfuse-pull": _connector_langfuse_pull,
     "issues-pull": _schedule_run_issues_pull,
     "notion-walk": _schedule_run_notion_walk,
     "overlap-refresh": _schedule_run_overlap_refresh,
@@ -5479,6 +5945,20 @@ def main() -> int:
     ap_crf.add_argument("--base", default="origin/main",
                         help="base ref for the diff (default: origin/main)")
     ap_crf.set_defaults(func=cmd_check_readme_fresh)
+
+    ap_idx = sub.add_parser("index",
+                            help="rebuild the derived SQLite index "
+                                 "(gitignored, disposable)")
+    ap_idx.add_argument("--schema", action="store_true",
+                        help="print the documented schema")
+    ap_idx.set_defaults(func=cmd_index)
+
+    ap_q = sub.add_parser("query",
+                          help="read-only SQL over the derived index")
+    ap_q.add_argument("sql")
+    ap_q.add_argument("--limit", type=int, default=200)
+    ap_q.add_argument("--json", action="store_true")
+    ap_q.set_defaults(func=cmd_query)
 
     ap_links = sub.add_parser("links",
                               help="link-graph health: orphans / hubs / "

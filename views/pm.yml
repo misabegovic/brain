@@ -1,0 +1,15 @@
+# PM view — initiatives, pending bets, insights, ingest queue.
+title: "PM view"
+audience: team/pm
+description: >
+  Committed work, proposals awaiting a bet, patterns from feedback,
+  and what's queued for ingestion.
+blocks:
+  - title: "Open initiatives"
+    pages: {kind: initiative, status: living}
+  - title: "Pitches awaiting a bet"
+    pages: {kind: pitch, status: draft}
+  - title: "Insights"
+    pages: {kind: insight}
+  - title: "Ingest queue"
+    inbox: {kind: ingest}

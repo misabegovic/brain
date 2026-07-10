@@ -116,22 +116,24 @@ snapshots findings into `sources/research/`, and lands the commit
 that earns the confidence bump with citations. The brain studies its
 weakest load-bearing knowledge first.
 
-## Proposed — composable role-fit views (pitch, pre-bet)
+## 0.5.0 — composable role-fit views — **shipped 2026-07-10**
 
-Captured 2026-07-10 at
-[pitches/composable-role-views.md](pitches/composable-role-views.md):
-declarative YAML view specs composing blocks (wiki-page filters,
-state tiles, snapshot excerpts, inbox, link health) into generated
-`wiki/_views/custom/<name>.md` pages, plus Datadog and Langfuse
-connectors under the existing snapshot contract with optional state
-extracts. Ships example specs per role (engineer / pm / operator).
-On a bet it takes the next version slot and the serving/hosting
-slices shift accordingly — served consumers would get role views
-for free, since views are just pages.
+Bet, shaped, and built the same day: pitch → deepdive (five research
+notes) → [PRD](prds/composable-role-views.md) →
+[ADR](adrs/sql-views-over-derived-index.md) → build. A disposable
+SQLite index rides every views regeneration; view specs in `views/`
+are SQL (plus shorthands that compile to SQL) rendering to
+`wiki/_views/custom/`; `brain.py query` gives read-only ad-hoc SQL;
+Datadog (monitors + SLOs) and Langfuse (prompt inventory) joined the
+connector fleet with state extracts for view tiles. Example specs:
+engineer / pm / operator. The serving and hosting slices below shift
+to 0.6 / 0.7.
 
-## 0.5.0 — the serving plane (access for people outside the product)
+## 0.6.0 — the serving plane (access for people outside the product)
 
-**MCP-first.** The stdio MCP grows an HTTP transport behind SSO
+**MCP-first**, now plus the Datasette pilot over the derived index
+(researched: immutable mode behind an IAP is its canonical
+deployment; stable 0.65.x). The stdio MCP grows an HTTP transport behind SSO
 (identity-aware proxy); people outside the product connect *their
 own* MCP-aware client (Claude, Cursor, ChatGPT connectors) to the
 brain's read-only tools — the operator pays hosting, consumers pay
@@ -146,7 +148,7 @@ with no agent of their own, added only if demand shows up, with
 per-query cost capped by construction. Local-first is unchanged —
 serving is an optional deployment profile, not the default mode.
 
-## 0.6.0 — self-hosting hardening
+## 0.7.0 — self-hosting hardening
 
 One compose profile: static UI and MCP-HTTP against the git remote
 as the single source of truth (backups are git); the deterministic

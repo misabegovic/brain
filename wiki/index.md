@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.5.0 shipped: composable role-fit views.**
+  Derived SQLite index + FTS5 riding every views run; SQL view
+  specs in `views/` rendering to
+  [custom views](_views/custom/engineer.md); `brain.py query`;
+  Datadog + Langfuse connectors. Full /shape trail:
+  [PRD](brain/prds/composable-role-views.md) ·
+  [ADR](brain/adrs/sql-views-over-derived-index.md).
 - **2026-07-10** — the views bet's
   [ADR](brain/adrs/sql-views-over-derived-index.md) landed: SQL over
   a derived disposable index, shorthands compile to SQL, index rides
@@ -87,8 +94,9 @@ start filling in as the slash-command surface runs.
 ## Open initiatives
 
 <!-- home-section; maintained-by: /shape -->
-- [Brain roadmap — the 0.x arc](brain/roadmap.md) — 0.2 through 0.4
-  shipped; next up: 0.5 the MCP-first serving plane.
+- [Brain roadmap — the 0.x arc](brain/roadmap.md) — 0.2 through 0.5
+  shipped; next up: 0.6 the MCP-first serving plane (incl. the
+  Datasette pilot).
 
 [See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
 

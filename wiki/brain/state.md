@@ -26,6 +26,13 @@ into the sections below.
 
 ## Now
 
+- **Composable views are live (0.5.0, 2026-07-10).** Derived
+  SQLite index (FTS5) rebuilt on every views run; SQL view specs in
+  `views/` render to `wiki/_views/custom/` (engineer / pm /
+  operator examples); `brain.py query` for ad-hoc read-only SQL;
+  Datadog + Langfuse connectors with state extracts. Full trail:
+  pitch → deepdive → PRD → ADR → build, all human-gated inline.
+
 - **Pruning + deepening are live (0.4.0, 2026-07-10).**
   `brain.py links` health views; `inbox-refresh` now queues
   per-kind half-life crossings, orphans, research picks (low
@@ -72,9 +79,6 @@ into the sections below.
 
 ## Target
 
-- **Pending bet:** [composable role-fit
-  views](pitches/composable-role-views.md) — the layer that lets an
-  individual configure the brain to fit their role.
 
 - Adopt for a project: fill `brain.config.yml`, author team/user
   personas, run the first `/in` ingest.

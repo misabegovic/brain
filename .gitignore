@@ -51,3 +51,8 @@ wiki/_views/readme-staleness.json
 .venv/
 
 .venv2/
+
+# Derived SQLite index — disposable, rebuilt by `brain.py views`/`index`.
+# Never committed; files are the only source of truth.
+wiki/_views/index.db
+wiki/_views/index.db.tmp

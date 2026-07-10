@@ -1113,6 +1113,24 @@ the home links resolve. The new shell is `BRAIN_DIR`-aware — all
 `brain.py` commands honour `$BRAIN_DIR` so the existing tools work
 against the new shell without copying `tools/` over.
 
+### `brain.py index` / `query` / `views/` specs — composable views
+
+```bash
+python3 tools/brain.py index [--schema]   # rebuild the derived index / print schema
+python3 tools/brain.py query '<sql>'      # read-only SQL over the index
+```
+
+Per `wiki/brain/adrs/sql-views-over-derived-index.md`: a disposable,
+gitignored SQLite index (`wiki/_views/index.db`) is rebuilt from the
+files on every `views` run — pages + computed edges, links, inbox,
+flattened state, connector snapshots, FTS5 over page and snapshot
+text. **View specs** are YAML files in `views/` (blocks: raw `sql:`
+or shorthands `pages:` / `state:` / `inbox:` that compile to SQL);
+each renders to `wiki/_views/custom/<name>.md` on regeneration.
+Example specs ship for engineer / pm / operator roles. The index is
+never committed and never load-bearing — delete-and-rebuild is
+always safe; consumers open read-only.
+
 ### `brain.py links` — link-graph health
 
 ```bash
