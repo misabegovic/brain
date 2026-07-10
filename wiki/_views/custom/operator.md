@@ -31,6 +31,7 @@ Everything pending, every cursor, every tracked deadline — the maintenance pic
 
 | path | kind | confidence | updated |
 |---|---|---|---|
+| brain/adrs/chat-print-mode-bridge.md | decision | medium | 2026-07-10 |
 | brain/adrs/competitor-intel-ingestion.md | decision | medium | 2026-07-10 |
 | brain/adrs/connector-snapshot-contract.md | decision | medium | 2026-07-10 |
 | brain/adrs/home-content-shape.md | decision | medium | 2026-07-10 |
@@ -40,4 +41,3 @@ Everything pending, every cursor, every tracked deadline — the maintenance pic
 | brain/adrs/parallel-efforts-on-request.md | decision | medium | 2026-07-10 |
 | brain/adrs/parallel-execution-agent-teams.md | decision | medium | 2026-07-10 |
 | brain/adrs/queue-and-tend-inbox.md | decision | high | 2026-07-10 |
-| brain/adrs/shape-deepdive-pre-flight.md | decision | medium | 2026-07-10 |

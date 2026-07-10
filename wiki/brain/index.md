@@ -38,14 +38,15 @@ sanitized to organisation-agnostic form:
 - [Connector snapshot contract](adrs/connector-snapshot-contract.md) — connectors are pull-only snapshot-writers: immutable dedup files, cursors, inbox items out, never a wiki write.
 - [SQL views over a derived index](adrs/sql-views-over-derived-index.md) — view specs are SQL over a disposable SQLite index; shorthands compile to SQL; the index rides the views pipeline.
 - [Workbench PTY bridge](adrs/workbench-pty-bridge.md) — loopback browser page over a stdlib PTY bridge; harness launches + config adapters as data tables; never in serving mode.
+- [Chat print-mode bridge](adrs/chat-print-mode-bridge.md) — chat as a per-harness print-mode registry; terminal demoted to a toggle; bare `brain` opens the app.
 - [Kernel-manifest instancing](adrs/kernel-manifest-instancing.md) — instances born by explicit manifest: mechanism + kernel trail cross, dogfood never does.
 - [Single-image serving profile](adrs/single-image-serving-profile.md) — one infra-agnostic image, env-selected surface; instance isolation via env ports + hashed timer units; Railway as reference, not dependency.
 
 ## Pitches (pre-bet) — awaiting a bet
 
-- [Chat-first app](pitches/chat-first-app.md) — the conversation is
-  the interface; terminal demoted to a power toggle. **Awaiting the
-  operator's picks** (chat-backend shape, terminal's fate).
+- [Chat-first app](pitches/chat-first-app.md) — **superseded**
+  2026-07-10: graduated on the operator's picks (registry / toggle /
+  full collapse).
 
 ## Topics (discussions in flight)
 
@@ -68,6 +69,9 @@ sanitized to organisation-agnostic form:
 
 ## PRDs
 
+- [Chat-first app](prds/chat-first-app.md) — conversation as the
+  interface; ambient status; bare `brain` opens the app. Bet
+  2026-07-10.
 - [Instance birth](prds/instance-birth.md) — `init --full` births a
   working instance from the kernel manifest. Bet 2026-07-10.
 - [Composable role-fit views](prds/composable-role-views.md) — SQL

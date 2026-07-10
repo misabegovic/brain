@@ -1,7 +1,8 @@
 ---
 title: "Chat-first app — the conversation is the interface; the mechanism disappears behind it"
 kind: pitch
-status: draft
+status: superseded
+superseded_by: brain/prds/chat-first-app.md
 updated: 2026-07-10
 confidence: medium
 sources:

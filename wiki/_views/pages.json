@@ -52,6 +52,19 @@
   ],
   "pages": [
     {
+      "path": "brain/adrs/chat-print-mode-bridge.md",
+      "title": "The chat is a per-harness print-mode bridge: conversation as the interface, terminal demoted to a toggle, bare `brain` opens the app",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../prds/chat-first-app.md",
+        "../adrs/workbench-pty-bridge.md"
+      ],
+      "tokens": 958
+    },
+    {
       "path": "brain/adrs/competitor-intel-ingestion.md",
       "title": "Competitor intel lives at wiki/org/competitors/<competitor>/index.md, ingested via the existing wiki-ingest classifier with an explicit hint override",
       "kind": "decision",
@@ -312,7 +325,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1087,
+      "tokens": 1166,
       "affected_by": [
         "org/competitors/codeplain/index.md"
       ]
@@ -321,7 +334,8 @@
       "path": "brain/pitches/chat-first-app.md",
       "title": "Chat-first app \u2014 the conversation is the interface; the mechanism disappears behind it",
       "kind": "pitch",
-      "status": "draft",
+      "status": "superseded",
+      "superseded_by": "brain/prds/chat-first-app.md",
       "updated": "2026-07-10",
       "confidence": "medium",
       "sources": [
@@ -380,6 +394,20 @@
         "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
       ],
       "tokens": 386
+    },
+    {
+      "path": "brain/prds/chat-first-app.md",
+      "title": "Chat-first app \u2014 conversation as the interface, ambient status, one command to open it all",
+      "kind": "initiative",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/chat-first-app.md",
+      "sources": [
+        "../pitches/chat-first-app.md",
+        "../../../sources/conversations/2026-07-10--chat-first-simplification.md"
+      ],
+      "tokens": 447
     },
     {
       "path": "brain/prds/composable-role-views.md",
