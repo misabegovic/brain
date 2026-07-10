@@ -62,3 +62,6 @@
 2026-07-10 commit — 3eba6fe: tend sweep (hub-ADR verification)
    diff: 10 files changed, 65 insertions(+), 48 deletions(-)
    restricted-paths: false
+2026-07-10 commit — 619161d: /shape phases 1+2 — harness-workbench PRD + ADR; pitch superseded
+   diff: 10 files changed, 236 insertions(+), 17 deletions(-)
+   restricted-paths: false
