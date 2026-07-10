@@ -1113,6 +1113,23 @@ the home links resolve. The new shell is `BRAIN_DIR`-aware — all
 `brain.py` commands honour `$BRAIN_DIR` so the existing tools work
 against the new shell without copying `tools/` over.
 
+### `brain.py setup` / `doctor` / `serve /dash` — the hands-off surface
+
+```bash
+python3 tools/brain.py setup [--org X --repos a,b --yes --dry-run]
+python3 tools/brain.py doctor [--json]
+python3 tools/brain.py serve      # JSON API + human ops page at /dash
+brain tend [budget]               # wrapper: open the agent with /tend
+brain dash                        # wrapper: serve + open localhost:8765/dash
+```
+
+`setup` is the idempotent bootstrap (env, config, pre-commit gate,
+venv, timer, UI deps — each step detects "already done"); `doctor`
+is the health checklist behind it (ok/warn/fail + the fixing
+command; exit 1 only on fails); `/dash` renders doctor + the tend
+queue + quick-start as a server-side HTML page for non-terminal
+users. All three read the same `_doctor_checks()` source of truth.
+
 ### `brain.py status` — single-pane-of-glass dashboard
 
 ```bash

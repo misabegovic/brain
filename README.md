@@ -45,20 +45,30 @@ skeleton, `sources/` starts empty, `log/log.md` starts empty.
 
 ## Adopting the shell for a project
 
-1. **Configure.** Edit `brain.config.yml` — org name plus the
-   `active_repos:` this brain tracks. Repos resolve on disk under
-   `$BRAIN_PROJECTS_ROOT` (default `~/projects/`).
-2. **Pick a mode.** Copy `.env.example` to `.env`. `LOCAL_FIRST=true`
-   (the default in the example) suspends the PR/CI ritual for
-   single-operator work; unset it to get PR-gated multi-agent
-   governance. See `AGENTS.md` § Governance.
-3. **Author personas.** `.claude/personas/team/` (internal
+```bash
+python3 tools/brain.py setup     # one command: .env, org, repos, hook, timer, UI deps
+```
+
+The wizard is idempotent — it prompts for the organisation name and
+active repos (or takes `--org` / `--repos` / `--yes`), copies
+`.env.example` to `.env` (local-first mode), installs the pre-commit
+gate and the daily accumulation timer, and ends with the `doctor`
+health checklist. `brain doctor` re-checks any time;
+`brain dash` opens the local ops dashboard (health, tend queue,
+quick start) at `localhost:8765/dash`.
+
+Then:
+
+1. **Author personas.** `.claude/personas/team/` (internal
    archetypes) and `users/` (customer archetypes) are authored
    per-organisation — see `.claude/personas/README.md`. The
    `agents/` roles ship with the kernel.
-4. **Ingest.** Point the agent at a repo or document: `/in <source>`.
-   Shelves grow under `wiki/<repo>/` as content earns them.
-5. **Wire the reach surface** (optional). Register the MCP server,
+2. **Ingest.** Point the agent at a repo or document: `/in <source>`.
+   Shelves grow under `wiki/<repo>/` as content earns them. From
+   then on the loop is hands-off: the timer queues work, the
+   session-start line tells you when there's something to digest,
+   and `/tend` (or `brain tend` from any shell) digests it.
+3. **Wire the reach surface** (optional). Register the MCP server,
    symlink `tools/brain` onto your PATH, run
    `brain.py install-sibling <repo>` to surface brain pages inside
    sibling-repo agent sessions.
@@ -116,6 +126,10 @@ python3 tools/brain.py views        # regen wiki/_views/ (by-kind, by-team, by-r
 python3 tools/brain.py search '<q>' # hybrid keyword search
 python3 tools/brain.py status       # single-pane health dashboard
 python3 tools/brain.py inbox summary # the tend queue in one line
+python3 tools/brain.py setup        # one-command bootstrap (idempotent)
+python3 tools/brain.py doctor       # health checklist
+tools/brain dash                    # local ops dashboard (serve + open /dash)
+tools/brain tend                    # open the agent with /tend
 tools/install-timer.sh              # daily accumulation timer (systemd user / cron)
 pytest tests/                       # kernel invariants
 ```

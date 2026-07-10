@@ -1090,6 +1090,96 @@ def cmd_coverage(args) -> int:
     return 0 if not uncovered else 2
 
 
+def _render_dash(page_count: int) -> str:
+    """Server-rendered ops dashboard for `serve` at /dash.
+
+    Everything is computed per-request from live state — the page is
+    the human-friendly face of `doctor` + `status` + `inbox`, so a
+    non-terminal user can see whether the brain is healthy and what
+    it wants tended without learning the CLI.
+    """
+    import html as _html
+
+    def esc(s) -> str:
+        return _html.escape(str(s))
+
+    config_path = REPO / "brain.config.yml"
+    org = ""
+    try:
+        org = (yaml.safe_load(config_path.read_text()) or {}).get("org") or ""
+    except Exception:
+        pass
+    env_path = REPO / ".env"
+    mode = ("local-first" if env_path.exists()
+            and "LOCAL_FIRST=true" in env_path.read_text() else "PR-gated")
+
+    icon = {"ok": "✓", "warn": "−", "fail": "✗"}
+    check_rows = ""
+    for c in _doctor_checks():
+        hint = (f'<div class="hint">fix: <code>{esc(c["hint"])}</code></div>'
+                if c["hint"] and c["status"] != "ok" else "")
+        check_rows += (
+            f'<tr class="{c["status"]}"><td>{icon[c["status"]]}</td>'
+            f'<td>{esc(c["label"])}</td>'
+            f'<td>{esc(c["detail"])}{hint}</td></tr>\n')
+
+    items = _inbox_items()
+    if items:
+        order = {"high": 0, "normal": 1, "low": 2}
+        items.sort(key=lambda i: (order.get(i.get("priority"), 1),
+                                  i.get("produced_at", "")))
+        inbox_rows = "".join(
+            f'<tr><td><code>{esc(i["id"])}</code></td>'
+            f'<td>{esc(i.get("kind", "?"))}</td>'
+            f'<td>{esc(i.get("priority", "normal"))}</td>'
+            f'<td>{esc(i.get("summary", ""))}</td></tr>\n'
+            for i in items)
+        inbox_html = (f'<table><tr><th>id</th><th>kind</th><th>priority'
+                      f'</th><th>summary</th></tr>{inbox_rows}</table>'
+                      f'<p>Digest in your agent session: <code>/tend</code>'
+                      f' (or <code>brain tend</code> from any shell).</p>')
+    else:
+        inbox_html = "<p>Empty — nothing pending. The timer refills it.</p>"
+
+    title = f"brain — {org}" if org else "brain"
+    return f"""<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{esc(title)} · ops</title>
+<style>
+ :root {{ color-scheme: light dark; }}
+ body {{ font: 15px/1.5 system-ui, sans-serif; max-width: 52rem;
+        margin: 2rem auto; padding: 0 1rem; }}
+ h1 {{ font-size: 1.3rem; }} h2 {{ font-size: 1.05rem; margin-top: 2rem; }}
+ table {{ border-collapse: collapse; width: 100%; }}
+ td, th {{ padding: .35rem .6rem; text-align: left; vertical-align: top;
+          border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent); }}
+ tr.warn td:first-child {{ color: #c80; }} tr.fail td:first-child {{ color: #c33; }}
+ tr.ok td:first-child {{ color: #2a2; }}
+ code {{ background: color-mix(in srgb, currentColor 8%, transparent);
+        padding: .1rem .3rem; border-radius: 3px; }}
+ .hint {{ opacity: .75; font-size: .9em; }}
+ .meta {{ opacity: .75; }}
+</style></head><body>
+<h1>{esc(title)}</h1>
+<p class="meta">{page_count} pages · {mode} mode · {esc(today_utc().isoformat())}
+ · <a href="/pages.json">pages.json</a> · <a href="/search?q=">search API</a></p>
+<h2>Health</h2>
+<table>{check_rows}</table>
+<p class="meta">Same as <code>brain doctor</code>; one-command fix-up:
+<code>brain setup</code>.</p>
+<h2>Tend queue</h2>
+{inbox_html}
+<h2>Quick start</h2>
+<ol>
+ <li><code>python3 tools/brain.py setup</code> — configure org, repos,
+     hook, timer (idempotent).</li>
+ <li>Open your agent in the repo — the inbox summary greets you.</li>
+ <li><code>/tend</code> to digest, <code>/in &lt;source&gt;</code> to feed,
+     <code>/ask</code> to query.</li>
+</ol>
+</body></html>"""
+
+
 def cmd_serve(args) -> int:
     """Read-only HTTP API for the brain. localhost only by default."""
     port = args.port
@@ -1133,6 +1223,7 @@ def cmd_serve(args) -> int:
             if path == "/":
                 self._send_json(200, {
                     "endpoints": [
+                        "/dash",
                         "/pages.json",
                         "/pages/<wiki-relative-path>",
                         "/views/by-kind",
@@ -1143,6 +1234,11 @@ def cmd_serve(args) -> int:
                     ],
                     "page_count": len(entries_cache),
                 })
+                return
+
+            if path == "/dash":
+                self._send_text(200, _render_dash(len(entries_cache)),
+                                "text/html; charset=utf-8")
                 return
 
             if path == "/pages.json":
@@ -1955,6 +2051,247 @@ def _write_cursors(data: dict) -> None:
     SYNC_CURSORS.parent.mkdir(exist_ok=True)
     data["generated"] = today_utc().isoformat()
     SYNC_CURSORS.write_text(json.dumps(data, indent=2) + "\n")
+
+
+def _doctor_checks() -> list[dict]:
+    """The health checklist behind `doctor`, `setup`, and the /dash
+    surface. Each check: id, label, status (ok|warn|fail), detail,
+    hint (the command that fixes a warn/fail; empty when healthy).
+    Warns are missing ergonomics; fails are broken substrate.
+    """
+    checks: list[dict] = []
+
+    def add(id: str, label: str, status: str, detail: str, hint: str = ""):
+        checks.append({"id": id, "label": label, "status": status,
+                       "detail": detail, "hint": hint})
+
+    if (REPO / ".git").exists():
+        add("git", "git repository", "ok", "initialised")
+    else:
+        add("git", "git repository", "fail", "no .git — history and the "
+            "audit trail need git", "git init")
+
+    try:
+        import tiktoken  # noqa: F401
+        add("tiktoken", "token counting", "ok", "tiktoken available")
+    except ImportError:
+        add("tiktoken", "token counting", "warn",
+            "tiktoken missing — pages.json token counts drift vs CI",
+            "tools/setup-local.sh")
+
+    env_path = REPO / ".env"
+    if env_path.exists():
+        local_first = "LOCAL_FIRST=true" in env_path.read_text()
+        add("env", "operating mode", "ok",
+            "local-first (single operator)" if local_first
+            else "PR-gated (multi-agent)")
+    else:
+        add("env", "operating mode", "warn",
+            ".env missing — defaults to PR-gated mode",
+            "cp .env.example .env")
+
+    config_path = REPO / "brain.config.yml"
+    if config_path.exists():
+        try:
+            cfg = yaml.safe_load(config_path.read_text()) or {}
+        except yaml.YAMLError:
+            cfg = None
+        if cfg is None:
+            add("config", "brain.config.yml", "fail", "unparseable YAML",
+                "fix the YAML syntax")
+        else:
+            org = (cfg.get("org") or "").strip()
+            repos = cfg.get("active_repos") or []
+            if not org and not repos:
+                add("config", "brain.config.yml", "warn",
+                    "org and active_repos are empty — the shell is "
+                    "unconfigured", "python3 tools/brain.py setup")
+            elif not repos:
+                add("config", "brain.config.yml", "warn",
+                    f"org={org!r}; no active repos declared yet",
+                    "add repos to active_repos in brain.config.yml")
+            else:
+                missing = [r for r in repos if not (PROJECTS / r).exists()]
+                if missing:
+                    add("config", "brain.config.yml", "warn",
+                        f"{len(repos)} repo(s); missing on disk: "
+                        f"{', '.join(missing)}",
+                        f"clone them under {PROJECTS} or adjust "
+                        "BRAIN_PROJECTS_ROOT")
+                else:
+                    add("config", "brain.config.yml", "ok",
+                        f"org={org!r}; {len(repos)} active repo(s), all "
+                        "on disk")
+    else:
+        add("config", "brain.config.yml", "fail", "missing",
+            "python3 tools/brain.py setup")
+
+    hook = REPO / ".git" / "hooks" / "pre-commit"
+    if hook.is_symlink() or hook.exists():
+        add("pre-commit", "pre-commit gate", "ok", "installed")
+    else:
+        add("pre-commit", "pre-commit gate", "warn",
+            "not installed — validate/views run only in CI",
+            "ln -s ../../tools/git-hooks/pre-commit .git/hooks/pre-commit")
+
+    timer_state = ""
+    if shutil.which("systemctl"):
+        res = subprocess.run(
+            ["systemctl", "--user", "is-active", "brain-schedule.timer"],
+            capture_output=True, text=True)
+        timer_state = res.stdout.strip()
+    if timer_state == "active":
+        add("timer", "accumulation timer", "ok",
+            "brain-schedule.timer active (daily run-due)")
+    else:
+        add("timer", "accumulation timer", "warn",
+            "no local timer — producers only run when invoked by hand",
+            "tools/install-timer.sh")
+
+    if (REPO / "ui" / "node_modules").exists():
+        add("ui", "browse UI", "ok", "dependencies installed")
+    else:
+        add("ui", "browse UI", "warn", "ui/node_modules missing",
+            "cd ui && npm install")
+
+    if shutil.which("claude"):
+        add("agent", "agent CLI", "ok",
+            "claude on PATH — `brain tend` works")
+    else:
+        add("agent", "agent CLI", "warn",
+            "no agent CLI found — the brain still works as a validated "
+            "wiki; any MCP-aware agent can connect",
+            "install an agent CLI or use the MCP server")
+
+    items = _inbox_items()
+    add("inbox", "tend queue", "ok",
+        f"{len(items)} pending" if items else "empty")
+
+    return checks
+
+
+def cmd_setup(args) -> int:
+    """One-command bootstrap for a fresh checkout. Idempotent — every
+    step detects "already done" and skips. `--yes` accepts every
+    optional step non-interactively; `--dry-run` prints the plan.
+    """
+    dry = args.dry_run
+    yes = args.yes
+    interactive = sys.stdin.isatty() and not yes and not dry
+
+    def confirm(question: str, default: bool = True) -> bool:
+        if dry:
+            return False
+        if yes:
+            return True
+        if not interactive:
+            return default
+        answer = input(f"  {question} [{'Y/n' if default else 'y/N'}] ").strip().lower()
+        return default if not answer else answer in ("y", "yes")
+
+    def step(label: str, needed: bool, action, hint: str = ""):
+        if not needed:
+            print(f"  ✓ {label} — already done")
+            return
+        if dry:
+            print(f"  → would: {label}" + (f"  ({hint})" if hint else ""))
+            return
+        action()
+        print(f"  ✓ {label}")
+
+    print("# brain setup\n")
+
+    env_path = REPO / ".env"
+    step(".env (local-first mode)", not env_path.exists(),
+         lambda: shutil.copy(REPO / ".env.example", env_path))
+
+    config_path = REPO / "brain.config.yml"
+    cfg_text = config_path.read_text()
+    org = args.org
+    if 'org: ""' in cfg_text:
+        if not org and interactive:
+            org = input("  organisation name (empty to skip): ").strip()
+        if org:
+            step(f"config: org = {org!r}", True,
+                 lambda: config_path.write_text(
+                     config_path.read_text().replace(
+                         'org: ""', f'org: "{org}"', 1)))
+        else:
+            print("  − config: org left empty (edit brain.config.yml later)")
+    else:
+        print("  ✓ config: org — already set")
+
+    repos = [r.strip() for r in (args.repos or "").split(",") if r.strip()]
+    if "active_repos: []" in config_path.read_text():
+        if not repos and interactive:
+            raw = input("  active repos, comma-separated (empty to skip): ")
+            repos = [r.strip() for r in raw.split(",") if r.strip()]
+        if repos:
+            block = "active_repos:\n" + "".join(f"  - {r}\n" for r in repos)
+            step(f"config: {len(repos)} active repo(s)", True,
+                 lambda: config_path.write_text(
+                     config_path.read_text().replace(
+                         "active_repos: []\n", block, 1)))
+        else:
+            print("  − config: active_repos left empty (edit later)")
+    else:
+        print("  ✓ config: active_repos — already set")
+
+    hook = REPO / ".git" / "hooks" / "pre-commit"
+    step("pre-commit gate", (REPO / ".git").exists() and not hook.exists(),
+         lambda: hook.symlink_to("../../tools/git-hooks/pre-commit"))
+
+    try:
+        import tiktoken  # noqa: F401
+        has_tiktoken = True
+    except ImportError:
+        has_tiktoken = False
+    if not has_tiktoken and confirm("create the local venv (tiktoken, pytest)?"):
+        step("local venv", True, lambda: subprocess.run(
+            ["bash", str(REPO / "tools" / "setup-local.sh")], check=False))
+
+    timer_active = False
+    if shutil.which("systemctl"):
+        timer_active = subprocess.run(
+            ["systemctl", "--user", "is-active", "brain-schedule.timer"],
+            capture_output=True, text=True).stdout.strip() == "active"
+    if not timer_active and confirm("install the daily accumulation timer?"):
+        step("accumulation timer", True, lambda: subprocess.run(
+            ["bash", str(REPO / "tools" / "install-timer.sh")], check=False))
+
+    ui_deps = REPO / "ui" / "node_modules"
+    if not ui_deps.exists() and shutil.which("npm") and confirm(
+            "install the browse-UI dependencies (npm install)?"):
+        step("browse-UI dependencies", True, lambda: subprocess.run(
+            ["npm", "install", "--no-audit", "--no-fund"],
+            cwd=REPO / "ui", check=False, capture_output=True))
+
+    if dry:
+        print("\n(dry run — nothing changed)")
+        return 0
+    print("\n# health after setup\n")
+
+    class _DoctorArgs:
+        json = False
+
+    return cmd_doctor(_DoctorArgs())
+
+
+def cmd_doctor(args) -> int:
+    """One-screen health checklist; the setup wizard's exit report."""
+    checks = _doctor_checks()
+    if getattr(args, "json", False):
+        print(json.dumps(checks, indent=2))
+    else:
+        icon = {"ok": "✓", "warn": "−", "fail": "✗"}
+        for c in checks:
+            print(f"  {icon[c['status']]} {c['label']:<20} {c['detail']}")
+            if c["hint"] and c["status"] != "ok":
+                print(f"      fix: {c['hint']}")
+        fails = sum(1 for c in checks if c["status"] == "fail")
+        warns = sum(1 for c in checks if c["status"] == "warn")
+        print(f"\n  {len(checks)} checks — {fails} failing, {warns} warning(s)")
+    return 1 if any(c["status"] == "fail" for c in checks) else 0
 
 
 INBOX_KINDS = {"ingest", "groom", "research", "custom"}
@@ -4671,6 +5008,24 @@ def main() -> int:
     ap_crf.add_argument("--base", default="origin/main",
                         help="base ref for the diff (default: origin/main)")
     ap_crf.set_defaults(func=cmd_check_readme_fresh)
+
+    ap_setup = sub.add_parser("setup",
+                              help="one-command bootstrap for a fresh "
+                                   "checkout (idempotent)")
+    ap_setup.add_argument("--org", default="", help="organisation name")
+    ap_setup.add_argument("--repos", default="",
+                          help="comma-separated active repos")
+    ap_setup.add_argument("--yes", action="store_true",
+                          help="accept every optional step")
+    ap_setup.add_argument("--dry-run", dest="dry_run", action="store_true",
+                          help="print the plan; change nothing")
+    ap_setup.set_defaults(func=cmd_setup)
+
+    ap_doc = sub.add_parser("doctor",
+                            help="one-screen health checklist "
+                                 "(exit 1 on failing checks)")
+    ap_doc.add_argument("--json", action="store_true")
+    ap_doc.set_defaults(func=cmd_doctor)
 
     ap_ib = sub.add_parser("inbox",
                            help="the tend queue at wiki/_state/inbox/ — "

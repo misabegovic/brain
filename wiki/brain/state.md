@@ -26,6 +26,12 @@ into the sections below.
 
 ## Now
 
+- **The hands-off surface is live (0.2.x, 2026-07-10).**
+  `brain.py setup` (one-command idempotent bootstrap), `brain.py
+  doctor` (health checklist with fixing commands), `serve /dash`
+  (server-rendered ops page: health + tend queue + quick start),
+  and the `brain tend` / `brain dash` wrapper verbs. Terminal users
+  bootstrap with one command; non-terminal users read the dashboard.
 - **Queue-and-tend is live (0.2.0, 2026-07-10).** Deterministic
   producers accumulate per-item JSON into `wiki/_state/inbox/`
   (`inbox-refresh` op: cursor diffs, half-life crossings, link

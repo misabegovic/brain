@@ -44,4 +44,26 @@ else
 fi
 
 export BRAIN_DIR="$BRAIN_HOME"
+
+# Convenience verbs that go beyond brain.py:
+#   brain tend [budget]  — open the agent in the brain with /tend
+#   brain dash           — serve + open the ops dashboard
+case "${1:-}" in
+  tend)
+    shift
+    if command -v claude >/dev/null; then
+      cd "$BRAIN_HOME"
+      exec claude "/tend ${*:-}"
+    fi
+    echo "brain tend: no agent CLI found on PATH." >&2
+    echo "  Open your agent in $BRAIN_HOME and run: /tend ${*:-}" >&2
+    exit 1
+    ;;
+  dash)
+    ( sleep 1; xdg-open "http://localhost:8765/dash" 2>/dev/null \
+        || open "http://localhost:8765/dash" 2>/dev/null || true ) &
+    exec python3 "$BRAIN_HOME/tools/brain.py" serve
+    ;;
+esac
+
 exec python3 "$BRAIN_HOME/tools/brain.py" "$@"

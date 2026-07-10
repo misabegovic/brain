@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **hands-off surface shipped (0.2.x).**
+  One-command `brain.py setup`, a `doctor` health checklist, a
+  server-rendered ops dashboard at `serve /dash`, and `brain tend` /
+  `brain dash` wrapper verbs — terminal users bootstrap in one
+  command; the dashboard covers everyone else.
 - **2026-07-10** — **0.2.0 shipped: queue-and-tend.**
   `brain.py inbox` (per-item queue at `wiki/_state/inbox/`), the
   `inbox-refresh` producer op, the [`/tend`](brain/adrs/queue-and-tend-inbox.md)
