@@ -56,3 +56,6 @@ wiki/_views/readme-staleness.json
 # Never committed; files are the only source of truth.
 wiki/_views/index.db
 wiki/_views/index.db.tmp
+
+# Serving-mode query audit log (local, append-only)
+log/queries.log

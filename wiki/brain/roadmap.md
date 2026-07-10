@@ -129,7 +129,18 @@ connector fleet with state extracts for view tiles. Example specs:
 engineer / pm / operator. The serving and hosting slices below shift
 to 0.6 / 0.7.
 
-## 0.6.0 — the serving plane (access for people outside the product)
+## 0.6.0 — the serving plane — **software shipped 2026-07-10; deployment pending**
+
+The software half landed: the MCP server's streamable-HTTP
+transport (localhost-bound, origin-checked), serving mode
+(`BRAIN_SERVING=1`: ai-suggestions excluded from the corpus, every
+tool call appended to the query audit log), and the Datasette pilot
+(`tools/serve-datasette.sh`, immutable mode, canned queries) over
+the derived index. What remains is deployment — where it runs and
+which identity-aware proxy fronts it — which is operator
+infrastructure, chosen per adoption.
+
+### Original slice definition
 
 **MCP-first**, now plus the Datasette pilot over the derived index
 (researched: immutable mode behind an IAP is its canonical

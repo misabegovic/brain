@@ -26,6 +26,12 @@ into the sections below.
 
 ## Now
 
+- **Serving software is ready (0.6 software half, 2026-07-10).**
+  MCP over streamable HTTP, serving-mode guardrails (suggestion
+  exclusion + query audit log), and the Datasette pilot over the
+  derived index. Deployment (host + identity proxy) is the
+  remaining operator choice.
+
 - **Composable views are live (0.5.0, 2026-07-10).** Derived
   SQLite index (FTS5) rebuilt on every views run; SQL view specs in
   `views/` render to `wiki/_views/custom/` (engineer / pm /

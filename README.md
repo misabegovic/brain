@@ -177,7 +177,8 @@ rules in `AGENTS.md` § Governance.
 | Datadog / Langfuse | ✅ pull connectors | Monitor+SLO state / prompt inventory → snapshots + state extracts for view tiles. |
 | GitHub / Notion / Slack | ✅ pull connectors | Snapshot-writers: immutable files into `sources/`, inbox items out. Configure `connectors:` in `brain.config.yml` + read-only tokens in `.env`. |
 | GitHub            | via `gh` CLI         | Pre-allowed in `.claude/settings.json`.                        |
-| MCP               | ✅ `tools/brain-mcp.py` | Read-only brain access for any MCP-aware client.            |
+| MCP               | ✅ `tools/brain-mcp.py` | Read-only; stdio or `--http`; `BRAIN_SERVING=1` for external consumers (ai-suggestions excluded + query audit log). |
+| Datasette         | ✅ pilot             | `tools/serve-datasette.sh` — faceted browse + SQL + JSON API over the derived index (immutable mode). |
 | mempalace         | optional             | Verbatim / semantic-recall layer.                              |
 
 ## Browse (UI)

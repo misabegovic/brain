@@ -1099,6 +1099,20 @@ rather than duplicating its logic; improvements to `brain.py` flow
 through automatically. Auto-loaded for this repo via `.mcp.json` +
 `enabledMcpjsonServers: ["brain"]`.
 
+**HTTP transport**: `python3 tools/brain-mcp.py --http [--port 8766]`
+serves streamable-HTTP (stateless: POST /mcp, JSON responses,
+localhost-bound, origin-checked). **Serving mode**
+(`BRAIN_SERVING=1`): ai-suggestions are excluded from search and
+page reads (the path is the signal), and every tool call is
+appended to `log/queries.log` (git-ignored, append-only). A
+deployment for people outside the product runs `--http` with
+`BRAIN_SERVING=1` against a read-only checkout, behind an
+identity-aware proxy — the process itself has no auth and no write
+tools. **Datasette pilot**: `tools/serve-datasette.sh` serves the
+derived index in immutable mode with canned queries
+(`tools/datasette/metadata.yml`) — the faceted-browse/SQL/JSON tier
+of the serving plane.
+
 ### `brain.py init <path>` — scaffold an empty brain shell
 
 ```bash

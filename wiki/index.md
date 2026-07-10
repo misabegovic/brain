@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.6 software half shipped: the serving plane.**
+  MCP streamable-HTTP transport, `BRAIN_SERVING=1` guardrails
+  (ai-suggestions excluded, query audit log), and the Datasette
+  pilot over the derived index. Deployment/SSO remains the
+  operator's infra choice.
 - **2026-07-10** — **0.5.0 shipped: composable role-fit views.**
   Derived SQLite index + FTS5 riding every views run; SQL view
   specs in `views/` rendering to

@@ -58,6 +58,27 @@ SERVER_VERSION = "0.1.0"
 
 # ---------- tool implementations ----------------------------------------
 
+def serving_mode() -> bool:
+    """BRAIN_SERVING=1 marks a deployment that serves people outside
+    the product: ai-suggestions are excluded from the corpus (the
+    path is the primary signal, per governance) and every tool call
+    is appended to the query audit log."""
+    return os.environ.get("BRAIN_SERVING", "") == "1"
+
+
+def audit_query(tool: str, args: dict) -> None:
+    if not serving_mode():
+        return
+    import datetime as _dt
+    log_path = BRAIN_DIR / "log" / "queries.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    entry = {"ts": _dt.datetime.now(_dt.timezone.utc).isoformat(),
+             "tool": tool,
+             "args": {k: str(v)[:200] for k, v in (args or {}).items()}}
+    with log_path.open("a") as f:
+        f.write(json.dumps(entry) + "\n")
+
+
 def tool_brain_search(args: dict) -> str:
     query = args.get("query") or ""
     if not query:
@@ -74,13 +95,26 @@ def tool_brain_search(args: dict) -> str:
     proc = subprocess.run(
         cmd, capture_output=True, text=True, timeout=10, cwd=BRAIN_DIR
     )
-    return proc.stdout or proc.stderr or "{}"
+    out = proc.stdout or proc.stderr or "{}"
+    if serving_mode():
+        try:
+            data = json.loads(out)
+            data["results"] = [r for r in data.get("results", [])
+                               if "ai-suggestions/" not in r.get("path", "")]
+            out = json.dumps(data, indent=2)
+        except json.JSONDecodeError:
+            pass
+    return out
 
 
 def tool_brain_get_page(args: dict) -> str:
     path = args.get("path") or ""
     if not path:
         raise ValueError("'path' is required")
+    if serving_mode() and "ai-suggestions/" in path:
+        raise ValueError(
+            "ai-suggestions are drafts pending human review and are "
+            "not part of the serving corpus")
     candidate = (WIKI / path).resolve()
     try:
         candidate.relative_to(WIKI)
@@ -322,6 +356,7 @@ def handle_request(req: dict) -> dict | None:
                 "code": -32602, "message": f"unknown tool: {name}",
             })
         try:
+            audit_query(name, arguments)
             text = handler(arguments)
             return jsonrpc_response(req_id, {
                 "content": [{"type": "text", "text": text}],
@@ -346,7 +381,79 @@ def handle_request(req: dict) -> dict | None:
     return None
 
 
+def serve_http(host: str, port: int) -> int:
+    """Streamable-HTTP transport (stateless mode): POST /mcp carries
+    one JSON-RPC message, the response is plain JSON. Notifications
+    get 202. Localhost by default; a deployment puts an
+    identity-aware proxy in front — this process has no auth of its
+    own and no write tools to protect. Origin is checked to block
+    DNS-rebinding when bound to localhost."""
+    import http.server
+    import socketserver
+
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def _reply(self, code: int, body: dict | None = None):
+            data = json.dumps(body).encode() if body is not None else b""
+            self.send_response(code)
+            if data:
+                self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            if data:
+                self.wfile.write(data)
+
+        def log_message(self, fmt, *args):
+            sys.stderr.write(f"[brain-mcp] {fmt % args}\n")
+
+        def do_POST(self):  # noqa: N802
+            if self.path.rstrip("/") not in ("", "/mcp"):
+                self._reply(404, {"error": "POST /mcp"})
+                return
+            origin = self.headers.get("Origin", "")
+            if origin and not re.match(
+                    r"https?://(localhost|127\.0\.0\.1)(:\d+)?$", origin):
+                self._reply(403, {"error": "origin not allowed"})
+                return
+            try:
+                length = int(self.headers.get("Content-Length", 0))
+                req = json.loads(self.rfile.read(length))
+            except (ValueError, json.JSONDecodeError):
+                self._reply(400, {"error": "bad JSON-RPC body"})
+                return
+            response = handle_request(req)
+            if response is None:
+                self._reply(202)
+            else:
+                self._reply(200, response)
+
+        def do_GET(self):  # noqa: N802
+            self._reply(405, {"error": "streamable HTTP: POST /mcp "
+                                       "(stateless mode; no SSE stream)"})
+
+    class Server(socketserver.ThreadingTCPServer):
+        allow_reuse_address = True
+        daemon_threads = True
+
+    with Server((host, port), Handler) as httpd:
+        mode = " [serving mode]" if serving_mode() else ""
+        sys.stderr.write(f"[brain-mcp] http://{host}:{port}/mcp{mode}\n")
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            pass
+    return 0
+
+
 def main() -> int:
+    import argparse
+    ap = argparse.ArgumentParser(description="brain MCP server")
+    ap.add_argument("--http", action="store_true",
+                    help="streamable-HTTP transport instead of stdio")
+    ap.add_argument("--host", default="127.0.0.1")
+    ap.add_argument("--port", type=int, default=8766)
+    opts = ap.parse_args()
+    if opts.http:
+        return serve_http(opts.host, opts.port)
     for line in sys.stdin:
         line = line.strip()
         if not line:
