@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.12.2: the billing guard.** Harness
+  subprocesses (chat + terminal) have API-key env vars stripped by
+  construction — a turn can only bill the logged-in subscription;
+  `chat.allow_api_keys` opts back in; doctor warns when keys are
+  present. Verified: this machine had no keys set, so all session
+  turns were subscription-billed. Recorded as an amendment on the
+  [chat ADR](brain/adrs/chat-print-mode-bridge.md).
 - **2026-07-10** — **0.12.1: persona-playthrough upgrades.** Three
   personas driven through the live UI (newcomer / operator / PM);
   fixes: composer autofocus, markdown-lite bubbles, suggestion

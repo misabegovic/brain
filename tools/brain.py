@@ -2393,6 +2393,21 @@ def _doctor_checks() -> list[dict]:
     add("inbox", "tend queue", "ok",
         f"{len(items)} pending" if items else "empty")
 
+    leaked = [v for v in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN",
+                          "OPENAI_API_KEY", "CURSOR_API_KEY",
+                          "OPENCODE_API_KEY") if os.environ.get(v)]
+    if leaked:
+        add("billing", "chat billing guard", "warn",
+            f"{', '.join(leaked)} set in this environment — harness "
+            f"CLIs would bill the API, not your subscription. The app "
+            f"strips these from chat/terminal subprocesses "
+            f"(chat.allow_api_keys overrides)",
+            "unset the key(s) or accept the app's stripping")
+    else:
+        add("billing", "chat billing guard", "ok",
+            "no API-key env vars — harness turns bill your "
+            "subscription; the app strips keys defensively anyway")
+
     return checks
 
 

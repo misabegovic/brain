@@ -287,3 +287,25 @@ def test_workbench_page_playthrough_upgrades():
     assert 'id="chips"' in html, "suggestion chips (playthrough #3)"
     # Escaping happens before markup insertion — the order in source.
     assert html.index("&amp;") < html.index("<code>$1</code>")
+
+
+def test_billing_guard_strips_api_keys(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test-leak")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-leak2")
+    env = wb.billing_safe_env(allow_api_keys=False)
+    assert "ANTHROPIC_API_KEY" not in env
+    assert "OPENAI_API_KEY" not in env
+    assert wb.billing_safe_env(allow_api_keys=True)[
+        "ANTHROPIC_API_KEY"] == "sk-test-leak"
+
+
+def test_chat_subprocess_never_sees_api_key(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test-leak")
+    stub = [{"name": "envprobe", "bin": "sh",
+             "first_args": ["-c", "echo ${ANTHROPIC_API_KEY:-STRIPPED}"],
+             "continue_args": ["-c", "echo ${ANTHROPIC_API_KEY:-STRIPPED}"]}]
+    wb._chat_continuing.discard("envprobe")
+    r = wb.run_chat_message("envprobe", "ignored", cwd=str(REPO),
+                            registry=stub)
+    wb._chat_continuing.discard("envprobe")
+    assert r["ok"] and r["reply"] == "STRIPPED", r

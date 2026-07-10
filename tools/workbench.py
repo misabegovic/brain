@@ -61,6 +61,40 @@ CHAT_CLIS = [
 
 _chat_continuing: set = set()
 
+# API-key environment variables that flip harness CLIs from
+# subscription billing to metered API billing. The app strips these
+# from every harness subprocess (chat and terminal) by default, so a
+# turn can only ever bill the operator's logged-in plan — the
+# billing guard from the chat-print-mode-bridge ADR's amendment.
+# Opt back in via brain.config.yml `chat: { allow_api_keys: true }`.
+API_KEY_ENV_VARS = (
+    "ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN",
+    "OPENAI_API_KEY", "OPENAI_ORG_ID",
+    "CURSOR_API_KEY", "OPENCODE_API_KEY",
+)
+
+
+def billing_safe_env(allow_api_keys: bool = False) -> dict:
+    env = dict(os.environ)
+    if not allow_api_keys:
+        for var in API_KEY_ENV_VARS:
+            env.pop(var, None)
+    return env
+
+
+def _allow_api_keys() -> bool:
+    try:
+        import yaml
+        config = pathlib_config = None
+        from pathlib import Path
+        cfg_path = Path(__file__).resolve().parent.parent / "brain.config.yml"
+        if cfg_path.exists():
+            config = yaml.safe_load(cfg_path.read_text()) or {}
+            return bool((config.get("chat") or {}).get("allow_api_keys"))
+    except Exception:
+        pass
+    return False
+
 
 def run_chat_message(harness: str, message: str, cwd: str,
                      timeout: int = 600,
@@ -86,7 +120,8 @@ def run_chat_message(harness: str, message: str, cwd: str,
     try:
         res = subprocess.run(
             [row["bin"], *args, message],
-            cwd=cwd, capture_output=True, text=True, timeout=timeout)
+            cwd=cwd, capture_output=True, text=True, timeout=timeout,
+            env=billing_safe_env(_allow_api_keys()))
     except subprocess.TimeoutExpired:
         return {"ok": False,
                 "reply": "(the agent is taking too long — the turn was "
@@ -111,7 +146,8 @@ class PtySession:
             [shell, "-l", "-i"],
             stdin=slave, stdout=slave, stderr=slave,
             start_new_session=True,
-            env={**os.environ, "TERM": "xterm-256color"},
+            env={**billing_safe_env(_allow_api_keys()),
+                 "TERM": "xterm-256color"},
         )
         os.close(slave)
 

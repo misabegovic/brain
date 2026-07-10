@@ -45,3 +45,12 @@ connectors:
     # use a dedicated project's keys or self-host.
     host: ""
 
+
+# Chat / terminal billing guard. Harness subprocesses spawned by the
+# app have API-key env vars stripped (ANTHROPIC_API_KEY,
+# OPENAI_API_KEY, ...) so a turn can only bill your logged-in
+# subscription plan — never a metered API key that happens to be in
+# your shell. Set allow_api_keys: true only if you explicitly want
+# API-billed harness runs.
+chat:
+  allow_api_keys: false

@@ -90,3 +90,17 @@ opencode), a blocking chat endpoint with per-session continuation
 tracking, the attention strip fed by the doctor and inbox sources,
 bare `brain` opening the app, README restructured to lead with the
 conversation.
+
+## Amendments
+
+- **2026-07-10 — billing guard** (operator concern; direction
+  unchanged). Print-mode CLIs bill whichever credential they find:
+  the logged-in subscription, or — taking precedence when present —
+  an API key exported in the environment, silently converting every
+  turn into a metered charge. The app now strips the known API-key
+  variables from every harness subprocess it spawns (chat and
+  terminal alike), so a turn can only bill the operator's plan;
+  a config flag opts back into API billing explicitly, and the
+  health checklist warns whenever such keys are present in the
+  server's environment. The subscription-only cost claim in this
+  decision is thereby enforced by construction rather than assumed.

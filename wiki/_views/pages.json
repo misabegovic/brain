@@ -62,7 +62,7 @@
         "../prds/chat-first-app.md",
         "../adrs/workbench-pty-bridge.md"
       ],
-      "tokens": 958
+      "tokens": 1113
     },
     {
       "path": "brain/adrs/competitor-intel-ingestion.md",
