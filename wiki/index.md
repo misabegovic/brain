@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.11.0 shipped: instance birth.** `init --full`
+  births a working instance from the kernel manifest (mechanism +
+  kernel trail cross; dogfood never does), verified by its own gates
+  and a suite test. The **1.0 gate** is settled as five observable
+  criteria ([topic](brain/topics/one-point-oh-criteria.md)) —
+  birth (passing), a self-running week, a real-data loop, cold-start
+  onboarding, all-green at tag.
 - **2026-07-10** — tend sweep 2: the epic ADR, the roadmap, and the
   operator-lessons shelf verified against the shipped mechanism and
   promoted to `confidence: high`; queue cleared. Standing constraint

@@ -21,6 +21,7 @@ Committed work, proposals awaiting a bet, patterns from feedback, and what's que
 |---|---|---|---|---|
 | brain/prds/composable-role-views.md | Composable role-fit views — SQL view specs over a derived index, with observability connectors | living | medium | 2026-07-10 |
 | brain/prds/harness-workbench.md | Harness workbench — the brain's local surface runs your harness terminal beside the rendered results | living | medium | 2026-07-10 |
+| brain/prds/instance-birth.md | Instance birth — init --full creates a working brain instance from the kernel manifest | living | medium | 2026-07-10 |
 
 ## Pitches awaiting a bet
 

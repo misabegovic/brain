@@ -149,3 +149,34 @@ def test_topic_kind_validates():
     assert brain.REQUIRED_SECTIONS_BY_KIND["topic"] == [
         "Question", "Discussion", "Outcome"]
     assert (REPO / "tools" / "templates" / "topic.md").exists()
+
+
+def test_instance_birth(tmp_path):
+    """The first 1.0 criterion, executable: init --full births an
+    instance whose own gates pass and which carries no dogfood."""
+    import subprocess
+    target = tmp_path / "instance"
+    proc = subprocess.run(
+        [sys.executable, str(REPO / "tools" / "brain.py"), "init",
+         str(target), "--full", "--org", "T"],
+        capture_output=True, text=True, timeout=120)
+    assert proc.returncode == 0, proc.stderr[:800]
+    # Mechanism crossed.
+    for rel in ("tools/brain.py", "tools/workbench.py",
+                ".claude/skills/tend/SKILL.md", "views/engineer.yml",
+                "wiki/brain/adrs/queue-and-tend-inbox.md",
+                "wiki/org/methodology/superpowers.md"):
+        assert (target / rel).exists(), f"kernel path missing: {rel}"
+    # Dogfood did not.
+    for rel in ("wiki/brain/roadmap.md", "wiki/brain/topics",
+                "wiki/brain/pitches", "sources/research",
+                "sources/conversations", "wiki/org/competitors"):
+        assert not (target / rel).exists(), f"dogfood leaked: {rel}"
+    # The instance's own detectors run clean.
+    import os
+    env = {**os.environ, "BRAIN_DIR": str(target)}
+    check = subprocess.run(
+        [sys.executable, str(target / "tools" / "brain.py"),
+         "reflection-check"],
+        cwd=target, env=env, capture_output=True, text=True, timeout=60)
+    assert check.returncode == 0, check.stdout[:800]

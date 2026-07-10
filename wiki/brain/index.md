@@ -38,14 +38,20 @@ sanitized to organisation-agnostic form:
 - [Connector snapshot contract](adrs/connector-snapshot-contract.md) — connectors are pull-only snapshot-writers: immutable dedup files, cursors, inbox items out, never a wiki write.
 - [SQL views over a derived index](adrs/sql-views-over-derived-index.md) — view specs are SQL over a disposable SQLite index; shorthands compile to SQL; the index rides the views pipeline.
 - [Workbench PTY bridge](adrs/workbench-pty-bridge.md) — loopback browser page over a stdlib PTY bridge; harness launches + config adapters as data tables; never in serving mode.
+- [Kernel-manifest instancing](adrs/kernel-manifest-instancing.md) — instances born by explicit manifest: mechanism + kernel trail cross, dogfood never does.
 - [Single-image serving profile](adrs/single-image-serving-profile.md) — one infra-agnostic image, env-selected surface; instance isolation via env ports + hashed timer units; Railway as reference, not dependency.
 
 ## Topics (discussions in flight)
 
 - [Phoenix-Architecture adoption depth](topics/regenerative-schema-extensions.md)
   — which further Fowler concepts earn schema weight. Open.
+- [1.0 criteria](topics/one-point-oh-criteria.md) — the five-point
+  gate for instancing elsewhere. **Settled 2026-07-10.**
 
 ## Pitches (pre-bet)
+
+- [Instance birth](pitches/instance-birth.md) — **superseded**
+  2026-07-10: graduated in the same directive.
 
 - [Harness workbench](pitches/harness-workbench.md) — **superseded**
   2026-07-10: graduated on the operator's bet.
@@ -56,6 +62,8 @@ sanitized to organisation-agnostic form:
 
 ## PRDs
 
+- [Instance birth](prds/instance-birth.md) — `init --full` births a
+  working instance from the kernel manifest. Bet 2026-07-10.
 - [Composable role-fit views](prds/composable-role-views.md) — SQL
   view specs over a derived index, with Datadog / Langfuse
   connectors. Bet 2026-07-10.

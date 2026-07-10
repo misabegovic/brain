@@ -26,6 +26,11 @@ into the sections below.
 
 ## Now
 
+- **Instance birth is live (0.11.0, 2026-07-10).** One command
+  births a gate-passing instance; the contamination boundary is an
+  explicit manifest; 1.0 criteria settled (birth passes; the rest
+  need calendar time + a real adoption).
+
 - **Standing constraint (operator, 2026-07-10):** this repository is
   the tool's own project, permanently — `active_repos` stays empty
   here; the brain dogfoods itself. Adoption for real projects

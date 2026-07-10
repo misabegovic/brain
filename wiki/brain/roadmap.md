@@ -268,6 +268,25 @@ catalogued with causes) join the structure-emergent set, with
 routing rows in `/in` and `/capture`. First topic opened on adoption
 depth for the remaining Fowler concepts.
 
+## 0.11.0 — instance birth — **shipped 2026-07-10**
+
+The delivery mechanism for the operator's standing constraint (this
+repo is the tool's own project; adoption = separate instances).
+`init --full` births a working instance from an explicit kernel
+manifest ([ADR](adrs/kernel-manifest-instancing.md)): mechanism and
+the kernel's documentation trail cross; dogfood never does;
+citations that stayed behind are filtered with a schema fallback;
+the born instance passes its own gates before the command returns.
+Executable as a suite test — which is 1.0 criterion #1.
+
+## The 1.0 gate
+
+Settled at [topics/one-point-oh-criteria.md](topics/one-point-oh-criteria.md):
+(1) birth works — in the suite; (2) seven unattended timer days;
+(3) one full connector→tend loop on real data in an instance;
+(4) cold-start onboarding by a non-operator; (5) all-green at tag
+time. Criteria 2–4 need calendar time and a real adoption.
+
 ## Standing ideas (unversioned)
 
 Deliberately not adopted from the open-knowledge direction: a vector

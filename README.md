@@ -45,6 +45,19 @@ skeleton, `sources/` starts empty, `log/log.md` starts empty.
 
 ## Adopting the shell for a project
 
+This repository is the tool's own project — real adoptions get their
+own **instance**:
+
+```bash
+python3 tools/brain.py init ~/projects/my-brain --full --org "My Org"
+cd ~/projects/my-brain && python3 tools/brain.py setup
+```
+
+`init --full` births a complete instance from the kernel manifest —
+the whole mechanism plus the kernel's decision trail, none of this
+repo's self-tracking content — git-initialised and gate-passing.
+Then, inside the instance:
+
 ```bash
 python3 tools/brain.py setup     # one command: .env, org, repos, hook, timer, UI deps
 ```

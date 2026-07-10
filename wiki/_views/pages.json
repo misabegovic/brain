@@ -94,6 +94,19 @@
       "tokens": 1351
     },
     {
+      "path": "brain/adrs/kernel-manifest-instancing.md",
+      "title": "Instances are born by manifest: init --full copies the mechanism and the kernel's decision trail, scaffolds the rest fresh",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../prds/instance-birth.md",
+        "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
+      ],
+      "tokens": 817
+    },
+    {
       "path": "brain/adrs/multi-prd-epic-shape.md",
       "title": "Epics are single-page umbrella artifacts with parent_epic linkage, validator-enforced no-umbrella-ADR, epic-aware briefs, and a quiet-on-day-one promotion heuristic",
       "kind": "decision",
@@ -299,7 +312,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 875,
+      "tokens": 1025,
       "affected_by": [
         "org/competitors/codeplain/index.md"
       ]
@@ -341,6 +354,20 @@
       "tokens": 951
     },
     {
+      "path": "brain/pitches/instance-birth.md",
+      "title": "Instance birth \u2014 a clean kernel\u2192instance path that carries the mechanism, never the dogfood",
+      "kind": "pitch",
+      "status": "superseded",
+      "superseded_by": "brain/prds/instance-birth.md",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md",
+        "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
+      ],
+      "tokens": 386
+    },
+    {
       "path": "brain/prds/composable-role-views.md",
       "title": "Composable role-fit views \u2014 SQL view specs over a derived index, with observability connectors",
       "kind": "initiative",
@@ -372,6 +399,20 @@
       "tokens": 585
     },
     {
+      "path": "brain/prds/instance-birth.md",
+      "title": "Instance birth \u2014 init --full creates a working brain instance from the kernel manifest",
+      "kind": "initiative",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/instance-birth.md",
+      "sources": [
+        "../pitches/instance-birth.md",
+        "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
+      ],
+      "tokens": 359
+    },
+    {
       "path": "brain/roadmap.md",
       "title": "Brain roadmap \u2014 0.x arc toward a self-maintaining, servable brain",
       "kind": "meta",
@@ -384,7 +425,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 3418
+      "tokens": 3651
     },
     {
       "path": "brain/state.md",
@@ -396,7 +437,19 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1525
+      "tokens": 1590
+    },
+    {
+      "path": "brain/topics/one-point-oh-criteria.md",
+      "title": "What must be true before 1.0 \u2014 when is the tool ready to instance elsewhere?",
+      "kind": "topic",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md"
+      ],
+      "tokens": 363
     },
     {
       "path": "brain/topics/regenerative-schema-extensions.md",
@@ -409,7 +462,7 @@
         "../../../sources/web/aicoding-fowler-phoenix--f0e11r.md",
         "../../../sources/conversations/2026-07-10--openknowledge-direction-and-ui-stress.md"
       ],
-      "tokens": 193
+      "tokens": 278
     },
     {
       "path": "org/competitors/codeplain/index.md",

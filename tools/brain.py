@@ -5386,6 +5386,193 @@ def cmd_schedule(args) -> int:
     return 2
 
 
+# The kernel manifest — what crosses into every born instance, per
+# wiki/brain/adrs/kernel-manifest-instancing.md. Fail-closed: anything
+# not listed here stays in the tool's repo. Mechanism and its
+# documentation cross; observations and self-tracking never do.
+KERNEL_COPY_PATHS = [
+    # mechanism
+    "tools",
+    ".claude/commands",
+    ".claude/skills",
+    ".claude/settings.json",
+    ".claude/personas/agents",
+    ".claude/personas/README.md",
+    "ui/src", "ui/astro.config.mjs", "ui/package.json",
+    "ui/package-lock.json", "ui/tsconfig.json",
+    "ui/remark-rewrite-links.mjs", "ui/serve.mjs", "ui/Dockerfile",
+    "ui/README.md",
+    "deploy",
+    "tests",
+    ".github",
+    "views",
+    "AGENTS.md",
+    "brain-schedule.yml",
+    ".gitignore", ".dockerignore", ".env.example", ".mcp.json",
+    "railway.toml", "VERSION",
+    # the kernel's own documentation trail
+    "wiki/brain/adrs",
+    "wiki/brain/authoring-adrs-and-prds.md",
+    "wiki/org/methodology",
+    "wiki/org/operator-lessons.md",
+]
+
+
+def _init_full(target: Path, org: str) -> int:
+    """Birth a working instance: manifest copy + fresh scaffold."""
+    src_root = REPO
+    kernel_version = (src_root / "VERSION").read_text().strip()
+    for rel in KERNEL_COPY_PATHS:
+        src = src_root / rel
+        if not src.exists():
+            print(f"init --full: manifest path missing in kernel: {rel}",
+                  file=sys.stderr)
+            return 1
+        dst = target / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if src.is_dir():
+            shutil.copytree(
+                src, dst, symlinks=True,
+                ignore=shutil.ignore_patterns(
+                    "node_modules", "__pycache__", ".build-cache",
+                    "dist", "*.pyc", ".pytest_cache"))
+        else:
+            shutil.copy2(src, dst)
+
+    (target / "CLAUDE.md").symlink_to("AGENTS.md")
+    (target / "sources").mkdir(exist_ok=True)
+    shutil.copy2(src_root / "sources" / "README.md",
+                 target / "sources" / "README.md")
+    (target / "log").mkdir(exist_ok=True)
+    (target / "log" / "log.md").write_text("")
+    for d in ("_views", "_archive", "_overlaps", "_state",
+              "org", "insights", "brain"):
+        (target / "wiki" / d).mkdir(parents=True, exist_ok=True)
+    (target / "wiki" / "_state" / "sync-cursors.json").write_text("{}\n")
+
+    today = today_utc().isoformat()
+    org_label = org or "<your organisation>"
+
+    def page(rel: str, title: str, kind: str, body: str):
+        depth = "../" * len(Path(rel).parts)
+        p = target / "wiki" / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(
+            f"---\ntitle: \"{title}\"\nkind: {kind}\nstatus: draft\n"
+            f"updated: {today}\nconfidence: high\nsources:\n"
+            f"  - {depth}AGENTS.md\n---\n\n# {title}\n\n{body}\n")
+
+    def owner(section: str) -> str:
+        if section in ("What changed", "Open initiatives",
+                       "Recent decisions"):
+            return "/shape"
+        if section == "Insights now":
+            return "/feedback"
+        return "/groom"
+
+    home_sections = "\n\n".join(
+        f"## {s}\n\n<!-- home-section: empty; maintained-by: "
+        f"{owner(s)} -->\n*(empty — nothing yet)*"
+        for s in ("What changed", "Open initiatives", "Recent decisions",
+                  "Drift surface", "Insights now", "Brain trajectory",
+                  "Curated picks"))
+    page("index.md", f"{org_label} brain — home", "meta",
+         f"A brain instance for {org_label}, born from kernel "
+         f"{kernel_version} on {today}. Fill `brain.config.yml`, run "
+         f"`python3 tools/brain.py setup`, then `/in <source>`.\n\n"
+         f"{home_sections}\n\n## Where to find things\n\n"
+         f"- [Brain — meta level](brain/index.md)\n"
+         f"- [Org — methodology + cross-product](org/index.md)")
+    adr_lines = []
+    for adr in sorted((target / "wiki" / "brain" / "adrs").glob("*.md")):
+        parsed = parse(adr)
+        title = str(parsed[0].get("title", adr.stem)) if parsed else adr.stem
+        short = title.split(";")[0].split(":")[0].strip()
+        adr_lines.append(f"- [{short}](adrs/{adr.name})")
+    page("brain/index.md", "Brain (meta level)", "meta",
+         "This instance's self-tracking shelf. The `adrs/` folder "
+         "carries the **kernel decision trail** it was born with — "
+         "decisions about the tool, superseded here only by your own "
+         "records.\n\n"
+         "- [State](state.md)\n"
+         "- [Authoring ADRs and PRDs](authoring-adrs-and-prds.md)\n"
+         "\n## ADRs (kernel trail)\n\n"
+         + "\n".join(adr_lines)
+         + "\n\n## PRDs\n\n*(none yet)*")
+    page("brain/state.md", "Brain — state", "reference",
+         "## Cross-level context\n\n*(none yet)*\n\n## Past\n\n"
+         f"- **{today}** — instance born from kernel "
+         f"{kernel_version}.\n\n## Now\n\n- Unconfigured — awaiting "
+         "`setup` and the first ingest.\n\n## Perceived\n\n*(none "
+         "yet)*\n\n## Target\n\n- First ingest.")
+    page("org/index.md", f"{org_label} — org level", "meta",
+         "Cross-organisation pages: methodology (born with the "
+         "kernel), operator lessons, and whatever the org earns.\n\n"
+         "- [Methodology](methodology/index.md)\n"
+         "- [Operator lessons](operator-lessons.md)")
+
+    # Crossed pages may cite tool-repo sources (research notes,
+    # conversation snapshots) that stay behind — drop citations that
+    # don't resolve inside the instance so its own gates run clean.
+    for page_file in (target / "wiki").rglob("*.md"):
+        text = page_file.read_text()
+        if not text.startswith("---"):
+            continue
+        end = text.find("\n---", 3)
+        if end == -1:
+            continue
+        fm, body = text[:end], text[end:]
+        kept, changed = [], False
+        for line in fm.splitlines():
+            stripped = line.strip()
+            ref_like = stripped.startswith("- ") and (
+                stripped[2:].startswith(("../", "sources/", "tools/",
+                                         "wiki/", ".claude/")))
+            if ref_like:
+                ref = stripped[2:].strip()
+                resolved = (page_file.parent / ref).resolve()                     if ref.startswith(".") else (target / ref)
+                if not resolved.exists() and not ref.startswith("http"):
+                    changed = True
+                    continue
+            kept.append(line)
+        if changed:
+            new_fm = "\n".join(kept)
+            # A page whose citations all stayed behind falls back to
+            # the schema — the kernel is its own primary source.
+            import re as _re
+            if _re.search(r"sources:\s*$", new_fm):
+                rel_depth = "../" * len(
+                    page_file.relative_to(target / "wiki").parts)
+                new_fm += f"\n  - {rel_depth}AGENTS.md"
+            page_file.write_text(new_fm + body)
+
+    config = (src_root / "brain.config.yml").read_text()
+    if org:
+        config = config.replace('org: ""', f'org: "{org}"', 1)
+    (target / "brain.config.yml").write_text(config)
+
+    subprocess.run(["git", "init", "-q"], cwd=target, check=False)
+    hooks = target / ".git" / "hooks"
+    if hooks.exists() and not (hooks / "pre-commit").exists():
+        (hooks / "pre-commit").symlink_to(
+            "../../tools/git-hooks/pre-commit")
+
+    env = {**os.environ, "BRAIN_DIR": str(target)}
+    for gate in ("views", "validate"):
+        res = subprocess.run(
+            [sys.executable, str(target / "tools" / "brain.py"), gate],
+            cwd=target, env=env, capture_output=True, text=True)
+        if res.returncode != 0:
+            print(f"init --full: {gate} failed in instance:\n"
+                  f"{res.stdout[:800]}{res.stderr[:400]}", file=sys.stderr)
+            return 1
+    print(f"instance born at {target}")
+    print(f"  kernel {kernel_version} · org={org_label!r} · "
+          f"validate+views green")
+    print(f"  next: cd {target} && python3 tools/brain.py setup")
+    return 0
+
+
 def cmd_init(args) -> int:
     """Scaffold an empty brain shell at the target directory.
 
@@ -5404,6 +5591,9 @@ def cmd_init(args) -> int:
             return 1
 
     target.mkdir(parents=True, exist_ok=True)
+
+    if getattr(args, "full", False):
+        return _init_full(target, args.org or "")
 
     org = args.org or "<your-organisation>"
 
@@ -6602,6 +6792,10 @@ def main() -> int:
                          help="organisation name (default: '<your-organisation>')")
     ap_init.add_argument("--force", action="store_true",
                          help="scaffold even if the target directory is non-empty")
+    ap_init.add_argument("--full", action="store_true",
+                         help="birth a complete instance: kernel manifest "
+                              "copy + fresh scaffold (per the "
+                              "kernel-manifest-instancing ADR)")
     ap_init.set_defaults(func=cmd_init)
 
     ap_search = sub.add_parser(

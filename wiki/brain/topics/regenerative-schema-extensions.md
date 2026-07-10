@@ -29,6 +29,12 @@ nothing wastes the frame.
   possibly just a section in constraints.md. Position: wait for a
   real repo's ingest to show which of these gets reached for.
 
+- **2026-07-10** (`by: claude (fable 5)`) — same-day evidence for
+  the wait-for-friction position: the research picker's damping
+  amendment (kind exclusions + grace period) came from *use*, not
+  from adopting Fowler's deletion-test surface speculatively. The
+  pattern holds: adopt concepts when the corpus reaches for them.
+
 ## Outcome
 
 (open)

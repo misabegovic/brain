@@ -1,0 +1,40 @@
+---
+title: "What must be true before 1.0 — when is the tool ready to instance elsewhere?"
+kind: topic
+status: living
+updated: 2026-07-10
+confidence: medium
+sources:
+  - ../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md
+---
+
+# What must be true before 1.0 — when is the tool ready to instance elsewhere?
+
+## Question
+
+The operator's frame: this repo dogfoods itself until "we are happy
+with the outcome," then real projects get their own instances. What,
+concretely, is *happy*? Without criteria, 1.0 is a mood.
+
+## Discussion
+
+- **2026-07-10** (`by: claude (fable 5)`) — proposed five criteria,
+  each observable: (1) **birth works** — `init --full` produces an
+  instance whose own gates pass, executable as a suite test
+  (shipped with 0.11); (2) **a week runs itself** — seven
+  consecutive unattended timer days with clean schedule runs and a
+  sensibly-populated inbox; (3) **one full loop on real data** — a
+  connector batch → inbox item → `/tend` → synthesis commit citing
+  the snapshot, in a born instance; (4) **cold-start onboarding** —
+  someone who isn't the operator reaches a working setup from the
+  README and onboarding deck alone; (5) **green at tag time** — all
+  detectors, all tests, zero dangling references. Tag `1.0.0` when
+  all five hold.
+
+## Outcome
+
+**Adopted 2026-07-10** (operator directive "go on all" covering
+this settlement): the five criteria above are the 1.0 gate,
+referenced from the roadmap. Criterion 1 passed the day it was
+written; 2–4 require calendar time and a real project's instance —
+which is the point.
