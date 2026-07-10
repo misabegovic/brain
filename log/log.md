@@ -74,3 +74,6 @@
 2026-07-10 commit — 1998d47: 0.7.0 shipped — hosting profile + instance isolation + codeplain intel
    diff: 22 files changed, 490 insertions(+), 49 deletions(-)
    restricted-paths: true
+2026-07-10 commit — 03f2565: 0.8.0 shipped — work-inside-the-brain UX (/ui, workbench nav, sidebar, VERSION)
+   diff: 13 files changed, 216 insertions(+), 15 deletions(-)
+   restricted-paths: true
