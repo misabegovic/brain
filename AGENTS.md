@@ -1076,11 +1076,11 @@ python3 tools/brain.py install-sibling <repo> --dry-run
 ```
 
 Idempotently installs a `<!-- brain:managed:* -->`-fenced block in
-the sibling's `CLAUDE.md` (or `AGENTS.md`), drops a
-`.claude/brain-hook.sh` PreToolUse hook that surfaces relevant brain
-pages before `Grep`/`Glob`/`Read` tool calls, and registers the hook
-in `.claude/settings.json`. Operator content outside the sentinels
-is never modified.
+the sibling's `CLAUDE.md` (or `AGENTS.md`), drops a `brain-hook.sh`
+PreToolUse hook into the *sibling repo's* `.claude/` that surfaces
+relevant brain pages before `Grep`/`Glob`/`Read` tool calls, and
+registers the hook in the sibling's `.claude/settings.json`.
+Operator content outside the sentinels is never modified.
 
 ### `tools/brain-mcp.py` — stdio MCP server
 

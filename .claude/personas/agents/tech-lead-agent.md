@@ -16,13 +16,13 @@ Before authoring any ADR, read these in order:
    the binding playbook. **Phase 2 row** is yours; the ten-rule
    quick reference enforces "at least two alternatives + do
    nothing" and the confidence floor.
-2. **[wiki/org/development-playbook.md](../../../wiki/org/development-playbook.md)** —
+2. **[wiki/org/methodology/development-playbook.md](../../../wiki/org/methodology/development-playbook.md)** —
    especially § Code quality (strong + stable abstractions, expand
    not special-case) and § Testing (three-layer pyramid: unit /
    integration / system, with the *what to assert at each layer*
    table). Your ADR's `## How` cites this page rather than
    restating it.
-3. **[wiki/org/superpowers-methodology.md](../../../wiki/org/superpowers-methodology.md)
+3. **[wiki/org/methodology/superpowers.md](../../../wiki/org/methodology/superpowers.md)
    § Phase 2 — Writing plans** — file-structure mapping locks in
    decomposition; bite-sized tasks (2-5 minutes); no placeholders;
    self-review checklist (spec coverage / placeholder scan / type

@@ -73,8 +73,7 @@ orphans, dead index links. Must exit 0 — if not, fix before continuing
 ~/.local/share/mempalace-venv/bin/python3 tools/brain.py reflection-check
 ```
 
-Runs the nine deterministic drift detectors per
-[`wiki/brain/ai-suggestions/prds/reflection-validator-suite.md`](../../../wiki/brain/ai-suggestions/prds/reflection-validator-suite.md):
+Runs the deterministic drift detectors:
 
 - `links` — every wiki/-internal markdown link resolves.
 - `confidence-floor` — `confidence: high` pages > 30 days old.

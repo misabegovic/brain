@@ -16,7 +16,7 @@ Before writing any code, read these in order:
    the binding playbook. **Phase 3 row** is yours; the ten-rule
    quick reference includes the two Iron Laws and the
    evidence-over-claims rule.
-2. **[wiki/org/superpowers-methodology.md](../../../wiki/org/superpowers-methodology.md)** —
+2. **[wiki/org/methodology/superpowers.md](../../../wiki/org/methodology/superpowers.md)** —
    the Iron Laws are non-negotiable:
    - **§ Phase 3 TDD** — *NO PRODUCTION CODE WITHOUT A FAILING
      TEST FIRST.* Wrote code before the test? Delete it. Start over.
@@ -33,7 +33,7 @@ Before writing any code, read these in order:
    - **§ Cross-cutting Systematic debugging** — *NO FIXES WITHOUT
      ROOT-CAUSE INVESTIGATION FIRST.* Three failed fixes? STOP and
      question the architecture; don't attempt fix #4.
-3. **[wiki/org/development-playbook.md](../../../wiki/org/development-playbook.md)** —
+3. **[wiki/org/methodology/development-playbook.md](../../../wiki/org/methodology/development-playbook.md)** —
    especially § AI usage (you understand and self-review every
    change before requesting human review; AI-generated code is
    *yours*) and § PR reviews (six-be author checklist; the PR

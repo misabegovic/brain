@@ -9,7 +9,7 @@ You are working in `~/projects/brain`. This skill produces a
 **zoom-out brief** that places a piece of work in its bigger
 product + architectural picture. The brief addresses the
 *makeup-mirror failure mode* named in
-[`wiki/brain/prds/zoom-out-on-current-work.md`](../../../wiki/brain/prds/zoom-out-on-current-work.md):
+[`wiki/brain/adrs/zoom-out-on-current-work.md`](../../../wiki/brain/adrs/zoom-out-on-current-work.md):
 deep focus on a small surface produces internally-coherent work
 that turns out to miss the bigger picture; the brief zooms out
 *for* the user (and the agent) at the right moments.
@@ -32,7 +32,7 @@ this skill is the implementation of that decision.
 | Form                                         | Meaning                                                                                                                                |
 |----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
 | `/zoom-out <slug>`                           | Brief on `wiki/<repo>/{prds,adrs}/<slug>.md` (the canonical case during `/shape` work).                                                |
-| `/zoom-out <wiki-relative-path>`             | Brief on any wiki page (`wiki/<repo>/permanent/architecture/foo.md`, `wiki/org/way-of-working.md`, `wiki/brain/state.md`, etc.).        |
+| `/zoom-out <wiki-relative-path>`             | Brief on any wiki page (`wiki/<repo>/permanent/architecture/foo.md`, `wiki/org/methodology/way-of-working.md`, `wiki/brain/state.md`, etc.).        |
 | `/zoom-out <sibling-repo-relative-path>`     | Brief on a sibling-repo file or directory (`~/projects/<repo>/app/models/user.rb`). Used during Phase 3 builds + `/continue`. |
 | `/zoom-out <PR#>`                            | Brief on the in-flight work tied to a PR (brain or sibling-repo). Maps PR → slug → wiki pages.                                         |
 | `/zoom-out` (no args)                        | List the last 5 active work items from `log/log.md` and ask which to zoom out on.                                                      |

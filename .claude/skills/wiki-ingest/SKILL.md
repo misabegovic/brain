@@ -133,7 +133,7 @@ the PRD/ADR yourself.
 | Cross-repo process / methodology (Shape Up, onboarding)             | `wiki/` root (edit / create)                           |
 | Customer-feedback insights                                          | `wiki/insights/` (cross-cutting; via `/feedback`)      |
 | Public competitor information (press release / competitor product page / trade press) | `wiki/org/competitors/<competitor>/index.md` (edit / create). See [`wiki/brain/adrs/competitor-intel-ingestion.md`](../../../wiki/brain/adrs/competitor-intel-ingestion.md). |
-| Brain-self meta (the brain itself)                                  | `wiki/` root (e.g. `brain-roadmap.md`)                 |
+| Brain-self meta (the brain itself)                                  | `wiki/brain/` (e.g. `roadmap.md`, `state.md`)          |
 
 If a concept inside `permanent/` has grown 2+ specialised
 sub-aspects (e.g. `architecture` covers ember-spa, avo-admin, and

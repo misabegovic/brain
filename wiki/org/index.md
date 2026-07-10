@@ -1,7 +1,7 @@
 ---
 title: "Org — methodology + cross-product"
 kind: meta
-status: draft
+status: living
 updated: 2026-07-10
 confidence: high
 sources:
@@ -12,6 +12,11 @@ sources:
 
 Cross-organisation pages live here: ways of working, methodology,
 cross-product synthesis, org-level decisions and initiatives.
+
+- [Methodology](methodology/index.md) — way of working, development
+  playbook, the superpowers methodology.
+- [Operator lessons](operator-lessons.md) — durable lessons the
+  operator teaches the agent.
 
 ## ADRs
 

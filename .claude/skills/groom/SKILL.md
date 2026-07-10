@@ -61,7 +61,7 @@ move back). Confidence demotions are reversible (next ingest can promote).
 
 `wiki/_archive/` is a tooling-output folder like `_views` and
 `_overlaps` — lint and orphan checks skip it. Pages there keep their
-relative paths (e.g. `wiki/_archive/feature-x.md`) so backlinks
+relative paths (e.g. `wiki/_archive/<page>.md`) so backlinks
 continue to resolve.
 
 When archiving:
@@ -103,7 +103,7 @@ regen captures the new state.
   `/in` (re-ingest) territory or human edit territory. `/groom` only
   changes status / confidence / location.
 - **Not run on every push.** This is a periodic operation —
-  recommended cadence in `wiki/brain-roadmap.md` is monthly.
+  recommended cadence is monthly.
 
 ## Done check
 

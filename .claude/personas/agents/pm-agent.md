@@ -15,10 +15,10 @@ Before authoring any PRD, read these in order:
 1. **[wiki/brain/authoring-adrs-and-prds.md](../../../wiki/brain/authoring-adrs-and-prds.md)** —
    the binding playbook. Required-reading-per-phase, ten-rule quick
    reference, explicit confidence floors. **Phase 1 row** is yours.
-2. **[wiki/org/way-of-working.md](../../../wiki/org/way-of-working.md)** —
+2. **[wiki/org/methodology/way-of-working.md](../../../wiki/org/methodology/way-of-working.md)** —
    Shape Up cadence at the organisation. Cycle vocabulary, appetite as
    *budget* not *estimate*, the eight-week shaping calendar.
-3. **[wiki/org/superpowers-methodology.md](../../../wiki/org/superpowers-methodology.md)
+3. **[wiki/org/methodology/superpowers.md](../../../wiki/org/methodology/superpowers.md)
    § Phase 1 — Brainstorming** — Socratic spec discipline. **Hard
    gate**: no implementation skill, no scaffolding, no other-skill
    invocation until the user has approved the design. One question
@@ -57,7 +57,7 @@ strategic want — into a *shaped* PRD that:
 ## Process
 
 The shape mirrors superpowers'
-[brainstorming](../../../wiki/org/superpowers-methodology.md#phase-1--brainstorming-idea--spec) —
+[brainstorming](../../../wiki/org/methodology/superpowers.md#phase-1--brainstorming-idea--spec) —
 Socratic dialogue, sectioned design, spec self-review, user
 approval before plan-writing.
 

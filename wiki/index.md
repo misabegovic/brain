@@ -17,8 +17,12 @@ start filling in as the slash-command surface runs.
 
 ## What changed
 
-<!-- home-section: empty; maintained-by: /shape -->
-*(empty — no /shape run yet)*
+<!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — kernel decision trail ported: 11 brain-meta ADRs,
+  the authoring guidance page, and the org methodology shelf
+  (way-of-working, development playbook, superpowers) landed in
+  sanitized, organisation-agnostic form. The shell is now fully
+  standalone — every internal reference resolves.
 
 [See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
 
@@ -31,8 +35,11 @@ start filling in as the slash-command surface runs.
 
 ## Recent decisions
 
-<!-- home-section: empty; maintained-by: /shape -->
-*(empty — no /shape run yet)*
+<!-- home-section; maintained-by: /shape -->
+- [Kernel ADR trail](brain/index.md#adrs) — 11 mechanism decisions
+  (shape pitches, epics, deepdive pre-flight, parallelism, zoom-out,
+  home shape, UI substrate, operator lessons, competitor intel)
+  recorded 2026-07-10 as ports from the origin deployment.
 
 [See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
 

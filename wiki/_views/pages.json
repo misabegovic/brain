@@ -5,7 +5,7 @@
       "anchor": "what-changed",
       "name": "What changed",
       "maintained_by": "/in",
-      "empty": true
+      "empty": false
     },
     {
       "anchor": "drift-surface",
@@ -23,7 +23,7 @@
       "anchor": "recent-decisions",
       "name": "Recent decisions",
       "maintained_by": "/shape",
-      "empty": true
+      "empty": false
     },
     {
       "anchor": "insights-now",
@@ -52,28 +52,267 @@
   ],
   "pages": [
     {
+      "path": "brain/adrs/competitor-intel-ingestion.md",
+      "title": "Competitor intel lives at wiki/org/competitors/<competitor>/index.md, ingested via the existing wiki-ingest classifier with an explicit hint override",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/wiki-ingest/SKILL.md",
+        "../../../tools/templates/competitor-index.md"
+      ],
+      "tokens": 1538
+    },
+    {
+      "path": "brain/adrs/home-content-shape.md",
+      "title": "Home page is the wiki index as an agent-maintained dashboard",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        "../../../tools/home-staleness.sh",
+        "../../../.claude/skills/sync/SKILL.md"
+      ],
+      "tokens": 1351
+    },
+    {
+      "path": "brain/adrs/multi-prd-epic-shape.md",
+      "title": "Epics are single-page umbrella artifacts with parent_epic linkage, validator-enforced no-umbrella-ADR, epic-aware briefs, and a quiet-on-day-one promotion heuristic",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/shape/SKILL.md",
+        ".claude/skills/zoom-out/SKILL.md"
+      ],
+      "tokens": 1710
+    },
+    {
+      "path": "brain/adrs/operator-lesson-pattern.md",
+      "title": "Operator lessons live as Lessons subsections on conventions pages plus one cross-cutting org page",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/capture/SKILL.md"
+      ],
+      "tokens": 1516
+    },
+    {
+      "path": "brain/adrs/parallel-efforts-on-request.md",
+      "title": "Opt-in parallel efforts via a /spawn skill that creates per-effort worktrees and a wiki/_state/efforts/ registry, with existing skills becoming worktree-aware",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/spawn/SKILL.md",
+        ".claude/skills/rebase/SKILL.md"
+      ],
+      "tokens": 1713
+    },
+    {
+      "path": "brain/adrs/parallel-execution-agent-teams.md",
+      "title": "Parallel-first execution: every /spawn dispatches a background owner subagent (opt-out via --no-owner), helper fan-out is named in the skills, and the rule recurses to the parent session",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/spawn/SKILL.md",
+        ".claude/skills/list-efforts/SKILL.md"
+      ],
+      "tokens": 1774
+    },
+    {
+      "path": "brain/adrs/shape-deepdive-pre-flight.md",
+      "title": "Deepdive on load-bearing points lands as a /shape pre-flight step; pace lands on the binding authoring playbook; the top-level schema is not extended",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/shape/SKILL.md",
+        ".claude/skills/continue/SKILL.md"
+      ],
+      "tokens": 1764
+    },
+    {
+      "path": "brain/adrs/shape-up-pitches.md",
+      "title": "Adopt Shape Up pitches as a pre-bet brain artifact kind",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/shape/SKILL.md"
+      ],
+      "tokens": 1199
+    },
+    {
+      "path": "brain/adrs/successor-ssg-for-ui.md",
+      "title": "Adopt Astro + Starlight + Pagefind as the successor SSG for the UI",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        "../../../ui/astro.config.mjs",
+        "../../../ui/README.md"
+      ],
+      "tokens": 1415
+    },
+    {
+      "path": "brain/adrs/ui-auto-refresh-hook.md",
+      "title": "UI auto-refresh \u2014 editor hook plus CI smoke build",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        "../../../tools/ui-build.sh",
+        "../../../.claude/skills/sync/SKILL.md"
+      ],
+      "tokens": 1197
+    },
+    {
+      "path": "brain/adrs/zoom-out-on-current-work.md",
+      "title": "zoom-out is a skill called as a step inside /shape and /continue, with conversation-first output and opt-in persistence as an aside-rendered Big-picture fit section",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/zoom-out/SKILL.md",
+        ".claude/skills/shape/SKILL.md"
+      ],
+      "tokens": 1756
+    },
+    {
+      "path": "brain/authoring-adrs-and-prds.md",
+      "title": "Authoring ADRs and PRDs",
+      "kind": "meta",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../AGENTS.md",
+        ".claude/skills/shape/SKILL.md"
+      ],
+      "tokens": 1861
+    },
+    {
       "path": "brain/index.md",
       "title": "Brain (meta level)",
       "kind": "meta",
-      "status": "draft",
+      "status": "living",
       "updated": "2026-07-10",
       "confidence": "high",
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 78
+      "tokens": 434
+    },
+    {
+      "path": "brain/state.md",
+      "title": "Brain \u2014 state",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../AGENTS.md"
+      ],
+      "tokens": 183
     },
     {
       "path": "org/index.md",
       "title": "Org \u2014 methodology + cross-product",
       "kind": "meta",
-      "status": "draft",
+      "status": "living",
       "updated": "2026-07-10",
       "confidence": "high",
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 70
+      "tokens": 116
+    },
+    {
+      "path": "org/methodology/development-playbook.md",
+      "title": "Development playbook \u2014 code quality, testing, AI usage, PR reviews",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md"
+      ],
+      "tokens": 1834
+    },
+    {
+      "path": "org/methodology/index.md",
+      "title": "Methodology \u2014 how the organisation works",
+      "kind": "meta",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md"
+      ],
+      "tokens": 240
+    },
+    {
+      "path": "org/methodology/superpowers.md",
+      "title": "Superpowers \u2014 agent workflow methodology (brainstorm \u2192 plan \u2192 TDD \u2192 verify)",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        "https://github.com/obra/superpowers",
+        "https://blog.fsck.com/2025/10/09/superpowers/"
+      ],
+      "tokens": 3032
+    },
+    {
+      "path": "org/methodology/way-of-working.md",
+      "title": "The way we work \u2014 the Shape Up cadence",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md"
+      ],
+      "tokens": 1282
+    },
+    {
+      "path": "org/operator-lessons.md",
+      "title": "Operator lessons",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../.claude/skills/capture/SKILL.md"
+      ],
+      "tokens": 111
     }
   ]
 }
