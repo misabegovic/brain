@@ -43,3 +43,6 @@
 2026-07-10 commit — 1924f5d: views pitch deepdived (5 research notes + prototype)
    diff: 8 files changed, 284 insertions(+), 7 deletions(-)
    restricted-paths: false
+2026-07-10 commit — 3ee02b9: /shape phase 1 — composable-role-views PRD; pitch superseded
+   diff: 6 files changed, 117 insertions(+), 8 deletions(-)
+   restricted-paths: false
