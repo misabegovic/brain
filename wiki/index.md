@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-10** — **0.8.0 shipped: work happens inside the brain.**
+  Rendered wiki at `/ui`, workbench navigation
+  (dashboard ↔ wiki ↔ views), self-healing UI rebuilds, a sidebar
+  that mirrors the shelves, `VERSION`/`--version`, and the first
+  [operator lesson](org/operator-lessons.md).
 - **2026-07-10** — **0.7.0 shipped: hosting.** One infra-agnostic
   image (`deploy/`), Railway reference config, env-selected public
   surface; instance isolation (env ports + hashed timer units)
@@ -122,7 +127,7 @@ start filling in as the slash-command surface runs.
 
 <!-- home-section; maintained-by: /shape -->
 - [Brain roadmap — the 0.x arc](brain/roadmap.md) — **0.2 through
-  0.7 shipped**; the arc from the operator's original intent is
+  0.8 shipped**; the arc from the operator's original intent is
   complete. What remains is adoption: point it at a project.
 
 [See more in `wiki/_views/by-kind.md`](_views/by-kind.md)

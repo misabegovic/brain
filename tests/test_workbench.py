@@ -171,3 +171,41 @@ def test_pty_round_trip_over_websocket():
     finally:
         proc.terminate()
         proc.wait(timeout=5)
+
+
+def test_ui_route_serves_rendered_wiki():
+    port = 8992
+    proc = subprocess.Popen(
+        [sys.executable, str(REPO / "tools" / "brain.py"),
+         "serve", "--port", str(port)], stderr=subprocess.PIPE)
+    try:
+        import urllib.error
+        import urllib.request
+        deadline = time.time() + 15
+        status = None
+        while time.time() < deadline:
+            try:
+                status = urllib.request.urlopen(
+                    f"http://127.0.0.1:{port}/ui/", timeout=5).status
+                break
+            except (urllib.error.URLError, ConnectionError):
+                if proc.poll() is not None:
+                    break
+                time.sleep(0.3)
+        assert status == 200, "rendered wiki should serve at /ui/"
+        page = urllib.request.urlopen(
+            f"http://127.0.0.1:{port}/ui/brain/roadmap/",
+            timeout=5).read().decode()
+        assert "roadmap" in page.lower()
+    finally:
+        proc.terminate()
+        proc.wait(timeout=5)
+
+
+def test_version_flag():
+    out = subprocess.run(
+        [sys.executable, str(REPO / "tools" / "brain.py"), "--version"],
+        capture_output=True, text=True, timeout=10)
+    assert out.returncode == 0
+    assert out.stdout.strip() == \
+        f"brain {(REPO / 'VERSION').read_text().strip()}"

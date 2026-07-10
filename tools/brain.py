@@ -43,6 +43,7 @@ import shutil
 import socketserver
 import subprocess
 import sys
+import threading
 import time
 import urllib.error
 import urllib.parse
@@ -1224,6 +1225,7 @@ def cmd_serve(args) -> int:
                   f"— run `cd ui && npm install`", file=sys.stderr)
             return 1
 
+    rebuild_lock = threading.Lock()
     entries_cache: list[dict] = []
 
     def refresh_cache():
@@ -1280,17 +1282,68 @@ def cmd_serve(args) -> int:
                                 "text/html; charset=utf-8")
                 return
 
+            if path == "/ui" or path.startswith("/ui/"):
+                # The rendered wiki, from the freshest static build
+                # (the ui-build hook's sandbox, else ui/dist).
+                site = None
+                for candidate in (REPO / "ui" / ".build-cache",
+                                  REPO / "ui" / "dist"):
+                    if (candidate / "index.html").exists():
+                        site = candidate
+                        break
+                if site is None:
+                    self._send_json(503, {
+                        "error": "no UI build — run tools/ui-build.sh "
+                                 "or cd ui && npm run build"})
+                    return
+                rel = path[len("/ui"):].lstrip("/")
+                target = (site / rel).resolve() if rel else site / "index.html"
+                try:
+                    target.relative_to(site)
+                except ValueError:
+                    self._send_json(403, {"error": "path escapes site"})
+                    return
+                if target.is_dir():
+                    target = target / "index.html"
+                if not target.exists() and not target.suffix:
+                    target = target / "index.html"
+                if not target.exists():
+                    target = site / "404.html"
+                    if not target.exists():
+                        self._send_json(404, {"error": "not found"})
+                        return
+                ctypes = {".html": "text/html; charset=utf-8",
+                          ".css": "text/css",
+                          ".js": "application/javascript",
+                          ".mjs": "application/javascript",
+                          ".json": "application/json",
+                          ".svg": "image/svg+xml", ".png": "image/png",
+                          ".ico": "image/x-icon", ".woff2": "font/woff2",
+                          ".txt": "text/plain"}
+                data = target.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", ctypes.get(
+                    target.suffix, "application/octet-stream"))
+                self.send_header("Content-Length", str(len(data)))
+                self.send_header("Cache-Control", "no-cache")
+                self.end_headers()
+                self.wfile.write(data)
+                return
+
             if workbench and path.startswith("/workbench"):
                 host_hdr = (self.headers.get("Host") or "").split(":")[0]
                 if host_hdr not in ("localhost", "127.0.0.1", "::1", ""):
                     self._send_json(403, {"error": "host not allowed"})
                     return
                 if path == "/workbench":
+                    view_names = sorted(
+                        s.stem for s in VIEWS_SPEC_DIR.glob("*.yml")
+                    ) if VIEWS_SPEC_DIR.exists() else []
                     self._send_text(
                         200,
                         wb.render_workbench_page(
                             wb.SESSION_TOKEN, wb.TERMINAL_CLIS,
-                            len(entries_cache)),
+                            len(entries_cache), view_names),
                         "text/html; charset=utf-8")
                     return
                 if path.startswith("/workbench/assets/"):
@@ -1306,7 +1359,25 @@ def cmd_serve(args) -> int:
                     latest = max(
                         (p.stat().st_mtime for p in WIKI.rglob("*.md")),
                         default=0)
-                    self._send_json(200, {"mtime": latest})
+                    # Keep the rendered wiki fresh regardless of which
+                    # editor made the change: when the static build is
+                    # staler than the wiki, kick one background rebuild
+                    # (single-flight; the poll cycle picks up the result).
+                    built = REPO / "ui" / ".build-cache" / "index.html"
+                    build_mtime = built.stat().st_mtime if built.exists() else 0
+                    if latest > build_mtime and rebuild_lock.acquire(
+                            blocking=False):
+                        def _rebuild():
+                            try:
+                                subprocess.run(
+                                    ["bash", str(REPO / "tools/ui-build.sh")],
+                                    capture_output=True, timeout=120)
+                            finally:
+                                rebuild_lock.release()
+                        threading.Thread(target=_rebuild,
+                                         daemon=True).start()
+                    self._send_json(200, {"mtime": latest,
+                                          "rendered": build_mtime})
                     return
                 if path == "/workbench/pty":
                     if qs.get("token", [""])[0] != wb.SESSION_TOKEN:
@@ -6066,7 +6137,13 @@ def cmd_reflection_check(args) -> int:
 
 
 def main() -> int:
+    version = "(unversioned)"
+    version_file = REPO / "VERSION"
+    if version_file.exists():
+        version = version_file.read_text().strip()
     ap = argparse.ArgumentParser(prog="brain")
+    ap.add_argument("--version", action="version",
+                    version=f"brain {version}")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("validate", help="check frontmatter conformance").set_defaults(

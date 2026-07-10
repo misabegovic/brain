@@ -26,6 +26,12 @@ into the sections below.
 
 ## Now
 
+- **Work happens inside the brain (0.8.0, 2026-07-10).** The
+  rendered wiki serves at `/ui` on the local server; the workbench
+  navigates dashboard/wiki/views beside the terminal; stale builds
+  self-heal via the change signal; sidebar mirrors the shelves;
+  `VERSION` + `--version` ship. First operator lesson recorded.
+
 - **Hosting profile is live (0.7.0, 2026-07-10).** `deploy/`
   (Dockerfile, entrypoint, compose on non-default ports) +
   `railway.toml`; per-instance isolation (env ports, hashed timer

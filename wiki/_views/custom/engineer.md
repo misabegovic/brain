@@ -36,7 +36,7 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 |---|---|---|---|
 | research-brain-adrs-multi-prd-epic-shape-md | research | normal | brain/adrs/multi-prd-epic-shape.md: confidence:medium but 4 pages link to it — deepen with cited research |
 | research-brain-roadmap-md | research | normal | brain/roadmap.md: confidence:medium but 3 pages link to it — deepen with cited research |
-| research-org-operator-lessons-md | research | normal | org/operator-lessons.md: confidence:medium but 3 pages link to it — deepen with cited research |
+| research-org-operator-lessons-md | research | normal | org/operator-lessons.md: confidence:medium but 4 pages link to it — deepen with cited research |
 
 ## Load-bearing pages by inbound links
 
@@ -45,13 +45,13 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 | brain/adrs/multi-prd-epic-shape.md | medium | 4 |
 | brain/adrs/queue-and-tend-inbox.md | high | 4 |
 | brain/adrs/successor-ssg-for-ui.md | high | 4 |
+| org/operator-lessons.md | medium | 4 |
 | brain/adrs/connector-snapshot-contract.md | medium | 3 |
 | brain/adrs/home-content-shape.md | medium | 3 |
 | brain/adrs/operator-lesson-pattern.md | medium | 3 |
 | brain/adrs/parallel-efforts-on-request.md | medium | 3 |
 | brain/adrs/shape-deepdive-pre-flight.md | medium | 3 |
 | brain/adrs/sql-views-over-derived-index.md | medium | 3 |
-| brain/adrs/workbench-pty-bridge.md | medium | 3 |
 
 ## Production state (Datadog)
 

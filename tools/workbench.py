@@ -204,10 +204,14 @@ def handle_ws_connection(handler) -> None:
 
 
 def render_workbench_page(token: str, harnesses: list[dict],
-                          page_count: int) -> str:
+                          page_count: int,
+                          views: list[str] | None = None) -> str:
     buttons = "".join(
         f'<button onclick="spawn(\'{h["name"]}\')">{h["name"]}</button>'
         for h in harnesses)
+    view_links = "".join(
+        f'<button onclick="nav(\'/ui/_views/custom/{v}/\')">{v}</button>'
+        for v in (views or []))
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <title>brain · workbench</title>
 <link rel="stylesheet" href="/workbench/assets/xterm.css">
@@ -215,7 +219,12 @@ def render_workbench_page(token: str, harnesses: list[dict],
  :root {{ color-scheme: light dark; }}
  body {{ margin: 0; font: 14px system-ui, sans-serif; display: flex;
         height: 100vh; }}
- #left {{ flex: 1 1 55%; border: 0; min-width: 20rem; }}
+ #leftwrap {{ flex: 1 1 55%; display: flex; flex-direction: column;
+              min-width: 20rem; }}
+ #nav {{ padding: .35rem .6rem; display: flex; gap: .4rem;
+        border-bottom: 1px solid #8884; }}
+ #nav button {{ font: inherit; padding: .15rem .6rem; cursor: pointer; }}
+ #left {{ flex: 1; border: 0; }}
  #right {{ flex: 1 1 45%; display: flex; flex-direction: column;
           border-left: 1px solid #8884; }}
  #bar {{ padding: .4rem .6rem; display: flex; gap: .4rem;
@@ -224,7 +233,14 @@ def render_workbench_page(token: str, harnesses: list[dict],
  #bar .hint {{ opacity: .6; margin-left: auto; font-size: .85em; }}
  #term {{ flex: 1; min-height: 0; padding: .3rem; background: #000; }}
 </style></head><body>
-<iframe id="left" src="/dash"></iframe>
+<div id="leftwrap">
+ <div id="nav">
+   <button onclick="nav('/dash')">dashboard</button>
+   <button onclick="nav('/ui/')">wiki</button>
+   {view_links}
+ </div>
+ <iframe id="left" src="/dash"></iframe>
+</div>
 <div id="right">
  <div id="bar">
    <span>open in:</span>{buttons}
@@ -263,6 +279,7 @@ def render_workbench_page(token: str, harnesses: list[dict],
    ws.send(JSON.stringify({{type: 'spawn', harness: name}}));
    term.focus();
  }}
+ function nav(url) {{ document.getElementById('left').src = url; }}
  let last = 0;
  setInterval(async () => {{
    try {{

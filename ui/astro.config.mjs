@@ -46,7 +46,29 @@ export default defineConfig({
           link: '/onboarding/',
           badge: { text: 'start here', variant: 'tip' },
         },
-        { label: 'Brain — self-tracking', link: '/brain/' },
+        {
+          label: 'Views',
+          autogenerate: { directory: '_views/custom' },
+        },
+        {
+          label: 'Brain — self-tracking',
+          collapsed: true,
+          items: [
+            { label: 'State', link: '/brain/state/' },
+            { label: 'Roadmap', link: '/brain/roadmap/' },
+            { label: 'Decisions (ADRs)',
+              autogenerate: { directory: 'brain/adrs' } },
+            { label: 'Initiatives (PRDs)',
+              autogenerate: { directory: 'brain/prds' } },
+            { label: 'Pitches',
+              autogenerate: { directory: 'brain/pitches' } },
+          ],
+        },
+        {
+          label: 'Org',
+          collapsed: true,
+          autogenerate: { directory: 'org' },
+        },
         {
           label: 'AI suggestions (drafts for review)',
           link: '/_views/ai-suggestions/',

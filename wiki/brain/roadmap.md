@@ -216,6 +216,21 @@ layout gets thin generated adapters per harness via a future
 pointing at canonical protocol files rather than maintaining copies
 that drift.
 
+## 0.8.0 — work happens inside the brain — **shipped 2026-07-10**
+
+Operator directive: the brain is a standalone project and its own
+daily surface. The local server now serves the **rendered wiki** at
+`/ui` (from the ui-build hook's sandbox, so it is the freshest
+build), the workbench's left pane navigates dashboard ↔ wiki ↔
+custom views, and the change signal kicks a single-flight UI rebuild
+whenever the rendered site is staler than the corpus — edits from
+any editor appear rendered within one poll cycle plus a build. The
+Starlight sidebar reflects the brain's real shelves (custom views,
+brain state/roadmap/ADRs/PRDs/pitches, org). Project hygiene:
+`VERSION` (bumped per shipped slice) + `brain.py --version`; the
+operating principle is recorded as the first operator lesson
+(develop-the-brain-inside-the-brain).
+
 ## Standing ideas (unversioned)
 
 From the open-knowledge study (see the captured source): page reads
