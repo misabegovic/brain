@@ -10,3 +10,6 @@
 2026-07-10 commit — f6d436f: 0.x roadmap captured (self-maintenance, connectors, serving)
    diff: 7 files changed, 179 insertions(+), 5 deletions(-)
    restricted-paths: false
+2026-07-10 commit — 57f6374: Roadmap revised to queue-and-tend (no scheduled LLM runs)
+   diff: 3 files changed, 68 insertions(+), 45 deletions(-)
+   restricted-paths: false
