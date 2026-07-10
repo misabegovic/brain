@@ -81,3 +81,7 @@
    diff: 12 files changed, 278 insertions(+), 28 deletions(-)
    restricted-paths: true
    by: claude (fable 5), directed by operator
+2026-07-10 commit — 7a95f17: 0.10.0 shipped — topics + regenerative schema (Fowler ingest)
+   diff: 16 files changed, 302 insertions(+), 8 deletions(-)
+   restricted-paths: true
+   by: claude (fable 5), directed by operator
