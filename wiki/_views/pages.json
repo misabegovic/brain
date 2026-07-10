@@ -1,0 +1,79 @@
+{
+  "generated": "2026-07-10",
+  "home_sections": [
+    {
+      "anchor": "what-changed",
+      "name": "What changed",
+      "maintained_by": "/in",
+      "empty": true
+    },
+    {
+      "anchor": "drift-surface",
+      "name": "Drift surface",
+      "maintained_by": "/groom",
+      "empty": true
+    },
+    {
+      "anchor": "open-initiatives",
+      "name": "Open initiatives",
+      "maintained_by": "/shape",
+      "empty": true
+    },
+    {
+      "anchor": "recent-decisions",
+      "name": "Recent decisions",
+      "maintained_by": "/shape",
+      "empty": true
+    },
+    {
+      "anchor": "insights-now",
+      "name": "Insights now",
+      "maintained_by": "/feedback",
+      "empty": true
+    },
+    {
+      "anchor": "brain-trajectory",
+      "name": "Brain trajectory",
+      "maintained_by": "/sync",
+      "empty": true
+    },
+    {
+      "anchor": "curated-picks",
+      "name": "Curated picks",
+      "maintained_by": "/in",
+      "empty": true
+    },
+    {
+      "anchor": "where-to-find-things",
+      "name": "Where to find things",
+      "maintained_by": "/in",
+      "empty": false
+    }
+  ],
+  "pages": [
+    {
+      "path": "brain/index.md",
+      "title": "Brain (meta level)",
+      "kind": "meta",
+      "status": "draft",
+      "updated": "2026-07-10",
+      "confidence": "high",
+      "sources": [
+        "../../AGENTS.md"
+      ],
+      "tokens": 78
+    },
+    {
+      "path": "org/index.md",
+      "title": "Org \u2014 methodology + cross-product",
+      "kind": "meta",
+      "status": "draft",
+      "updated": "2026-07-10",
+      "confidence": "high",
+      "sources": [
+        "../../AGENTS.md"
+      ],
+      "tokens": 70
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+name: scheduled
+
+# Per `wiki/brain/ai-suggestions/prds/scheduled-operations-and-tracking.md` § Open
+# questions #1: GitHub Actions cron is the v1 runner. Daily at 06:00 UTC,
+# `brain.py schedule run-due` invokes every enabled operation in
+# brain-schedule.yml. Output JSONs (`wiki/_state/*.json`) are committed back
+# via a follow-up auto-PR for audit trail.
+
+on:
+  schedule:
+    # Daily at 06:00 UTC. Adjust if a specific cadence (weekly /
+    # monthly) per operation matters more than per-day idempotency.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install --quiet pyyaml tiktoken
+
+      - name: Run scheduled operations
+        run: python3 tools/brain.py schedule run-due
+        env:
+          # gh CLI is pre-installed on ubuntu-latest; GITHUB_TOKEN
+          # gives it auth automatically.
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Commit state updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add wiki/_state/ wiki/_overlaps/auto-refresh-*.md 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "scheduled: refresh state from brain.py schedule run-due"
+            git push
+          else
+            echo "no state changes"
+          fi

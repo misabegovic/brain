@@ -1,0 +1,428 @@
+---
+// Brain — onboarding deck.
+//
+// A standalone Astro page outside Starlight's docs collection.
+// Bet adopted in wiki/brain/adrs/brain-intro-deck.md (Option A):
+// single file, slide content inline as a typed array, scroll-snap
+// mobile-native, full layout control. The hybrid option (content in
+// wiki/, render in ui/) is the named supersede if a second
+// slide-shaped artifact arrives later.
+//
+// Run locally with `npm run dev` from ui/. Reachable at /onboarding/.
+
+type SlideLink = { label: string; href: string };
+type Slide = {
+  n: number;
+  total: number;
+  kicker: string;
+  title: string;
+  body?: string;
+  bullets?: string[];
+  callout?: string;
+  links?: SlideLink[];
+};
+
+const TOTAL = 12;
+
+const slides: Slide[] = [
+  {
+    n: 1,
+    total: TOTAL,
+    kicker: 'Brain',
+    title: "An LLM-maintained knowledge base.",
+    body: "A ~10-minute orientation. Walk through with whoever sent you the link, or scroll on your own.",
+    bullets: [
+      'Markdown wiki Claude maintains — schema, governance, and slash-command surface make it operationally different from a Notion replacement.',
+      'Designed to be read by humans and agents alike.',
+      'Local-first. Lives in this repo and on your laptop.',
+    ],
+    callout: '↓ Scroll or swipe up to advance.',
+  },
+  {
+    n: 2,
+    total: TOTAL,
+    kicker: 'Why it exists',
+    title: 'Three missions.',
+    bullets: [
+      '1. Codebases could be regenerated from the specs that live here. The brain is the source of understanding; sibling repos are the source of code. The two stay aligned.',
+      '2. Cross-team overlaps surface, rather than hide. When two teams work on adjacent problems, the brain makes the overlap visible.',
+      "3. Autonomous agents can use this as their primary working memory — plan, decide, implement against the brain rather than against raw codebases alone.",
+    ],
+    body: "Methodology: the LLM-wiki pattern from Karpathy, with mempalace as the verbatim/semantic-recall layer.",
+  },
+  {
+    n: 3,
+    total: TOTAL,
+    kicker: 'How it is structured (1/3)',
+    title: 'Three layers.',
+    bullets: [
+      'Raw sources (immutable) — sources/, sibling repos under ~/projects/, Notion (read-only). Never rewritten.',
+      'Wiki (synthesis) — markdown pages humans and agents author together. Cross-linked. Every non-trivial claim cites a source.',
+      'Schema (the rules) — AGENTS.md. The schema document tells the agent how to maintain the wiki.',
+    ],
+    callout: 'Hard rule: the wiki is a derived view; never re-ingest it as a source. Citations always resolve back through wiki/ to sources/ or sibling repos.',
+  },
+  {
+    n: 4,
+    total: TOTAL,
+    kicker: 'How it is structured (2/3)',
+    title: 'Three levels.',
+    bullets: [
+      "brain/ — meta about the brain itself (its schema, governance, UI, roadmap).",
+      'org/ — cross-organisation (way of working, Shape Up cadence, methodology, cross-product synthesis pages).',
+      "<repo>/ — per-repo, one shelf per repo in brain.config.yml. The narrowest scope that captures a fact wins.",
+    ],
+    body: "Pages tag their level via repos: and affects: frontmatter. The brain's three-level model maps onto how the org actually works — an org-level decision belongs in org/, not buried in one repo.",
+  },
+  {
+    n: 5,
+    total: TOTAL,
+    kicker: 'How it is structured (3/3)',
+    title: 'Per-repo: three layers, three lifetimes.',
+    bullets: [
+      'permanent/ — what the repo IS (purpose, architecture, conventions, interfaces, domain). Slow-changing knowledge.',
+      'state.md — where the repo IS GOING (Past / Now / Perceived / Target). The gap between Now and Target is the work; the gap between Now and Perceived is the risk.',
+      'adrs/ + prds/ — how it got here, where it is headed. Decisions and committed initiatives accumulate over time.',
+    ],
+    callout: 'Reading permanent/ tells you what the repo is. state.md tells you where it is going. Walking adrs/ and prds/ tells you how it got here.',
+  },
+  {
+    n: 6,
+    total: TOTAL,
+    kicker: 'The load-bearing safety property',
+    title: 'AI-suggestions vs. human-approved.',
+    body: "Agent-authored ADRs and PRDs are suggestions, not decisions. The path determines authority — there is no co-mingling.",
+    bullets: [
+      'wiki/<scope>/{adrs,prds}/<slug>.md — human-approved. A human reviewed → iterated → approved. The team committed.',
+      'wiki/<scope>/ai-suggestions/{adrs,prds}/<slug>.md — agent draft awaiting human review. Carries ai_suggestion: true and a banner.',
+      'Flow: agent suggests → human reviews → graduation PR moves the file out of ai-suggestions/, drops the flag, and reshapes language from inference-mode to direct-mode.',
+    ],
+    callout: 'A page in ai-suggestions/ is NOT a decision the team has made and does NOT reflect upcoming product changes. Do not act on it as if it were.',
+    links: [
+      { label: 'AI-suggestions catalogue', href: '/_views/ai-suggestions/' },
+    ],
+  },
+  {
+    n: 7,
+    total: TOTAL,
+    kicker: 'How decisions get made',
+    title: '/shape — the only path to ADRs and PRDs.',
+    body: "Forward mode: pitch → PRD → ADR → build. Each phase lands as its own PR, with an explicit human gate.",
+    bullets: [
+      'Phase 1 (PM agent) — pitch becomes a PRD. PR opens. STOPS for human APPROVED.',
+      'Phase 1.5 (RFC, opt-in via --rfc) — persona reactions land on the PRD. Used when the work is contentious or crosses teams.',
+      'Phase 2 (Tech Lead agent) — PRD plus RFC becomes an ADR with at least two alternatives + do-nothing. PR opens. STOPS for human APPROVED.',
+      'Phase 3 (Developer agent) — ADR becomes code in the sibling repo. Draft PR with brain backlinks. Human marks ready.',
+    ],
+    callout: "The human gate at every phase boundary is what makes a decision real. CI green is necessary but not sufficient for /shape PRs.",
+    links: [
+      { label: 'The binding playbook', href: '/brain/authoring-adrs-and-prds/' },
+    ],
+  },
+  {
+    n: 8,
+    total: TOTAL,
+    kicker: 'The slash-command surface',
+    title: "Most users don't need this. The agent dispatches.",
+    body: "If you talk to the brain in natural language, it picks the right command. The list is here so you can recognise what's running.",
+    bullets: [
+      '/in <source> — add something from a known source (path / URL).',
+      '/capture <scope> — capture in-flight signal (conversation, design discussion) — no source URL needed.',
+      "/ask <question> — query. Default factual; escalates to plan / overlap / coverage by phrasing.",
+      '/shape <scope> <pitch> — the path to ADRs and PRDs (above).',
+      '/groom — periodic judgement sweep (confidence demotion, insight decay, supersede→archive).',
+      '/sync — mechanical health sweep (sibling fetch, lint, source-link check, validate, regen views).',
+      '/review <PR#> — review and auto-merge a PR after every guardrail passes.',
+    ],
+  },
+  {
+    n: 9,
+    total: TOTAL,
+    kicker: 'How this fits with what you already use',
+    title: 'Brain vs. Notion vs. Slack.',
+    bullets: [
+      "External planning source (e.g. Notion) — the brain reads from it; never writes back. It stays the place for live product specs, customer-facing PRDs, exec materials.",
+      "Slack — institutional knowledge that is otherwise ephemeral. Capture the load-bearing parts into the brain via /capture <scope>.",
+      'Issue trackers — ingest on demand; the wiki synthesises, never mirrors.',
+    ],
+    callout: "Reach for the brain when: 'why did we pick X?' (ADRs), 'how does this repo fit together?' (permanent/ + state.md), 'who else is working on Y?' (/ask overlap). Reach for Notion for live product spec. Reach for Slack and capture into the brain when the context matters past the conversation.",
+  },
+  {
+    n: 10,
+    total: TOTAL,
+    kicker: 'What the brain knows about today',
+    title: 'Eight active sibling repos plus the brain itself.',
+    bullets: [
+      'Declared in brain.config.yml — one wiki/<repo>/ shelf each.',
+      'Each shelf: permanent/ + state.md + pitches/ + adrs/ + prds/.',
+      'infrastructure — OpenTofu IaC over AWS / DNSimple / Tailscale / Buildkite.',
+    ],
+    body: "Plus brain itself (this repo's own meta pages live in wiki/brain/).",
+    links: [
+      { label: 'Home dashboard', href: '/' },
+      { label: 'By repo', href: '/_views/by-repo/' },
+    ],
+  },
+  {
+    n: 11,
+    total: TOTAL,
+    kicker: 'Where this lives',
+    title: 'Local-first, on purpose.',
+    bullets: [
+      'The wiki lives in this repo. Durable, citable URLs.',
+      'The UI runs on your machine: cd ui && npm run dev → localhost:4321.',
+      'The agent runs in your Claude Code session.',
+    ],
+    callout: "No third-party hosting, no SaaS retention, no vendor lock-in beyond markdown (which is portable). The 'share a link' affordance is intentionally absent — durable knowledge is shared via the GitHub paths in wiki/, not a hosted UI.",
+  },
+  {
+    n: 12,
+    total: TOTAL,
+    kicker: 'Start here',
+    title: 'Where to land first.',
+    bullets: [
+      'README.md — the dense entry point. Repo layout, governance summary, the slash-command table.',
+      'AGENTS.md — the schema. CLAUDE.md is a symlink to it. Read this when you want to understand the rules.',
+      'wiki/index.md — the home dashboard. Agent-maintained, seven sections.',
+      'wiki/brain/authoring-adrs-and-prds.md — the binding playbook for /shape. Required reading per phase.',
+      "Try: ask the agent 'what does the brain know about <topic>?' — it will dispatch /ask and walk you through.",
+    ],
+    callout: "Walk-through complete. Questions, feedback, things that did not land — bring them to whoever sent you the link.",
+    links: [
+      { label: 'README', href: '/' },
+      { label: 'AGENTS.md', href: '/' },
+      { label: 'Home dashboard', href: '/' },
+      { label: 'Binding playbook', href: '/brain/authoring-adrs-and-prds/' },
+    ],
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0e1116" />
+    <meta name="description" content="Brain — an LLM-maintained knowledge base. A ~10-minute orientation deck for colleagues new to the brain." />
+    <title>Brain — onboarding</title>
+    <style>
+      :root {
+        --bg: #0e1116;
+        --bg-alt: #151a21;
+        --fg: #e6edf3;
+        --fg-muted: #9ba7b4;
+        --accent: #79c0ff;
+        --accent-warm: #ffa657;
+        --rule: #21262d;
+        --max-width: 38rem;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        font-size: 17px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+
+      .deck {
+        height: 100vh;
+        height: 100dvh;
+        overflow-y: scroll;
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .slide {
+        min-height: 100vh;
+        min-height: 100dvh;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        padding: 1.75rem 1.5rem 5.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+      }
+
+      .slide:nth-child(odd) { background: var(--bg); }
+      .slide:nth-child(even) { background: var(--bg-alt); }
+
+      .slide-inner {
+        width: 100%;
+        max-width: var(--max-width);
+        margin: 0 auto;
+      }
+
+      .kicker {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.78rem;
+        color: var(--accent);
+        margin: 0 0 0.75rem;
+        font-weight: 600;
+      }
+
+      .title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0 0 1.25rem;
+        letter-spacing: -0.01em;
+      }
+
+      .body {
+        font-size: 1rem;
+        line-height: 1.55;
+        margin: 0 0 1.25rem;
+        color: var(--fg);
+      }
+
+      .bullets {
+        margin: 0 0 1.25rem;
+        padding-left: 1.1rem;
+      }
+
+      .bullets li {
+        margin: 0 0 0.7rem;
+        line-height: 1.55;
+      }
+
+      .bullets li::marker {
+        color: var(--accent);
+      }
+
+      .callout {
+        border-left: 3px solid var(--accent-warm);
+        padding: 0.7rem 0.95rem;
+        background: rgba(255, 166, 87, 0.07);
+        border-radius: 4px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: var(--fg);
+        margin: 0 0 1.25rem;
+      }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        margin: 1rem 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .links a {
+        color: var(--accent);
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        font-size: 0.95rem;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0;
+      }
+
+      .links a:hover, .links a:focus {
+        border-bottom-color: var(--accent);
+        outline: none;
+      }
+
+      code {
+        background: rgba(255, 255, 255, 0.06);
+        padding: 0.1em 0.35em;
+        border-radius: 3px;
+        font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.9em;
+      }
+
+      .pager {
+        position: absolute;
+        bottom: 1.25rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-variant-numeric: tabular-nums;
+        font-size: 0.78rem;
+        color: var(--fg-muted);
+        letter-spacing: 0.05em;
+        pointer-events: none;
+      }
+
+      .skip {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        background: var(--bg-alt);
+        border: 1px solid var(--rule);
+        color: var(--fg-muted);
+        font-size: 0.78rem;
+        padding: 0.4rem 0.7rem;
+        border-radius: 999px;
+        text-decoration: none;
+        z-index: 10;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .skip:hover, .skip:focus {
+        color: var(--fg);
+        border-color: var(--accent);
+        outline: none;
+      }
+
+      @media (min-width: 720px) {
+        body { font-size: 18px; }
+        .slide { padding: 3rem 3rem 5.5rem; }
+        .title { font-size: 2.1rem; }
+        .kicker { font-size: 0.82rem; }
+        .body { font-size: 1.05rem; }
+      }
+
+      @media (min-width: 1100px) {
+        :root { --max-width: 42rem; }
+        .title { font-size: 2.4rem; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .deck { scroll-behavior: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="/" aria-label="Exit to home">Exit ↗</a>
+    <main class="deck" role="main">
+      {slides.map((slide) => (
+        <section class="slide" aria-labelledby={`slide-${slide.n}-title`}>
+          <div class="slide-inner">
+            <p class="kicker">{slide.kicker}</p>
+            <h1 class="title" id={`slide-${slide.n}-title`}>{slide.title}</h1>
+            {slide.body && <p class="body">{slide.body}</p>}
+            {slide.bullets && (
+              <ul class="bullets">
+                {slide.bullets.map((b) => <li>{b}</li>)}
+              </ul>
+            )}
+            {slide.callout && <p class="callout">{slide.callout}</p>}
+            {slide.links && slide.links.length > 0 && (
+              <ul class="links">
+                {slide.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+              </ul>
+            )}
+          </div>
+          <span class="pager" aria-hidden="true">{slide.n} / {slide.total}</span>
+        </section>
+      ))}
+    </main>
+  </body>
+</html>

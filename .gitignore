@@ -1,0 +1,53 @@
+# mempalace local index — do not commit
+.mempalace/
+mempalace.db
+*.chroma/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# secrets
+.env
+.env.*
+!.env.example
+
+# MemPalace per-project files (issue #185)
+mempalace.yaml
+entities.json
+
+# Python bytecode caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Subagent worktree harness
+.claude/worktrees/
+
+# ScheduleWakeup runtime lock (Claude Code Skill scheduled-tasks)
+.claude/scheduled_tasks.lock
+
+# UI build sandbox — output of the auto-refresh hook
+# (tools/ui-build.sh; see wiki/brain/adrs/ui-auto-refresh-hook.md).
+# Kept local only; ui/public/ is the committed artefact.
+ui/.build-cache/
+
+# Home staleness sentinel — written by tools/home-staleness.sh on
+# every wiki/ edit; cleared by editing wiki/index.md. Local-session
+# state only; CI's check-home-fresh is the load-bearing enforcement.
+# See wiki/brain/adrs/home-content-shape.md.
+wiki/_views/home-staleness.json
+
+# Stale legacy sentinel from the previous in-session readme-staleness
+# hook; current shape is CI-only via brain.py check-readme-fresh.
+# Kept ignored so any local copy is harmless.
+wiki/_views/readme-staleness.json
+
+# Python virtualenv (local-only, used for tools/brain.py)
+.venv/
+
+.venv2/

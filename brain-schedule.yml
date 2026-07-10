@@ -1,0 +1,113 @@
+# brain-schedule.yml — declarative recurring operations.
+#
+# Per `wiki/brain/ai-suggestions/prds/scheduled-operations-and-tracking.md`.
+# This config is portable (cron / GitHub Actions / Claude Code's
+# ScheduleWakeup all consume the same shape). The runtime that
+# executes is separate; v1 ships the config + listing only.
+#
+# `brain.py schedule list` prints these.
+# `brain.py schedule run <op>` invokes a single op.
+# `brain.py schedule run-due` invokes every op whose `next_run` is
+# past. The runner that fires on cron lives in
+# .github/workflows/scheduled.yml (proposed) or as a Claude Code
+# /loop routine (proposed) — separate decision.
+
+version: 1
+
+operations:
+  # ---- Sync + grooming (mechanical) ------------------------------
+
+  - name: reflection-check
+    description: Run all 9 reflection-check sub-checks; surface findings.
+    cadence: daily
+    handler: python3 tools/brain.py reflection-check
+    output: stdout
+    enabled: true
+
+  - name: sync-siblings
+    description: Fetch each sibling repo and list new commits since cursor.
+    cadence: daily
+    handler: bash tools/sync-siblings.sh
+    output: stdout
+    enabled: true
+
+  - name: views-regen
+    description: Regenerate wiki/_views/ from current corpus state.
+    cadence: daily
+    handler: python3 tools/brain.py views
+    output: wiki/_views/
+    enabled: true
+
+  # ---- Tracking surfaces (state JSON refresh) --------------------
+
+  - name: security-scan
+    description: Per-repo dependency / config scan; refresh wiki/_state/security.json.
+    cadence: weekly
+    handler: python3 tools/brain.py schedule run security-scan 
+    output: wiki/_state/security.json
+    enabled: true
+
+  - name: eu-ai-act-countdown
+    description: Recompute days-to-deadline + per-Article readiness; refresh wiki/_state/eu-ai-act.json.
+    cadence: weekly
+    handler: python3 tools/brain.py schedule run eu-ai-act-countdown 
+    output: wiki/_state/eu-ai-act.json
+    enabled: true
+
+  - name: issues-pull
+    description: Pull GitHub Issues / Linear / Jira state into wiki/_state/issues.json.
+    cadence: daily
+    handler: python3 tools/brain.py schedule run issues-pull 
+    output: wiki/_state/issues.json
+    enabled: true
+
+  # ---- Ingestion + intersection-finding -------------------------
+
+  - name: notion-walk
+    description: Walk the external planning-source snapshots; flag new / changed pages for ingest.
+    cadence: weekly
+    handler: python3 tools/brain.py schedule run notion-walk 
+    output: wiki/_state/notion-cursor.json
+    enabled: true
+
+  - name: overlap-refresh
+    description: Re-run cross-team overlap analysis; refresh wiki/_overlaps/.
+    cadence: weekly
+    handler: python3 tools/brain.py schedule run overlap-refresh 
+    output: wiki/_overlaps/
+    enabled: true
+
+  - name: zoom-out-digest
+    description: Produce a brain-wide zoom-out digest of intersections + drift.
+    cadence: weekly
+    handler: python3 tools/brain.py schedule run zoom-out-digest 
+    output: wiki/_state/zoom-out-digest.md
+    enabled: true
+
+  # ---- Grooming -------------------------------------------------
+
+  - name: ai-suggestion-grooming
+    description: Sweep ai-suggestions/ for stale drafts (>180d untouched); flag for archive or promotion.
+    cadence: monthly
+    handler: python3 tools/brain.py schedule run ai-suggestion-grooming 
+    output: stdout
+    enabled: true
+
+  - name: brain-repo-truth-verification
+    description: Heuristic + LLM-grade verification that brain claims still match repo state.
+    cadence: monthly
+    handler: python3 tools/brain.py reflection-check repo-claims 
+    output: stdout
+    enabled: true
+
+# How operations get fired (runner — separate ADR):
+#
+# - GitHub Actions cron (.github/workflows/scheduled.yml) is the
+#   primary v1 runner. The brain.py status / schedule run commands
+#   are CLI; cron just dispatches them.
+# - Claude Code's `/loop` + ScheduleWakeup is the secondary runner
+#   for ops that need an operator-in-the-loop (zoom-out-digest;
+#   ai-suggestion-grooming surfacing).
+# - Per-machine cron is the fallback.
+#
+# Each runner consumes the same brain-schedule.yml shape.

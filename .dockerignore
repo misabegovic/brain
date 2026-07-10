@@ -1,0 +1,45 @@
+# Keep the Docker build context lean.
+# The Dockerfile builds from the brain repo root; we only need ui/ + wiki/
+# to be available, plus this .dockerignore to drop everything else.
+
+# git plumbing
+.git
+.gitignore
+.gitattributes
+
+# editor / OS
+.idea
+.vscode
+.DS_Store
+*.swp
+*~
+
+# secrets
+.env
+.env.*
+!.env.example
+
+# mempalace local index (already gitignored, double-belt for Docker)
+.mempalace
+mempalace.db
+mempalace.yaml
+entities.json
+*.chroma
+
+# logs (the brain log is intentionally not in the runtime image)
+log/
+
+# tools / sources / .claude — not needed for the UI build
+tools/
+sources/
+.claude/
+
+# UI build artifacts (will be rebuilt inside the image)
+ui/node_modules/
+ui/public/
+ui/.quartz-cache/
+
+# Documentation that doesn't ship
+README.md
+AGENTS.md
+CLAUDE.md
