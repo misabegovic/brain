@@ -15,7 +15,7 @@
 set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # dirname + short path hash: distinct even for same-named dirs
-# (e.g. ~/projects/brain vs ~/projects/tt/brain).
+# (e.g. ~/projects/brain vs a second checkout elsewhere).
 PATH_HASH="$(printf '%s' "$REPO_ROOT" | sha1sum | cut -c1-6)"
 INSTANCE="$(basename "$REPO_ROOT" | tr -cd 'a-zA-Z0-9-')-${PATH_HASH}"
 UNIT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
