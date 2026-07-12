@@ -175,6 +175,14 @@ Create the venv once with:
 tools/setup-local.sh
 ```
 
+### Machine-local term denylist (optional)
+
+For public or shared brains, keep terms that must never ship —
+client names, internal repo names — in `.reflection-denylist`
+(git-ignored, one term per line). `brain.py reflection-check
+denylist` flags any tracked file containing them; the terms
+themselves never enter the repo. An absent file is a clean no-op.
+
 ### Sibling-repo root
 
 All tooling resolves sibling-repo paths through one configurable
