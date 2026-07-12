@@ -153,6 +153,6 @@
    restricted-paths: false
    by: claude (fable 5)
 2026-07-12 commit — 0fe34e6: shape(persona-playthrough-loop) Phase 2: ADR
-   diff: 5 files, +105/-2
+   diff: 6 files, +101/-3
    restricted-paths: false
    by: claude (fable 5)

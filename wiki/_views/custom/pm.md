@@ -31,7 +31,9 @@ Committed work, proposals awaiting a bet, patterns from feedback, and what's que
 
 ## Insights
 
-*(no rows)*
+| path | title | status | confidence | updated |
+|---|---|---|---|---|
+| insights/quickstart-third-command-fragility.md | The quickstart's third command (`brain`) is fragile on cold-start machines | draft | low | 2026-07-12 |
 
 ## Ingest queue
 

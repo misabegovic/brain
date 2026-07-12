@@ -348,6 +348,19 @@ app page becomes the rendered knowledge under the ambient strip
 `doctor` warning. Every remaining first-party surface now survives
 the deletion test.
 
+## 0.16.0 — persona playthrough loop — **shipped 2026-07-12**
+
+Shaped and built on the operator's same-day bet
+([pitch](pitches/persona-playthrough-loop.md) →
+[PRD](prds/persona-playthrough-loop.md) →
+[ADR](adrs/persona-playthrough-loop.md)): four user personas for
+the brain-as-product, the `/playthrough` skill (real execution,
+immutable transcripts, insights capped at `confidence: low` until
+a human confirms), and a version-cursor producer queueing one
+sweep per shipped release. The first dogfood walk paid for the
+mechanism immediately — two cold-start defects fixed in-session,
+one hypothesis routed to the insights shelf.
+
 ## Standing ideas (unversioned)
 
 Deliberately not adopted from the open-knowledge direction: a vector

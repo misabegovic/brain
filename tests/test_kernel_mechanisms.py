@@ -180,3 +180,64 @@ def test_instance_birth(tmp_path):
          "reflection-check"],
         cwd=target, env=env, capture_output=True, text=True, timeout=60)
     assert check.returncode == 0, check.stdout[:800]
+
+
+# ---------- playthrough version-cursor producer ---------------------------
+
+PLAYTHROUGH_CURSOR = REPO / "wiki" / "_state" / "playthrough-cursor.json"
+
+
+def test_playthrough_cursor_initialises_silently(tmp_path):
+    """First run writes the cursor without queueing — a fresh shell
+    or newborn instance owes no sweep."""
+    existed = PLAYTHROUGH_CURSOR.read_text() if PLAYTHROUGH_CURSOR.exists() \
+        else None
+    if PLAYTHROUGH_CURSOR.exists():
+        PLAYTHROUGH_CURSOR.unlink()
+    try:
+        brain._playthrough_queue_slice()
+        state = json.loads(PLAYTHROUGH_CURSOR.read_text())
+        assert state["version"] == (REPO / "VERSION").read_text().strip()
+        item = REPO / "wiki" / "_state" / "inbox" / (
+            "playthrough-" + state["version"].replace(".", "-") + ".json")
+        assert not item.exists(), "first run must not queue a sweep"
+    finally:
+        if existed is not None:
+            PLAYTHROUGH_CURSOR.write_text(existed)
+        elif PLAYTHROUGH_CURSOR.exists():
+            PLAYTHROUGH_CURSOR.unlink()
+
+
+def test_playthrough_cursor_queues_once_per_bump():
+    existed = PLAYTHROUGH_CURSOR.read_text() if PLAYTHROUGH_CURSOR.exists() \
+        else None
+    version = (REPO / "VERSION").read_text().strip()
+    slug = version.replace(".", "-")
+    item = REPO / "wiki" / "_state" / "inbox" / f"playthrough-{slug}.json"
+    item_existed = item.exists()
+    PLAYTHROUGH_CURSOR.write_text(json.dumps({"version": "0.0.0"}))
+    try:
+        brain._playthrough_queue_slice()
+        assert item.exists(), "version bump must queue a sweep item"
+        data = json.loads(item.read_text())
+        assert data["produced_by"] == "playthrough-cursor"
+        assert data["route"] == "/playthrough"
+        # Cursor advanced at queue time: a second run is a no-op,
+        # and a tended (done) item is never re-queued.
+        item.unlink()
+        brain._playthrough_queue_slice()
+        assert not item.exists(), "swept item must not be re-queued"
+    finally:
+        if not item_existed:
+            item.unlink(missing_ok=True)
+        if existed is not None:
+            PLAYTHROUGH_CURSOR.write_text(existed)
+        else:
+            PLAYTHROUGH_CURSOR.unlink(missing_ok=True)
+
+
+def test_playthrough_surfaces_ship():
+    assert (REPO / ".claude" / "skills" / "playthrough" / "SKILL.md").exists()
+    assert (REPO / ".claude" / "commands" / "playthrough.md").exists()
+    personas = list((REPO / ".claude" / "personas" / "users").glob("*.md"))
+    assert len(personas) >= 4, "the brain's own user personas must ship"

@@ -570,6 +570,7 @@ directly** — those are populated exclusively by `/shape`.
 | Repo-detected pre-existing decision (e.g. "X chosen over Y")        | Hand off to `/shape <repo> --record`                   |
 | Cross-repo process / methodology (Shape Up, onboarding)             | `wiki/org/`                                            |
 | Customer-feedback insights                                          | `wiki/insights/` (cross-cutting; via `/feedback`)      |
+| Playthrough finding (synthetic-user friction, via `/playthrough`)  | `wiki/insights/` at `confidence: low` — capped until a human confirms; transcript at `sources/playthroughs/` |
 | Public competitor information (press releases, product pages, trade press) | `wiki/org/competitors/<competitor>/index.md` (edit/create); snapshots at `sources/web/competitors/<competitor>/<slug>--<shortid>.md`. |
 | Brain-self meta                                                     | `wiki/brain/`                                          |
 
@@ -706,6 +707,7 @@ authoritative copy.
 | `/sync`              | One-shot **mechanical** health sweep.                                                   | `sync` skill (siblings + lint + check + validate + views + log rotation). |
 | `/tend [<budget>]`   | Digest the inbox — the queue of pending synthesis work accumulated at `wiki/_state/inbox/` by the deterministic producers (cursor diffs, half-life crossings, link health, connector batches, operator-defined producers). Budget bounds the sweep: item count, time-box, kind, or a single id. The in-session half of queue-and-tend; never runs on a schedule. | `tend` skill. |
 | `/groom`             | Periodic **judgement** sweep — knowledge GC.                                            | `groom` skill (confidence demotion, insight decay, supersede→archive). |
+| `/playthrough [<persona> [<scenario>]]` | Walk the product as a user persona — **real execution, never simulation**. Transcript snapshots to `sources/playthroughs/`; decision-worthy findings become `wiki/insights/` pages at `confidence: low` (capped until a human confirms). Queued per version bump by the playthrough cursor; digested via `/tend`. | `playthrough` skill. |
 | `/shape <scope> <pitch>` | Shape Up workflow: pitch → PRD → ADR → build. **Manual by default** — pauses at every load-bearing in-phase decision and lets the user pick. `--auto` to run autonomously (phase-end gates still apply). `--pitch` for a pre-bet pitch page. `--rfc` for an RFC pass between PRD and ADR. `--epic` for an umbrella `kind: epic` page (children spawn via regular forward `/shape` with `parent_epic:` linkage). | `shape` skill (chains `rfc` if `--rfc`). |
 | `/continue <slug-or-PR#>` | Resume in-flight `/shape` work. Detect phase, ingest new context (PR comments / new sources), pre-push verify per § Working inside a sibling repo rules 4+5. | `continue` skill. |
 | `/zoom-out <target>` | Per-work-item zoom-out brief — surface big-picture fit during deep focus. Auto-fired at `/shape` Phase 1→2 + Phase 2→3 boundaries; manual elsewhere. | `zoom-out` skill. |
@@ -746,6 +748,7 @@ the agent applies on every turn:
 | Sharing context, design discussion, customer interaction               | `/capture <scope>` (scope: `brain` / `org` / `<repo>`)      |
 | "let's discuss X" / "what do we think about X" / "add to the X discussion" / an unresolved question worth a trail | `/capture` → `wiki/<scope>/topics/<slug>.md` (new or dated append) |
 | "this looks stale / outdated"                                          | `/groom`                                                    |
+| "walk the product as a user" / "test as a persona" / "playthrough"     | `/playthrough <persona> [<scenario>]`                       |
 | "is the brain healthy?" / "sweep please"                               | `/sync`                                                     |
 | "tend the brain" / "do the inbox" / "digest the queue" / "catch the brain up" | `/tend [<budget>]`                                    |
 | "this insight should become a project"                                 | `/promote <insight>`                                        |

@@ -4,6 +4,18 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.16.0 — 2026-07-12
+- Persona playthrough loop (pitch → PRD → ADR → build, one bet):
+  four brain-as-product user personas, the `/playthrough` skill
+  (real execution, transcripts to sources/playthroughs/, findings
+  as confidence-capped insights), and a version-cursor producer
+  queueing one sweep per shipped release.
+- Cold-start fixes from the first dogfood walk: non-interactive
+  `setup` no longer consents to side-effectful steps (timer, PATH
+  symlink, npm) without `--yes`; a fresh clone's first `brain` run
+  shows a self-refreshing "building the site" placeholder instead
+  of a raw JSON error while the first UI build lands.
+
 ## 0.15.0 — 2026-07-12
 - Surfaces settle at MCP + CLI (superseding ADR mcp-cli-surface):
   the embedded terminal removed — PTY bridge, websocket slice,

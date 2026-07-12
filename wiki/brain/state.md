@@ -26,6 +26,13 @@ into the sections below.
 
 ## Now
 
+- **The playthrough loop is live (0.16.0, 2026-07-12).** Synthetic
+  users walk every release: personas in
+  `.claude/personas/users/`, `/playthrough` protocol, transcripts
+  at `sources/playthroughs/`, findings as confidence-capped
+  insights, sweeps queued per version bump. First walk (Noor,
+  cold-start) fixed two setup/first-run defects in-session.
+
 - **Surfaces settled at MCP + CLI (0.15.0, 2026-07-12).** The
   embedded terminal removed by superseding ADR
   ([mcp-cli-surface](adrs/mcp-cli-surface.md)) the same week as the

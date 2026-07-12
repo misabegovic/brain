@@ -1500,6 +1500,24 @@ def cmd_serve(args) -> int:
             # rendered wiki — including "/" (the home dashboard page).
             if serve_static(url.path):
                 return
+            if workbench:
+                # First run: no build exists yet. The status poll has
+                # already kicked one; a raw JSON error here was the
+                # Noor cold-start playthrough's give-up point
+                # (2026-07-12) — show a self-refreshing placeholder
+                # until the build lands.
+                self._send_text(200, (
+                    "<!doctype html><html><head><meta charset='utf-8'>"
+                    "<meta http-equiv='refresh' content='5'>"
+                    "<title>brain</title>"
+                    "<style>:root{color-scheme:light dark}"
+                    "body{font:15px/1.5 system-ui,sans-serif;display:grid;"
+                    "place-items:center;height:100vh;margin:0}</style>"
+                    "</head><body><p>Building the knowledge site for the "
+                    "first time&hellip; this page refreshes itself "
+                    "(usually under a minute).</p></body></html>"),
+                    "text/html; charset=utf-8")
+                return
             self._send_json(404, {"error": "unknown endpoint "
                                            "(and no UI build to serve — "
                                            "run tools/ui-build.sh)"})
@@ -2400,7 +2418,13 @@ def cmd_setup(args) -> int:
         if yes:
             return True
         if not interactive:
-            return default
+            # Piped/CI stdin without --yes must never consent to
+            # side-effectful steps (timer, PATH symlink, npm) — the
+            # Noor cold-start playthrough caught setup auto-installing
+            # through a pipe, 2026-07-12.
+            print(f"  − {question} — skipped (non-interactive; "
+                  f"re-run with --yes to accept)")
+            return False
         answer = input(f"  {question} [{'Y/n' if default else 'y/N'}] ").strip().lower()
         return default if not answer else answer in ("y", "yes")
 
@@ -5039,9 +5063,51 @@ def _schedule_run_inbox_refresh() -> int:
             (INBOX_DIR / f"{item['id']}.json").unlink(missing_ok=True)
             removed += 1
 
+    _playthrough_queue_slice()
+
     print(f"inbox-refresh: {added} added, {updated_n} refreshed, "
           f"{removed} cleared; {len(_inbox_items())} pending total")
     return 0
+
+
+PLAYTHROUGH_CURSOR = WIKI / "_state" / "playthrough-cursor.json"
+
+
+def _playthrough_queue_slice() -> None:
+    """Queue one persona-playthrough sweep per shipped version.
+
+    Distinct produced_by so the inbox-refresh reconciler never
+    clears a pending sweep — the item persists until tended. The
+    cursor advances at queue time, so a swept (inbox done) item is
+    not re-queued. First run initialises the cursor silently: a
+    fresh shell or newborn instance owes no sweep.
+    """
+    version_path = REPO / "VERSION"
+    if not version_path.exists():
+        return
+    version = version_path.read_text().strip()
+    if PLAYTHROUGH_CURSOR.exists():
+        seen = json.loads(PLAYTHROUGH_CURSOR.read_text()).get("version")
+    else:
+        seen = None
+    if seen == version:
+        return
+    if seen is not None:
+        slug = re.sub(r"[^a-zA-Z0-9]+", "-", version)
+        inbox_add(
+            id=f"playthrough-{slug}",
+            kind="custom",
+            summary=f"{version} shipped — persona playthrough sweep "
+                    f"before the next slice",
+            route="/playthrough",
+            source="VERSION",
+            priority="normal",
+            produced_by="playthrough-cursor",
+            update=True,
+        )
+    PLAYTHROUGH_CURSOR.write_text(json.dumps(
+        {"version": version, "queued": today_utc().isoformat()},
+        indent=2) + "\n")
 
 
 def _schedule_run_deadline_countdown() -> int:

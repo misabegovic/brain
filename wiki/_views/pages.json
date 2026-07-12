@@ -541,7 +541,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 4440
+      "tokens": 4600
     },
     {
       "path": "brain/state.md",
@@ -553,7 +553,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1921
+      "tokens": 2017
     },
     {
       "path": "brain/topics/chat-surface-necessity.md",
@@ -606,6 +606,21 @@
         "../../../sources/conversations/2026-07-10--openknowledge-direction-and-ui-stress.md"
       ],
       "tokens": 278
+    },
+    {
+      "path": "insights/quickstart-third-command-fragility.md",
+      "title": "The quickstart's third command (`brain`) is fragile on cold-start machines",
+      "kind": "insight",
+      "status": "draft",
+      "updated": "2026-07-12",
+      "confidence": "low",
+      "affected_personas": [
+        ".claude/personas/users/noor-cold-start-adopter.md"
+      ],
+      "sources": [
+        "sources/playthroughs/2026-07-12--noor-cold-start-adopter--readme-quickstart.md"
+      ],
+      "tokens": 478
     },
     {
       "path": "org/competitive-positioning.md",

@@ -18,6 +18,17 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **0.16.0: the persona playthrough loop.** User
+  personas for the brain-as-product
+  ([PRD](brain/prds/persona-playthrough-loop.md) ·
+  [ADR](brain/adrs/persona-playthrough-loop.md)): `/playthrough`
+  executes scenarios for real, transcripts snapshot to
+  `sources/playthroughs/`, findings become `confidence: low`
+  insights until a human confirms, and every version bump queues a
+  sweep. The dogfood walk (Noor, cold-start) caught two defects —
+  non-tty setup auto-consent and a raw-JSON first-run app pane —
+  both fixed in-session, plus one open
+  [insight](insights/quickstart-third-command-fragility.md).
 - **2026-07-12** — **0.15.0: surfaces settle at MCP + CLI.** The
   embedded terminal removed on the operator's call
   ([superseding ADR](brain/adrs/mcp-cli-surface.md)) — it was an
