@@ -250,7 +250,9 @@ Gates: `brain.py validate` + auto-stages `wiki/_views/` regen +
 | `/rebase`                    | Cheap-rebase onto `origin/main`, auto-resolving `wiki/_views/` conflicts via regen.               |
 
 Full protocols live in `.claude/skills/<skill>/SKILL.md`; governance
-rules in `AGENTS.md` § Governance.
+rules in `AGENTS.md` § Governance. PR descriptions are plain-English
+executive summaries (see `.github/pull_request_template.md`) — no
+personal data, no boilerplate.
 
 ## External integrations
 
