@@ -184,3 +184,7 @@
    diff: 24 files, +715/-1541
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — 496dc12: 0.17.0 — presentation layer ships: Priya walk + docs + version
+   diff: 16 files, +189/-35
+   restricted-paths: true
+   by: claude (fable 5)
