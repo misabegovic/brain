@@ -200,3 +200,7 @@
    diff: 2 files, +32/-19
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — fce1ae5: 0.19.1 — the delegated cold-start
+   diff: 9 files, +160/-13
+   restricted-paths: true
+   by: claude (fable 5)
