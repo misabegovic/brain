@@ -232,3 +232,7 @@
    diff: 10 files, +150/-15
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 merge — PR #9: Deliver: operator-trust fixes (Viktor cluster)
+   diff: 12 files, +230/-12
+   restricted-paths: true
+   by: claude (fable 5)
