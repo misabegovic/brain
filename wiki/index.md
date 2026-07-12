@@ -18,6 +18,14 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **delivered: serving-mode hardening (Sam cluster).**
+  The ai-suggestions draft exclusion now holds on every read surface
+  in serving mode — the `brain.py serve` JSON API, `pages.json`,
+  `/views/*`, the `search` CLI, and a serving-mode static UI build —
+  not just the MCP. And the MCP HTTP surface gained the same loopback
+  `Host`-header guard `brain.py serve` uses, so anti-DNS-rebinding
+  holds by construction on both. SECURITY.md states each property
+  once.
 - **2026-07-12** — **delivered: reader-trust fixes (Priya cluster).**
   Generated reading lists and the trail now mark superseded status
   and render human titles instead of raw slugs; custom/role views

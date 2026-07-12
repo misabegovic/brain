@@ -228,3 +228,7 @@
    diff: 14 files, +180/-40
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 merge — PR #8: Deliver: serving-mode hardening (Sam security cluster)
+   diff: 10 files, +150/-15
+   restricted-paths: true
+   by: claude (fable 5)

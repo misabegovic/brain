@@ -12,8 +12,11 @@ import { inboxItems, sectionBullets, version } from '../lib/data.mjs';
 const all = (await getCollection('docs')).filter(
   (e) => !e.id.startsWith('_'),
 );
+const serving = process.env.BRAIN_SERVING === '1';
 const live = all.filter(
-  (e) => !['superseded', 'archived'].includes(e.data.status ?? ''),
+  (e) =>
+    !['superseded', 'archived'].includes(e.data.status ?? '') &&
+    !(serving && e.id.includes('ai-suggestions/')),
 );
 const href = (e) =>
   '/' + (e.id === 'index' ? 'home' : e.id.replace(/\/index$/, '')) + '/';
