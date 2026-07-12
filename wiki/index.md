@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **personal-data guard wired into the harness.** A
+  `commit-msg` git hook + a `/pr` check
+  ([`brain.py check-no-personal-data`], [ADR](brain/adrs/no-personal-data-in-public-artifacts.md))
+  reject session URLs and account-tied links in commit messages and
+  PR bodies — deterministically, so no harness directive can leak
+  them. Setup installs the hook; a PR template + CONTRIBUTING note
+  carry the human-facing convention. Every born instance inherits it.
 - **2026-07-12** — **delivered: operator-trust fixes (Viktor cluster).**
   Producer death is now first-class health — a heartbeat lets
   `doctor` fail distinctly when the accumulation loop stalls, and

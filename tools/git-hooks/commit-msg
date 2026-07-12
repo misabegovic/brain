@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# brain commit-msg hook — reject personal data (session URLs,
+# account-tied links) in commit messages before they land in a
+# public repo. Wired so no harness directive can leak a session URL.
+#
+# Install with:
+#   ln -s ../../tools/git-hooks/commit-msg .git/hooks/commit-msg
+#
+# Bypass (don't, routinely) with `git commit --no-verify`.
+set -euo pipefail
+REPO=$(git rev-parse --show-toplevel)
+PY="$HOME/.local/share/mempalace-venv/bin/python3"
+[ -x "$PY" ] || PY=python3
+if ! "$PY" "$REPO/tools/brain.py" check-no-personal-data --file "$1"; then
+  echo "" >&2
+  echo "✗ commit refused: strip the personal data above and re-commit." >&2
+  exit 1
+fi

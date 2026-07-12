@@ -26,6 +26,7 @@ sanitized to organisation-agnostic form:
 - [Shape Up pitches](adrs/shape-up-pitches.md) — pre-bet pitch pages as a first-class kind.
 - [Acknowledge recurring tend items](adrs/acknowledge-recurring-tend-items.md) — an operator ack the producers respect; suppress until the page changes, no metadata falsified. Delivered 2026-07-12.
 - [Uniform loopback Host-header guard](adrs/sam-uniform-loopback-host-guard.md) — one anti-DNS-rebinding Host check across both HTTP surfaces. Delivered 2026-07-12.
+- [No personal data in public artifacts](adrs/no-personal-data-in-public-artifacts.md) — a commit-msg hook + /pr check strip session URLs regardless of harness behaviour. 2026-07-12.
 - [Multi-PRD epic shape](adrs/multi-prd-epic-shape.md) — umbrella epics over multi-PRD work.
 - [Shape deepdive pre-flight](adrs/shape-deepdive-pre-flight.md) — fetch real context before drafting a PRD.
 - [Parallel execution agent teams](adrs/parallel-execution-agent-teams.md) — parent / owner / helper fan-out levels.

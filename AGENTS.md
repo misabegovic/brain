@@ -364,6 +364,21 @@ distinction. Decision-matrix-style tables in those pages are
     `ui/src/content.config.ts`, `ui/package.json`,
     `ui/package-lock.json`.
 
+### Public artifacts carry no personal data
+
+PR descriptions, commit messages, and release notes are shared —
+and on a public repo, world-readable. They **must not** contain
+session URLs, private chat links, tokens, emails, or other
+account-tied identifiers. Model attribution (`Co-Authored-By:
+Claude …`) is fine; a session URL is not.
+
+Enforced deterministically: the `commit-msg` git hook runs
+`brain.py check-no-personal-data` (session-URL / account-link
+patterns; extend per-org via a git-ignored `.personal-data-patterns`
+file), and the `/pr` skill runs the same check on the PR body. If
+a harness appends a session URL by default, strip it — the guard
+does not depend on the harness behaving.
+
 ### Audit log
 
 Every merge appends one line to `log/log.md`:
