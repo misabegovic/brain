@@ -119,7 +119,7 @@
         "../prds/human-legible-presentation-layer.md",
         "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md"
       ],
-      "tokens": 941
+      "tokens": 1153
     },
     {
       "path": "brain/adrs/kernel-manifest-instancing.md",

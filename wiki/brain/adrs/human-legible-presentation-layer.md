@@ -23,15 +23,18 @@ sources:
 sentences), validated for shape when present, exported through
 `pages.json`; the validator warns — never fails — on live
 commitment-class pages that lack one, and `/groom` owns drift
-checking. **The briefing:** a custom Astro page (like the
-onboarding deck) rendered at build time from data the repo already
+checking. **The UI:** a complete rewrite of the
+layer, not an extension — Starlight (the generic docs theme)
+retires; `ui/` becomes a purpose-built Astro app whose root *is*
+the briefing, rendered at build time from data the repo already
 derives — `pages.json` for kinds/statuses/appetites/summaries, the
 inbox directory for pending work and verdicts, `state.md` for the
-orientation strip. It becomes the app's landing surface (the
-`/workbench` knowledge pane opens it; the docs home remains the
-corpus index one click away). No client-side data fetching, no
-graph/chart dependencies — anything visual is computed at build
-time into plain markup. **Attention:** two verbs on the existing
+orientation strip. Wiki pages render inside the same app at their
+existing paths with lifecycle-aware chrome (kind, status,
+confidence, summary, the ai-suggestion banner); Pagefind stays for
+search; the dependency set shrinks to Astro + Pagefind. No
+client-side data fetching, no graph/chart dependencies — anything
+visual is computed at build time into plain markup. **Attention:** two verbs on the existing
 inbox — `inbox judge <id>` stamps a verdict
 (needs-operator / fyi / routine, routine being the default under
 uncertainty) plus a one-line reason onto the item's JSON;
@@ -56,10 +59,17 @@ introduce state.
 
 ## Alternatives
 
-- **Build-time Astro page + frontmatter summaries + inbox verbs**
-  *(chosen)* — zero new dependencies, zero new stores, rebuilt by
-  the self-heal loop that already exists; judgement rides the
-  inbox the tend session already touches.
+- **Purpose-built Astro app + frontmatter summaries + inbox
+  verbs** *(chosen)* — the layer is rewritten around the briefing
+  (operator direction, mid-shaping: "a complete rewrite of the UI
+  layer, not an extension"); dependencies shrink (Starlight out),
+  zero new stores, rebuilt by the self-heal loop that already
+  exists; judgement rides the inbox the tend session already
+  touches.
+- **Extend Starlight with a briefing page** — the pre-correction
+  shape of this ADR: cheapest, but the frame stays a generic docs
+  site and the opinion lives in an annex; the operator rejected it
+  explicitly. Superseded in-flight by the rewrite bet.
 - **A live server-rendered briefing** (the `/dash` pattern grown
   up) — always-fresh, but duplicates the rendered site's styling
   layer in Python strings and dies in serving mode; the static
@@ -90,5 +100,11 @@ introduce state.
 - **Costs** discipline: summaries are only as good as the agent's
   edit habit; the validator warning and `/groom`'s drift check are
   reminders, not gates. Accepted, revisitable if drift appears.
+- **Costs** the rewrite itself: navigation, page chrome, search
+  wiring, and the onboarding deck are re-implemented rather than
+  inherited from the theme. Accepted — the theme's genericity was
+  the problem being solved.
 - **Retains** every standing guarantee: read-only UI, no second
-  content store, no scheduled LLM, serving mode unchanged.
+  content store, no scheduled LLM, serving mode unchanged; wiki
+  page URLs keep their existing shape so links and bookmarks
+  survive.
