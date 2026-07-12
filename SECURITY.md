@@ -1,8 +1,10 @@
 # Security
 
-Report vulnerabilities privately to **m.isabegovic@hotmail.com** —
-please do not open public issues for security reports. You should
-receive a response within a few days.
+Report vulnerabilities privately via **GitHub's private
+vulnerability reporting** (Security tab → "Report a vulnerability"
+on this repository) — please do not open public issues for security
+reports. For anything non-sensitive, a regular GitHub issue is
+fine. You should receive a response within a few days.
 
 Scope notes for reporters:
 

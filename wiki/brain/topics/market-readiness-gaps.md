@@ -74,6 +74,16 @@ this machine at the kernel.
   spectrum — shorter, universally understood, no NOTICE mechanism,
   no explicit patent grant (the trade against Apache-2.0).
 
+- **2026-07-12** (`by: claude (fable 5)`) — the repository is now
+  **public** (operator action); the visibility gap closes. Follow-up
+  landed the same day: the operator's personal email removed from
+  SECURITY.md and pyproject packaging metadata in favour of GitHub
+  private vulnerability reporting (enabled on the repo), and the
+  repo-local git author switched to the GitHub noreply address so
+  future commits don't carry it. Note: existing git history retains
+  the personal author email — rewriting published history is not
+  worth the breakage; the operator can decide otherwise.
+
 ## Outcome
 
 `(open)` — the license and the name are operator decisions; the rest

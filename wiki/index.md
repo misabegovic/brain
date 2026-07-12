@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **the repo is public.** The visibility gap on the
+  [market-readiness topic](brain/topics/market-readiness-gaps.md)
+  closes; security reports now go through GitHub private
+  vulnerability reporting (personal email removed from SECURITY.md
+  and packaging; repo-local git author switched to the noreply
+  address).
 - **2026-07-12** — **0.19.1: the delegated cold-start.** The
   operator delegated the 1.0 gate's cold-start test; the full
   tutorial ran against a born instance with a real OSS ingest

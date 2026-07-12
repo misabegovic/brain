@@ -4,6 +4,12 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.19.2 — 2026-07-12
+- Repo public: SECURITY.md now directs to GitHub private
+  vulnerability reporting (enabled) instead of a personal email;
+  email removed from packaging metadata; repo-local commits switch
+  to the GitHub noreply author.
+
 ## 0.19.1 — 2026-07-12
 - Delegated cold-start: the full first-session tutorial executed
   against a born instance with a real OSS ingest (1.0 criteria 3+4

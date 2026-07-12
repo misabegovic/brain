@@ -11,7 +11,7 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.11"
-authors = [{ name = "Muhamed Isabegovic", email = "m.isabegovic@hotmail.com" }]
+authors = [{ name = "Muhamed Isabegovic" }]
 dependencies = ["pyyaml>=6"]
 dynamic = ["version"]
 
