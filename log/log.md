@@ -148,3 +148,7 @@
    diff: 30 files, +381/-668
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — d707944: shape(persona-playthrough-loop) Phase 1: pitch + PRD
+   diff: 7 files, +252/-2
+   restricted-paths: false
+   by: claude (fable 5)
