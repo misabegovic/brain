@@ -125,3 +125,7 @@
    diff: 13 files changed, 122 insertions(+), 10 deletions(-)
    restricted-paths: false
    by: claude (fable 5)
+2026-07-12 commit — ff875f0: CI cron disarmed (one-runner enforcement; queue-and-tend amendment 2)
+   diff: 4 files changed, 24 insertions(+), 10 deletions(-)
+   restricted-paths: true
+   by: claude (fable 5)
