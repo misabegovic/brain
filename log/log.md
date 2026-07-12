@@ -144,3 +144,7 @@
    diff: 5 files, +97/-36
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — 98565b6: 0.15.0 — surfaces settle at MCP + CLI: embedded terminal removed
+   diff: 30 files, +381/-668
+   restricted-paths: true
+   by: claude (fable 5)
