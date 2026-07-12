@@ -168,3 +168,7 @@
    diff: 6 files, +128/-10
    restricted-paths: false
    by: claude (fable 5)
+2026-07-12 commit — 883bb56: shape(human-legible-presentation-layer) Phase 2: ADR
+   diff: 5 files, +112/-2
+   restricted-paths: false
+   by: claude (fable 5)
