@@ -6629,7 +6629,12 @@ def cmd_reflection_check(args) -> int:
         )
         scan: set[Path] = {REPO / "AGENTS.md", REPO / "README.md"}
         for pattern in (".claude/**/*.md", "tools/**/*.md", "ui/*.md",
-                        "ui/*.mjs", "wiki/**/*.md"):
+                        "ui/*.mjs", "wiki/**/*.md",
+                        # UI source strings too — the onboarding deck
+                        # leak (2026-07-12) hid inside a TS array the
+                        # markdown-only sweep never read.
+                        "ui/src/**/*.astro", "ui/src/**/*.mjs",
+                        "ui/src/**/*.ts"):
             scan.update(REPO.glob(pattern))
         n = 0
         seen: set[tuple[str, str]] = set()
@@ -6661,8 +6666,55 @@ def cmd_reflection_check(args) -> int:
                 n += 1
         return n
 
+    def check_denylist() -> int:
+        """Machine-local content denylist (never committed).
+
+        The standalone guarantee's other half: internal-refs catches
+        dangling paths, but a client/org term leaking into the public
+        kernel is prose, not a path. Operators keep one term per line
+        in .reflection-denylist (git-ignored; BRAIN_DENYLIST
+        overrides) — client names, internal repo names, anything that
+        must never ship. Absent file → clean no-op, so the check is
+        personal by construction: the terms themselves never enter
+        the repo.
+        """
+        deny_path = Path(os.environ.get(
+            "BRAIN_DENYLIST", REPO / ".reflection-denylist"))
+        if not deny_path.exists():
+            return 0
+        terms = [ln.strip() for ln in deny_path.read_text().splitlines()
+                 if ln.strip() and not ln.startswith("#")]
+        if not terms:
+            return 0
+        n = 0
+        skip_re = re.compile(
+            r"node_modules|\.git/|_views/|\.build-cache|dist/|"
+            r"\.astro/|\.env|\.reflection-denylist")
+        tracked = subprocess.run(
+            ["git", "ls-files"], cwd=REPO, capture_output=True,
+            text=True).stdout.splitlines()
+        for rel in tracked:
+            if skip_re.search(rel):
+                continue
+            f = REPO / rel
+            if not f.is_file():
+                continue
+            try:
+                text = f.read_text(errors="ignore").lower()
+            except OSError:
+                continue
+            for term in terms:
+                if term.lower() in text:
+                    findings.append(
+                        f"denylist: {rel} contains a deny-listed term "
+                        f"(#{terms.index(term) + 1} in "
+                        f"{deny_path.name})")
+                    n += 1
+        return n
+
     runners = {
         "links": check_links,
+        "denylist": check_denylist,
         "confidence-floor": check_confidence_floor,
         "active-scope": check_active_scope,
         "supersedes-cycles": check_supersedes_cycles,

@@ -26,6 +26,20 @@ into the sections below.
 
 ## Now
 
+- **PR mode is the operating mode (2026-07-12).** The operator
+  removed `LOCAL_FIRST` from this brain's `.env`: agents work on
+  feature branches, every change lands via PR with CI green, and
+  `/shape` outputs need human-approved review before merge. Named
+  deviations from the local-first period (inline-approved ADRs to
+  the accepted shelf, direct pushes) are closed going forward.
+
+- **The standalone guarantee grew teeth (0.19.3, 2026-07-12).**
+  internal-refs now reads UI source strings (the onboarding-deck
+  leak class) — and caught a dangling ADR reference on arrival —
+  and a machine-local, never-committed denylist
+  (`.reflection-denylist`, `BRAIN_DENYLIST` override) lets an
+  operator flag client terms without shipping them.
+
 - **Onboarding is built in (0.19.0, 2026-07-12).** The deck teaches
   the current product (incl. a first-session tutorial); the README
   points to it; every shelf home doubles as a generated project

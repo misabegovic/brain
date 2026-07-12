@@ -4,6 +4,16 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.19.3 — 2026-07-12
+- Standalone-guarantee detectors: internal-refs scans ui/src source
+  strings (.astro/.mjs/.ts) — immediately caught a dangling ADR
+  reference in the onboarding deck's header; new `denylist`
+  reflection check reads a machine-local, git-ignored
+  .reflection-denylist (BRAIN_DENYLIST override) so operators can
+  flag org/client terms without committing them.
+- Operating mode: LOCAL_FIRST removed on this brain (operator
+  direction) — changes land via PR with CI green from here on.
+
 ## 0.19.2 — 2026-07-12
 - Repo public: SECURITY.md now directs to GitHub private
   vulnerability reporting (enabled) instead of a personal email;

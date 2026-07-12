@@ -241,3 +241,47 @@ def test_playthrough_surfaces_ship():
     assert (REPO / ".claude" / "commands" / "playthrough.md").exists()
     personas = list((REPO / ".claude" / "personas" / "users").glob("*.md"))
     assert len(personas) >= 4, "the brain's own user personas must ship"
+
+
+# ---------- standalone-guarantee detectors (0.19.3) ------------------------
+
+def test_denylist_flags_planted_term(tmp_path):
+    """The machine-local denylist catches a term anywhere in tracked
+    files; an absent list is a clean no-op."""
+    import os
+    import subprocess
+    deny = tmp_path / "denylist"
+    deny.write_text("# comment\nzzz-planted-clientname\n")
+    rogue = REPO / ".claude" / "_rogue_denylist_test.md"
+    rogue.write_text("This mentions ZZZ-Planted-ClientName in prose.\n")
+    subprocess.run(["git", "add", str(rogue)], cwd=REPO,
+                   capture_output=True)
+    try:
+        env_saved = os.environ.get("BRAIN_DENYLIST")
+        os.environ["BRAIN_DENYLIST"] = str(deny)
+        assert _run_reflection("denylist") == 1, (
+            "denylist missed a planted term in a tracked file")
+        os.environ["BRAIN_DENYLIST"] = str(tmp_path / "absent")
+        assert _run_reflection("denylist") == 0, (
+            "absent denylist must be a clean no-op")
+    finally:
+        if env_saved is None:
+            os.environ.pop("BRAIN_DENYLIST", None)
+        else:
+            os.environ["BRAIN_DENYLIST"] = env_saved
+        subprocess.run(["git", "rm", "-f", "--cached", str(rogue)],
+                       cwd=REPO, capture_output=True)
+        rogue.unlink(missing_ok=True)
+
+
+def test_internal_refs_scans_ui_source_strings():
+    """The onboarding-deck leak class: a dangling repo path inside a
+    UI TypeScript/Astro string must be caught."""
+    rogue = REPO / "ui" / "src" / "_rogue_ref_test.ts"
+    rogue.write_text(
+        'const doc = "see tools/definitely-not-a-real-file.py";\n')
+    try:
+        assert _run_reflection("internal-refs") == 1, (
+            "internal-refs missed a dangling path in ui/src source")
+    finally:
+        rogue.unlink()

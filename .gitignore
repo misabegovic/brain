@@ -59,3 +59,4 @@ wiki/_views/index.db.tmp
 
 # Serving-mode query audit log (local, append-only)
 log/queries.log
+.reflection-denylist
