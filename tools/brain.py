@@ -106,6 +106,19 @@ def _producer_health() -> dict:
             else "stalled", "hours": round(age_h, 1)}
 
 
+def serving_mode() -> bool:
+    """BRAIN_SERVING=1 marks a deployment serving people outside the
+    product: ai-suggestion drafts are excluded from every read
+    surface. Mirrors tools/brain-mcp.py serving_mode() so the CLI,
+    the local HTTP server, and the MCP agree by construction
+    (Sam serving-mode finding, 2026-07-12)."""
+    return os.environ.get("BRAIN_SERVING", "") == "1"
+
+
+def _suggestion_path(rel: str) -> bool:
+    return "/ai-suggestions/" in ("/" + rel)
+
+
 def _local_first(env_path) -> bool:
     """True only when .env declares LOCAL_FIRST=true on its own line.
 
@@ -738,10 +751,16 @@ def cmd_stats(_args) -> int:
 
 
 def collect_pages_data() -> list[dict]:
-    """Build the structured per-page list used by views and serve."""
+    """Build the structured per-page list used by views and serve.
+
+    In serving mode, ai-suggestion drafts are excluded so /pages.json
+    and /views/* never surface them (Sam serving-mode finding)."""
     pages = wiki_pages()
+    serving = serving_mode()
     out = []
     for p in pages:
+        if serving and _suggestion_path(str(p.relative_to(WIKI))):
+            continue
         parsed = parse(p)
         if parsed is None:
             continue
@@ -1501,6 +1520,11 @@ def cmd_serve(args) -> int:
 
             if path.startswith("/pages/"):
                 rel = path[len("/pages/"):]
+                if serving_mode() and _suggestion_path(rel):
+                    self._send_json(403, {"error": "ai-suggestions are "
+                        "drafts pending human review and are excluded in "
+                        "serving mode"})
+                    return
                 target = WIKI / rel
                 if not target.exists() or ".." in rel:
                     self._send_json(404, {"error": "not found"})
@@ -4370,12 +4394,14 @@ VIEWS_SPEC_DIR = REPO / "views"
 CUSTOM_VIEWS_DIR = WIKI / "_views" / "custom"
 
 
-def _compile_block(block: dict) -> tuple[str, list]:
-    """One spec block → (sql, params). Raw `sql:` is the full tier;
-    the shorthands (`pages:`, `state:`, `inbox:`) compile to SQL —
-    never bypass it (per the sql-views-over-derived-index ADR)."""
+def _compile_block(block: dict) -> tuple[str, list, str]:
+    """One spec block → (sql, params, style). Raw `sql:` is the full
+    tier; the shorthands (`pages:`, `state:`, `inbox:`) compile to SQL
+    — never bypass it (per the sql-views-over-derived-index ADR). The
+    style tag lets the renderer present pages as a reader-facing brief
+    (title links, not raw paths) rather than a table."""
     if block.get("sql"):
-        return block["sql"], []
+        return block["sql"], [], "raw"
     if "pages" in block:
         f = block["pages"] or {}
         where, params = [], []
@@ -4390,10 +4416,11 @@ def _compile_block(block: dict) -> tuple[str, list]:
             params.append(f["repo"])
         clause = (" WHERE " + " AND ".join(where)) if where else ""
         return (f"SELECT path, title, status, confidence, updated "
-                f"FROM pages{clause} ORDER BY updated DESC, path", params)
+                f"FROM pages{clause} ORDER BY updated DESC, path",
+                params, "pages")
     if "state" in block:
         return ("SELECT key, value FROM state WHERE surface = ? "
-                "ORDER BY key", [block["state"]])
+                "ORDER BY key", [block["state"]], "state")
     if "inbox" in block:
         f = block["inbox"] or {}
         if isinstance(f, str):
@@ -4405,10 +4432,40 @@ def _compile_block(block: dict) -> tuple[str, list]:
         clause = (" WHERE " + " AND ".join(where)) if where else ""
         return (f"SELECT id, kind, priority, summary FROM inbox{clause} "
                 f"ORDER BY CASE priority WHEN 'high' THEN 0 "
-                f"WHEN 'normal' THEN 1 ELSE 2 END, produced_at, id", params)
+                f"WHEN 'normal' THEN 1 ELSE 2 END, produced_at, id",
+                params, "inbox")
     raise ValueError(
         f"block {block.get('title', '?')!r} needs one of: sql, pages, "
         f"state, inbox")
+
+
+def _page_link(path: str) -> str:
+    """A wiki path → a clean-URL markdown link target (mirrors the UI)."""
+    slug = re.sub(r"\.md$", "", path)
+    slug = re.sub(r"/index$", "", slug)
+    slug = "" if slug in ("index", "") else slug
+    return "/" + slug + ("/" if slug else "")
+
+
+def _render_pages_brief(rows: list, empty: str) -> str:
+    """Render page rows as a reader-facing brief: one bullet per page,
+    linked by title, with status + date — never a raw path column
+    (Priya reader-trust finding, 2026-07-12)."""
+    if not rows:
+        return empty + "\n"
+    out = []
+    for path, title, status, confidence, updated in rows:
+        title = str(title).replace("[", "").replace("]", "")
+        marks = []
+        if status and status not in ("living", "accepted"):
+            marks.append(f"**{status}**")
+        elif status:
+            marks.append(status)
+        if updated:
+            marks.append(f"updated {updated}")
+        tail = " — " + " · ".join(marks) if marks else ""
+        out.append(f"- [{title}]({_page_link(path)}){tail}")
+    return "\n".join(out) + "\n"
 
 
 def _render_rows(cols: list[str], rows: list) -> str:
@@ -4460,25 +4517,37 @@ def _render_custom_views() -> list[str]:
             "",
             f"# {spec.get('title', name)}",
             "",
-            f"Auto-generated by `brain.py views` from "
-            f"`views/{spec_path.name}` — edit the spec, not this page."
-            + (f" Audience: {spec['audience']}."
-               if spec.get("audience") else ""),
-            "",
         ]
+        # Reader-first: the description (what the view is for) leads;
+        # the "generated, edit the spec" note is a quiet footer, not
+        # the opening line (Priya reader-trust finding, 2026-07-12).
         if spec.get("description"):
             parts += [spec["description"], ""]
         for block in spec.get("blocks") or []:
             parts.append(f"## {block.get('title', '(untitled block)')}")
             parts.append("")
+            empty = block.get("empty") or "*Nothing here right now.*"
             try:
-                sql, params = _compile_block(block)
+                sql, params, style = _compile_block(block)
                 cur = db.execute(sql, params)
                 rows = cur.fetchmany(int(block.get("limit", 20)))
                 cols = [d[0] for d in cur.description or []]
-                parts.append(_render_rows(cols, rows))
+                if style == "pages":
+                    parts.append(_render_pages_brief(rows, empty))
+                elif not rows:
+                    parts.append(empty + "\n")
+                else:
+                    parts.append(_render_rows(cols, rows))
             except Exception as exc:
                 parts.append(f"*(block error: {exc})*\n")
+        parts += [
+            "---",
+            "",
+            f"*Generated from [`views/{spec_path.name}`]"
+            f"(../../../views/{spec_path.name}) by `brain.py views`"
+            + (f" · audience: {spec['audience']}"
+               if spec.get("audience") else "") + ".*",
+        ]
         out = CUSTOM_VIEWS_DIR / f"{name}.md"
         out.write_text("\n".join(parts))
         rendered.append(name)
@@ -6336,6 +6405,9 @@ def cmd_search(args) -> int:
         status = meta.get("status")
         if status in ("superseded", "archived") and not include_superseded:
             continue
+
+        if serving_mode() and _suggestion_path(rel):
+            continue  # drafts excluded from serving-mode search
 
         if kind_filter and meta.get("kind") != kind_filter:
             continue

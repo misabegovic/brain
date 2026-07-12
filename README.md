@@ -200,7 +200,7 @@ export BRAIN_PROJECTS_ROOT="$HOME/work"
 python3 tools/brain.py validate     # frontmatter + section conformance
 python3 tools/brain.py check        # source citations resolve
 python3 tools/brain.py stats        # corpus shape
-python3 tools/brain.py views        # regen wiki/_views/ (by-kind, by-team, by-repo, pages.json, ai-suggestions)
+python3 tools/brain.py views        # regen wiki/_views/ (by-kind/team/repo, pages.json, ai-suggestions, custom role views as reader-facing briefs)
 python3 tools/brain.py search '<q>' # hybrid keyword search
 python3 tools/brain.py status       # single-pane health dashboard
 python3 tools/brain.py inbox summary # the tend queue in one line
@@ -258,7 +258,7 @@ rules in `AGENTS.md` § Governance.
 | Datadog / Langfuse | ✅ pull connectors | Monitor+SLO state / prompt inventory → snapshots + state extracts for view tiles. |
 | GitHub / Notion / Slack | ✅ pull connectors | Snapshot-writers: immutable files into `sources/`, inbox items out. Configure `connectors:` in `brain.config.yml` + read-only tokens in `.env`. |
 | GitHub            | via `gh` CLI         | Pre-allowed in `.claude/settings.json`.                        |
-| MCP               | ✅ `tools/brain-mcp.py` | Read-only; stdio or `--http`; `BRAIN_SERVING=1` for external consumers (ai-suggestions excluded + query audit log). |
+| MCP               | ✅ `tools/brain-mcp.py` | Read-only; stdio or `--http` (loopback Host + Origin checks); `BRAIN_SERVING=1` excludes ai-suggestion drafts across *every* read surface (MCP, serve JSON API, search CLI, static build) + query audit log. |
 | Datasette         | ✅ pilot             | `tools/serve-datasette.sh` — faceted browse + SQL + JSON API over the derived index (immutable mode). |
 | mempalace         | optional             | Verbatim / semantic-recall layer.                              |
 

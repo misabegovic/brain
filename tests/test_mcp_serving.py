@@ -99,3 +99,65 @@ def test_http_transport_round_trip():
     finally:
         proc.terminate()
         proc.wait(timeout=5)
+
+
+def test_brain_serve_helpers_exclude_suggestions(monkeypatch):
+    """brain.py's shared serving-mode exclusion covers pages.json
+    (collect_pages_data) and search, matching the MCP."""
+    import sys as _sys
+    from pathlib import Path as _P
+    _sys.path.insert(0, str(_P(__file__).resolve().parent.parent / "tools"))
+    import brain
+    monkeypatch.setenv("BRAIN_SERVING", "1")
+    assert brain.serving_mode() is True
+    assert brain._suggestion_path("brain/ai-suggestions/adrs/x.md") is True
+    assert brain._suggestion_path("brain/adrs/x.md") is False
+    paths = {e["path"] for e in brain.collect_pages_data()}
+    assert not any("/ai-suggestions/" in ("/" + p) for p in paths), (
+        "serving-mode pages.json must exclude ai-suggestion drafts")
+
+
+def test_mcp_host_guard_is_uniform():
+    """The MCP HTTP surface refuses a non-loopback Host, matching
+    brain.py serve (Sam uniform-host-guard finding)."""
+    import subprocess
+    import sys as _sys
+    import time
+    import urllib.error
+    import urllib.request
+    from pathlib import Path as _P
+    repo = _P(__file__).resolve().parent.parent
+    port = 8796
+    proc = subprocess.Popen(
+        [_sys.executable, str(repo / "tools" / "brain-mcp.py"),
+         "--http", "--port", str(port)], stderr=subprocess.DEVNULL)
+    try:
+        deadline = time.time() + 12
+        body = b'{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+        while time.time() < deadline:
+            try:
+                req = urllib.request.Request(
+                    f"http://127.0.0.1:{port}/mcp", data=body,
+                    headers={"Host": "localhost", "Content-Type":
+                             "application/json"}, method="POST")
+                urllib.request.urlopen(req, timeout=3)
+                break
+            except urllib.error.HTTPError:
+                break
+            except OSError:
+                if proc.poll() is not None:
+                    break
+                time.sleep(0.3)
+        # Forged Host → 403.
+        forged = urllib.request.Request(
+            f"http://127.0.0.1:{port}/mcp", data=body,
+            headers={"Host": "evil.example.com", "Content-Type":
+                     "application/json"}, method="POST")
+        try:
+            urllib.request.urlopen(forged, timeout=3)
+            raise AssertionError("forged Host must be refused")
+        except urllib.error.HTTPError as e:
+            assert e.code == 403
+    finally:
+        proc.terminate()
+        proc.wait(timeout=5)

@@ -6,11 +6,14 @@ description: >
   the maintenance picture in one page.
 blocks:
   - title: "Tend queue (all)"
+    empty: "Queue clear — nothing waiting to tend."
     inbox: {}
     limit: 30
   - title: "Deadlines"
+    empty: "No deadlines tracked."
     state: deadlines
   - title: "Connector cursors"
+    empty: "No connectors configured."
     state: connector-cursors
   - title: "Stalest pages"
     sql: |

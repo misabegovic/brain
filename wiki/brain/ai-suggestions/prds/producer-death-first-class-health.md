@@ -10,6 +10,13 @@ repos:
   - brain
 appetite: small
 confidence: low
+summary: >-
+  The Viktor playthrough found a dead accumulation timer renders "queue
+  clear" identically to a tended-clean queue, and the timer warning is
+  flattened in with "UI deps missing" — clear-because-tended and
+  clear-because-the-producer-is-dead are indistinguishable. Suggestion:
+  treat producer/timer death as a first-class health state that
+  qualifies the queue-empty claim.
 sources:
   - sources/playthroughs/2026-07-12--viktor-daily-operator--daily-loop.md
   - tools/brain.py

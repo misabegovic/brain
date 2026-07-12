@@ -17,4 +17,14 @@ Scope notes for reporters:
   shell and carries no websocket; it is structurally excluded from
   serving deployments (`BRAIN_SERVING=1`). Since 0.15.0 the kernel
   ships no PTY bridge and spawns no harness subprocesses.
+- Both local HTTP surfaces (`brain.py serve` and `brain-mcp.py
+  --http`) apply the same loopback `Host`-header allow-list to block
+  DNS-rebinding, and the MCP surface additionally checks `Origin`.
+  Neither is a substitute for the identity-aware proxy a serving
+  deployment puts in front.
+- The `ai-suggestions/` draft shelf is excluded from every read
+  surface in serving mode (`BRAIN_SERVING=1`) — the MCP tools, the
+  `brain.py serve` JSON API (`/pages/`, `/pages.json`, `/views/*`),
+  the `brain.py search` CLI, and a serving-mode static UI build. A
+  draft leaking through any serving surface is in scope.
 - Connector credentials are expected to be read-only-scoped.
