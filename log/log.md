@@ -244,3 +244,7 @@
    diff: 9 files, +190/-3
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 merge — PR #11: Simplify the PR template to a plain-English executive summary
+   diff: 4 files, +30/-25
+   restricted-paths: true
+   by: claude (fable 5)
