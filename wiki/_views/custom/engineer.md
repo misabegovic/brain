@@ -20,6 +20,7 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 | path | title | status | confidence | updated |
 |---|---|---|---|---|
 | brain/adrs/mcp-cli-surface.md | The kernel's interaction surfaces are MCP and the CLI — the embedded terminal retires with the chat pane | accepted | medium | 2026-07-12 |
+| brain/adrs/persona-playthrough-loop.md | Playthroughs are executed skills with immutable transcripts; synthetic findings are confidence-capped insights | accepted | medium | 2026-07-12 |
 | brain/adrs/competitor-intel-ingestion.md | Competitor intel lives at wiki/org/competitors/<competitor>/index.md, ingested via the existing wiki-ingest classifier w | accepted | medium | 2026-07-10 |
 | brain/adrs/connector-snapshot-contract.md | Connectors are pull-only snapshot-writers: immutable dedup-keyed files under sources/, cursors in state, inbox items out | accepted | medium | 2026-07-10 |
 | brain/adrs/home-content-shape.md | Home page is the wiki index as an agent-maintained dashboard | accepted | medium | 2026-07-10 |
@@ -28,7 +29,6 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 | brain/adrs/operator-lesson-pattern.md | Operator lessons live as Lessons subsections on conventions pages plus one cross-cutting org page | accepted | medium | 2026-07-10 |
 | brain/adrs/parallel-efforts-on-request.md | Opt-in parallel efforts via a /spawn skill that creates per-effort worktrees and a wiki/_state/efforts/ registry, with e | accepted | medium | 2026-07-10 |
 | brain/adrs/parallel-execution-agent-teams.md | Parallel-first execution: every /spawn dispatches a background owner subagent (opt-out via --no-owner), helper fan-out i | accepted | medium | 2026-07-10 |
-| brain/adrs/queue-and-tend-inbox.md | Self-maintenance is queue-and-tend: deterministic producers accumulate a per-item inbox; synthesis digests in-session vi | accepted | high | 2026-07-10 |
 
 ## Research queue (deepening picks)
 

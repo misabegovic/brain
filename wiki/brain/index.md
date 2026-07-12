@@ -37,6 +37,7 @@ sanitized to organisation-agnostic form:
 - [Queue-and-tend inbox](adrs/queue-and-tend-inbox.md) — deterministic producers accumulate; `/tend` digests in-session; no scheduled LLM runs.
 - [Connector snapshot contract](adrs/connector-snapshot-contract.md) — connectors are pull-only snapshot-writers: immutable dedup files, cursors, inbox items out, never a wiki write.
 - [SQL views over a derived index](adrs/sql-views-over-derived-index.md) — view specs are SQL over a disposable SQLite index; shorthands compile to SQL; the index rides the views pipeline.
+- [Persona playthrough loop](adrs/persona-playthrough-loop.md) — playthroughs are executed skills with immutable transcripts; synthetic findings are confidence-capped insights.
 - [MCP + CLI surface](adrs/mcp-cli-surface.md) — the embedded terminal retires with the chat pane; the app page is the rendered knowledge under the ambient strip; billing guard degrades to a doctor warning.
 - [Workbench PTY bridge](adrs/workbench-pty-bridge.md) — **superseded** 2026-07-12 by mcp-cli-surface: the PTY bridge is removed from the kernel.
 - [Chat print-mode bridge](adrs/chat-print-mode-bridge.md) — chat as a per-harness print-mode registry; terminal demoted to a toggle; bare `brain` opens the app.

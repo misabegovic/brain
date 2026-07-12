@@ -206,6 +206,19 @@
       "tokens": 1774
     },
     {
+      "path": "brain/adrs/persona-playthrough-loop.md",
+      "title": "Playthroughs are executed skills with immutable transcripts; synthetic findings are confidence-capped insights",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "sources": [
+        "../prds/persona-playthrough-loop.md",
+        "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md"
+      ],
+      "tokens": 872
+    },
+    {
       "path": "brain/adrs/queue-and-tend-inbox.md",
       "title": "Self-maintenance is queue-and-tend: deterministic producers accumulate a per-item inbox; synthesis digests in-session via /tend \u2014 never on a schedule",
       "kind": "decision",
@@ -356,7 +369,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1413,
+      "tokens": 1448,
       "affected_by": [
         "org/competitive-positioning.md",
         "org/competitors/codeplain/index.md"
