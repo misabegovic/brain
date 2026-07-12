@@ -382,6 +382,47 @@
       "tokens": 1756
     },
     {
+      "path": "brain/ai-suggestions/prds/attention-calibration-operator-surface.md",
+      "title": "Operator-side surface for attention calibration",
+      "kind": "initiative",
+      "status": "suggested",
+      "ai_suggestion": true,
+      "updated": "2026-07-12",
+      "team": "brain",
+      "division": "(inferred)",
+      "repos": [
+        "brain"
+      ],
+      "appetite": "small",
+      "confidence": "low",
+      "sources": [
+        "sources/playthroughs/2026-07-12--viktor-daily-operator--daily-loop.md",
+        "~/projects/brain/ui/src/pages/dashboard.astro",
+        ".claude/skills/tend/SKILL.md"
+      ],
+      "tokens": 1276
+    },
+    {
+      "path": "brain/ai-suggestions/prds/producer-death-first-class-health.md",
+      "title": "Producer death as first-class health, not a notice",
+      "kind": "initiative",
+      "status": "suggested",
+      "ai_suggestion": true,
+      "updated": "2026-07-12",
+      "team": "brain",
+      "division": "(inferred)",
+      "repos": [
+        "brain"
+      ],
+      "appetite": "small",
+      "confidence": "low",
+      "sources": [
+        "sources/playthroughs/2026-07-12--viktor-daily-operator--daily-loop.md",
+        "tools/brain.py"
+      ],
+      "tokens": 1323
+    },
+    {
       "path": "brain/authoring-adrs-and-prds.md",
       "title": "Authoring ADRs and PRDs",
       "kind": "meta",
@@ -404,7 +445,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1588,
+      "tokens": 1709,
       "affected_by": [
         "org/competitive-positioning.md",
         "org/competitors/codeplain/index.md"

@@ -107,4 +107,11 @@ sanitized to organisation-agnostic form:
 
 ## AI suggestions (drafts for human review)
 
-*(none yet)*
+- [Producer death as first-class health, not a notice](ai-suggestions/prds/producer-death-first-class-health.md) —
+  PRD suggestion from the Viktor daily-operator playthrough
+  (2026-07-12): a dead accumulation timer renders as a generic
+  notice while the strip says "queue clear".
+- [Operator-side surface for attention calibration](ai-suggestions/prds/attention-calibration-operator-surface.md) —
+  PRD suggestion from the same playthrough: no pending-grades
+  list and sample-size-free grade stats let the calibration loop
+  starve silently.

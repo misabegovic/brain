@@ -1,0 +1,11 @@
+{
+  "grades": [
+    {
+      "id": "datadog-monitor-flap-2026-07-12",
+      "verdict": "routine",
+      "grade": "useful",
+      "note": "",
+      "graded": "2026-07-12"
+    }
+  ]
+}

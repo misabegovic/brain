@@ -18,6 +18,14 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **Viktor daily-operator playthrough.** The daily
+  loop ran for real (doctor/status/inbox/links, the inbox-refresh
+  producer, the judge→grade attention loop, the served briefing/
+  dashboard/strip on 8801). Queue quality verdict: no wolf-crying —
+  the producer's grace period held. Two AI-suggested PRDs landed:
+  producer-death-as-first-class-health and an operator-side surface
+  for attention calibration (transcript at
+  `sources/playthroughs/2026-07-12--viktor-daily-operator--daily-loop.md`).
 - **2026-07-12** — **0.19.3: PR mode + detector teeth.** The
   operator removed LOCAL_FIRST — every change now lands via PR with
   CI green. The internal-refs detector reads UI source strings
