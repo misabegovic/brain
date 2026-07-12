@@ -176,3 +176,7 @@
    diff: 2 files, +36/-13
    restricted-paths: false
    by: claude (fable 5)
+2026-07-12 commit — 7d33b6d: build(presentation-layer) slice A: summaries + attention verbs
+   diff: 43 files, +263/-0
+   restricted-paths: true
+   by: claude (fable 5)

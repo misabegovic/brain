@@ -1,7 +1,8 @@
 ---
 title: "Instance birth — init --full creates a working brain instance from the kernel manifest"
 kind: initiative
-status: living
+status: superseded
+superseded_by: brain/state.md
 updated: 2026-07-10
 confidence: medium
 supersedes: brain/pitches/instance-birth.md

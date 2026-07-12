@@ -837,6 +837,13 @@ genuinely independent.
   ---
   ```
   Only `title`, `kind`, `status`, `updated`, and `sources` are required.
+- **`summary:`** — optional executive summary (one to three
+  sentences, ≤600 chars), maintained by the agent whenever content
+  changes. The briefing and card components render it; humans read
+  summaries, agents read bodies. The validator warns when a
+  card-rendered kind (pitch / initiative / decision / epic / topic /
+  insight / idea) at `living`/`accepted` lacks one; `/groom` checks
+  drift.
 - **Cross-links:** relative markdown links between wiki pages.
 - **Dates:** absolute (`2026-04-29`), never relative.
 - **Voice:** present tense, declarative. Mark uncertainty explicitly with
@@ -1245,7 +1252,12 @@ producer-chosen `--id`. The `inbox-refresh` schedule op reconciles
 the deterministic slice (cursor diffs, half-life crossings, link
 health) on every run; operator-defined producers are any script that
 calls `inbox add`, registered as one more `brain-schedule.yml` entry
-(template: `tools/producers/example-producer.sh`). `/tend` digests.
+(template: `tools/producers/example-producer.sh`). `/tend`
+digests — judging external-signal items with `inbox judge <id>
+--attention needs-operator|fyi|routine --reason "..."` (in-session
+only; the briefing's Needs-you band renders the verdicts, and
+`inbox grade <id> --grade useful|noise` records the operator's
+useful/noise calibration into `wiki/_state/attention-grades.json`).
 The local timer is installed by `tools/install-timer.sh` (systemd
 user timer; prints a crontab fallback). Per
 `wiki/brain/adrs/queue-and-tend-inbox.md`: no LLM ever runs on the

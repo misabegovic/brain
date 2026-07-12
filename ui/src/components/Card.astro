@@ -1,0 +1,19 @@
+---
+// One lifecycle-aware card. `chips` entries: { label, tone? }.
+interface Props {
+  href?: string;
+  title: string;
+  summary?: string;
+  chips?: { label: string; tone?: string }[];
+  reason?: string; // attention cards: the traceable one-line verdict reason
+}
+const { href, title, summary, chips = [], reason } = Astro.props;
+---
+<li class="card">
+  <div class="chips">
+    {chips.map((c) => <span class={`chip ${c.tone ?? ''}`}>{c.label}</span>)}
+  </div>
+  <h3>{href ? <a href={href}>{title}</a> : title}</h3>
+  {reason && <p><strong>Why:</strong> {reason}</p>}
+  {summary && <p>{summary}</p>}
+</li>

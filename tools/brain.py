@@ -1235,7 +1235,8 @@ def render_app_page(views: list | None = None) -> str:
  #page {{ flex: 1; border: 0; }}
 </style></head><body>
 <div id="nav">
-  <button onclick="nav('/')">knowledge</button>
+  <button onclick="nav('/')">briefing</button>
+  <button onclick="nav('/home/')">corpus</button>
   <button onclick="nav('/dash')">status</button>
   {view_links}
   <span id="strip">…</span>
@@ -1488,7 +1489,9 @@ def cmd_serve(args) -> int:
                 self._send_json(200, {"axis": axis, "groups": dict(groups)})
                 return
 
-            if path == "/search":
+            # Without ?q= the path belongs to the UI's search page
+            # (static fallback below); with it, the JSON API answers.
+            if path == "/search" and qs.get("q"):
                 q = (qs.get("q") or [""])[0]
                 if not q:
                     self._send_json(400, {"error": "missing q"})

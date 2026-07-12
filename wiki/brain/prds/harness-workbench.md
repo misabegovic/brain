@@ -1,7 +1,8 @@
 ---
 title: "Harness workbench — the brain's local surface runs your harness terminal beside the rendered results"
 kind: initiative
-status: living
+status: superseded
+superseded_by: brain/state.md
 updated: 2026-07-10
 confidence: medium
 supersedes: brain/pitches/harness-workbench.md

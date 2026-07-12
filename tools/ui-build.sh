@@ -31,3 +31,6 @@ mkdir -p ui/.build-cache
 # transcript and CI log.
 cd ui
 npx astro build --outDir .build-cache >/dev/null
+# Pagefind indexes the fresh build so /search/ works everywhere the
+# static site is served.
+npx pagefind --site .build-cache >/dev/null 2>&1 || true

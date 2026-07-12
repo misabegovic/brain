@@ -49,7 +49,7 @@ def test_app_page_has_no_terminal():
     for gone in ("WebSocket", "xterm", "pty", "spawn(", 'id="term"'):
         assert gone not in html, f"terminal remnant in app page: {gone}"
     assert 'id="strip"' in html and 'id="page"' in html
-    assert ">knowledge</button>" in html and ">engineer</button>" in html
+    assert ">briefing</button>" in html and ">engineer</button>" in html
 
 
 def test_serving_mode_hides_app_page():

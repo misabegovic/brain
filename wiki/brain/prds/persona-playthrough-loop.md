@@ -1,7 +1,8 @@
 ---
 title: "Persona playthrough loop — every release gets walked by synthetic users; findings route to insights below the human-confirmation line"
 kind: initiative
-status: living
+status: superseded
+superseded_by: brain/state.md
 updated: 2026-07-12
 confidence: medium
 supersedes: brain/pitches/persona-playthrough-loop.md

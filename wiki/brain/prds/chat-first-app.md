@@ -1,7 +1,8 @@
 ---
 title: "Chat-first app — conversation as the interface, ambient status, one command to open it all"
 kind: initiative
-status: living
+status: superseded
+superseded_by: brain/state.md
 updated: 2026-07-10
 confidence: medium
 supersedes: brain/pitches/chat-first-app.md
