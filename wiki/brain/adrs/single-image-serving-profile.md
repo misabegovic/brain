@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  One infra-agnostic container image; BRAIN_SURFACE selects ui/mcp/datasette on the platform port; per-instance isolation via env ports and hashed timer units. Railway is a reference target, not a dependency.
 sources:
   - ../prds/composable-role-views.md
   - ../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md

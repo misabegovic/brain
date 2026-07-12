@@ -46,6 +46,36 @@ command — judge from the summary whether it still fits.
 Fan out per the parallel-first discipline when a single item has
 parallel shape (multiple files to read, multiple pages to check).
 
+#### Attention judgement (connector + external-signal items)
+
+Per `wiki/brain/adrs/human-legible-presentation-layer.md`: when an
+item carries external signal (a connector batch, a Langfuse/Datadog
+state change, anything the operator did not author), judge whether
+the operator personally needs to look **before** clearing it:
+
+```bash
+python3 tools/brain.py inbox judge <id> --attention needs-operator|fyi|routine --reason "<one line>"
+```
+
+Rules:
+- **Read the calibration first**: `wiki/_state/attention-grades.json`
+  holds the operator's past useful/noise grades — a verdict shape
+  the operator graded `noise` argues for demotion next time.
+- **`routine` is the default under uncertainty** — a partner that
+  cries wolf is worse than no partner. Reserve `needs-operator` for
+  signal you would interrupt someone's day for.
+- **The reason is one line, traceable, and never quotes raw
+  connector payloads** (error strings leak secrets).
+- Items judged `needs-operator` stay queued (visible in the
+  briefing's Needs-you band) unless the work itself resolves them —
+  the verdict is for the operator's eyes, not a substitute for
+  digestion. `fyi`/`routine` items are digested and cleared
+  normally; the verdict remains in git history.
+
+The operator grades verdicts with
+`python3 tools/brain.py inbox grade <id> --grade useful|noise` —
+mention the command when surfacing a needs-operator item.
+
 ### 4. Land and clear, per item
 
 After each item's work is committed (LOCAL_FIRST: local commit +

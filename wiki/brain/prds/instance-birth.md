@@ -5,6 +5,8 @@ status: living
 updated: 2026-07-10
 confidence: medium
 supersedes: brain/pitches/instance-birth.md
+summary: >
+  init --full births a working instance from the kernel manifest: mechanism plus kernel trail, no dogfood, git-initialised, gates passing — the adoption path for real projects.
 sources:
   - ../pitches/instance-birth.md
   - ../../../sources/conversations/2026-07-10--tool-repo-constraint.md

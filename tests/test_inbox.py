@@ -92,3 +92,43 @@ def test_inbox_summary_never_fails():
         op = "summary"
 
     assert brain.cmd_inbox(_Args()) == 0
+
+
+# ---------- attention judge/grade (presentation-layer ADR) ----------------
+
+def test_inbox_judge_and_grade_round_trip():
+    import json as _json
+    import subprocess
+    import sys as _sys
+    iid = "test-judge-item"
+    item = REPO / "wiki" / "_state" / "inbox" / f"{iid}.json"
+    grades_path = REPO / "wiki" / "_state" / "attention-grades.json"
+    grades_before = grades_path.read_text() if grades_path.exists() else None
+    try:
+        run = lambda *a: subprocess.run(
+            [_sys.executable, str(REPO / "tools" / "brain.py"), "inbox", *a],
+            capture_output=True, text=True, timeout=30)
+        assert run("add", "--id", iid, "--kind", "custom",
+                   "--summary", "test").returncode == 0
+        out = run("judge", iid, "--attention", "needs-operator",
+                  "--reason", "novel error class in prod")
+        assert out.returncode == 0, out.stderr
+        data = _json.loads(item.read_text())
+        assert data["attention"] == "needs-operator"
+        assert data["attention_reason"] == "novel error class in prod"
+        assert data["judged"]
+        out = run("grade", iid, "--grade", "noise", "--note", "not worth it")
+        assert out.returncode == 0, out.stderr
+        grades = _json.loads(grades_path.read_text())["grades"]
+        rec = [g for g in grades if g["id"] == iid][-1]
+        assert rec["grade"] == "noise"
+        assert rec["verdict"] == "needs-operator"
+        # Bad verdict is rejected at the parser.
+        assert run("judge", iid, "--attention", "panic",
+                   "--reason", "x").returncode == 2
+    finally:
+        item.unlink(missing_ok=True)
+        if grades_before is not None:
+            grades_path.write_text(grades_before)
+        else:
+            grades_path.unlink(missing_ok=True)

@@ -6,6 +6,8 @@ superseded_by: brain/adrs/mcp-cli-surface.md
 updated: 2026-07-12
 confidence: medium
 supersedes: brain/adrs/chat-print-mode-bridge.md
+summary: >
+  Superseded: removed the chat pane in favour of MCP + CLI + the embedded terminal. The terminal followed it out the same week (mcp-cli-surface).
 sources:
   - ../topics/chat-surface-necessity.md
   - ../../../sources/conversations/2026-07-12--chat-surface-reconsidered.md

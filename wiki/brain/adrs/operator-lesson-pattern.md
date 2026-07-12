@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Recurring operator guidance lands as named lessons on wiki/org/operator-lessons.md — one anchor per lesson so skills and agents can cite and re-apply them.
 sources:
   - ../../../AGENTS.md
   - .claude/skills/capture/SKILL.md

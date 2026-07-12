@@ -4,6 +4,8 @@ kind: topic
 status: draft
 updated: 2026-07-10
 confidence: low
+summary: >
+  Six repo-verified gaps between the kernel and a credible market entry. License (MIT) and packaging closed; the product name and repo visibility remain operator calls.
 sources:
   - ../../../README.md
   - ../../org/competitive-positioning.md

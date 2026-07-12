@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Parallel work is opt-in via /spawn: per-effort worktrees and branches plus a registry record; the default workflow stays single-effort, single-checkout.
 sources:
   - ../../../AGENTS.md
   - .claude/skills/spawn/SKILL.md

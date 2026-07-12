@@ -5,6 +5,8 @@ status: superseded
 superseded_by: brain/prds/harness-workbench.md
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Superseded pitch: run any harness terminal beside the rendered brain. Graduated and shipped 0.6.x; the terminal half was later removed at 0.15.0.
 sources:
   - ../../../sources/conversations/2026-07-10--harness-workbench-intent.md
   - ../../../sources/research/2026-07-10--openknowledge-terminal-architecture.md

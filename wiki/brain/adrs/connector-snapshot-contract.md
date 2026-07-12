@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Connectors are pull-only snapshot-writers: immutable dedup-keyed files into sources/, cursors in wiki/_state/, inbox items out. A connector never writes the wiki — synthesis stays in-session.
 sources:
   - ../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md
   - ../../../brain-schedule.yml

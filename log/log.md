@@ -172,3 +172,7 @@
    diff: 5 files, +112/-2
    restricted-paths: false
    by: claude (fable 5)
+2026-07-12 commit — be0453b: shape(human-legible-presentation-layer) Phase 2 amendment: full UI rewrite
+   diff: 2 files, +36/-13
+   restricted-paths: false
+   by: claude (fable 5)

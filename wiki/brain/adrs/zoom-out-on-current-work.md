@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Deep-focus work gets a per-item zoom-out brief — deterministic graph context plus a one-paragraph product fit — auto-fired at /shape phase boundaries.
 sources:
   - ../../../AGENTS.md
   - .claude/skills/zoom-out/SKILL.md

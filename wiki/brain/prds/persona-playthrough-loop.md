@@ -5,6 +5,8 @@ status: living
 updated: 2026-07-12
 confidence: medium
 supersedes: brain/pitches/persona-playthrough-loop.md
+summary: >
+  Every release gets walked by synthetic users: personas, the /playthrough protocol, immutable transcripts, findings routed to insights below the human-confirmation line, sweeps queued per version bump.
 sources:
   - ../pitches/persona-playthrough-loop.md
   - ../../../sources/conversations/2026-07-12--persona-playthrough-loop.md

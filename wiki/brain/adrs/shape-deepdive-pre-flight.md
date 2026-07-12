@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Before Phase 1 of /shape, a deepdive pass reads the affected surfaces so the PRD is grounded in observed state rather than the pitch's assumptions.
 sources:
   - ../../../AGENTS.md
   - .claude/skills/shape/SKILL.md

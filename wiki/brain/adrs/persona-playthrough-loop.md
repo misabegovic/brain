@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-12
 confidence: medium
+summary: >
+  Playthroughs are executed skills — real commands, real pages — with immutable transcripts under sources/playthroughs/; synthetic findings become insights capped at confidence: low until a human confirms.
 sources:
   - ../prds/persona-playthrough-loop.md
   - ../../../sources/conversations/2026-07-12--persona-playthrough-loop.md

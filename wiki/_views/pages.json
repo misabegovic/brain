@@ -59,6 +59,7 @@
       "superseded_by": "brain/adrs/mcp-cli-terminal-surface.md",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Superseded: the first-party chat pane rode per-harness print-mode CLI rows on the operator's subscription. Removed two days later by mcp-cli-terminal-surface; the billing guard it introduced outlived it.\n",
       "sources": [
         "../prds/chat-first-app.md",
         "../adrs/workbench-pty-bridge.md"
@@ -72,6 +73,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Public competitor information routes to per-competitor org shelves with web snapshots under sources/; press-release claims stay marked as vendor claims, never facts.\n",
       "sources": [
         "../../../AGENTS.md",
         ".claude/skills/wiki-ingest/SKILL.md",
@@ -86,6 +88,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Connectors are pull-only snapshot-writers: immutable dedup-keyed files into sources/, cursors in wiki/_state/, inbox items out. A connector never writes the wiki \u2014 synthesis stays in-session.\n",
       "sources": [
         "../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
         "../../../brain-schedule.yml",
@@ -100,6 +103,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "The wiki home is a generated dashboard of contract sections (What changed, Open initiatives, Recent decisions) that skills maintain \u2014 every wiki edit pairs with a home touch.\n",
       "sources": [
         "../../../AGENTS.md",
         "../../../tools/home-staleness.sh",
@@ -128,6 +132,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Instances are born from an explicit copy-path manifest: mechanism and the kernel's decision trail cross; this repo's self-tracking dogfood never does. init --full is the only birth path.\n",
       "sources": [
         "../prds/instance-birth.md",
         "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
@@ -142,6 +147,7 @@
       "updated": "2026-07-12",
       "confidence": "medium",
       "supersedes": "brain/adrs/mcp-cli-terminal-surface.md",
+      "summary": "The kernel's interaction surfaces settle at MCP and the CLI: the embedded terminal (PTY bridge, websocket, xterm) retires; the app page is the rendered knowledge under the ambient strip; the billing guard degrades to a doctor warning.\n",
       "sources": [
         "../../../sources/conversations/2026-07-12--embedded-terminal-removal.md",
         "../topics/chat-surface-necessity.md"
@@ -157,6 +163,7 @@
       "updated": "2026-07-12",
       "confidence": "medium",
       "supersedes": "brain/adrs/chat-print-mode-bridge.md",
+      "summary": "Superseded: removed the chat pane in favour of MCP + CLI + the embedded terminal. The terminal followed it out the same week (mcp-cli-surface).\n",
       "sources": [
         "../topics/chat-surface-necessity.md",
         "../../../sources/conversations/2026-07-12--chat-surface-reconsidered.md"
@@ -170,6 +177,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "high",
+      "summary": "Umbrella-scale work gets a kind: epic page with children spawned as regular PRDs linked via parent_epic; epics carry no engineering bets and no umbrella ADR.\n",
       "sources": [
         "../../../sources/research/2026-07-10--tend-sweep-2-verification.md",
         "../../../AGENTS.md",
@@ -185,6 +193,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Recurring operator guidance lands as named lessons on wiki/org/operator-lessons.md \u2014 one anchor per lesson so skills and agents can cite and re-apply them.\n",
       "sources": [
         "../../../AGENTS.md",
         ".claude/skills/capture/SKILL.md"
@@ -198,6 +207,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Parallel work is opt-in via /spawn: per-effort worktrees and branches plus a registry record; the default workflow stays single-effort, single-checkout.\n",
       "sources": [
         "../../../AGENTS.md",
         ".claude/skills/spawn/SKILL.md",
@@ -212,6 +222,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Three agent levels (parent session, effort owners, helpers) with parallel-first tool-call discipline at every level; owners fan out via concurrent tool calls since they cannot dispatch subagents.\n",
       "sources": [
         "../../../AGENTS.md",
         ".claude/skills/spawn/SKILL.md",
@@ -226,6 +237,7 @@
       "status": "accepted",
       "updated": "2026-07-12",
       "confidence": "medium",
+      "summary": "Playthroughs are executed skills \u2014 real commands, real pages \u2014 with immutable transcripts under sources/playthroughs/; synthetic findings become insights capped at confidence: low until a human confirms.\n",
       "sources": [
         "../prds/persona-playthrough-loop.md",
         "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md"
@@ -239,6 +251,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "high",
+      "summary": "No LLM ever runs on a schedule: deterministic producers accumulate inbox items (cursor diffs, half-life crossings, link health); interactive sessions digest them via /tend. Amended twice: research-picker damping; one-runner enforcement.\n",
       "sources": [
         "../../../sources/research/2026-07-10--hub-adr-verification.md",
         "../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
@@ -254,6 +267,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Before Phase 1 of /shape, a deepdive pass reads the affected surfaces so the PRD is grounded in observed state rather than the pitch's assumptions.\n",
       "sources": [
         "../../../AGENTS.md",
         ".claude/skills/shape/SKILL.md",
@@ -268,6 +282,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Pitches are the pre-bet artefact: fat-marker solution shape allowed, appetite as spending limit; a bet graduates a pitch into an epic or PRD/ADR pair and marks it superseded.\n",
       "sources": [
         "../../../AGENTS.md",
         ".claude/skills/shape/SKILL.md"
@@ -281,6 +296,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "One infra-agnostic container image; BRAIN_SURFACE selects ui/mcp/datasette on the platform port; per-instance isolation via env ports and hashed timer units. Railway is a reference target, not a dependency.\n",
       "sources": [
         "../prds/composable-role-views.md",
         "../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
@@ -295,6 +311,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Custom views are SQL specs in views/*.yml compiled over a disposable, gitignored SQLite index (FTS5) rebuilt on every views run; the index is never committed and never load-bearing.\n",
       "sources": [
         "../prds/composable-role-views.md",
         "../../../sources/research/2026-07-10--sqlite-fts5-derived-index.md",
@@ -310,6 +327,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "high",
+      "summary": "Astro is the UI substrate (originally Astro + Starlight): content collections over the symlinked wiki, static build, mobile-native. The 2026-07-12 presentation-layer rewrite retired Starlight; Astro stays.\n",
       "sources": [
         "../../../sources/research/2026-07-10--hub-adr-verification.md",
         "../../../AGENTS.md",
@@ -325,6 +343,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Wiki edits trigger a quiet UI rebuild into ui/.build-cache via a PostToolUse hook; the serve layer self-heals stale builds from the live status poll.\n",
       "sources": [
         "../../../AGENTS.md",
         "../../../tools/ui-build.sh",
@@ -340,6 +359,7 @@
       "superseded_by": "brain/adrs/mcp-cli-surface.md",
       "updated": "2026-07-12",
       "confidence": "medium",
+      "summary": "Superseded: the embedded terminal ran the operator's shell over a stdlib PTY-websocket bridge, loopback-only with token and Host checks. Removed 0.15.0 \u2014 layout was load-bearing, the component was not.\n",
       "sources": [
         "../prds/harness-workbench.md",
         "../../../sources/research/2026-07-10--openknowledge-terminal-architecture.md"
@@ -353,6 +373,7 @@
       "status": "accepted",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Deep-focus work gets a per-item zoom-out brief \u2014 deterministic graph context plus a one-paragraph product fit \u2014 auto-fired at /shape phase boundaries.\n",
       "sources": [
         "../../../AGENTS.md",
         ".claude/skills/zoom-out/SKILL.md",
@@ -397,6 +418,7 @@
       "superseded_by": "brain/prds/chat-first-app.md",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Superseded pitch: replace the terminal-first workbench with a chat-first app. Bet, built (0.12), and reversed within days \u2014 the trail records the full arc.\n",
       "sources": [
         "../../../sources/conversations/2026-07-10--chat-first-simplification.md",
         "../adrs/workbench-pty-bridge.md",
@@ -412,6 +434,7 @@
       "superseded_by": "brain/prds/composable-role-views.md",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Superseded pitch: role-fit views (engineer/pm/operator) assembled from connector data. Graduated into the composable-role-views PRD and shipped as SQL view specs.\n",
       "sources": [
         "../../../sources/conversations/2026-07-10--composable-views-idea.md",
         "../../../sources/conversations/2026-07-10--sqlite-substrate-musing.md",
@@ -433,6 +456,7 @@
       "superseded_by": "brain/prds/harness-workbench.md",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Superseded pitch: run any harness terminal beside the rendered brain. Graduated and shipped 0.6.x; the terminal half was later removed at 0.15.0.\n",
       "sources": [
         "../../../sources/conversations/2026-07-10--harness-workbench-intent.md",
         "../../../sources/research/2026-07-10--openknowledge-terminal-architecture.md",
@@ -449,6 +473,7 @@
       "updated": "2026-07-12",
       "appetite": "big",
       "confidence": "medium",
+      "summary": "Superseded pitch, bet 2026-07-12: an opinionated Shape Up-native UI \u2014 summaries as schema, a briefing home that triages attention, lifecycle components, attention judgement in the tend loop.\n",
       "sources": [
         "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md",
         "../../insights/quickstart-third-command-fragility.md"
@@ -463,6 +488,7 @@
       "superseded_by": "brain/prds/instance-birth.md",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Superseded pitch: one command births a complete, gate-passing brain instance from the kernel. Graduated and shipped as init --full (0.11.0).\n",
       "sources": [
         "../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md",
         "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
@@ -478,6 +504,7 @@
       "updated": "2026-07-12",
       "appetite": "small",
       "confidence": "medium",
+      "summary": "Superseded pitch, bet 2026-07-12: synthetic users walk every release; findings become confidence-capped insights. Graduated and shipped same day (0.16.0).\n",
       "sources": [
         "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md",
         "../../org/operator-lessons.md"
@@ -492,6 +519,7 @@
       "updated": "2026-07-10",
       "confidence": "medium",
       "supersedes": "brain/pitches/chat-first-app.md",
+      "summary": "The 0.12 chat-first app: conversation as the interface over per-harness print-mode rows, terminal demoted to a toggle. Shipped, then the chat pane was removed at 0.14 \u2014 the layout and strip survive.\n",
       "sources": [
         "../pitches/chat-first-app.md",
         "../../../sources/conversations/2026-07-10--chat-first-simplification.md"
@@ -506,6 +534,7 @@
       "updated": "2026-07-10",
       "confidence": "medium",
       "supersedes": "brain/pitches/composable-role-views.md",
+      "summary": "Composable role-fit views: a derived SQLite index rebuilt from files on every views run, YAML view specs rendering to wiki/_views/custom/, Datadog and Langfuse connectors feeding state tiles.\n",
       "sources": [
         "../pitches/composable-role-views.md",
         "../../../sources/conversations/2026-07-10--composable-views-idea.md",
@@ -522,6 +551,7 @@
       "updated": "2026-07-10",
       "confidence": "medium",
       "supersedes": "brain/pitches/harness-workbench.md",
+      "summary": "The local surface that put a harness terminal beside the rendered brain with install-agent MCP wiring. Shipped 0.6.x; the terminal was removed at 0.15.0, install-agent and the app shell remain.\n",
       "sources": [
         "../pitches/harness-workbench.md",
         "../../../sources/conversations/2026-07-10--harness-workbench-intent.md",
@@ -552,6 +582,7 @@
       "updated": "2026-07-10",
       "confidence": "medium",
       "supersedes": "brain/pitches/instance-birth.md",
+      "summary": "init --full births a working instance from the kernel manifest: mechanism plus kernel trail, no dogfood, git-initialised, gates passing \u2014 the adoption path for real projects.\n",
       "sources": [
         "../pitches/instance-birth.md",
         "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
@@ -566,6 +597,7 @@
       "updated": "2026-07-12",
       "confidence": "medium",
       "supersedes": "brain/pitches/persona-playthrough-loop.md",
+      "summary": "Every release gets walked by synthetic users: personas, the /playthrough protocol, immutable transcripts, findings routed to insights below the human-confirmation line, sweeps queued per version bump.\n",
       "sources": [
         "../pitches/persona-playthrough-loop.md",
         "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md"
@@ -607,6 +639,7 @@
       "superseded_by": "brain/adrs/mcp-cli-surface.md",
       "updated": "2026-07-12",
       "confidence": "medium",
+      "summary": "Settled twice in one week: the chat pane, then the embedded terminal, both failed the deletion test against MCP + CLI coverage. Surfaces settle at MCP + CLI.\n",
       "sources": [
         "../../../sources/conversations/2026-07-12--chat-surface-reconsidered.md",
         "../adrs/chat-print-mode-bridge.md"
@@ -620,6 +653,7 @@
       "status": "draft",
       "updated": "2026-07-10",
       "confidence": "low",
+      "summary": "Six repo-verified gaps between the kernel and a credible market entry. License (MIT) and packaging closed; the product name and repo visibility remain operator calls.\n",
       "sources": [
         "../../../README.md",
         "../../org/competitive-positioning.md"
@@ -633,6 +667,7 @@
       "status": "living",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "The five 1.0 criteria: instance birth in the test suite (done), seven unattended days, a real-data loop in a born instance, a cold-start human test, all gates green at tag.\n",
       "sources": [
         "../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md"
       ],
@@ -645,6 +680,7 @@
       "status": "living",
       "updated": "2026-07-10",
       "confidence": "medium",
+      "summary": "Which further Phoenix-Architecture concepts (deletion test, provenance-over-diffs, regeneration drills) earn schema weight beyond constraints.md and implementation-memory.md. Open.\n",
       "sources": [
         "../../../sources/web/aicoding-fowler-phoenix--f0e11r.md",
         "../../../sources/conversations/2026-07-10--openknowledge-direction-and-ui-stress.md"
@@ -661,6 +697,7 @@
       "affected_personas": [
         ".claude/personas/users/noor-cold-start-adopter.md"
       ],
+      "summary": "Playthrough-born hypothesis: the README's third command (brain) depends on an optional PATH step and platform PATH conventions; a cold-start user can hit command-not-found with no fallback shown. Awaiting human confirmation.\n",
       "sources": [
         "sources/playthroughs/2026-07-12--noor-cold-start-adopter--readme-quickstart.md"
       ],

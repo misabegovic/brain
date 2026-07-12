@@ -4,6 +4,8 @@ kind: topic
 status: living
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Which further Phoenix-Architecture concepts (deletion test, provenance-over-diffs, regeneration drills) earn schema weight beyond constraints.md and implementation-memory.md. Open.
 sources:
   - ../../../sources/web/aicoding-fowler-phoenix--f0e11r.md
   - ../../../sources/conversations/2026-07-10--openknowledge-direction-and-ui-stress.md

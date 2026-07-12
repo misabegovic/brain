@@ -5,6 +5,8 @@ status: superseded
 superseded_by: brain/prds/chat-first-app.md
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Superseded pitch: replace the terminal-first workbench with a chat-first app. Bet, built (0.12), and reversed within days — the trail records the full arc.
 sources:
   - ../../../sources/conversations/2026-07-10--chat-first-simplification.md
   - ../adrs/workbench-pty-bridge.md

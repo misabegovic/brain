@@ -69,6 +69,10 @@ PROJECTS = Path(
 SYNC_CURSORS = WIKI / "_state" / "sync-cursors.json"
 EFFORTS_DIR = WIKI / "_state" / "efforts"
 INBOX_DIR = WIKI / "_state" / "inbox"
+SUMMARY_EXPECTED_KINDS = {"pitch", "initiative", "decision", "epic",
+                          "topic", "insight", "idea"}
+ATTENTION_VERDICTS = ("needs-operator", "fyi", "routine")
+ATTENTION_GRADES_PATH = WIKI / "_state" / "attention-grades.json"
 
 
 def today_utc() -> dt.date:
@@ -305,6 +309,7 @@ def approx_tokens(body: str) -> int:
 
 def cmd_validate(_args) -> int:
     errors: list[str] = []
+    warnings: list[str] = []
     pages = wiki_pages()
     on_disk = {str(p.relative_to(WIKI)) for p in pages}
 
@@ -344,6 +349,18 @@ def cmd_validate(_args) -> int:
         srcs = meta.get("sources") or []
         if status != "draft" and not srcs:
             errors.append(f"{rel}: non-draft page has empty sources")
+
+        summary = meta.get("summary")
+        if summary is not None:
+            if not isinstance(summary, str) or not summary.strip():
+                errors.append(f"{rel}: summary must be a non-empty string")
+            elif len(summary) > 600:
+                errors.append(f"{rel}: summary too long "
+                              f"({len(summary)} chars > 600)")
+        elif kind in SUMMARY_EXPECTED_KINDS and status in (
+                "living", "accepted"):
+            warnings.append(f"{rel}: no summary: — the briefing renders "
+                            f"this kind as a card")
 
         for dep in meta.get("depends_on") or []:
             if dep not in on_disk:
@@ -437,6 +454,8 @@ def cmd_validate(_args) -> int:
         print(f"\n{len(errors)} error(s) across {len(pages)} page(s)")
         return 1
 
+    for w in warnings:
+        print(f"warn  {w}")
     print(f"OK  {len(pages)} page(s) valid")
     return 0
 
@@ -2762,6 +2781,41 @@ def cmd_inbox(args) -> int:
             return 1
         path.unlink()
         print(f"inbox: cleared {args.id}")
+        return 0
+
+    if op == "judge":
+        path = INBOX_DIR / f"{args.id}.json"
+        if not path.exists():
+            print(f"inbox judge: no item {args.id!r}", file=sys.stderr)
+            return 1
+        item = json.loads(path.read_text())
+        item["attention"] = args.attention
+        item["attention_reason"] = args.reason
+        item["judged"] = today_utc().isoformat()
+        path.write_text(json.dumps(item, indent=2) + "\n")
+        print(f"inbox: judged {args.id} → {args.attention} ({args.reason})")
+        return 0
+
+    if op == "grade":
+        grades = []
+        if ATTENTION_GRADES_PATH.exists():
+            grades = json.loads(ATTENTION_GRADES_PATH.read_text()).get(
+                "grades", [])
+        item_path = INBOX_DIR / f"{args.id}.json"
+        verdict = None
+        if item_path.exists():
+            verdict = json.loads(item_path.read_text()).get("attention")
+        grades.append({
+            "id": args.id,
+            "verdict": verdict,
+            "grade": args.grade,
+            "note": args.note or "",
+            "graded": today_utc().isoformat(),
+        })
+        ATTENTION_GRADES_PATH.write_text(json.dumps(
+            {"grades": grades}, indent=2) + "\n")
+        print(f"inbox: graded {args.id} → {args.grade}"
+              + (f" (verdict was {verdict})" if verdict else ""))
         return 0
 
     print(f"unknown inbox op: {op!r}", file=sys.stderr)
@@ -6737,6 +6791,21 @@ def main() -> int:
     ib_sub.add_parser("summary",
                       help="one-line count for session-start surfacing")
     ib_done = ib_sub.add_parser("done", help="clear a digested item")
+    ib_judge = ib_sub.add_parser(
+        "judge", help="stamp an attention verdict on an item (in-session "
+                      "only; the briefing's Needs-you band reads it)")
+    ib_judge.add_argument("id")
+    ib_judge.add_argument("--attention", required=True,
+                          choices=ATTENTION_VERDICTS)
+    ib_judge.add_argument("--reason", required=True,
+                          help="one line, traceable, no raw payloads")
+    ib_grade = ib_sub.add_parser(
+        "grade", help="operator grades a verdict (useful|noise) — "
+                      "calibration for future judgement")
+    ib_grade.add_argument("id")
+    ib_grade.add_argument("--grade", required=True,
+                          choices=("useful", "noise"))
+    ib_grade.add_argument("--note", default="")
     ib_done.add_argument("id")
     ap_ib.set_defaults(func=cmd_inbox)
 

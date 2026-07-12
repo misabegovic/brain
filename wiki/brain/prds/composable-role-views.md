@@ -5,6 +5,8 @@ status: living
 updated: 2026-07-10
 confidence: medium
 supersedes: brain/pitches/composable-role-views.md
+summary: >
+  Composable role-fit views: a derived SQLite index rebuilt from files on every views run, YAML view specs rendering to wiki/_views/custom/, Datadog and Langfuse connectors feeding state tiles.
 sources:
   - ../pitches/composable-role-views.md
   - ../../../sources/conversations/2026-07-10--composable-views-idea.md

@@ -5,6 +5,8 @@ status: superseded
 superseded_by: brain/prds/instance-birth.md
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Superseded pitch: one command births a complete, gate-passing brain instance from the kernel. Graduated and shipped as init --full (0.11.0).
 sources:
   - ../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md
   - ../../../sources/conversations/2026-07-10--tool-repo-constraint.md

@@ -5,6 +5,8 @@ status: accepted
 updated: 2026-07-12
 confidence: medium
 supersedes: brain/adrs/mcp-cli-terminal-surface.md
+summary: >
+  The kernel's interaction surfaces settle at MCP and the CLI: the embedded terminal (PTY bridge, websocket, xterm) retires; the app page is the rendered knowledge under the ambient strip; the billing guard degrades to a doctor warning.
 sources:
   - ../../../sources/conversations/2026-07-12--embedded-terminal-removal.md
   - ../topics/chat-surface-necessity.md

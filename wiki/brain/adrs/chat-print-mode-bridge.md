@@ -5,6 +5,8 @@ status: superseded
 superseded_by: brain/adrs/mcp-cli-terminal-surface.md
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Superseded: the first-party chat pane rode per-harness print-mode CLI rows on the operator's subscription. Removed two days later by mcp-cli-terminal-surface; the billing guard it introduced outlived it.
 sources:
   - ../prds/chat-first-app.md
   - ../adrs/workbench-pty-bridge.md

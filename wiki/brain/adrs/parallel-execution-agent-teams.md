@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Three agent levels (parent session, effort owners, helpers) with parallel-first tool-call discipline at every level; owners fan out via concurrent tool calls since they cannot dispatch subagents.
 sources:
   - ../../../AGENTS.md
   - .claude/skills/spawn/SKILL.md

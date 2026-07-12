@@ -6,6 +6,8 @@ superseded_by: brain/prds/persona-playthrough-loop.md
 updated: 2026-07-12
 appetite: small
 confidence: medium
+summary: >
+  Superseded pitch, bet 2026-07-12: synthetic users walk every release; findings become confidence-capped insights. Graduated and shipped same day (0.16.0).
 sources:
   - ../../../sources/conversations/2026-07-12--persona-playthrough-loop.md
   - ../../org/operator-lessons.md

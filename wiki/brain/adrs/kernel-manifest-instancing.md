@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Instances are born from an explicit copy-path manifest: mechanism and the kernel's decision trail cross; this repo's self-tracking dogfood never does. init --full is the only birth path.
 sources:
   - ../prds/instance-birth.md
   - ../../../sources/conversations/2026-07-10--tool-repo-constraint.md

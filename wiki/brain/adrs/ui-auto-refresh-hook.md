@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Wiki edits trigger a quiet UI rebuild into ui/.build-cache via a PostToolUse hook; the serve layer self-heals stale builds from the live status poll.
 sources:
   - ../../../AGENTS.md
   - ../../../tools/ui-build.sh

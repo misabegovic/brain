@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Public competitor information routes to per-competitor org shelves with web snapshots under sources/; press-release claims stay marked as vendor claims, never facts.
 sources:
   - ../../../AGENTS.md
   - .claude/skills/wiki-ingest/SKILL.md

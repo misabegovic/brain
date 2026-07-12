@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Pitches are the pre-bet artefact: fat-marker solution shape allowed, appetite as spending limit; a bet graduates a pitch into an epic or PRD/ADR pair and marks it superseded.
 sources:
   - ../../../AGENTS.md
   - .claude/skills/shape/SKILL.md

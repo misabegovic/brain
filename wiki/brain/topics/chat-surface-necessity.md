@@ -5,6 +5,8 @@ status: superseded
 superseded_by: brain/adrs/mcp-cli-surface.md
 updated: 2026-07-12
 confidence: medium
+summary: >
+  Settled twice in one week: the chat pane, then the embedded terminal, both failed the deletion test against MCP + CLI coverage. Surfaces settle at MCP + CLI.
 sources:
   - ../../../sources/conversations/2026-07-12--chat-surface-reconsidered.md
   - ../adrs/chat-print-mode-bridge.md

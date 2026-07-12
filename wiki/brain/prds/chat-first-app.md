@@ -5,6 +5,8 @@ status: living
 updated: 2026-07-10
 confidence: medium
 supersedes: brain/pitches/chat-first-app.md
+summary: >
+  The 0.12 chat-first app: conversation as the interface over per-harness print-mode rows, terminal demoted to a toggle. Shipped, then the chat pane was removed at 0.14 — the layout and strip survive.
 sources:
   - ../pitches/chat-first-app.md
   - ../../../sources/conversations/2026-07-10--chat-first-simplification.md

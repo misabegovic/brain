@@ -6,6 +6,8 @@ superseded_by: brain/prds/human-legible-presentation-layer.md
 updated: 2026-07-12
 appetite: big
 confidence: medium
+summary: >
+  Superseded pitch, bet 2026-07-12: an opinionated Shape Up-native UI — summaries as schema, a briefing home that triages attention, lifecycle components, attention judgement in the tend loop.
 sources:
   - ../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md
   - ../../insights/quickstart-third-command-fragility.md

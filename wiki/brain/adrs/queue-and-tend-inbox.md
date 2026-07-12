@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: high
+summary: >
+  No LLM ever runs on a schedule: deterministic producers accumulate inbox items (cursor diffs, half-life crossings, link health); interactive sessions digest them via /tend. Amended twice: research-picker damping; one-runner enforcement.
 sources:
   - ../../../sources/research/2026-07-10--hub-adr-verification.md
   - ../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md

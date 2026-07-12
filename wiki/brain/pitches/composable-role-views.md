@@ -5,6 +5,8 @@ status: superseded
 superseded_by: brain/prds/composable-role-views.md
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Superseded pitch: role-fit views (engineer/pm/operator) assembled from connector data. Graduated into the composable-role-views PRD and shipped as SQL view specs.
 sources:
   - ../../../sources/conversations/2026-07-10--composable-views-idea.md
   - ../../../sources/conversations/2026-07-10--sqlite-substrate-musing.md

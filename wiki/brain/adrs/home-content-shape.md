@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  The wiki home is a generated dashboard of contract sections (What changed, Open initiatives, Recent decisions) that skills maintain — every wiki edit pairs with a home touch.
 sources:
   - ../../../AGENTS.md
   - ../../../tools/home-staleness.sh

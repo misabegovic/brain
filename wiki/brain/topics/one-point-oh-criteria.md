@@ -4,6 +4,8 @@ kind: topic
 status: living
 updated: 2026-07-10
 confidence: medium
+summary: >
+  The five 1.0 criteria: instance birth in the test suite (done), seven unattended days, a real-data loop in a born instance, a cold-start human test, all gates green at tag.
 sources:
   - ../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md
 ---

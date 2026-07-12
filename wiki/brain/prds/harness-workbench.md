@@ -5,6 +5,8 @@ status: living
 updated: 2026-07-10
 confidence: medium
 supersedes: brain/pitches/harness-workbench.md
+summary: >
+  The local surface that put a harness terminal beside the rendered brain with install-agent MCP wiring. Shipped 0.6.x; the terminal was removed at 0.15.0, install-agent and the app shell remain.
 sources:
   - ../pitches/harness-workbench.md
   - ../../../sources/conversations/2026-07-10--harness-workbench-intent.md

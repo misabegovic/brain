@@ -102,6 +102,15 @@ YYYY-MM-DD groom — walked <N> pages: <D> demoted, <A> archived,
 Validate must exit 0 — archive moves can break index links, the views
 regen captures the new state.
 
+## Summary drift
+
+Pages carrying a `summary:` frontmatter field (the briefing renders
+them as cards) get one extra check per sweep: does the summary
+still match the body? A page whose content moved on while its
+summary stayed put misleads at the exact altitude humans read.
+Rewrite stale summaries in place (a summary edit alone does not
+bump `updated:`).
+
 ## What groom is *not*
 
 - **Not deletion.** Archive ≠ delete. Demotion ≠ removal.

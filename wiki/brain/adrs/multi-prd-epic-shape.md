@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: high
+summary: >
+  Umbrella-scale work gets a kind: epic page with children spawned as regular PRDs linked via parent_epic; epics carry no engineering bets and no umbrella ADR.
 sources:
   - ../../../sources/research/2026-07-10--tend-sweep-2-verification.md
   - ../../../AGENTS.md

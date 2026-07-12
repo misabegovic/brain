@@ -4,6 +4,8 @@ kind: decision
 status: accepted
 updated: 2026-07-10
 confidence: medium
+summary: >
+  Custom views are SQL specs in views/*.yml compiled over a disposable, gitignored SQLite index (FTS5) rebuilt on every views run; the index is never committed and never load-bearing.
 sources:
   - ../prds/composable-role-views.md
   - ../../../sources/research/2026-07-10--sqlite-fts5-derived-index.md
