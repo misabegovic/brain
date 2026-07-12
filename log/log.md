@@ -196,3 +196,7 @@
    diff: 14 files, +348/-81
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — d9f238e: fix(ci): build the UI before pytest; empty-brain heuristic
+   diff: 2 files, +32/-19
+   restricted-paths: true
+   by: claude (fable 5)
