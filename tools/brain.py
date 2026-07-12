@@ -484,7 +484,7 @@ def _check_path(p: str, page: Path | None = None) -> tuple[str, str]:
 
     # Legacy-path remap: brain pages were authored assuming
     # `~/projects/<repo>/...` but the operator may have configured
-    # `$BRAIN_PROJECTS_ROOT` to point elsewhere (e.g. `~/projects/tt/`).
+    # `$BRAIN_PROJECTS_ROOT` to point elsewhere (e.g. `~/work/`).
     # If the literal path doesn't exist but `PROJECTS/<repo>/<rest>`
     # does, prefer that. Mirrors the per-skill sibling-repo handling.
     if candidate.is_absolute() and not candidate.exists():
