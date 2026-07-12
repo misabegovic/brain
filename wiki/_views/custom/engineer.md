@@ -19,7 +19,7 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 
 | path | title | status | confidence | updated |
 |---|---|---|---|---|
-| brain/adrs/chat-print-mode-bridge.md | The chat is a per-harness print-mode bridge: conversation as the interface, terminal demoted to a toggle, bare `brain` o | accepted | medium | 2026-07-10 |
+| brain/adrs/mcp-cli-terminal-surface.md | The kernel's interaction surfaces are MCP, CLI, and the terminal — no first-party chat pane | accepted | medium | 2026-07-12 |
 | brain/adrs/competitor-intel-ingestion.md | Competitor intel lives at wiki/org/competitors/<competitor>/index.md, ingested via the existing wiki-ingest classifier w | accepted | medium | 2026-07-10 |
 | brain/adrs/connector-snapshot-contract.md | Connectors are pull-only snapshot-writers: immutable dedup-keyed files under sources/, cursors in state, inbox items out | accepted | medium | 2026-07-10 |
 | brain/adrs/home-content-shape.md | Home page is the wiki index as an agent-maintained dashboard | accepted | medium | 2026-07-10 |
@@ -43,9 +43,9 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 | brain/adrs/successor-ssg-for-ui.md | high | 4 |
 | brain/topics/one-point-oh-criteria.md | medium | 4 |
 | org/operator-lessons.md | high | 4 |
-| brain/adrs/chat-print-mode-bridge.md | medium | 3 |
 | brain/adrs/connector-snapshot-contract.md | medium | 3 |
 | brain/adrs/home-content-shape.md | medium | 3 |
+| brain/adrs/mcp-cli-terminal-surface.md | medium | 3 |
 | brain/adrs/operator-lesson-pattern.md | medium | 3 |
 | brain/adrs/parallel-efforts-on-request.md | medium | 3 |
 

@@ -322,6 +322,19 @@ releases, packaging, public docs, community files), each queued as
 an inbox item. The license and name are operator decisions,
 deliberately left open on the topic.
 
+## 0.14.0 — surfaces simplified: MCP + CLI + terminal — **shipped 2026-07-12**
+
+The operator's reconsideration, two days of evidence, and the
+deletion test agreed: the first-party chat pane duplicated richer
+existing surfaces (an interactive harness in the terminal, MCP-aware
+chat clients via `install-agent`, the CLI) at higher per-turn cost.
+Removed via a superseding ADR
+([mcp-cli-terminal-surface](adrs/mcp-cli-terminal-surface.md));
+kept: the knowledge-first layout, the ambient strip, bare-`brain`
+entry, `install-agent`, and the billing guard (now governing every
+harness subprocess). A recorded reversal within days is the
+mechanism working — cheap corrections are what the trail is for.
+
 ## Standing ideas (unversioned)
 
 Deliberately not adopted from the open-knowledge direction: a vector

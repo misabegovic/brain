@@ -1,7 +1,8 @@
 ---
 title: "Does the kernel need its own chat surface, or do MCP + CLI + the terminal cover it?"
 kind: topic
-status: living
+status: superseded
+superseded_by: brain/adrs/mcp-cli-terminal-surface.md
 updated: 2026-07-12
 confidence: medium
 sources:
@@ -42,4 +43,7 @@ load-bearing surface or a component that passes the deletion test?
 
 ## Outcome
 
-(open — the operator's call)
+**Settled 2026-07-12** — the operator decided: remove. Recorded as
+[adrs/mcp-cli-terminal-surface.md](../adrs/mcp-cli-terminal-surface.md),
+superseding the chat-print-mode-bridge decision. Strip, entry point,
+install-agent, and the billing guard survive.

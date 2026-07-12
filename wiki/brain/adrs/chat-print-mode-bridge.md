@@ -1,7 +1,8 @@
 ---
 title: "The chat is a per-harness print-mode bridge: conversation as the interface, terminal demoted to a toggle, bare `brain` opens the app"
 kind: decision
-status: accepted
+status: superseded
+superseded_by: brain/adrs/mcp-cli-terminal-surface.md
 updated: 2026-07-10
 confidence: medium
 sources:

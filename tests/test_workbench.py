@@ -239,54 +239,14 @@ def test_lint_page_flags_broken_link(tmp_path):
         rogue.unlink()
 
 
-def test_run_chat_message_with_stub_registry():
-    stub = [{"name": "echo", "bin": "echo",
-             "first_args": ["first:"], "continue_args": ["cont:"]}]
-    wb._chat_continuing.discard("echo")
-    r1 = wb.run_chat_message("echo", "hello", cwd=str(REPO), registry=stub)
-    assert r1["ok"] and r1["reply"] == "first: hello"
-    r2 = wb.run_chat_message("echo", "again", cwd=str(REPO), registry=stub)
-    assert r2["ok"] and r2["reply"] == "cont: again", \
-        "second turn must use the continuation form"
-    wb._chat_continuing.discard("echo")
-
-
-def test_run_chat_message_rejects_unknown_and_missing():
-    r = wb.run_chat_message("nope", "x", cwd=str(REPO), registry=[])
-    assert not r["ok"] and "unknown" in r["reply"]
-    r = wb.run_chat_message(
-        "ghost", "x", cwd=str(REPO),
-        registry=[{"name": "ghost", "bin": "no-such-bin-xyz",
-                   "first_args": [], "continue_args": []}])
-    assert not r["ok"] and "PATH" in r["reply"]
-
-
-def test_chat_rows_shape():
-    names = [r["name"] for r in wb.CHAT_CLIS]
-    assert names == sorted(set(names))
-    for row in wb.CHAT_CLIS:
-        assert row["bin"] and isinstance(row["first_args"], list)
-        assert isinstance(row["continue_args"], list)
-
-
-def test_workbench_page_is_chat_first():
+def test_workbench_page_is_terminal_primary():
+    """Per mcp-cli-terminal-surface (supersedes chat-print-mode-bridge):
+    no chat pane; terminal primary; strip and nav survive."""
     html = wb.render_workbench_page("tok", wb.TERMINAL_CLIS, 40,
-                                    ["engineer"], wb.CHAT_CLIS)
-    assert "composer" in html and "toggleTerm" in html
-    assert html.index("msgs") < html.index('id="term"'), \
-        "chat renders before the terminal"
-    assert 'value="claude"' in html
-
-
-def test_workbench_page_playthrough_upgrades():
-    html = wb.render_workbench_page("tok", wb.TERMINAL_CLIS, 40,
-                                    [], wb.CHAT_CLIS)
-    assert "autofocus" in html, "composer must autofocus (playthrough #1)"
-    assert "mdlite" in html and "<code>$1</code>" in html, \
-        "agent bubbles render markdown-lite (playthrough #2)"
-    assert 'id="chips"' in html, "suggestion chips (playthrough #3)"
-    # Escaping happens before markup insertion — the order in source.
-    assert html.index("&amp;") < html.index("<code>$1</code>")
+                                    ["engineer"])
+    assert "composer" not in html and "mdlite" not in html
+    assert 'id="term"' in html and 'id="strip"' in html
+    assert ">knowledge</button>" in html
 
 
 def test_billing_guard_strips_api_keys(monkeypatch):
@@ -299,13 +259,11 @@ def test_billing_guard_strips_api_keys(monkeypatch):
         "ANTHROPIC_API_KEY"] == "sk-test-leak"
 
 
-def test_chat_subprocess_never_sees_api_key(monkeypatch):
+def test_harness_subprocess_never_sees_api_key(monkeypatch):
+    """The billing guard now governs PTY sessions — probe via a real
+    subprocess using the same env builder the PTY uses."""
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test-leak")
-    stub = [{"name": "envprobe", "bin": "sh",
-             "first_args": ["-c", "echo ${ANTHROPIC_API_KEY:-STRIPPED}"],
-             "continue_args": ["-c", "echo ${ANTHROPIC_API_KEY:-STRIPPED}"]}]
-    wb._chat_continuing.discard("envprobe")
-    r = wb.run_chat_message("envprobe", "ignored", cwd=str(REPO),
-                            registry=stub)
-    wb._chat_continuing.discard("envprobe")
-    assert r["ok"] and r["reply"] == "STRIPPED", r
+    out = subprocess.run(
+        ["sh", "-c", "echo ${ANTHROPIC_API_KEY:-STRIPPED}"],
+        env=wb.billing_safe_env(False), capture_output=True, text=True)
+    assert out.stdout.strip() == "STRIPPED"

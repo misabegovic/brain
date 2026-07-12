@@ -49,19 +49,18 @@ skeleton, `sources/` starts empty, `log/log.md` starts empty.
 brain        # that's it — serves and opens the app
 ```
 
-One window: a **chat** wired to your agent harness (Claude Code,
-Codex, Cursor, OpenCode — print modes, on your existing
-subscription), the **rendered knowledge** beside it (live-reloading
-as the agent works), and an ambient strip showing health and what's
-waiting. **Billing guard:** the app strips API-key env vars from
-every harness subprocess, so a chat turn can only bill your
-logged-in plan — never a metered key lurking in your shell
-(`chat.allow_api_keys` opts back in; `doctor` warns if keys are
-present). Ask "what needs attention?" and the agent tends the queue;
-say "note this decision" and it lands where the mechanism says it
-should. A raw terminal hides behind the `terminal` toggle for power
-use. Everything below this section is the machinery the chat drives
-for you.
+One window: your **agent harness in a terminal** (one-click launch:
+Claude Code, Codex, Cursor, OpenCode) beside the **rendered
+knowledge** (live-reloading as the agent works), with an ambient
+strip showing health and what's waiting. Talking to the harness *is*
+the chat — "what needs attention?" tends the queue, "note this
+decision" lands it where the mechanism says. Prefer a chat app?
+`install-agent` wires the brain's MCP into any MCP-aware client
+(Claude Desktop, Cursor, ChatGPT connectors) — same knowledge, their
+chat UI. **Billing guard:** the app strips API-key env vars from
+every harness subprocess, so sessions bill your logged-in plan —
+never a metered key lurking in your shell (`chat.allow_api_keys`
+opts back in; `doctor` warns if keys are present).
 
 ## Adopting the shell for a project
 

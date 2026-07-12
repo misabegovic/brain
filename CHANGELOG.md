@@ -4,6 +4,12 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.14.0 — 2026-07-12
+- Surfaces simplified: first-party chat pane removed (superseding
+  ADR mcp-cli-terminal-surface) — MCP + CLI + terminal cover it;
+  ambient strip, bare-`brain` entry, install-agent, and the billing
+  guard retained. CI cron disarmed to manual dispatch (one runner).
+
 ## 0.13.1 — 2026-07-10
 - Market-readiness: Apache-2.0 license, NOTICE, CHANGELOG,
   CONTRIBUTING, SECURITY, pyproject packaging, first tagged
