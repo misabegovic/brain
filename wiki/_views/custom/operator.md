@@ -17,9 +17,7 @@ Everything pending, every cursor, every tracked deadline — the maintenance pic
 
 ## Tend queue (all)
 
-| id | kind | priority | summary |
-|---|---|---|---|
-| ui-comment-20260712-144654 | custom | normal | operator comment on security-review: "sam adversarial probe 2026-07-12" |
+*(no rows)*
 
 ## Deadlines
 
