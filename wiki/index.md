@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **playthrough sweep: 8 AI-suggestions for review.**
+  A three-persona sweep (Viktor / Priya / Sam, six agent runs)
+  walked the product and landed eight `confidence: low` drafts under
+  [brain/ai-suggestions](brain/index.md#ai-suggestions-drafts-for-human-review)
+  plus a serving-mode insight. All security guarantees held under
+  Sam's adversarial probe.
 - **2026-07-12** — **0.19.3: PR mode + detector teeth.** The
   operator removed LOCAL_FIRST — every change now lands via PR with
   CI green. The internal-refs detector reads UI source strings
