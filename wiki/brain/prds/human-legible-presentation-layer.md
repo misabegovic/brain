@@ -1,7 +1,8 @@
 ---
 title: "Human-legible presentation layer — the UI becomes the partner's briefing: opinionated, Shape Up-native, attention-first"
 kind: initiative
-status: living
+status: superseded
+superseded_by: brain/state.md
 updated: 2026-07-12
 confidence: medium
 supersedes: brain/pitches/human-legible-presentation-layer.md
@@ -77,8 +78,10 @@ validator, summaries authored across the card-rendered kinds,
 CLI verbs, the briefing page as the app's landing surface with the
 three bands + orientation strip + empty-state guidance, decision
 cards honouring the ai-suggestion distinction, and the tend skill's
-judgement + calibration steps. Trail timeline and link-graph visual
-are within-appetite follow-ups.
+judgement + calibration steps. The 0.18.0 slice closed the bet:
+type filters + pagination, the dashboard/trail/graph read
+surfaces, and the interactive channel (queue/comment → inbox items
+via the local /api/act; see the ADR's amendment).
 
 ## Perceived
 

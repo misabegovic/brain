@@ -26,6 +26,14 @@ into the sections below.
 
 ## Now
 
+- **The briefing is two-way (0.18.0, 2026-07-12).** Type filters +
+  pagination, dashboard/trail/graph read surfaces, and the
+  interactive channel: queue/comment clicks become inbox items
+  (`produced_by: ui-action`) the next tend session digests —
+  humans still act through their agent; the click just hands the
+  agent work faster. The presentation-layer bet closes with its
+  within-appetite remainders delivered.
+
 - **The briefing is the UI (0.17.0, 2026-07-12).** Complete UI
   rewrite on the operator's bet: Starlight out, purpose-built Astro
   app in — the root is the partner's briefing (attention verdicts,

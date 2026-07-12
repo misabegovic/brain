@@ -378,6 +378,21 @@ defect, and five shipped PRDs still claiming in-flight — the
 opinionated surface doing its job on day one. Within-appetite
 follow-ups: trail timeline, link-graph visual.
 
+## 0.18.0 — the briefing becomes two-way — **shipped 2026-07-12**
+
+Operator direction on 0.17.0's heels: filters + show-more
+pagination on the briefing; `/dashboard/` (numbers, bars, activity
+sparkline), `/trail/` (lifecycle timeline with supersedes chains),
+and `/graph/` (build-time SVG link graph) — all dependency-free;
+and the **interactive channel**: queue/comment actions on cards and
+pages POST to the local `/api/act`, which appends a normal inbox
+item the next tend session digests
+([ADR amendment](adrs/human-legible-presentation-layer.md)). The
+UI's only write surface is the inbox; the endpoint requires a
+custom header (CSRF-proof via unanswered preflight) and never
+mounts in serving mode. This also delivers the 0.17
+within-appetite remainders — the presentation-layer bet closes.
+
 ## Standing ideas (unversioned)
 
 Deliberately not adopted from the open-knowledge direction: a vector

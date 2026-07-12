@@ -41,7 +41,7 @@ command — judge from the summary whether it still fits.
 | `ingest`   | Follow the `/in` routing tables against `source`. For `cursor-diff-<repo>` items: sibling-repo handling first, then walk `brain.py sync-cursor diff <repo>`, synthesise into the repo's shelves, advance the cursor per the wiki-ingest protocol. |
 | `groom`    | Apply the groom skill's judgement to the named page(s) — refresh-or-demote half-life crossings, fix link-health findings, supersede→archive transitions. |
 | `research` | Deepdive per the shape skill's pre-flight discipline: fetch constraining context (sibling code, web sources read verbatim), snapshot findings into `sources/research/`, land the synthesis that earns the confidence bump with citations. |
-| `custom`   | Judge from `summary` + `route`. When genuinely ambiguous, ask the operator one short question rather than guessing. |
+| `custom`   | Judge from `summary` + `route`. When genuinely ambiguous, ask the operator one short question rather than guessing. Items with `produced_by: ui-action` are **operator intent clicked in from the briefing** (a queued execution or a comment on a page) — treat them as direct operator requests: do the work or answer the comment (land the answer where the content belongs, e.g. the page's topic or the discussion), then clear. |
 
 Fan out per the parallel-first discipline when a single item has
 parallel shape (multiple files to read, multiple pages to check).

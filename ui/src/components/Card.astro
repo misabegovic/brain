@@ -1,19 +1,25 @@
 ---
 // One lifecycle-aware card. `chips` entries: { label, tone? }.
+// `target` enables the interactive channel; `kind` feeds the
+// briefing's type filter.
+import Actions from './Actions.astro';
 interface Props {
   href?: string;
   title: string;
   summary?: string;
   chips?: { label: string; tone?: string }[];
   reason?: string; // attention cards: the traceable one-line verdict reason
+  target?: string;
+  kind?: string;
 }
-const { href, title, summary, chips = [], reason } = Astro.props;
+const { href, title, summary, chips = [], reason, target, kind } = Astro.props;
 ---
-<li class="card">
+<li class="card" data-kind={kind}>
   <div class="chips">
     {chips.map((c) => <span class={`chip ${c.tone ?? ''}`}>{c.label}</span>)}
   </div>
   <h3>{href ? <a href={href}>{title}</a> : title}</h3>
   {reason && <p><strong>Why:</strong> {reason}</p>}
   {summary && <p>{summary}</p>}
+  {target && <Actions target={target} />}
 </li>

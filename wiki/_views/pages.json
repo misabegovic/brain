@@ -123,7 +123,7 @@
         "../prds/human-legible-presentation-layer.md",
         "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md"
       ],
-      "tokens": 1153
+      "tokens": 1418
     },
     {
       "path": "brain/adrs/kernel-manifest-instancing.md",
@@ -566,7 +566,8 @@
       "path": "brain/prds/human-legible-presentation-layer.md",
       "title": "Human-legible presentation layer \u2014 the UI becomes the partner's briefing: opinionated, Shape Up-native, attention-first",
       "kind": "initiative",
-      "status": "living",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
       "updated": "2026-07-12",
       "confidence": "medium",
       "supersedes": "brain/pitches/human-legible-presentation-layer.md",
@@ -575,7 +576,7 @@
         "../pitches/human-legible-presentation-layer.md",
         "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md"
       ],
-      "tokens": 884
+      "tokens": 922
     },
     {
       "path": "brain/prds/instance-birth.md",
@@ -622,7 +623,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 4846
+      "tokens": 5049
     },
     {
       "path": "brain/state.md",
@@ -634,7 +635,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2127
+      "tokens": 2230
     },
     {
       "path": "brain/topics/chat-surface-necessity.md",

@@ -190,3 +190,86 @@ def test_no_pty_module_ships():
     for gone in ("openpty", "Sec-WebSocket", "TERMINAL_CLIS",
                  "billing_safe_env"):
         assert gone not in text, f"PTY remnant in brain.py: {gone}"
+
+
+def test_ui_action_endpoint_queues_inbox_item():
+    import urllib.request
+    port = 8993
+    proc = subprocess.Popen(
+        [sys.executable, str(REPO / "tools" / "brain.py"),
+         "serve", "--port", str(port)], stderr=subprocess.PIPE)
+    created = []
+    try:
+        deadline = time.time() + 15
+        while time.time() < deadline:
+            try:
+                urllib.request.urlopen(
+                    f"http://127.0.0.1:{port}/api", timeout=5)
+                break
+            except OSError:
+                if proc.poll() is not None:
+                    break
+                time.sleep(0.3)
+        req = urllib.request.Request(
+            f"http://127.0.0.1:{port}/api/act",
+            data=json.dumps({"action": "comment",
+                             "target": "wiki/brain/roadmap.md",
+                             "note": "test comment"}).encode(),
+            headers={"X-Brain-Act": "1",
+                     "Content-Type": "application/json"},
+            method="POST")
+        resp = json.loads(urllib.request.urlopen(req, timeout=5).read())
+        item_id = resp["queued"]
+        created.append(item_id)
+        item = json.loads(
+            (REPO / "wiki" / "_state" / "inbox" / f"{item_id}.json")
+            .read_text())
+        assert item["produced_by"] == "ui-action"
+        assert "test comment" in item["summary"]
+        # Without the custom header the request is refused (CSRF guard).
+        bare = urllib.request.Request(
+            f"http://127.0.0.1:{port}/api/act",
+            data=b'{"action":"comment","note":"x"}', method="POST")
+        try:
+            urllib.request.urlopen(bare, timeout=5)
+            raise AssertionError("action without header must 403")
+        except urllib.error.HTTPError as e:
+            assert e.code == 403
+    finally:
+        for iid in created:
+            (REPO / "wiki" / "_state" / "inbox" / f"{iid}.json").unlink(
+                missing_ok=True)
+        proc.terminate()
+        proc.wait(timeout=5)
+
+
+def test_ui_action_absent_in_serving_mode():
+    import urllib.request
+    port = 8994
+    proc = subprocess.Popen(
+        [sys.executable, str(REPO / "tools" / "brain.py"),
+         "serve", "--port", str(port)],
+        env={**os.environ, "BRAIN_SERVING": "1"}, stderr=subprocess.PIPE)
+    try:
+        deadline = time.time() + 15
+        while time.time() < deadline:
+            try:
+                urllib.request.urlopen(
+                    f"http://127.0.0.1:{port}/api", timeout=5)
+                break
+            except OSError:
+                if proc.poll() is not None:
+                    break
+                time.sleep(0.3)
+        req = urllib.request.Request(
+            f"http://127.0.0.1:{port}/api/act",
+            data=b'{"action":"comment","note":"x"}',
+            headers={"X-Brain-Act": "1"}, method="POST")
+        try:
+            urllib.request.urlopen(req, timeout=5)
+            raise AssertionError("act must not mount in serving mode")
+        except urllib.error.HTTPError as e:
+            assert e.code == 405
+    finally:
+        proc.terminate()
+        proc.wait(timeout=5)

@@ -54,3 +54,75 @@ export function version() {
   const f = path.join(REPO, 'VERSION');
   return fs.existsSync(f) ? fs.readFileSync(f, 'utf8').trim() : '';
 }
+
+// ---- link graph (computed from page bodies at build time) -----------
+
+const SKIP_PREFIXES = ['_'];
+
+function wikiFiles(dir = WIKI, out = []) {
+  for (const name of fs.readdirSync(dir)) {
+    const full = path.join(dir, name);
+    const rel = path.relative(WIKI, full);
+    if (SKIP_PREFIXES.some((p) => rel.startsWith(p))) continue;
+    const stat = fs.statSync(full);
+    if (stat.isDirectory()) wikiFiles(full, out);
+    else if (name.endsWith('.md')) out.push(rel);
+  }
+  return out;
+}
+
+export function linkGraph() {
+  const files = wikiFiles();
+  const set = new Set(files);
+  const edges = [];
+  for (const rel of files) {
+    const text = fs.readFileSync(path.join(WIKI, rel), 'utf8');
+    for (const m of text.matchAll(/\]\(([^)]+\.md)(#[^)]*)?\)/g)) {
+      const target = m[1];
+      if (/^(https?|mailto):/.test(target) || target.startsWith('~')) continue;
+      const resolved = path
+        .normalize(path.join(path.dirname(rel), target))
+        .replaceAll('\\', '/');
+      if (set.has(resolved) && resolved !== rel) {
+        edges.push([rel, resolved]);
+      }
+    }
+  }
+  const inbound = Object.fromEntries(files.map((f) => [f, 0]));
+  for (const [, dst] of edges) inbound[dst]++;
+  return { files, edges, inbound };
+}
+
+// ---- audit-log activity (ops per day, last N days) -------------------
+
+export function logActivity(days = 30) {
+  const file = path.join(REPO, 'log', 'log.md');
+  if (!fs.existsSync(file)) return { series: [], total: 0 };
+  const counts = new Map();
+  for (const m of fs
+    .readFileSync(file, 'utf8')
+    .matchAll(/^(\d{4}-\d{2}-\d{2}) (mine|ingest|merge|commit)/gm)) {
+    counts.set(m[1], (counts.get(m[1]) ?? 0) + 1);
+  }
+  const series = [];
+  const today = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today.getTime() - i * 86400000)
+      .toISOString()
+      .slice(0, 10);
+    series.push({ date: d, n: counts.get(d) ?? 0 });
+  }
+  return { series, total: [...counts.values()].reduce((a, b) => a + b, 0) };
+}
+
+// ---- attention-grade calibration -------------------------------------
+
+export function gradeStats() {
+  const file = path.join(WIKI, '_state', 'attention-grades.json');
+  if (!fs.existsSync(file)) return { useful: 0, noise: 0 };
+  const grades = JSON.parse(fs.readFileSync(file, 'utf8')).grades ?? [];
+  return {
+    useful: grades.filter((g) => g.grade === 'useful').length,
+    noise: grades.filter((g) => g.grade === 'noise').length,
+  };
+}

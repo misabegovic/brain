@@ -17,9 +17,7 @@ Committed work, proposals awaiting a bet, patterns from feedback, and what's que
 
 ## Open initiatives
 
-| path | title | status | confidence | updated |
-|---|---|---|---|---|
-| brain/prds/human-legible-presentation-layer.md | Human-legible presentation layer — the UI becomes the partner's briefing: opinionated, Shape Up-native, attention-first | living | medium | 2026-07-12 |
+*(no rows)*
 
 ## Pitches awaiting a bet
 

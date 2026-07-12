@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **0.18.0: the briefing becomes two-way.**
+  Filters + pagination, `/dashboard/` + `/trail/` + `/graph/`, and
+  the interactive channel — queue/comment clicks on any card or
+  page become inbox items the next tend digests
+  ([ADR amendment](brain/adrs/human-legible-presentation-layer.md)).
+  The presentation-layer bet closes.
 - **2026-07-12** — **0.17.0: the briefing is the UI.** The
   presentation-layer bet shipped as a complete UI rewrite
   ([PRD](brain/prds/human-legible-presentation-layer.md) ·

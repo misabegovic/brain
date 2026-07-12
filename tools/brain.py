@@ -1546,6 +1546,52 @@ def cmd_serve(args) -> int:
 
         def do_POST(self):  # noqa: N802
             url = urllib.parse.urlparse(self.path)
+            # The UI's single write surface (presentation-layer ADR,
+            # 2026-07-12 amendment): an action becomes an inbox item
+            # the next tend session digests. Never mounted in serving
+            # mode; the custom-header requirement forces a CORS
+            # preflight this server never grants, so a hostile web
+            # page cannot fire it cross-origin.
+            if workbench and url.path == "/api/act":
+                host_hdr = (self.headers.get("Host") or "").split(":")[0]
+                if host_hdr not in ("localhost", "127.0.0.1", "::1", ""):
+                    self._send_json(403, {"error": "host not allowed"})
+                    return
+                if self.headers.get("X-Brain-Act") != "1":
+                    self._send_json(403, {"error": "missing action header"})
+                    return
+                try:
+                    n = int(self.headers.get("Content-Length") or 0)
+                    body = json.loads(self.rfile.read(min(n, 65536)))
+                    action = str(body["action"])
+                    target = str(body.get("target", ""))[:300]
+                    note = str(body.get("note", ""))[:2000]
+                except (KeyError, ValueError, json.JSONDecodeError):
+                    self._send_json(400, {"error": "bad action body"})
+                    return
+                if action not in ("execute", "comment"):
+                    self._send_json(400, {"error": "unknown action"})
+                    return
+                stamp = _dt_now_compact()
+                item_id = f"ui-{action}-{stamp}"
+                if action == "execute":
+                    summary = (f"operator queued {target or 'work'} for "
+                               f"execution from the briefing"
+                               + (f' — "{note}"' if note else ""))
+                    priority = "high"
+                else:
+                    summary = (f'operator comment on {target or "the brain"}:'
+                               f' "{note}"')
+                    priority = "normal"
+                try:
+                    inbox_add(id=item_id, kind="custom", summary=summary,
+                              route="/tend " + item_id, priority=priority,
+                              source=target, produced_by="ui-action")
+                except ValueError as exc:
+                    self._send_json(400, {"error": str(exc)})
+                    return
+                self._send_json(200, {"queued": item_id})
+                return
             self._send_json(405, {"error": "read-only"})
 
     class Server(socketserver.ThreadingTCPServer):
@@ -5125,6 +5171,11 @@ def _schedule_run_inbox_refresh() -> int:
     print(f"inbox-refresh: {added} added, {updated_n} refreshed, "
           f"{removed} cleared; {len(_inbox_items())} pending total")
     return 0
+
+
+def _dt_now_compact() -> str:
+    import time
+    return time.strftime("%Y%m%d-%H%M%S")
 
 
 PLAYTHROUGH_CURSOR = WIKI / "_state" / "playthrough-cursor.json"

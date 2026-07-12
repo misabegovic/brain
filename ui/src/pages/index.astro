@@ -1,8 +1,8 @@
 ---
 // The briefing — the app's root and its opinion. Three judgement
 // bands (Needs you / In flight / On the table) over an orientation
-// strip (were / are / going). Everything derives from the wiki and
-// the inbox at build time; the self-heal rebuild keeps it fresh.
+// strip (were / are / going), with type filters, show-more
+// pagination, and the interactive channel on every card.
 // Per wiki/brain/adrs/human-legible-presentation-layer.md.
 import { getCollection } from 'astro:content';
 import App from '../layouts/App.astro';
@@ -17,6 +17,7 @@ const live = all.filter(
 );
 const href = (e) =>
   '/' + (e.id === 'index' ? 'home' : e.id.replace(/\/index$/, '')) + '/';
+const wikiPath = (e) => 'wiki/' + e.id + '.md';
 const isSuggestion = (e) => e.id.includes('ai-suggestions/');
 const age = (e) => {
   const u = e.data.updated;
@@ -54,21 +55,42 @@ const inFlight = live.filter(
 const topics = live.filter((e) => e.data.kind === 'topic');
 const ideas = live.filter((e) => e.data.kind === 'idea');
 
+// ---- Filter vocabulary (only kinds actually present) ------------------
+const presentKinds = [...new Set([
+  ...needsOperator.map(() => 'verdict'),
+  ...awaitingBet.map(() => 'pitch'),
+  ...awaitingConfirmation.map(() => 'insight'),
+  ...suggestions.map(() => 'draft'),
+  ...inFlight.map((e) => e.data.kind),
+  ...topics.map(() => 'topic'),
+  ...ideas.map(() => 'idea'),
+])];
+
 // ---- Orientation -----------------------------------------------------
 const were = sectionBullets('index.md', 'What changed', 3);
 const are = sectionBullets('brain/state.md', 'Now', 3);
 const going = sectionBullets('brain/state.md', 'Target', 3);
 
 const emptyCorpus = live.length <= 2;
+const PAGE = 8; // cards shown per band before "show all"
 ---
 <App
   title="Briefing"
   description="What needs you, what's in flight, what's on the table."
 >
   <h1 style="margin:0 0 .1rem; font-size:1.5em;">Briefing</h1>
-  <p style="margin:0 0 1.2rem; color:var(--muted);">
+  <p style="margin:0 0 .9rem; color:var(--muted);">
     The brain's judgement of what matters right now · v{version()}
   </p>
+
+  {presentKinds.length > 1 && (
+    <div class="filters" id="filters">
+      <button class="on" data-filter="">all</button>
+      {presentKinds.map((k) => (
+        <button data-filter={k}>{k}</button>
+      ))}
+    </div>
+  )}
 
   {emptyCorpus && (
     <div class="empty">
@@ -81,7 +103,7 @@ const emptyCorpus = live.length <= 2;
     </div>
   )}
 
-  <section>
+  <section data-band>
     <h2>Needs you
       <span class="chip alert">{needsOperator.length + awaitingBet.length
         + awaitingConfirmation.length + suggestions.length}</span>
@@ -91,6 +113,8 @@ const emptyCorpus = live.length <= 2;
         <Card
           title={i.summary}
           reason={i.attention_reason}
+          kind="verdict"
+          target={i.id}
           chips={[
             { label: 'attention', tone: 'alert' },
             { label: i.kind ?? 'item' },
@@ -103,6 +127,8 @@ const emptyCorpus = live.length <= 2;
           href={href(e)}
           title={e.data.title}
           summary={e.data.summary}
+          kind="pitch"
+          target={wikiPath(e)}
           chips={[
             { label: 'awaiting your bet', tone: 'warn' },
             e.data.appetite
@@ -117,6 +143,8 @@ const emptyCorpus = live.length <= 2;
           href={href(e)}
           title={e.data.title}
           summary={e.data.summary}
+          kind="insight"
+          target={wikiPath(e)}
           chips={[
             { label: 'hypothesis — confirm or refute', tone: 'warn' },
             { label: 'insight' },
@@ -129,6 +157,8 @@ const emptyCorpus = live.length <= 2;
           href={href(e)}
           title={e.data.title}
           summary={e.data.summary}
+          kind="draft"
+          target={wikiPath(e)}
           chips={[
             { label: 'AI draft — review to graduate', tone: 'warn' },
             { label: e.data.kind ?? 'draft' },
@@ -151,7 +181,7 @@ const emptyCorpus = live.length <= 2;
     )}
   </section>
 
-  <section>
+  <section data-band>
     <h2>In flight <span class="chip accent">{inFlight.length}</span></h2>
     <ul class="cards">
       {inFlight.map((e) => (
@@ -159,6 +189,8 @@ const emptyCorpus = live.length <= 2;
           href={href(e)}
           title={e.data.title}
           summary={e.data.summary}
+          kind={e.data.kind}
+          target={wikiPath(e)}
           chips={[
             { label: e.data.kind === 'epic' ? 'epic' : 'bet placed', tone: 'ok' },
             { label: age(e) },
@@ -176,7 +208,7 @@ const emptyCorpus = live.length <= 2;
     )}
   </section>
 
-  <section>
+  <section data-band>
     <h2>On the table
       <span class="chip">{topics.length + ideas.length}</span>
     </h2>
@@ -186,6 +218,8 @@ const emptyCorpus = live.length <= 2;
           href={href(e)}
           title={e.data.title}
           summary={e.data.summary}
+          kind="topic"
+          target={wikiPath(e)}
           chips={[{ label: 'open discussion' }, { label: age(e) }]}
         />
       ))}
@@ -194,6 +228,8 @@ const emptyCorpus = live.length <= 2;
           href={href(e)}
           title={e.data.title}
           summary={e.data.summary}
+          kind="idea"
+          target={wikiPath(e)}
           chips={[{ label: 'idea' }, { label: age(e) }]}
         />
       ))}
@@ -239,6 +275,13 @@ const emptyCorpus = live.length <= 2;
     font-size: 1.05em; margin: 0 0 .2rem;
     display: flex; align-items: center; gap: .5rem;
   }
+  .filters { display: flex; gap: .35rem; flex-wrap: wrap; margin: 0 0 .4rem; }
+  .filters button {
+    font: inherit; font-size: .82em; cursor: pointer;
+    background: var(--chip); color: var(--muted); border: 0;
+    border-radius: 99px; padding: .1rem .7rem;
+  }
+  .filters button.on { color: var(--fg); outline: 1px solid var(--accent); }
   .orientation .tri {
     display: grid; gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
@@ -248,4 +291,59 @@ const emptyCorpus = live.length <= 2;
     letter-spacing: .05em; }
   .orientation ul { margin: 0; padding-left: 1.1rem; }
   .orientation li { margin: .3rem 0; font-size: .92em; }
+  .more {
+    font: inherit; font-size: .85em; cursor: pointer;
+    background: none; border: 1px dashed var(--line);
+    border-radius: .5rem; color: var(--muted);
+    padding: .3rem .9rem; margin: .2rem 0 0;
+  }
 </style>
+
+<script is:inline define:vars={{ PAGE }}>
+  // Type filter: hides cards whose data-kind doesn't match.
+  const filters = document.getElementById('filters');
+  let active = '';
+  function apply() {
+    document.querySelectorAll('[data-band]').forEach((band) => {
+      const cards = [...band.querySelectorAll('.card')];
+      let shown = 0;
+      const expanded = band.dataset.expanded === '1';
+      cards.forEach((c) => {
+        const match = !active || c.dataset.kind === active;
+        const withinPage = expanded || shown < PAGE;
+        c.style.display = match && (withinPage || !match) ? '' : 'none';
+        if (match && withinPage) shown++;
+        else if (match) c.style.display = 'none';
+      });
+      const matching = cards.filter(
+        (c) => !active || c.dataset.kind === active).length;
+      let btn = band.querySelector('.more');
+      if (matching > PAGE && !expanded) {
+        if (!btn) {
+          btn = document.createElement('button');
+          btn.className = 'more';
+          btn.addEventListener('click', () => {
+            band.dataset.expanded = '1';
+            apply();
+          });
+          band.querySelector('.cards').after(btn);
+        }
+        btn.textContent = `show all ${matching}`;
+        btn.style.display = '';
+      } else if (btn) {
+        btn.style.display = 'none';
+      }
+    });
+  }
+  if (filters) {
+    filters.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      active = b.dataset.filter;
+      filters.querySelectorAll('button').forEach((x) =>
+        x.classList.toggle('on', x === b));
+      apply();
+    });
+  }
+  apply();
+</script>

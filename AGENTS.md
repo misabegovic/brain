@@ -1301,7 +1301,16 @@ were/are/going orientation strip. Wiki pages render at their
 existing paths with lifecycle chrome (kind/status/confidence/
 appetite chips, the `summary:` lead, ai-suggestion and superseded
 banners); the wiki home renders at `/home/`; Pagefind search at
-`/search/`. Build: `npm run build` (Astro + Pagefind; details in
+`/search/`; `/dashboard/` (corpus numbers, bars, activity
+sparkline), `/trail/` (the lifecycle as a timeline with supersedes
+chains), and `/graph/` (the link graph as build-time SVG) round out
+the read surfaces. The briefing filters by type and paginates per
+band. **The interactive channel** (ADR amendment 2026-07-12): cards
+and pages carry *queue* and *comment* actions that POST to the
+local server's `/api/act`, which appends an inbox item
+(`produced_by: ui-action`) for the next tend session — the UI's
+only write surface is the inbox; the endpoint never mounts in
+serving mode. Build: `npm run build` (Astro + Pagefind; details in
 `ui/README.md`). **Local-first** — sharing happens via the repo
 paths in `wiki/`, not a hosted URL. Mobile-native is a
 non-negotiable rule for any UI iteration.

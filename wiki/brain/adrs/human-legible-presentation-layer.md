@@ -104,7 +104,27 @@ introduce state.
   wiring, and the onboarding deck are re-implemented rather than
   inherited from the theme. Accepted — the theme's genericity was
   the problem being solved.
-- **Retains** every standing guarantee: read-only UI, no second
-  content store, no scheduled LLM, serving mode unchanged; wiki
-  page URLs keep their existing shape so links and bookmarks
-  survive.
+- **Retains** every standing guarantee: read-only UI (amended
+  below to a narrow inbox-write channel), no second content store,
+  no scheduled LLM, serving mode unchanged; wiki page URLs keep
+  their existing shape so links and bookmarks survive.
+
+## Amendments
+
+- **2026-07-12 — the interactive channel (operator direction).**
+  The briefing and page views gain actions — *queue for the agent*
+  and *comment* — and the "UI stays read-only" consequence is
+  narrowed rather than reversed: the UI's only write surface is
+  the **inbox**. An action POSTs to the local server, which
+  appends a normal inbox item (`produced_by: ui-action`); the next
+  tend session digests it like any operator-queued work. The UI
+  still never writes the wiki; no second store appears (the inbox
+  was always the human↔agent seam); the endpoint mounts only
+  outside serving mode, and cross-origin abuse is blocked by a
+  required custom header (unanswered CORS preflight) plus the Host
+  check. Same amendment adds the briefing's type filters and
+  show-more pagination, a build-time dashboard page
+  (numbers/bars/sparkline, dependency-free), and delivers the
+  within-appetite remainders (trail timeline, link-graph visual).
+  Direction unchanged: humans act through their agent — the click
+  is a faster way to hand the agent work.

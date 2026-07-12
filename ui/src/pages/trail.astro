@@ -1,0 +1,87 @@
+---
+// The trail — the Shape Up lifecycle as a timeline: pitches, bets,
+// decisions, and their graduation chains (supersedes edges), newest
+// first. Build-time markup, no dependencies.
+import { getCollection } from 'astro:content';
+import App from '../layouts/App.astro';
+
+const TRAIL_KINDS = ['pitch', 'initiative', 'epic', 'decision', 'topic', 'insight'];
+const all = (await getCollection('docs')).filter(
+  (e) => !e.id.startsWith('_') && TRAIL_KINDS.includes(e.data.kind ?? ''),
+);
+const dateOf = (e) => {
+  const u = e.data.updated;
+  return typeof u === 'string' ? u : (u?.toISOString?.().slice(0, 10) ?? '');
+};
+const entries = all
+  .map((e) => ({ e, date: dateOf(e) }))
+  .sort((a, b) => (a.date < b.date ? 1 : -1));
+const byDate = new Map();
+for (const it of entries) {
+  if (!byDate.has(it.date)) byDate.set(it.date, []);
+  byDate.get(it.date).push(it.e);
+}
+const href = (e) =>
+  '/' + (e.id === 'index' ? 'home' : e.id.replace(/\/index$/, '')) + '/';
+const refHref = (ref) =>
+  '/' + ref.replace(/\.md$/, '').replace(/\/index$/, '') + '/';
+const refName = (ref) => ref.replace(/\.md$/, '').split('/').pop();
+const tone = (e) =>
+  e.data.status === 'superseded' || e.data.status === 'archived'
+    ? 'warn'
+    : e.data.status === 'living' || e.data.status === 'accepted'
+      ? 'ok'
+      : '';
+---
+<App title="Trail" description="How the thinking evolved, newest first.">
+  <h1 style="font-size:1.4em; margin:.2rem 0 .1rem;">Trail</h1>
+  <p style="margin:0 0 1.2rem; color:var(--muted);">
+    Pitches, bets, decisions, and what superseded what — newest first.
+  </p>
+
+  <div class="timeline">
+    {[...byDate.entries()].map(([date, list]) => (
+      <div class="day">
+        <div class="date">{date}</div>
+        <div class="events">
+          {list.map((e) => (
+            <div class="event">
+              <span class={`chip ${tone(e)}`}>{e.data.kind}</span>
+              <span class={`chip ${tone(e)}`}>{e.data.status}</span>
+              <a href={href(e)}>{e.data.title}</a>
+              <div class="links">
+                {e.data.supersedes && (
+                  <span>⬅ supersedes{' '}
+                    <a href={refHref(e.data.supersedes)}>{refName(e.data.supersedes)}</a>
+                  </span>
+                )}
+                {e.data.superseded_by && (
+                  <span>➡ superseded by{' '}
+                    <a href={refHref(e.data.superseded_by)}>{refName(e.data.superseded_by)}</a>
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</App>
+
+<style>
+  .timeline { border-left: 2px solid var(--line); padding-left: 1.1rem; }
+  .day { margin: 0 0 1.4rem; position: relative; }
+  .day::before {
+    content: ''; position: absolute; left: -1.45rem; top: .35rem;
+    width: .6rem; height: .6rem; border-radius: 99px;
+    background: var(--accent);
+  }
+  .date { font-weight: 600; font-size: .9em; color: var(--muted);
+    margin-bottom: .4rem; }
+  .event { margin: .45rem 0; font-size: .95em; }
+  .event a { color: var(--fg); }
+  .event .chip { margin-right: .3rem; }
+  .links { color: var(--muted); font-size: .82em; margin-top: .1rem;
+    display: flex; gap: 1rem; flex-wrap: wrap; }
+</style>

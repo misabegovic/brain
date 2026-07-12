@@ -4,6 +4,21 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.18.0 — 2026-07-12
+- The briefing becomes two-way (presentation-layer ADR amendment):
+  queue/comment actions on cards and pages POST to the local
+  /api/act, which appends an inbox item (produced_by: ui-action)
+  for the next tend session. Custom-header CSRF guard; never
+  mounts in serving mode. Tend treats ui-action items as direct
+  operator intent.
+- Briefing gains type filters and per-band show-more pagination.
+- New read surfaces, all dependency-free and build-time:
+  /dashboard/ (stat cards, kind/status/confidence bars, 30-day
+  activity sparkline, hubs), /trail/ (lifecycle timeline with
+  supersedes chains), /graph/ (link graph as clickable SVG).
+- Closes the presentation-layer bet (0.17 within-appetite
+  remainders delivered).
+
 ## 0.17.0 — 2026-07-12
 - Human-legible presentation layer (pitch → PRD → ADR → build, one
   bet, corrected mid-shaping to a full rewrite): Starlight retired;

@@ -6,6 +6,7 @@
 // renders at /home/ since the briefing owns the root.
 import { getCollection, render } from 'astro:content';
 import App from '../layouts/App.astro';
+import Actions from '../components/Actions.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('docs');
@@ -60,6 +61,7 @@ const statusTone =
       </div>
     )}
     {d.summary && <p class="lead">{d.summary}</p>}
+    <Actions target={'wiki/' + entry.id + '.md'} />
 
     <div class="prose">
       <Content />
