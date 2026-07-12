@@ -192,3 +192,7 @@
    diff: 25 files, +890/-29
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — 337feca: 0.19.0 — onboarding surfaces: deck rewrite + project overviews
+   diff: 14 files, +348/-81
+   restricted-paths: true
+   by: claude (fable 5)
