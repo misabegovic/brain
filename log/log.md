@@ -120,3 +120,8 @@
    diff: 19 files changed, 408 insertions(+), 70 deletions(-)
    restricted-paths: true
    by: claude (fable 5), operator picked Apache-2.0 + name-deferred
+2026-07-12 tend — first two unattended timer runs committed (views drift, overlap reports, digest); inbox empty
+2026-07-12 commit — bcf1d98: tend — unattended-run accumulation landed
+   diff: 13 files changed, 122 insertions(+), 10 deletions(-)
+   restricted-paths: false
+   by: claude (fable 5)
