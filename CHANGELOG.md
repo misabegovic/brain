@@ -4,6 +4,17 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.14.2 — 2026-07-12
+- README rewritten for cold-start readers: one-line pitch, app
+  screenshot (`docs/workbench.png`), the three ideas, a true
+  3-command quickstart; machinery pushed below the fold.
+- `setup` gains a `brain`-on-PATH step (~/.local/bin symlink) so
+  the quickstart's third command works out of the box.
+- Fixed: the workbench's self-healing UI rebuild was orphaned when
+  0.12 moved the page's poll from `/workbench/changed` to
+  `/workbench/status` — the kick now rides the live poll, so the
+  rendered pane can't serve a stale build.
+
 ## 0.14.1 — 2026-07-12
 - License changed to MIT (from Apache-2.0; no public release had
   occurred, so no downstream reliance). NOTICE removed.

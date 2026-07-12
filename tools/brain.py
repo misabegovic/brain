@@ -1362,6 +1362,25 @@ def cmd_serve(args) -> int:
                     latest = max(
                         (pp.stat().st_mtime for pp in WIKI.rglob("*.md")),
                         default=0)
+                    # Self-healing rebuild rides the poll the page
+                    # actually makes (0.12 moved the poll here and
+                    # orphaned the kick on /changed — found via a
+                    # stale screenshot, 2026-07-12).
+                    built = REPO / "ui" / ".build-cache" / "index.html"
+                    build_mtime = (built.stat().st_mtime
+                                   if built.exists() else 0)
+                    if latest > build_mtime and rebuild_lock.acquire(
+                            blocking=False):
+                        def _rebuild():
+                            try:
+                                subprocess.run(
+                                    ["bash",
+                                     str(REPO / "tools/ui-build.sh")],
+                                    capture_output=True, timeout=120)
+                            finally:
+                                rebuild_lock.release()
+                        threading.Thread(target=_rebuild,
+                                         daemon=True).start()
                     self._send_json(200, {
                         "inbox": len(_inbox_items()),
                         "fails": sum(1 for c in checks
@@ -2484,6 +2503,14 @@ def cmd_setup(args) -> int:
     if not timer_active and confirm("install the daily accumulation timer?"):
         step("accumulation timer", True, lambda: subprocess.run(
             ["bash", str(REPO / "tools" / "install-timer.sh")], check=False))
+
+    wrapper_dst = Path.home() / ".local" / "bin" / "brain"
+    if not shutil.which("brain") and not wrapper_dst.exists() and confirm(
+            "put the `brain` command on your PATH (~/.local/bin)?"):
+        def _link_wrapper():
+            wrapper_dst.parent.mkdir(parents=True, exist_ok=True)
+            wrapper_dst.symlink_to(REPO / "tools" / "brain")
+        step("`brain` on PATH", True, _link_wrapper)
 
     ui_deps = REPO / "ui" / "node_modules"
     if not ui_deps.exists() and shutil.which("npm") and confirm(

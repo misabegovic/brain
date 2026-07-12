@@ -1,21 +1,63 @@
 # brain
 
-An empty, reusable **brain shell** — an LLM-maintained knowledge base
-kernel, extracted as a harness you can point at any organisation or
-project. Clone it, fill in `brain.config.yml`, and an agent (Claude)
-maintains a synthesis of your repos, decisions, and roadmap with
-enough fidelity that:
+**A knowledge base your coding agent maintains for you.** Point it at
+your repos, docs, and decisions; the agent keeps a synthesized,
+browsable wiki of what's true, what was decided, and why — accurate
+enough to regenerate the code from, surface cross-team overlaps, and
+serve as any agent's working memory.
 
-1. **Codebases could be regenerated** from the specs that live here.
-2. **Cross-team overlaps surface** rather than hide.
-3. **Autonomous agents can use this as their primary working memory.**
+![the app — your agent beside the rendered knowledge](docs/workbench.png)
 
-The methodology is the one Karpathy describes in
-<https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f>:
-raw sources stay immutable, the wiki layer synthesises them, and a
-schema document (`AGENTS.md`) tells the agent how to maintain it.
-Verbatim history / semantic recall is handled by
-[mempalace](https://github.com/mempalace/mempalace).
+## How it works — three ideas
+
+1. **Sources go in, immutable.** Repos, documents, conversations,
+   connector pulls land under `sources/` and are never rewritten.
+2. **The wiki is the synthesis.** The agent maintains `wiki/` —
+   per-repo shelves, decisions, discussions, state — with every
+   claim citing a source. Rendered as a searchable site.
+3. **Your agent drives it; you just talk.** "What needs attention?"
+   digests the queue. "Note this decision" lands it where the rules
+   say. The rulebook is `AGENTS.md` — **you don't read it, your
+   agent does.**
+
+The pattern is [Karpathy's LLM-maintained
+wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f);
+this repo is that pattern productised: governance, health checks,
+a queue that accumulates work while you're away (no scheduled LLM
+runs, ever — see below), and one app to live in.
+
+## Quickstart
+
+```bash
+git clone <this-repo> brain && cd brain
+python3 tools/brain.py setup     # idempotent bootstrap: env, config, hooks, timer, UI
+brain                            # opens the app
+```
+
+That's the whole surface. The app is one window: your **agent
+harness in a terminal** (one-click: Claude Code, Codex, Cursor,
+OpenCode) beside the **rendered knowledge**, live-reloading as the
+agent works, with an ambient strip showing health and what's
+waiting. Prefer your own chat client? `python3 tools/brain.py
+install-agent --all` wires the brain's MCP server into any MCP-aware
+harness — same knowledge, your UI.
+
+Two guarantees worth knowing on day one:
+
+- **No scheduled LLM runs, ever.** A local timer runs cheap
+  deterministic producers that *queue* work; your interactive
+  session digests it ("tend the brain"). Nothing bills while you
+  sleep.
+- **Billing guard.** The app strips API-key env vars from every
+  harness subprocess, so sessions bill your logged-in subscription —
+  never a metered key lurking in your shell
+  (`chat.allow_api_keys` opts back in; `doctor` warns if keys are
+  present).
+
+---
+
+Everything below is reference — the machinery your agent operates so
+you don't have to.
 
 ## What ships in the shell
 
@@ -42,25 +84,6 @@ The **kernel** — mechanism, no content:
 
 The **content** is yours: `wiki/` starts as an empty three-level
 skeleton, `sources/` starts empty, `log/log.md` starts empty.
-
-## The app
-
-```bash
-brain        # that's it — serves and opens the app
-```
-
-One window: your **agent harness in a terminal** (one-click launch:
-Claude Code, Codex, Cursor, OpenCode) beside the **rendered
-knowledge** (live-reloading as the agent works), with an ambient
-strip showing health and what's waiting. Talking to the harness *is*
-the chat — "what needs attention?" tends the queue, "note this
-decision" lands it where the mechanism says. Prefer a chat app?
-`install-agent` wires the brain's MCP into any MCP-aware client
-(Claude Desktop, Cursor, ChatGPT connectors) — same knowledge, their
-chat UI. **Billing guard:** the app strips API-key env vars from
-every harness subprocess, so sessions bill your logged-in plan —
-never a metered key lurking in your shell (`chat.allow_api_keys`
-opts back in; `doctor` warns if keys are present).
 
 ## Adopting the shell for a project
 
