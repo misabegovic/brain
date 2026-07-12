@@ -1,0 +1,98 @@
+---
+// The link graph — pages as nodes grouped by shelf, body links as
+// edges. Computed and laid out at build time into plain SVG; no
+// graph library (presentation-layer ADR: dependency-free visuals).
+import App from '../layouts/App.astro';
+import { linkGraph } from '../lib/data.mjs';
+
+const { files, edges, inbound } = linkGraph();
+
+// Group by top-level shelf; order shelves by size, nodes by degree.
+const shelfOf = (f) => (f.includes('/') ? f.split('/')[0] : 'root');
+const shelves = new Map();
+for (const f of files) {
+  const s = shelfOf(f);
+  if (!shelves.has(s)) shelves.set(s, []);
+  shelves.get(s).push(f);
+}
+const shelfList = [...shelves.entries()].sort(
+  (a, b) => b[1].length - a[1].length,
+);
+for (const [, list] of shelfList) {
+  list.sort((a, b) => (inbound[b] ?? 0) - (inbound[a] ?? 0));
+}
+
+// Layout: one column per shelf.
+const COL_W = 250, ROW_H = 30, PAD = 40, NODE_W = 190, NODE_H = 22;
+const width = PAD * 2 + shelfList.length * COL_W;
+const maxRows = Math.max(...shelfList.map(([, l]) => l.length));
+const height = PAD * 2 + 30 + maxRows * ROW_H;
+const pos = new Map();
+shelfList.forEach(([shelf, list], col) => {
+  list.forEach((f, row) => {
+    pos.set(f, {
+      x: PAD + col * COL_W,
+      y: PAD + 30 + row * ROW_H,
+    });
+  });
+});
+const label = (f) => {
+  const name = f.replace(/\.md$/, '').split('/').pop();
+  return name.length > 24 ? name.slice(0, 23) + '…' : name;
+};
+const pageHref = (f) =>
+  '/' + f.replace(/\.md$/, '').replace(/\/index$/, '').replace(/^index$/, 'home') + '/';
+const edgePath = ([src, dst]) => {
+  const a = pos.get(src), b = pos.get(dst);
+  if (!a || !b) return '';
+  const x1 = a.x + NODE_W / 2, y1 = a.y + NODE_H / 2;
+  const x2 = b.x + NODE_W / 2, y2 = b.y + NODE_H / 2;
+  const mx = (x1 + x2) / 2;
+  return `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+};
+---
+<App title="Graph" description="The corpus as a link graph.">
+  <h1 style="font-size:1.4em; margin:.2rem 0 .1rem;">Graph</h1>
+  <p style="margin:0 0 1rem; color:var(--muted);">
+    {files.length} pages, {edges.length} links — grouped by shelf,
+    ordered by inbound degree. Click a node to open the page.
+  </p>
+  <div class="wrap">
+    <svg viewBox={`0 0 ${width} ${height}`}
+         style={`min-width:${width}px; height:${height}px;`}>
+      {edges.map((e) => (
+        <path d={edgePath(e)} fill="none" stroke="var(--line)"
+              stroke-width="1" opacity="0.7" />
+      ))}
+      {shelfList.map(([shelf], col) => (
+        <text x={PAD + col * COL_W} y={PAD + 8}
+              fill="var(--muted)" font-size="13" font-weight="700"
+              style="text-transform:uppercase; letter-spacing:.05em;"
+        >{shelf}</text>
+      ))}
+      {files.map((f) => {
+        const p = pos.get(f);
+        return (
+          <a href={pageHref(f)}>
+            <rect x={p.x} y={p.y} width={NODE_W} height={NODE_H}
+                  rx="6" fill="var(--card)" stroke="var(--line)" />
+            <text x={p.x + 8} y={p.y + 15} font-size="11.5"
+                  fill="var(--fg)">{label(f)}</text>
+            {(inbound[f] ?? 0) > 1 && (
+              <text x={p.x + NODE_W - 8} y={p.y + 15} font-size="10"
+                    text-anchor="end" fill="var(--accent)"
+              >{inbound[f]}</text>
+            )}
+          </a>
+        );
+      })}
+    </svg>
+  </div>
+</App>
+
+<style>
+  .wrap { overflow-x: auto; border: 1px solid var(--line);
+    border-radius: .7rem; background: var(--bg-soft); }
+  svg a { cursor: pointer; }
+  svg a:hover rect { stroke: var(--accent); }
+</style>

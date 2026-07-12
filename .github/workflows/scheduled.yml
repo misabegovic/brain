@@ -1,0 +1,54 @@
+name: scheduled
+
+# Manual-only. Per wiki/brain/adrs/queue-and-tend-inbox.md the
+# accumulation runner is a LOCAL timer, never CI: sibling repos and
+# connector credentials exist only on the operator's machine, and a
+# second runner produces exactly the divergent auto-commits this
+# workflow created on 2026-07-11/12 (see the ADR's amendments).
+# Kept dispatchable for operators who deliberately want a one-off
+# CI-side refresh.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install --quiet pyyaml tiktoken
+
+      - name: Run scheduled operations
+        run: python3 tools/brain.py schedule run-due
+        env:
+          # gh CLI is pre-installed on ubuntu-latest; GITHUB_TOKEN
+          # gives it auth automatically.
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Commit state updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add wiki/_state/ wiki/_overlaps/auto-refresh-*.md 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "scheduled: refresh state from brain.py schedule run-due"
+            git push
+          else
+            echo "no state changes"
+          fi

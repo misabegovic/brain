@@ -1,0 +1,12 @@
+{
+  "mcp": {
+    "brain": {
+      "type": "local",
+      "command": [
+        "python3",
+        "./tools/brain-mcp.py"
+      ],
+      "enabled": true
+    }
+  }
+}

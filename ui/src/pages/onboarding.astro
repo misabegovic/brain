@@ -1,0 +1,441 @@
+---
+// Brain — onboarding deck.
+//
+// A standalone Astro page outside Starlight's docs collection.
+// Single file, slide content inline as a typed array, scroll-snap
+// mobile-native, full layout control (an origin-deployment bet that
+// predates this shell; the shell's UI decisions live in
+// wiki/brain/adrs/human-legible-presentation-layer.md).
+//
+// Run locally with `npm run dev` from ui/. Reachable at /onboarding/.
+
+type SlideLink = { label: string; href: string };
+type Slide = {
+  n: number;
+  total: number;
+  kicker: string;
+  title: string;
+  body?: string;
+  bullets?: string[];
+  callout?: string;
+  links?: SlideLink[];
+};
+
+const TOTAL = 14;
+
+const slides: Slide[] = [
+  {
+    n: 1,
+    total: TOTAL,
+    kicker: 'Brain',
+    title: 'A knowledge base your agent maintains.',
+    body: 'A ~10-minute orientation. Walk through with whoever sent you the link, or scroll on your own.',
+    bullets: [
+      'A markdown wiki an AI agent maintains under a schema, governance gates, and an audit trail — operationally different from a Notion replacement.',
+      'Humans read the briefing (judgement, summaries, cards); agents read the verbose pages. One source of truth, two altitudes.',
+      'Local-first. Lives in this repo and on your machine.',
+    ],
+    callout: '↓ Scroll or swipe up to advance.',
+  },
+  {
+    n: 2,
+    total: TOTAL,
+    kicker: 'Why it exists',
+    title: 'Three missions.',
+    bullets: [
+      '1. Codebases could be regenerated from the specs that live here. The brain is the source of understanding; sibling repos are the source of code. The two stay aligned.',
+      '2. Cross-team overlaps surface, rather than hide. When two teams work on adjacent problems, the brain makes the overlap visible.',
+      '3. Autonomous agents can use this as their primary working memory — plan, decide, implement against the brain rather than against raw codebases alone.',
+    ],
+    body: 'Methodology: the LLM-wiki pattern from Karpathy, productised — governance, health checks, a work queue, and one app to live in.',
+  },
+  {
+    n: 3,
+    total: TOTAL,
+    kicker: 'How it is structured (1/3)',
+    title: 'Three layers.',
+    bullets: [
+      'Raw sources (immutable) — sources/, sibling repos, external tools (read-only). Never rewritten.',
+      'Wiki (synthesis) — markdown pages humans and agents author together. Cross-linked. Every non-trivial claim cites a source.',
+      'Schema (the rules) — AGENTS.md. It tells the agent how to maintain the wiki. You don\'t read it — your agent does.',
+    ],
+    callout: 'Hard rule: the wiki is a derived view; never re-ingest it as a source. Citations always resolve back through wiki/ to sources/ or sibling repos.',
+  },
+  {
+    n: 4,
+    total: TOTAL,
+    kicker: 'How it is structured (2/3)',
+    title: 'Three levels.',
+    bullets: [
+      'brain/ — meta about the brain itself (its schema, governance, UI, roadmap).',
+      'org/ — cross-organisation (way of working, methodology, cross-product synthesis pages).',
+      '<repo>/ — per-repo, one shelf per repo in brain.config.yml. The narrowest scope that captures a fact wins.',
+    ],
+    body: 'Pages tag their level via repos: and affects: frontmatter. An org-level decision belongs in org/, not buried in one repo.',
+  },
+  {
+    n: 5,
+    total: TOTAL,
+    kicker: 'How it is structured (3/3)',
+    title: 'Per-repo: three layers, three lifetimes.',
+    bullets: [
+      'permanent/ — what the repo IS (purpose, architecture, conventions, interfaces, constraints, implementation memory, domain). Slow-changing.',
+      'state.md — where the repo IS GOING (Past / Now / Perceived / Target). The gap between Now and Target is the work; the gap between Now and Perceived is the risk.',
+      'topics/ + pitches/ + adrs/ + prds/ — how it got here: discussions, pre-bet proposals, decisions, committed work.',
+    ],
+    callout: 'Reading permanent/ tells you what the repo is. state.md tells you where it is going. The trail tells you how it got here. Each repo shelf\'s home page doubles as its onboarding overview.',
+  },
+  {
+    n: 6,
+    total: TOTAL,
+    kicker: 'The load-bearing safety property',
+    title: 'AI-suggestions vs. human-approved.',
+    body: 'Agent-authored ADRs and PRDs are suggestions, not decisions. The path determines authority — there is no co-mingling.',
+    bullets: [
+      'wiki/<scope>/{adrs,prds}/ — human-approved. A human reviewed → iterated → approved. The team committed.',
+      'wiki/<scope>/ai-suggestions/ — agent drafts awaiting review. Banner in the UI, ai_suggestion: true in frontmatter.',
+      'Graduation moves the file out of ai-suggestions/ after human review. The briefing lists pending drafts under Needs you.',
+    ],
+    callout: 'A page in ai-suggestions/ is NOT a decision the team has made. The UI renders the distinction on every card and page — trust the banner.',
+  },
+  {
+    n: 7,
+    total: TOTAL,
+    kicker: 'How decisions get made',
+    title: 'Shape Up, with human gates.',
+    body: 'The lifecycle the whole product breathes: idea → topic → pitch → bet → PRD + ADR → build → shipped → superseded.',
+    bullets: [
+      'A pitch frames a problem with an appetite (a spending limit, not an estimate). It waits on the briefing until a human bets.',
+      'The bet graduates it: PRD (what/why), ADR (the how-bet with alternatives), then build — each phase human-gated.',
+      'Nothing is deleted; superseded pages keep the trail. The Trail page renders the whole story as a timeline.',
+    ],
+    links: [
+      { label: 'The binding playbook', href: '/brain/authoring-adrs-and-prds/' },
+      { label: 'Trail', href: '/trail/' },
+    ],
+  },
+  {
+    n: 8,
+    total: TOTAL,
+    kicker: 'The daily loop',
+    title: 'Queue-and-tend. No scheduled AI, ever.',
+    bullets: [
+      'A local timer runs cheap deterministic producers that QUEUE work (source diffs, staleness, link health, connector batches) into the inbox.',
+      'Your interactive session DIGESTS it — "tend the brain" — visible and supervised. Nothing bills while you sleep.',
+      'External signal (e.g. Langfuse errors, Datadog state) gets judged during tending: needs-operator / fyi / routine, with a one-line reason. You grade the verdicts; the judgement calibrates.',
+    ],
+    callout: 'The briefing\'s Needs-you band is exactly that judgement, rendered.',
+  },
+  {
+    n: 9,
+    total: TOTAL,
+    kicker: 'The app',
+    title: 'The briefing is the front page — and it listens.',
+    bullets: [
+      'Briefing — what needs you, what\'s in flight, what\'s on the table, plus were/are/going orientation. Filter by type; every card carries an executive summary.',
+      'Dashboard (numbers + graphs), Trail (the decision timeline), Graph (the link graph), Corpus (the full wiki), Search.',
+      'It\'s interactive: ⚑ queue and 💬 comment on any card or page hand work to the agent — clicks become inbox items the next session digests.',
+    ],
+    links: [
+      { label: 'Briefing', href: '/' },
+      { label: 'Dashboard', href: '/dashboard/' },
+    ],
+  },
+  {
+    n: 10,
+    total: TOTAL,
+    kicker: 'Talking to it',
+    title: 'Your agent is the interface.',
+    body: 'The brain ships two surfaces: an MCP server (any MCP-aware harness or chat client) and a CLI. install-agent wires Claude Code, Codex, Cursor, or OpenCode in one command.',
+    bullets: [
+      'Talk naturally — the agent dispatches the right operation: "what do we know about X?", "note this decision", "tend the brain", "walk the product as a user".',
+      'The slash commands (/in, /capture, /ask, /shape, /tend, /groom, /playthrough, …) exist so you can recognise what\'s running — most users never type them.',
+    ],
+  },
+  {
+    n: 11,
+    total: TOTAL,
+    kicker: 'Tutorial',
+    title: 'Your first session, step by step.',
+    bullets: [
+      '1. python3 tools/brain.py setup — one idempotent bootstrap (env, hooks, timer, UI). Say yes to "brain on PATH".',
+      '2. brain — opens this app. Empty brains show a guided empty state; this deck is always in the nav.',
+      '3. python3 tools/brain.py install-agent --all — wires your harness(es) to the brain over MCP.',
+      '4. In your own terminal, open your harness and say: "ingest <a repo or doc you care about>" — the first shelf grows.',
+      '5. Ask it something: "what do we know about <topic>?" Then check the briefing — it now has opinions.',
+      '6. Tomorrow: the session-start line tells you if the queue has work; say "tend the brain".',
+    ],
+    callout: 'That\'s the whole loop. Everything else is the agent\'s job.',
+  },
+  {
+    n: 12,
+    total: TOTAL,
+    kicker: 'Project onboarding',
+    title: 'Every project shelf is an onboarding page.',
+    bullets: [
+      'Each repo\'s shelf home renders a generated Project overview: a start-here reading path (purpose → architecture → state → conventions), open work, the recent trail, and freshness.',
+      'Gaps are honest: if architecture hasn\'t been written yet, the overview says so and names the command that starts it.',
+      'New teammate on a project? Send them the shelf home. Ten minutes of reading replaces the first week of asking around.',
+    ],
+  },
+  {
+    n: 13,
+    total: TOTAL,
+    kicker: 'Where this lives',
+    title: 'Local-first, on purpose.',
+    bullets: [
+      'The wiki lives in this repo. Durable, citable paths.',
+      'The app runs on your machine: brain → localhost:8765. Serving deployments are read-only by construction.',
+      'The agent runs in your own harness session, on your own subscription — the kernel never spawns one and never runs one on a schedule.',
+    ],
+    callout: 'No SaaS retention, no vendor lock-in beyond markdown. Durable knowledge is shared via repo paths, not a hosted UI.',
+  },
+  {
+    n: 14,
+    total: TOTAL,
+    kicker: 'Start here',
+    title: 'Where to land first.',
+    bullets: [
+      'The briefing — the brain\'s judgement of what matters now. Start every visit there.',
+      'The corpus home — the full catalogue with wayfinding.',
+      'A project shelf — if you\'re onboarding onto a specific repo, its shelf home is your overview.',
+      'Try: ask the agent "what does the brain know about <topic>?" — it dispatches /ask and walks you through.',
+    ],
+    callout: 'Walk-through complete. Questions, feedback, things that did not land — bring them to whoever sent you the link (or 💬 comment right here in the UI).',
+    links: [
+      { label: 'Briefing', href: '/' },
+      { label: 'Corpus home', href: '/home/' },
+      { label: 'Trail', href: '/trail/' },
+    ],
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0e1116" />
+    <meta name="description" content="Brain — an LLM-maintained knowledge base. A ~10-minute orientation deck for colleagues new to the brain." />
+    <title>Brain — onboarding</title>
+    <style>
+      :root {
+        --bg: #0e1116;
+        --bg-alt: #151a21;
+        --fg: #e6edf3;
+        --fg-muted: #9ba7b4;
+        --accent: #79c0ff;
+        --accent-warm: #ffa657;
+        --rule: #21262d;
+        --max-width: 38rem;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        font-size: 17px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+
+      .deck {
+        height: 100vh;
+        height: 100dvh;
+        overflow-y: scroll;
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .slide {
+        min-height: 100vh;
+        min-height: 100dvh;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        padding: 1.75rem 1.5rem 5.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+      }
+
+      .slide:nth-child(odd) { background: var(--bg); }
+      .slide:nth-child(even) { background: var(--bg-alt); }
+
+      .slide-inner {
+        width: 100%;
+        max-width: var(--max-width);
+        margin: 0 auto;
+      }
+
+      .kicker {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.78rem;
+        color: var(--accent);
+        margin: 0 0 0.75rem;
+        font-weight: 600;
+      }
+
+      .title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0 0 1.25rem;
+        letter-spacing: -0.01em;
+      }
+
+      .body {
+        font-size: 1rem;
+        line-height: 1.55;
+        margin: 0 0 1.25rem;
+        color: var(--fg);
+      }
+
+      .bullets {
+        margin: 0 0 1.25rem;
+        padding-left: 1.1rem;
+      }
+
+      .bullets li {
+        margin: 0 0 0.7rem;
+        line-height: 1.55;
+      }
+
+      .bullets li::marker {
+        color: var(--accent);
+      }
+
+      .callout {
+        border-left: 3px solid var(--accent-warm);
+        padding: 0.7rem 0.95rem;
+        background: rgba(255, 166, 87, 0.07);
+        border-radius: 4px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: var(--fg);
+        margin: 0 0 1.25rem;
+      }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        margin: 1rem 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .links a {
+        color: var(--accent);
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        font-size: 0.95rem;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0;
+      }
+
+      .links a:hover, .links a:focus {
+        border-bottom-color: var(--accent);
+        outline: none;
+      }
+
+      code {
+        background: rgba(255, 255, 255, 0.06);
+        padding: 0.1em 0.35em;
+        border-radius: 3px;
+        font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.9em;
+      }
+
+      .pager {
+        position: absolute;
+        bottom: 1.25rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-variant-numeric: tabular-nums;
+        font-size: 0.78rem;
+        color: var(--fg-muted);
+        letter-spacing: 0.05em;
+        pointer-events: none;
+      }
+
+      .skip {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        background: var(--bg-alt);
+        border: 1px solid var(--rule);
+        color: var(--fg-muted);
+        font-size: 0.78rem;
+        padding: 0.4rem 0.7rem;
+        border-radius: 999px;
+        text-decoration: none;
+        z-index: 10;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .skip:hover, .skip:focus {
+        color: var(--fg);
+        border-color: var(--accent);
+        outline: none;
+      }
+
+      @media (min-width: 720px) {
+        body { font-size: 18px; }
+        .slide { padding: 3rem 3rem 5.5rem; }
+        .title { font-size: 2.1rem; }
+        .kicker { font-size: 0.82rem; }
+        .body { font-size: 1.05rem; }
+      }
+
+      @media (min-width: 1100px) {
+        :root { --max-width: 42rem; }
+        .title { font-size: 2.4rem; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .deck { scroll-behavior: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="/" aria-label="Exit to home">Exit ↗</a>
+    <main class="deck" role="main">
+      {slides.map((slide) => (
+        <section class="slide" aria-labelledby={`slide-${slide.n}-title`}>
+          <div class="slide-inner">
+            <p class="kicker">{slide.kicker}</p>
+            <h1 class="title" id={`slide-${slide.n}-title`}>{slide.title}</h1>
+            {slide.body && <p class="body">{slide.body}</p>}
+            {slide.bullets && (
+              <ul class="bullets">
+                {slide.bullets.map((b) => <li>{b}</li>)}
+              </ul>
+            )}
+            {slide.callout && <p class="callout">{slide.callout}</p>}
+            {slide.links && slide.links.length > 0 && (
+              <ul class="links">
+                {slide.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+              </ul>
+            )}
+          </div>
+          <span class="pager" aria-hidden="true">{slide.n} / {slide.total}</span>
+        </section>
+      ))}
+    </main>
+  </body>
+</html>

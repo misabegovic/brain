@@ -1,0 +1,933 @@
+{
+  "generated": "2026-07-12",
+  "home_sections": [
+    {
+      "anchor": "what-changed",
+      "name": "What changed",
+      "maintained_by": "/in",
+      "empty": false
+    },
+    {
+      "anchor": "drift-surface",
+      "name": "Drift surface",
+      "maintained_by": "/groom",
+      "empty": true
+    },
+    {
+      "anchor": "open-initiatives",
+      "name": "Open initiatives",
+      "maintained_by": "/shape",
+      "empty": false
+    },
+    {
+      "anchor": "recent-decisions",
+      "name": "Recent decisions",
+      "maintained_by": "/shape",
+      "empty": false
+    },
+    {
+      "anchor": "insights-now",
+      "name": "Insights now",
+      "maintained_by": "/feedback",
+      "empty": true
+    },
+    {
+      "anchor": "brain-trajectory",
+      "name": "Brain trajectory",
+      "maintained_by": "/sync",
+      "empty": false
+    },
+    {
+      "anchor": "curated-picks",
+      "name": "Curated picks",
+      "maintained_by": "/in",
+      "empty": true
+    },
+    {
+      "anchor": "where-to-find-things",
+      "name": "Where to find things",
+      "maintained_by": "/in",
+      "empty": false
+    }
+  ],
+  "pages": [
+    {
+      "path": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "title": "Give recurring tend-queue items an operator acknowledgement path",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-12",
+      "repos": [
+        "brain"
+      ],
+      "confidence": "medium",
+      "summary": "The viktor-daily-operator playthrough demonstrated that a half-life tend item cleared with inbox done is re-added on the next producer run, and the only ways to silence it falsify page metadata. This suggests the queue needs an acknowledgement that sticks \u2014 a re-verified signal the producers respect \u2014 before the daily timer turns the inbox into a cries-wolf machine.",
+      "sources": [
+        "sources/playthroughs/2026-07-12--viktor-daily-operator--agent-sweep.md"
+      ],
+      "tokens": 1547
+    },
+    {
+      "path": "brain/adrs/chat-print-mode-bridge.md",
+      "title": "The chat is a per-harness print-mode bridge: conversation as the interface, terminal demoted to a toggle, bare `brain` opens the app",
+      "kind": "decision",
+      "status": "superseded",
+      "superseded_by": "brain/adrs/mcp-cli-terminal-surface.md",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Superseded: the first-party chat pane rode per-harness print-mode CLI rows on the operator's subscription. Removed two days later by mcp-cli-terminal-surface; the billing guard it introduced outlived it.\n",
+      "sources": [
+        "../prds/chat-first-app.md",
+        "../adrs/workbench-pty-bridge.md"
+      ],
+      "tokens": 1113
+    },
+    {
+      "path": "brain/adrs/connector-snapshot-contract.md",
+      "title": "Connectors are pull-only snapshot-writers: immutable dedup-keyed files under sources/, cursors in state, inbox items out \u2014 never a wiki write",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Connectors are pull-only snapshot-writers: immutable dedup-keyed files into sources/, cursors in wiki/_state/, inbox items out. A connector never writes the wiki \u2014 synthesis stays in-session.\n",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
+        "../../../brain-schedule.yml",
+        ".claude/skills/tend/SKILL.md"
+      ],
+      "tokens": 1211
+    },
+    {
+      "path": "brain/adrs/home-content-shape.md",
+      "title": "Home page is the wiki index as an agent-maintained dashboard",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "The wiki home is a generated dashboard of contract sections (What changed, Open initiatives, Recent decisions) that skills maintain \u2014 every wiki edit pairs with a home touch.\n",
+      "sources": [
+        "../../../AGENTS.md",
+        "../../../tools/home-staleness.sh",
+        "../../../.claude/skills/sync/SKILL.md"
+      ],
+      "tokens": 1351
+    },
+    {
+      "path": "brain/adrs/human-legible-presentation-layer.md",
+      "title": "The briefing is a build-time derivation; summaries live in frontmatter; attention verdicts live on inbox items",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "summary": "Three bets: executive summaries are a frontmatter field flowing through the views pipeline; the briefing is a dependency-free build-time Astro page over pages.json + inbox + state.md and becomes the app's landing surface; attention judgement is two small verbs on the existing inbox (judge, grade), recorded only in-session.\n",
+      "sources": [
+        "../prds/human-legible-presentation-layer.md",
+        "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md"
+      ],
+      "tokens": 1613
+    },
+    {
+      "path": "brain/adrs/kernel-manifest-instancing.md",
+      "title": "Instances are born by manifest: init --full copies the mechanism and the kernel's decision trail, scaffolds the rest fresh",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Instances are born from an explicit copy-path manifest: mechanism and the kernel's decision trail cross; this repo's self-tracking dogfood never does. init --full is the only birth path.\n",
+      "sources": [
+        "../prds/instance-birth.md",
+        "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
+      ],
+      "tokens": 814
+    },
+    {
+      "path": "brain/adrs/mcp-cli-surface.md",
+      "title": "The kernel's interaction surfaces are MCP and the CLI \u2014 the embedded terminal retires with the chat pane",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "supersedes": "brain/adrs/mcp-cli-terminal-surface.md",
+      "summary": "The kernel's interaction surfaces settle at MCP and the CLI: the embedded terminal (PTY bridge, websocket, xterm) retires; the app page is the rendered knowledge under the ambient strip; the billing guard degrades to a doctor warning.\n",
+      "sources": [
+        "../../../sources/conversations/2026-07-12--embedded-terminal-removal.md",
+        "../topics/chat-surface-necessity.md"
+      ],
+      "tokens": 670
+    },
+    {
+      "path": "brain/adrs/mcp-cli-terminal-surface.md",
+      "title": "The kernel's interaction surfaces are MCP, CLI, and the terminal \u2014 no first-party chat pane",
+      "kind": "decision",
+      "status": "superseded",
+      "superseded_by": "brain/adrs/mcp-cli-surface.md",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "supersedes": "brain/adrs/chat-print-mode-bridge.md",
+      "summary": "Superseded: removed the chat pane in favour of MCP + CLI + the embedded terminal. The terminal followed it out the same week (mcp-cli-surface).\n",
+      "sources": [
+        "../topics/chat-surface-necessity.md",
+        "../../../sources/conversations/2026-07-12--chat-surface-reconsidered.md"
+      ],
+      "tokens": 739
+    },
+    {
+      "path": "brain/adrs/multi-prd-epic-shape.md",
+      "title": "Epics are single-page umbrella artifacts with parent_epic linkage, validator-enforced no-umbrella-ADR, epic-aware briefs, and a quiet-on-day-one promotion heuristic",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "high",
+      "summary": "Umbrella-scale work gets a kind: epic page with children spawned as regular PRDs linked via parent_epic; epics carry no engineering bets and no umbrella ADR.\n",
+      "sources": [
+        "../../../sources/research/2026-07-10--tend-sweep-2-verification.md",
+        "../../../AGENTS.md",
+        ".claude/skills/shape/SKILL.md",
+        ".claude/skills/zoom-out/SKILL.md"
+      ],
+      "tokens": 1710
+    },
+    {
+      "path": "brain/adrs/operator-lesson-pattern.md",
+      "title": "Operator lessons live as Lessons subsections on conventions pages plus one cross-cutting org page",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Recurring operator guidance lands as named lessons on wiki/org/operator-lessons.md \u2014 one anchor per lesson so skills and agents can cite and re-apply them.\n",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/capture/SKILL.md"
+      ],
+      "tokens": 1516
+    },
+    {
+      "path": "brain/adrs/parallel-efforts-on-request.md",
+      "title": "Opt-in parallel efforts via a /spawn skill that creates per-effort worktrees and a wiki/_state/efforts/ registry, with existing skills becoming worktree-aware",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Parallel work is opt-in via /spawn: per-effort worktrees and branches plus a registry record; the default workflow stays single-effort, single-checkout.\n",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/spawn/SKILL.md",
+        ".claude/skills/rebase/SKILL.md"
+      ],
+      "tokens": 1713
+    },
+    {
+      "path": "brain/adrs/parallel-execution-agent-teams.md",
+      "title": "Parallel-first execution: every /spawn dispatches a background owner subagent (opt-out via --no-owner), helper fan-out is named in the skills, and the rule recurses to the parent session",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Three agent levels (parent session, effort owners, helpers) with parallel-first tool-call discipline at every level; owners fan out via concurrent tool calls since they cannot dispatch subagents.\n",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/spawn/SKILL.md",
+        ".claude/skills/list-efforts/SKILL.md"
+      ],
+      "tokens": 1774
+    },
+    {
+      "path": "brain/adrs/persona-playthrough-loop.md",
+      "title": "Playthroughs are executed skills with immutable transcripts; synthetic findings are confidence-capped insights",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "summary": "Playthroughs are executed skills \u2014 real commands, real pages \u2014 with immutable transcripts under sources/playthroughs/; synthetic findings become insights capped at confidence: low until a human confirms.\n",
+      "sources": [
+        "../prds/persona-playthrough-loop.md",
+        "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md"
+      ],
+      "tokens": 872
+    },
+    {
+      "path": "brain/adrs/queue-and-tend-inbox.md",
+      "title": "Self-maintenance is queue-and-tend: deterministic producers accumulate a per-item inbox; synthesis digests in-session via /tend \u2014 never on a schedule",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "high",
+      "summary": "No LLM ever runs on a schedule: deterministic producers accumulate inbox items (cursor diffs, half-life crossings, link health); interactive sessions digest them via /tend. Amended twice: research-picker damping; one-runner enforcement.\n",
+      "sources": [
+        "../../../sources/research/2026-07-10--hub-adr-verification.md",
+        "../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
+        ".claude/skills/tend/SKILL.md",
+        "../../../brain-schedule.yml"
+      ],
+      "tokens": 1685
+    },
+    {
+      "path": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "title": "Uniform loopback Host-header guard across both HTTP serving surfaces",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-12",
+      "team": "(inferred)",
+      "repos": [
+        "brain"
+      ],
+      "confidence": "medium",
+      "summary": "The two HTTP serving surfaces defend against DNS-rebinding differently \u2014 brain.py serve validates the Host header against a loopback allow-list, while brain-mcp.py --http validates only Origin (and only when present). Adopt a shared loopback Host-header check on both so the anti-rebinding guarantee is stated once and holds by construction.",
+      "sources": [
+        "sources/playthroughs/2026-07-12--sam-security-reviewer--agent-sweep.md",
+        "~/projects/brain/tools/brain.py",
+        "~/projects/brain/tools/brain-mcp.py",
+        "SECURITY.md"
+      ],
+      "tokens": 1697
+    },
+    {
+      "path": "brain/adrs/shape-deepdive-pre-flight.md",
+      "title": "Deepdive on load-bearing points lands as a /shape pre-flight step; pace lands on the binding authoring playbook; the top-level schema is not extended",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Before Phase 1 of /shape, a deepdive pass reads the affected surfaces so the PRD is grounded in observed state rather than the pitch's assumptions.\n",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/shape/SKILL.md",
+        ".claude/skills/continue/SKILL.md"
+      ],
+      "tokens": 1764
+    },
+    {
+      "path": "brain/adrs/shape-up-pitches.md",
+      "title": "Adopt Shape Up pitches as a pre-bet brain artifact kind",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Pitches are the pre-bet artefact: fat-marker solution shape allowed, appetite as spending limit; a bet graduates a pitch into an epic or PRD/ADR pair and marks it superseded.\n",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/shape/SKILL.md"
+      ],
+      "tokens": 1199
+    },
+    {
+      "path": "brain/adrs/single-image-serving-profile.md",
+      "title": "Deployment is one infra-agnostic image with an env-selected surface; instances isolate by env ports and hashed unit names; Railway is a reference target, not a dependency",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "One infra-agnostic container image; BRAIN_SURFACE selects ui/mcp/datasette on the platform port; per-instance isolation via env ports and hashed timer units. Railway is a reference target, not a dependency.\n",
+      "sources": [
+        "../prds/composable-role-views.md",
+        "../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
+        "../roadmap.md"
+      ],
+      "tokens": 1203
+    },
+    {
+      "path": "brain/adrs/sql-views-over-derived-index.md",
+      "title": "View specs are SQL over a derived, disposable SQLite index; shorthands compile to SQL; the index rides the views pipeline",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Custom views are SQL specs in views/*.yml compiled over a disposable, gitignored SQLite index (FTS5) rebuilt on every views run; the index is never committed and never load-bearing.\n",
+      "sources": [
+        "../prds/composable-role-views.md",
+        "../../../sources/research/2026-07-10--sqlite-fts5-derived-index.md",
+        "../../../sources/research/2026-07-10--composable-views-prior-art.md",
+        "../../../sources/research/2026-07-10--sqlite-index-prototype.md"
+      ],
+      "tokens": 1420
+    },
+    {
+      "path": "brain/adrs/successor-ssg-for-ui.md",
+      "title": "Adopt Astro + Starlight + Pagefind as the successor SSG for the UI",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "high",
+      "summary": "Astro is the UI substrate (originally Astro + Starlight): content collections over the symlinked wiki, static build, mobile-native. The 2026-07-12 presentation-layer rewrite retired Starlight; Astro stays.\n",
+      "sources": [
+        "../../../sources/research/2026-07-10--hub-adr-verification.md",
+        "../../../AGENTS.md",
+        "../../../ui/astro.config.mjs",
+        "../../../ui/README.md"
+      ],
+      "tokens": 1415
+    },
+    {
+      "path": "brain/adrs/ui-auto-refresh-hook.md",
+      "title": "UI auto-refresh \u2014 editor hook plus CI smoke build",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Wiki edits trigger a quiet UI rebuild into ui/.build-cache via a PostToolUse hook; the serve layer self-heals stale builds from the live status poll.\n",
+      "sources": [
+        "../../../AGENTS.md",
+        "../../../tools/ui-build.sh",
+        "../../../.claude/skills/sync/SKILL.md"
+      ],
+      "tokens": 1197
+    },
+    {
+      "path": "brain/adrs/workbench-pty-bridge.md",
+      "title": "The workbench is a loopback browser page over a stdlib PTY bridge; harness launches and config adapters are data tables; it never ships in serving mode",
+      "kind": "decision",
+      "status": "superseded",
+      "superseded_by": "brain/adrs/mcp-cli-surface.md",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "summary": "Superseded: the embedded terminal ran the operator's shell over a stdlib PTY-websocket bridge, loopback-only with token and Host checks. Removed 0.15.0 \u2014 layout was load-bearing, the component was not.\n",
+      "sources": [
+        "../prds/harness-workbench.md"
+      ],
+      "tokens": 1284
+    },
+    {
+      "path": "brain/adrs/zoom-out-on-current-work.md",
+      "title": "zoom-out is a skill called as a step inside /shape and /continue, with conversation-first output and opt-in persistence as an aside-rendered Big-picture fit section",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Deep-focus work gets a per-item zoom-out brief \u2014 deterministic graph context plus a one-paragraph product fit \u2014 auto-fired at /shape phase boundaries.\n",
+      "sources": [
+        "../../../AGENTS.md",
+        ".claude/skills/zoom-out/SKILL.md",
+        ".claude/skills/shape/SKILL.md"
+      ],
+      "tokens": 1756
+    },
+    {
+      "path": "brain/authoring-adrs-and-prds.md",
+      "title": "Authoring ADRs and PRDs",
+      "kind": "meta",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../AGENTS.md",
+        ".claude/skills/shape/SKILL.md"
+      ],
+      "tokens": 1861
+    },
+    {
+      "path": "brain/index.md",
+      "title": "Brain (meta level)",
+      "kind": "meta",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "high",
+      "sources": [
+        "../../AGENTS.md"
+      ],
+      "tokens": 1975
+    },
+    {
+      "path": "brain/pitches/chat-first-app.md",
+      "title": "Chat-first app \u2014 the conversation is the interface; the mechanism disappears behind it",
+      "kind": "pitch",
+      "status": "superseded",
+      "superseded_by": "brain/prds/chat-first-app.md",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Superseded pitch: replace the terminal-first workbench with a chat-first app. Bet, built (0.12), and reversed within days \u2014 the trail records the full arc.\n",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--chat-first-simplification.md",
+        "../adrs/workbench-pty-bridge.md",
+        "../adrs/queue-and-tend-inbox.md"
+      ],
+      "tokens": 854
+    },
+    {
+      "path": "brain/pitches/composable-role-views.md",
+      "title": "Composable role-fit views \u2014 declarative assemblies over wiki synthesis, connector state, and observability data",
+      "kind": "pitch",
+      "status": "superseded",
+      "superseded_by": "brain/prds/composable-role-views.md",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Superseded pitch: role-fit views (engineer/pm/operator) assembled from connector data. Graduated into the composable-role-views PRD and shipped as SQL view specs.\n",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--composable-views-idea.md",
+        "../../../sources/conversations/2026-07-10--sqlite-substrate-musing.md",
+        "../../../sources/research/2026-07-10--sqlite-fts5-derived-index.md",
+        "../../../sources/research/2026-07-10--composable-views-prior-art.md",
+        "../../../sources/research/2026-07-10--datasette-serving-surface.md",
+        "../../../sources/research/2026-07-10--datadog-langfuse-apis.md",
+        "../../../sources/research/2026-07-10--sqlite-index-prototype.md",
+        "../adrs/connector-snapshot-contract.md",
+        "../../../brain-schedule.yml"
+      ],
+      "tokens": 1638
+    },
+    {
+      "path": "brain/pitches/harness-workbench.md",
+      "title": "Harness workbench \u2014 a terminal in the brain's local UI, per-harness launch + config adapters, live-reloading results beside it",
+      "kind": "pitch",
+      "status": "superseded",
+      "superseded_by": "brain/prds/harness-workbench.md",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Superseded pitch: run any harness terminal beside the rendered brain. Graduated and shipped 0.6.x; the terminal half was later removed at 0.15.0.\n",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--harness-workbench-intent.md",
+        "../adrs/sql-views-over-derived-index.md"
+      ],
+      "tokens": 957
+    },
+    {
+      "path": "brain/pitches/human-legible-presentation-layer.md",
+      "title": "Human-legible presentation layer \u2014 an opinionated, Shape Up-native UI that triages attention",
+      "kind": "pitch",
+      "status": "superseded",
+      "superseded_by": "brain/prds/human-legible-presentation-layer.md",
+      "updated": "2026-07-12",
+      "appetite": "big",
+      "confidence": "medium",
+      "summary": "Superseded pitch, bet 2026-07-12: an opinionated Shape Up-native UI \u2014 summaries as schema, a briefing home that triages attention, lifecycle components, attention judgement in the tend loop.\n",
+      "sources": [
+        "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md",
+        "../../insights/quickstart-third-command-fragility.md"
+      ],
+      "tokens": 1787
+    },
+    {
+      "path": "brain/pitches/instance-birth.md",
+      "title": "Instance birth \u2014 a clean kernel\u2192instance path that carries the mechanism, never the dogfood",
+      "kind": "pitch",
+      "status": "superseded",
+      "superseded_by": "brain/prds/instance-birth.md",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Superseded pitch: one command births a complete, gate-passing brain instance from the kernel. Graduated and shipped as init --full (0.11.0).\n",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md",
+        "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
+      ],
+      "tokens": 383
+    },
+    {
+      "path": "brain/pitches/persona-playthrough-loop.md",
+      "title": "Persona playthrough loop \u2014 synthetic users walk every release; findings become insights, never facts",
+      "kind": "pitch",
+      "status": "superseded",
+      "superseded_by": "brain/prds/persona-playthrough-loop.md",
+      "updated": "2026-07-12",
+      "appetite": "small",
+      "confidence": "medium",
+      "summary": "Superseded pitch, bet 2026-07-12: synthetic users walk every release; findings become confidence-capped insights. Graduated and shipped same day (0.16.0).\n",
+      "sources": [
+        "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md",
+        "../../org/operator-lessons.md"
+      ],
+      "tokens": 821
+    },
+    {
+      "path": "brain/prds/attention-calibration-operator-surface.md",
+      "title": "Operator-side surface for attention calibration",
+      "kind": "initiative",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-12",
+      "team": "brain",
+      "division": "(inferred)",
+      "repos": [
+        "brain"
+      ],
+      "appetite": "small",
+      "confidence": "medium",
+      "summary": "The Viktor playthrough found the judge/grade calibration loop works end-to-end but is hard to operate: grading requires knowing the item id (no pending-grades list), and a single grade renders as \"100% verdicts graded useful\" with no sample size. Suggestion: a pending-grades surface and a sample-size-aware calibration stat so the loop is legible enough to actually use.",
+      "sources": [
+        "sources/playthroughs/2026-07-12--viktor-daily-operator--daily-loop.md",
+        "~/projects/brain/ui/src/pages/dashboard.astro",
+        ".claude/skills/tend/SKILL.md"
+      ],
+      "tokens": 1184
+    },
+    {
+      "path": "brain/prds/chat-first-app.md",
+      "title": "Chat-first app \u2014 conversation as the interface, ambient status, one command to open it all",
+      "kind": "initiative",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/chat-first-app.md",
+      "summary": "The 0.12 chat-first app: conversation as the interface over per-harness print-mode rows, terminal demoted to a toggle. Shipped, then the chat pane was removed at 0.14 \u2014 the layout and strip survive.\n",
+      "sources": [
+        "../pitches/chat-first-app.md",
+        "../../../sources/conversations/2026-07-10--chat-first-simplification.md"
+      ],
+      "tokens": 447
+    },
+    {
+      "path": "brain/prds/composable-role-views.md",
+      "title": "Composable role-fit views \u2014 SQL view specs over a derived index, with observability connectors",
+      "kind": "initiative",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/composable-role-views.md",
+      "summary": "Composable role-fit views: a derived SQLite index rebuilt from files on every views run, YAML view specs rendering to wiki/_views/custom/, Datadog and Langfuse connectors feeding state tiles.\n",
+      "sources": [
+        "../pitches/composable-role-views.md",
+        "../../../sources/conversations/2026-07-10--composable-views-idea.md",
+        "../../../sources/research/2026-07-10--composable-views-prior-art.md",
+        "../../../sources/research/2026-07-10--sqlite-index-prototype.md"
+      ],
+      "tokens": 697
+    },
+    {
+      "path": "brain/prds/harness-workbench.md",
+      "title": "Harness workbench \u2014 the brain's local surface runs your harness terminal beside the rendered results",
+      "kind": "initiative",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/harness-workbench.md",
+      "summary": "The local surface that put a harness terminal beside the rendered brain with install-agent MCP wiring. Shipped 0.6.x; the terminal was removed at 0.15.0, install-agent and the app shell remain.\n",
+      "sources": [
+        "../pitches/harness-workbench.md",
+        "../../../sources/conversations/2026-07-10--harness-workbench-intent.md"
+      ],
+      "tokens": 584
+    },
+    {
+      "path": "brain/prds/human-legible-presentation-layer.md",
+      "title": "Human-legible presentation layer \u2014 the UI becomes the partner's briefing: opinionated, Shape Up-native, attention-first",
+      "kind": "initiative",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/human-legible-presentation-layer.md",
+      "summary": "The UI stops being a neutral doc site: agent-maintained summaries on every page, a briefing home that triages what needs the operator's eyes, lifecycle-aware Shape Up cards, and attention verdicts judged in the tend loop. Humans read the briefing; agents keep the verbose wiki.\n",
+      "sources": [
+        "../pitches/human-legible-presentation-layer.md",
+        "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md"
+      ],
+      "tokens": 922
+    },
+    {
+      "path": "brain/prds/instance-birth.md",
+      "title": "Instance birth \u2014 init --full creates a working brain instance from the kernel manifest",
+      "kind": "initiative",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/instance-birth.md",
+      "summary": "init --full births a working instance from the kernel manifest: mechanism plus kernel trail, no dogfood, git-initialised, gates passing \u2014 the adoption path for real projects.\n",
+      "sources": [
+        "../pitches/instance-birth.md",
+        "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
+      ],
+      "tokens": 359
+    },
+    {
+      "path": "brain/prds/persona-playthrough-loop.md",
+      "title": "Persona playthrough loop \u2014 every release gets walked by synthetic users; findings route to insights below the human-confirmation line",
+      "kind": "initiative",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/persona-playthrough-loop.md",
+      "summary": "Every release gets walked by synthetic users: personas, the /playthrough protocol, immutable transcripts, findings routed to insights below the human-confirmation line, sweeps queued per version bump.\n",
+      "sources": [
+        "../pitches/persona-playthrough-loop.md",
+        "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md"
+      ],
+      "tokens": 689
+    },
+    {
+      "path": "brain/prds/pm-view-reads-like-a-brief.md",
+      "title": "Role views read like briefs \u2014 reader-voiced headers, human titles, explanatory empty states",
+      "kind": "initiative",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-12",
+      "team": "(inferred)",
+      "division": "(inferred)",
+      "repos": [
+        "brain"
+      ],
+      "appetite": "small",
+      "confidence": "medium",
+      "summary": "The Priya playthrough suggests the PM view \u2014 the one surface named for a non-terminal reader \u2014 speaks to spec editors: it opens with 'Auto-generated by brain.py views from views/pm.yml \u2014 edit the spec, not this page', keys rows on raw .md paths, and renders empty sections as '(no rows)'. Suggestion: role views lead with what the view is for, link rows by title, and explain what fills an empty section.",
+      "sources": [
+        "sources/playthroughs/2026-07-12--priya-non-terminal-pm--reading-journeys.md"
+      ],
+      "tokens": 1267
+    },
+    {
+      "path": "brain/prds/priya-trust-banner-render-proof.md",
+      "title": "Render-prove the AI-draft trust chrome instead of waiting for the first real draft",
+      "kind": "initiative",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-12",
+      "team": "brain",
+      "repos": [
+        "brain"
+      ],
+      "appetite": "small",
+      "confidence": "medium",
+      "summary": "Two playthroughs, two versions apart, both found the ai-suggestion banner shipped in code but never rendered against live content \u2014 the corpus has zero AI-draft pages, so the product's load-bearing trust distinction is unproven exactly where its most trust-sensitive reader would look. Suggested fix is a build-time render check that fails the UI build when the banner path goes unexercised.",
+      "sources": [
+        "sources/playthroughs/2026-07-12--priya-non-terminal-pm--agent-sweep.md",
+        "sources/playthroughs/2026-07-12--priya-non-terminal-pm--briefing-first-read.md"
+      ],
+      "tokens": 1299
+    },
+    {
+      "path": "brain/prds/producer-death-first-class-health.md",
+      "title": "Producer death as first-class health, not a notice",
+      "kind": "initiative",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-12",
+      "team": "brain",
+      "division": "(inferred)",
+      "repos": [
+        "brain"
+      ],
+      "appetite": "small",
+      "confidence": "medium",
+      "summary": "The Viktor playthrough found a dead accumulation timer renders \"queue clear\" identically to a tended-clean queue, and the timer warning is flattened in with \"UI deps missing\" \u2014 clear-because-tended and clear-because-the-producer-is-dead are indistinguishable. Suggestion: treat producer/timer death as a first-class health state that qualifies the queue-empty claim.",
+      "sources": [
+        "sources/playthroughs/2026-07-12--viktor-daily-operator--daily-loop.md",
+        "tools/brain.py"
+      ],
+      "tokens": 1231
+    },
+    {
+      "path": "brain/prds/status-honest-generated-reading-lists.md",
+      "title": "Generated reading lists carry lifecycle status \u2014 titles and superseded markers, never bare slugs or undifferentiated rows",
+      "kind": "initiative",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-12",
+      "team": "(inferred)",
+      "division": "(inferred)",
+      "repos": [
+        "brain"
+      ],
+      "appetite": "small",
+      "confidence": "medium",
+      "summary": "The Priya playthrough suggests generated reading surfaces undercut the trust promise: the shelf-home Project overview lists superseded ADRs beside the current one with only date chips (two contradictory decision titles, nothing marking which is the record), and the trail's supersedes links render raw slugs as link text. Suggestion: every generated list row carries the page's status, and every cross-reference renders the target's human title.",
+      "sources": [
+        "sources/playthroughs/2026-07-12--priya-non-terminal-pm--reading-journeys.md"
+      ],
+      "tokens": 1222
+    },
+    {
+      "path": "brain/roadmap.md",
+      "title": "Brain roadmap \u2014 0.x arc toward a self-maintaining, servable brain",
+      "kind": "meta",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "high",
+      "sources": [
+        "../../sources/research/2026-07-10--tend-sweep-2-verification.md",
+        "../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
+        "../../AGENTS.md",
+        "../../brain-schedule.yml"
+      ],
+      "tokens": 5155
+    },
+    {
+      "path": "brain/state.md",
+      "title": "Brain \u2014 state",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../AGENTS.md"
+      ],
+      "tokens": 2470
+    },
+    {
+      "path": "brain/topics/chat-surface-necessity.md",
+      "title": "Does the kernel need its own chat surface, or do MCP + CLI + the terminal cover it?",
+      "kind": "topic",
+      "status": "superseded",
+      "superseded_by": "brain/adrs/mcp-cli-surface.md",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "summary": "Settled twice in one week: the chat pane, then the embedded terminal, both failed the deletion test against MCP + CLI coverage. Surfaces settle at MCP + CLI.\n",
+      "sources": [
+        "../../../sources/conversations/2026-07-12--chat-surface-reconsidered.md",
+        "../adrs/chat-print-mode-bridge.md"
+      ],
+      "tokens": 671
+    },
+    {
+      "path": "brain/topics/market-readiness-gaps.md",
+      "title": "What stands between this repo and being a credible market entrant?",
+      "kind": "topic",
+      "status": "draft",
+      "updated": "2026-07-10",
+      "confidence": "low",
+      "summary": "Six repo-verified gaps between the kernel and a credible market entry. License (MIT) and packaging closed; the product name and repo visibility remain operator calls.\n",
+      "sources": [
+        "../../../README.md"
+      ],
+      "tokens": 1010
+    },
+    {
+      "path": "brain/topics/one-point-oh-criteria.md",
+      "title": "What must be true before 1.0 \u2014 when is the tool ready to instance elsewhere?",
+      "kind": "topic",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "The five 1.0 criteria: instance birth in the test suite (done), seven unattended days, a real-data loop in a born instance, a cold-start human test, all gates green at tag.\n",
+      "sources": [
+        "../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md"
+      ],
+      "tokens": 536
+    },
+    {
+      "path": "brain/topics/regenerative-schema-extensions.md",
+      "title": "How far should the brain adopt Phoenix-Architecture concepts into its schema?",
+      "kind": "topic",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "summary": "Which further Phoenix-Architecture concepts (deletion test, provenance-over-diffs, regeneration drills) earn schema weight beyond constraints.md and implementation-memory.md. Open.\n",
+      "sources": [
+        "../../../sources/web/aicoding-fowler-phoenix--f0e11r.md"
+      ],
+      "tokens": 278
+    },
+    {
+      "path": "insights/ai-suggestions-exclusion-mcp-only.md",
+      "title": "Serving-mode ai-suggestions exclusion is enforced on the MCP surface only",
+      "kind": "insight",
+      "status": "superseded",
+      "superseded_by": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "updated": "2026-07-12",
+      "confidence": "low",
+      "affected_personas": [
+        ".claude/personas/users/sam-security-reviewer.md"
+      ],
+      "summary": "Playthrough-born hypothesis: under BRAIN_SERVING=1 the ai-suggestions exclusion holds on the MCP server but not on the brain.py serve JSON API, the search CLI, or the static-UI build \u2014 three read surfaces an adopter would expect to behave identically. Drafts carry a visible banner and sit behind a proxy, so impact is bounded; awaiting a human security confirm.\n",
+      "sources": [
+        "sources/playthroughs/2026-07-12--sam-security-reviewer--serving-mode-guarantees.md"
+      ],
+      "tokens": 838
+    },
+    {
+      "path": "insights/quickstart-third-command-fragility.md",
+      "title": "The quickstart's third command (`brain`) is fragile on cold-start machines",
+      "kind": "insight",
+      "status": "draft",
+      "updated": "2026-07-12",
+      "confidence": "low",
+      "affected_personas": [
+        ".claude/personas/users/noor-cold-start-adopter.md"
+      ],
+      "summary": "Playthrough-born hypothesis: the README's third command (brain) depends on an optional PATH step and platform PATH conventions; a cold-start user can hit command-not-found with no fallback shown. Awaiting human confirmation.\n",
+      "sources": [
+        "sources/playthroughs/2026-07-12--noor-cold-start-adopter--readme-quickstart.md"
+      ],
+      "tokens": 591
+    },
+    {
+      "path": "org/index.md",
+      "title": "Org \u2014 methodology + cross-product",
+      "kind": "meta",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "high",
+      "sources": [
+        "../../AGENTS.md"
+      ],
+      "tokens": 116
+    },
+    {
+      "path": "org/methodology/development-playbook.md",
+      "title": "Development playbook \u2014 code quality, testing, AI usage, PR reviews",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md"
+      ],
+      "tokens": 1834
+    },
+    {
+      "path": "org/methodology/index.md",
+      "title": "Methodology \u2014 how the organisation works",
+      "kind": "meta",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md"
+      ],
+      "tokens": 268
+    },
+    {
+      "path": "org/methodology/regenerative-software.md",
+      "title": "Regenerative software \u2014 the Phoenix Architecture and how the brain maps to it",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/web/aicoding-fowler-phoenix--f0e11r.md",
+        "https://aicoding.leaflet.pub/"
+      ],
+      "tokens": 538
+    },
+    {
+      "path": "org/methodology/superpowers.md",
+      "title": "Superpowers \u2014 agent workflow methodology (brainstorm \u2192 plan \u2192 TDD \u2192 verify)",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md",
+        "https://github.com/obra/superpowers",
+        "https://blog.fsck.com/2025/10/09/superpowers/"
+      ],
+      "tokens": 3032
+    },
+    {
+      "path": "org/methodology/way-of-working.md",
+      "title": "The way we work \u2014 the Shape Up cadence",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "medium",
+      "sources": [
+        "../../../AGENTS.md"
+      ],
+      "tokens": 1282
+    },
+    {
+      "path": "org/operator-lessons.md",
+      "title": "Operator lessons",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-07-10",
+      "confidence": "high",
+      "sources": [
+        "../../sources/research/2026-07-10--tend-sweep-2-verification.md",
+        "../../.claude/skills/capture/SKILL.md"
+      ],
+      "tokens": 416
+    }
+  ]
+}

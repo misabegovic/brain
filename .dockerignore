@@ -1,0 +1,38 @@
+# Build context for deploy/Dockerfile — the serving image needs the
+# corpus (wiki/, sources/), the kernel (tools/, brain.config.yml,
+# AGENTS.md), and ui/ sources. Everything machine-local stays out.
+
+.git
+.idea
+.vscode
+.DS_Store
+*.swp
+*~
+
+# secrets — never in an image
+.env
+.env.*
+!.env.example
+
+# mempalace local index
+.mempalace
+mempalace.db
+mempalace.yaml
+entities.json
+*.chroma
+
+# runtime/local artifacts (regenerated or irrelevant in the image)
+log/queries.log
+log/schedule.log
+ui/node_modules/
+ui/dist/
+ui/.build-cache/
+wiki/_views/index.db
+wiki/_views/index.db.tmp
+.claude/worktrees/
+__pycache__/
+*.pyc
+.venv/
+.venv2/
+.pytest_cache/
+tests/

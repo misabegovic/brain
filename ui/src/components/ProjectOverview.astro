@@ -1,0 +1,149 @@
+---
+// Generated project-onboarding overview, appended to every shelf
+// home (wiki/<shelf>/index.md) — a start-here reading path, open
+// work, the recent trail, and freshness, derived from the shelf's
+// own pages at build time. Gaps are stated honestly so a thin shelf
+// coaches instead of blanking (presentation-layer ADR amendment).
+interface Props {
+  shelf: string;
+  pages: any[]; // collection entries under this shelf (excl. the index)
+}
+const { shelf, pages } = Astro.props;
+
+const href = (e) => '/' + e.id.replace(/\/index$/, '') + '/';
+const dateOf = (e) => {
+  const u = e.data.updated;
+  return typeof u === 'string' ? u : (u?.toISOString?.().slice(0, 10) ?? '');
+};
+const live = pages.filter(
+  (e) => !['superseded', 'archived'].includes(e.data.status ?? ''),
+);
+
+// Start-here reading path: the canonical order, only what exists.
+const READING = [
+  [`${shelf}/permanent/purpose`, 'Purpose — why this exists'],
+  [`${shelf}/permanent/architecture`, 'Architecture — the structural shape'],
+  [`${shelf}/state`, 'State — past, now, perceived, target'],
+  [`${shelf}/permanent/conventions`, 'Conventions — how code is written here'],
+  [`${shelf}/permanent/constraints`, 'Constraints — what cannot be violated'],
+  [`${shelf}/permanent/implementation-memory`, 'Implementation memory — lessons the runtime encodes'],
+  [`${shelf}/permanent/domain`, 'Domain — vocabulary and entities'],
+  [`${shelf}/roadmap`, 'Roadmap — the arc'],
+];
+const byId = new Map(pages.map((e) => [e.id, e]));
+const path_ = READING.filter(([id]) => byId.has(id)).map(([id, label]) => ({
+  e: byId.get(id),
+  label,
+}));
+const missing = READING.filter(
+  ([id]) => !byId.has(id) && ['purpose', 'architecture', 'state'].some((k) => id.includes(k)),
+).map(([id]) => id.split('/').pop());
+
+// Open work + recent trail.
+const open = live.filter((e) =>
+  ['topic', 'pitch', 'initiative', 'epic', 'insight', 'idea'].includes(
+    e.data.kind ?? '',
+  ),
+);
+const decisions = pages
+  .filter((e) => e.data.kind === 'decision')
+  .sort((a, b) => (dateOf(a) < dateOf(b) ? 1 : -1))
+  .slice(0, 5);
+const newest = pages.map(dateOf).sort().at(-1) ?? '';
+// Status tone so a superseded row can never read as the current
+// record (Priya reader-trust finding, 2026-07-12).
+const statusTone = (s) =>
+  s === 'superseded' || s === 'archived'
+    ? 'warn'
+    : s === 'living' || s === 'accepted'
+      ? 'ok'
+      : '';
+---
+<aside class="overview">
+  <h2>Project overview <span class="chip">{pages.length} pages ·
+    freshest {newest}</span></h2>
+
+  <div class="cols">
+    <div>
+      <h3>Start here — the reading path</h3>
+      {path_.length > 0 ? (
+        <ol>
+          {path_.map(({ e, label }) => (
+            <li>
+              <a href={href(e)}>{label}</a>
+              {e.data.summary && <p>{e.data.summary}</p>}
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p class="muted">
+          No synthesis pages yet — this shelf is waiting for its first
+          ingest.
+        </p>
+      )}
+      {missing.length > 0 && (
+        <p class="muted">
+          Not written yet: {missing.join(', ')} — an ingest pass
+          (<code>/in {shelf}</code>) starts them.
+        </p>
+      )}
+    </div>
+
+    <div>
+      <h3>Open work</h3>
+      {open.length > 0 ? (
+        <ul>
+          {open.map((e) => (
+            <li>
+              <span class="chip">{e.data.kind}</span>
+              {e.data.status && e.data.status !== 'living' && (
+                <span class={`chip ${statusTone(e.data.status)}`}
+                >{e.data.status}</span>
+              )}{' '}
+              <a href={href(e)}>{e.data.title}</a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="muted">Nothing in flight on this shelf.</p>
+      )}
+
+      <h3>Recent decisions</h3>
+      {decisions.length > 0 ? (
+        <ul>
+          {decisions.map((e) => (
+            <li>
+              <span class={`chip ${statusTone(e.data.status)}`}
+              >{e.data.status ?? 'decision'}</span>
+              <span class="chip">{dateOf(e)}</span>{' '}
+              <a href={href(e)}>{e.data.title}</a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="muted">No decisions recorded yet.</p>
+      )}
+    </div>
+  </div>
+</aside>
+
+<style>
+  .overview {
+    border: 1px solid var(--line); border-radius: .8rem;
+    background: var(--bg-soft); padding: 1rem 1.2rem; margin: 1.6rem 0;
+  }
+  .overview h2 { font-size: 1em; margin: 0 0 .6rem;
+    display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+  .overview h3 { font-size: .85em; margin: .8rem 0 .3rem;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: .05em; }
+  .cols { display: grid; gap: 1.2rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); }
+  .overview ol, .overview ul { margin: 0; padding-left: 1.2rem; }
+  .overview li { margin: .35rem 0; font-size: .93em; }
+  .overview li p { margin: .1rem 0 0; color: var(--muted);
+    font-size: .88em; }
+  .muted { color: var(--muted); font-size: .88em; }
+  .overview code { background: var(--chip); padding: 0 .3rem;
+    border-radius: .3rem; }
+</style>

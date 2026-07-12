@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# brain pre-commit hook — `brain.py validate` + `views` regen + reflection-check links.
+#
+# Install with:
+#   ln -s ../../tools/git-hooks/pre-commit .git/hooks/pre-commit
+#
+# (Symlink so updates to this file flow into installed hooks
+# without re-installation. The hook is committed to the repo so
+# the convention is shared; the install symlink is per-checkout.)
+#
+# What it gates:
+#
+# 1. `brain.py validate` — frontmatter shape + section conformance.
+#    Hard fail; commit refused.
+# 2. `brain.py views` — regenerate auto-views; if `wiki/_views/`
+#    drifts from committed state, hook auto-stages the regen.
+# 3. `brain.py reflection-check links` — broken markdown links.
+#    Hard fail; commit refused.
+#
+# Bypassed with `git commit --no-verify`. Don't bypass routinely;
+# the hook exists to catch errors before they hit CI / reviewers.
+
+set -euo pipefail
+
+REPO=$(git rev-parse --show-toplevel)
+cd "$REPO"
+
+echo "# brain pre-commit: validate + views + reflection-check links"
+
+# Prefer the mempalace venv python (has tiktoken installed) so the
+# token counts the hook regenerates match what tools/preflight.sh
+# regenerates on push. Falls back to system python3 when the venv
+# is absent. Without this alignment, the hook auto-stages a
+# tiktoken-less pages.json that the push-time preflight then
+# tries to overwrite with the tiktoken'd version, blocking push.
+PY=~/.local/share/mempalace-venv/bin/python3
+if [ ! -x "$PY" ]; then
+  PY=python3
+fi
+
+# 1. Validate
+if ! "$PY" tools/brain.py validate >&2; then
+  echo "" >&2
+  echo "✗ brain.py validate failed — commit refused." >&2
+  echo "  Fix the errors above (frontmatter / required sections / orphans)." >&2
+  exit 1
+fi
+
+# 2. Views regen — auto-stage if anything changed.
+"$PY" tools/brain.py views >/dev/null
+if ! git diff --quiet wiki/_views/; then
+  echo "  views regenerated — auto-staging wiki/_views/" >&2
+  git add wiki/_views/
+fi
+
+# 3. Reflection-check links (only the cheap mechanical sub-check;
+#    the full reflection-check runs in CI + /sync).
+n=$("$PY" tools/brain.py reflection-check links 2>/dev/null \
+    | grep -c "^links:" || true)
+if [ "${n:-0}" -gt 0 ]; then
+  echo "" >&2
+  echo "✗ brain.py reflection-check links found ${n} broken link(s) — commit refused." >&2
+  "$PY" tools/brain.py reflection-check links 2>&1 >&2 | grep "^links:" | head -10 >&2
+  exit 1
+fi
+
+echo "  ✓ validate + views + links clean"
+exit 0

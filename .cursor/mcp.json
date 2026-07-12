@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "brain": {
+      "command": "python3",
+      "args": [
+        "./tools/brain-mcp.py"
+      ],
+      "env": {
+        "BRAIN_DIR": "."
+      }
+    }
+  }
+}

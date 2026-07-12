@@ -1,0 +1,42 @@
+# Datasette pilot over the derived index (serving slice).
+#   pip install datasette
+#   tools/serve-datasette.sh
+# Read-only by construction: immutable mode + no write plugins +
+# derived disposable db. Put an identity-aware proxy in front for
+# anything beyond localhost.
+title: brain — derived index
+description: >-
+  Read-only browse and SQL over the brain's derived index. Files are
+  the source of truth; this database is regenerated on every views
+  run. Schema: `brain.py index --schema`.
+databases:
+  index:
+    tables:
+      pages:
+        sort_desc: updated
+        facets: [kind, status, confidence]
+    queries:
+      recent-decisions:
+        title: Recent decisions
+        sql: |-
+          SELECT path, title, updated FROM pages
+          WHERE kind = 'decision' AND status = 'accepted'
+          ORDER BY updated DESC, path LIMIT 25
+      load-bearing-pages:
+        title: Load-bearing pages (inbound links)
+        sql: |-
+          SELECT p.path, p.confidence, COUNT(l.src) AS inbound
+          FROM pages p JOIN links l ON l.dst = p.path
+          GROUP BY p.path ORDER BY inbound DESC, p.path LIMIT 25
+      search:
+        title: Full-text search
+        sql: |-
+          SELECT p.path, p.title, snippet(pages_fts, -1, '**', '**', '…', 24) AS hit
+          FROM pages_fts JOIN pages p ON p.rowid = pages_fts.rowid
+          WHERE pages_fts MATCH :q ORDER BY rank LIMIT 25
+      tend-queue:
+        title: Tend queue
+        sql: |-
+          SELECT id, kind, priority, summary FROM inbox
+          ORDER BY CASE priority WHEN 'high' THEN 0
+          WHEN 'normal' THEN 1 ELSE 2 END, produced_at, id

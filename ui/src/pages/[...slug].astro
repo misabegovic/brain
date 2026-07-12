@@ -1,0 +1,142 @@
+---
+// Wiki pages rendered inside the app with lifecycle-aware chrome:
+// kind/status/confidence/appetite chips, the executive summary as a
+// lead, the ai-suggestion banner, and supersession notices. URL shape
+// matches the pre-rewrite site (/<repo>/<page>/); the wiki home
+// renders at /home/ since the briefing owns the root.
+import { getCollection, render } from 'astro:content';
+import App from '../layouts/App.astro';
+import Actions from '../components/Actions.astro';
+import ProjectOverview from '../components/ProjectOverview.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('docs');
+  // Serving-mode build (BRAIN_SERVING=1) omits ai-suggestion drafts
+  // entirely — the static site is a serving surface too (Sam
+  // serving-mode finding). Local builds keep them for the review flow.
+  const serving = process.env.BRAIN_SERVING === '1';
+  return entries
+    .filter((entry) => !(serving && (
+      entry.id.includes('ai-suggestions/') ||
+      entry.id === '_views/ai-suggestions')))
+    .map((entry) => ({
+      params: {
+        slug: entry.id === 'index' ? 'home' : entry.id.replace(/\/index$/, ''),
+      },
+      props: { entry },
+    }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+// Shelf homes (wiki/<shelf>/index.md — the glob loader strips the
+// trailing /index, so their id is just the shelf name) get a
+// generated project overview appended — the shelf's onboarding
+// surface.
+const isShelfHome =
+  !entry.id.includes('/') && entry.id !== 'index' &&
+  !entry.id.startsWith('_');
+const shelfPages = isShelfHome
+  ? (await getCollection('docs')).filter(
+      (e) =>
+        e.id.startsWith(entry.id + '/') &&
+        !e.id.includes('ai-suggestions/'),
+    )
+  : [];
+const shelf = isShelfHome && shelfPages.length >= 0 ? entry.id : null;
+const d = entry.data;
+const isSuggestion =
+  entry.id.includes('ai-suggestions/') || d.ai_suggestion === true;
+const updated =
+  typeof d.updated === 'string'
+    ? d.updated
+    : d.updated?.toISOString?.().slice(0, 10);
+const refHref = (ref) => '/' + ref.replace(/\.md$/, '').replace(/\/index$/, '') + '/';
+const statusTone =
+  d.status === 'superseded' || d.status === 'archived'
+    ? 'warn'
+    : d.status === 'living' || d.status === 'accepted'
+      ? 'ok'
+      : '';
+---
+<App title={d.title} description={d.summary ?? ''}>
+  <article>
+    <div class="chips" style="margin-bottom:.4rem;">
+      {d.kind && <span class="chip accent">{d.kind}</span>}
+      {d.status && <span class={`chip ${statusTone}`}>{d.status}</span>}
+      {d.confidence && <span class="chip">confidence: {d.confidence}</span>}
+      {d.appetite && <span class="chip">appetite: {d.appetite}</span>}
+      {updated && <span class="chip">updated {updated}</span>}
+    </div>
+    <h1>{d.title}</h1>
+
+    {isSuggestion && (
+      <div class="banner warn">
+        <strong>AI suggestion.</strong> Agent-authored draft — not a
+        human-approved decision, not current or upcoming product state.
+        Review, iterate, and graduate (or discard) it.
+      </div>
+    )}
+    {d.status === 'superseded' && d.superseded_by && (
+      <div class="banner warn">
+        <strong>Superseded.</strong> The record moved on:
+        <a href={refHref(d.superseded_by)}>{d.superseded_by}</a>. This
+        page is kept as trail.
+      </div>
+    )}
+    {d.summary && <p class="lead">{d.summary}</p>}
+    <Actions target={(entry.filePath ?? '').replace(
+      /^src\/content\/docs\//, 'wiki/') || 'wiki/' + entry.id + '.md'} />
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {shelf && (
+      <ProjectOverview shelf={shelf} pages={shelfPages} />
+    )}
+
+    {d.supersedes && (
+      <p class="trailnote">
+        Supersedes <a href={refHref(d.supersedes)}>{d.supersedes}</a>.
+      </p>
+    )}
+  </article>
+</App>
+
+<style>
+  h1 { font-size: 1.45em; line-height: 1.3; margin: .2rem 0 .8rem; }
+  .lead {
+    font-size: 1.02em; color: var(--muted);
+    border-left: 3px solid var(--accent);
+    padding: .2rem 0 .2rem .8rem; margin: 0 0 1rem;
+  }
+  .banner {
+    border: 1px solid var(--line); border-radius: .6rem;
+    padding: .6rem .9rem; margin: 0 0 1rem; font-size: .92em;
+    background: var(--bg-soft);
+  }
+  .banner.warn { border-color: var(--warn); }
+  .trailnote { color: var(--muted); font-size: .88em; }
+  /* The chrome already renders the title; the body's own leading
+     H1 would duplicate it (Starlight used to strip it). */
+  .prose > :global(h1:first-child) { display: none; }
+  .prose :global(h2) { font-size: 1.15em; margin: 1.6rem 0 .5rem;
+    border-bottom: 1px solid var(--line); padding-bottom: .25rem; }
+  .prose :global(h3) { font-size: 1em; margin: 1.2rem 0 .4rem; }
+  .prose :global(pre) { background: var(--bg-soft);
+    border: 1px solid var(--line); border-radius: .5rem;
+    padding: .7rem .9rem; overflow-x: auto; font-size: .85em; }
+  .prose :global(code) { background: var(--bg-soft);
+    padding: 0 .25rem; border-radius: .3rem; font-size: .9em; }
+  .prose :global(pre code) { background: none; padding: 0; }
+  .prose :global(table) { border-collapse: collapse; display: block;
+    overflow-x: auto; font-size: .9em; }
+  .prose :global(th), .prose :global(td) {
+    border: 1px solid var(--line); padding: .35rem .6rem;
+    text-align: left; }
+  .prose :global(blockquote) { border-left: 3px solid var(--line);
+    margin: 1rem 0; padding: .1rem 0 .1rem .9rem;
+    color: var(--muted); }
+  .prose :global(img) { max-width: 100%; }
+</style>
