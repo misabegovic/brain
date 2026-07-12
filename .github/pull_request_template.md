@@ -1,19 +1,10 @@
 <!--
-Public repository — keep descriptions free of personal data.
-Do NOT paste session URLs, private links, tokens, emails, or any
-account-tied identifiers. Model attribution (Co-Authored-By) is
-fine; a session URL is not.
+Write this the way you'd explain the change to a teammate: a short
+paragraph or two, plain language, leading with why it matters and
+roughly how it works — not a list of files or a wall of headings.
+Link where the work comes from inline (the decision, the discussion,
+the issue, the source page).
+
+Keep it out of the public record: no session URLs, private links,
+tokens, or emails.
 -->
-
-## What
-
-<!-- The change, in a sentence or two. -->
-
-## Why
-
-<!-- The motivation: the finding, the decision, the source. -->
-
-## Notes
-
-<!-- Restricted-paths flag, follow-ups, anything a reviewer should
-weigh. Cite wiki/sources paths, not private links. -->

@@ -144,13 +144,29 @@ skill opens.
 ```bash
 gh pr create --base main --title "<one-line summary>" --body "$(cat <<'EOF'
 <executive-summary body — see § PR body shape below>
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
 )"
 ```
 
 ### PR body shape — *executive summary, not section-heavy*
+
+The repo's PR template (`.github/pull_request_template.md`) is the
+short version of this rule. **Write the body the way a developer
+would — plain prose a human wrote, not an LLM's lab notebook.** No
+robot-footer boilerplate, no emoji, no "This PR introduces…"; just
+what changed, why it matters, and a link to where it came from.
+
+**Concrete — dense vs. digestible.** Even short prose can be
+un-scannable. The fix is one idea per sentence, outcome first, and
+cut the meta-narration, dates, and paths a reader doesn't need.
+
+- *Too dense (still reads like an LLM):* "The PR template I added
+  last time still read like an LLM wrote it — rigid What/Why/Notes
+  headings that contradicted our own /pr skill, which has said since
+  May to write bodies as a short summary with no H2 scaffolding."
+- *Digestible:* "The PR template had What/Why/Notes headings that
+  fought our own house style. Replaced it with a one-line prompt for
+  a plain paragraph."
 
 PR descriptions are read at scan-speed by humans and agents.
 The diff is the source of truth for *what changed*; the linked
@@ -162,7 +178,7 @@ all three and rots faster than any of them.
 naming the change. Optional one short paragraph for context
 (link the parent PR / PRD / ADR / epic / source in prose, not
 in a separate `## Sources` block). One short sentence noting
-restricted-paths only when applicable. Standard 🤖 footer.
+restricted-paths only when applicable.
 
 **Lead with WHY and HOW in plain human language, not with a
 feature/file dump.** The first sentence or two name the problem
@@ -216,8 +232,6 @@ GitHub reflows on wide screens):
 Phase 1 PRD for `<slug>`, the <Nth> child of the [<epic-name> epic](<github-link>). Names the load-bearing decisions, deferred to the Phase 2 ADR. Phase-1 gate per AGENTS.md § Governance — conversational approval covers the gate; CI must still pass.
 
 Restricted-paths: false.
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
 If the PR genuinely warrants a *test plan* (changes the
