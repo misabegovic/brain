@@ -204,3 +204,7 @@
    diff: 9 files, +160/-13
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — aef21c0: 0.19.2 — public-repo hygiene: no personal email in the tree
+   diff: 6 files, +38/-8
+   restricted-paths: true
+   by: claude (fable 5)
