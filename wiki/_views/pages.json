@@ -369,7 +369,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1510,
+      "tokens": 1546,
       "affected_by": [
         "org/competitive-positioning.md",
         "org/competitors/codeplain/index.md"
@@ -430,7 +430,8 @@
       "path": "brain/pitches/human-legible-presentation-layer.md",
       "title": "Human-legible presentation layer \u2014 an opinionated, Shape Up-native UI that triages attention",
       "kind": "pitch",
-      "status": "draft",
+      "status": "superseded",
+      "superseded_by": "brain/prds/human-legible-presentation-layer.md",
       "updated": "2026-07-12",
       "appetite": "big",
       "confidence": "medium",
@@ -513,6 +514,21 @@
         "../../../sources/research/2026-07-10--openknowledge-terminal-architecture.md"
       ],
       "tokens": 585
+    },
+    {
+      "path": "brain/prds/human-legible-presentation-layer.md",
+      "title": "Human-legible presentation layer \u2014 the UI becomes the partner's briefing: opinionated, Shape Up-native, attention-first",
+      "kind": "initiative",
+      "status": "living",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/human-legible-presentation-layer.md",
+      "summary": "The UI stops being a neutral doc site: agent-maintained summaries on every page, a briefing home that triages what needs the operator's eyes, lifecycle-aware Shape Up cards, and attention verdicts judged in the tend loop. Humans read the briefing; agents keep the verbose wiki.\n",
+      "sources": [
+        "../pitches/human-legible-presentation-layer.md",
+        "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md"
+      ],
+      "tokens": 884
     },
     {
       "path": "brain/prds/instance-birth.md",

@@ -1,7 +1,8 @@
 ---
 title: "Human-legible presentation layer — an opinionated, Shape Up-native UI that triages attention"
 kind: pitch
-status: draft
+status: superseded
+superseded_by: brain/prds/human-legible-presentation-layer.md
 updated: 2026-07-12
 appetite: big
 confidence: medium

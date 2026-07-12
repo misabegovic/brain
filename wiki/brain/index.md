@@ -67,9 +67,8 @@ sanitized to organisation-agnostic form:
 ## Pitches (pre-bet)
 
 - [Human-legible presentation layer](pitches/human-legible-presentation-layer.md)
-  — **awaiting a bet** (big appetite): opinionated Shape Up-native
-  UI — summaries as schema, the partner's briefing home, lifecycle
-  components, attention judgement in the tend loop.
+  — **superseded** 2026-07-12: bet placed same day; graduated into
+  the PRD below.
 
 - [Persona playthrough loop](pitches/persona-playthrough-loop.md) —
   **superseded** 2026-07-12: graduated same-day on the operator's
@@ -87,6 +86,9 @@ sanitized to organisation-agnostic form:
 
 ## PRDs
 
+- [Human-legible presentation layer](prds/human-legible-presentation-layer.md)
+  — the UI becomes the partner's briefing: opinionated, Shape
+  Up-native, attention-first. Bet 2026-07-12.
 - [Persona playthrough loop](prds/persona-playthrough-loop.md) —
   synthetic users walk every release; findings become insights,
   capped below the human-confirmation line. Bet 2026-07-12.
