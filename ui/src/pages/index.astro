@@ -1,0 +1,363 @@
+---
+// The briefing — the app's root and its opinion. Three judgement
+// bands (Needs you / In flight / On the table) over an orientation
+// strip (were / are / going), with type filters, show-more
+// pagination, and the interactive channel on every card.
+// Per wiki/brain/adrs/human-legible-presentation-layer.md.
+import { getCollection } from 'astro:content';
+import App from '../layouts/App.astro';
+import Card from '../components/Card.astro';
+import { inboxItems, sectionBullets, version } from '../lib/data.mjs';
+
+const all = (await getCollection('docs')).filter(
+  (e) => !e.id.startsWith('_'),
+);
+const serving = process.env.BRAIN_SERVING === '1';
+const live = all.filter(
+  (e) =>
+    !['superseded', 'archived'].includes(e.data.status ?? '') &&
+    !(serving && e.id.includes('ai-suggestions/')),
+);
+const href = (e) =>
+  '/' + (e.id === 'index' ? 'home' : e.id.replace(/\/index$/, '')) + '/';
+const wikiPath = (e) =>
+  (e.filePath ?? '').replace(/^src\/content\/docs\//, 'wiki/') ||
+  'wiki/' + e.id + '.md';
+const isSuggestion = (e) => e.id.includes('ai-suggestions/');
+const age = (e) => {
+  const u = e.data.updated;
+  if (!u) return '';
+  const d = typeof u === 'string' ? new Date(u) : u;
+  const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+  return days <= 0 ? 'today' : days === 1 ? '1 day old' : `${days} days old`;
+};
+
+// ---- Needs you: verdicts + human gates -------------------------------
+const items = inboxItems();
+const needsOperator = items.filter((i) => i.attention === 'needs-operator');
+const prejudged = items.filter(
+  (i) => i.attention && i.attention !== 'needs-operator',
+).length;
+const unjudged = items.length - needsOperator.length - prejudged;
+
+const awaitingBet = live.filter(
+  (e) => e.data.kind === 'pitch' && !isSuggestion(e),
+);
+const awaitingConfirmation = live.filter(
+  (e) => e.data.kind === 'insight' && e.data.confidence === 'low',
+);
+const suggestions = live.filter(isSuggestion);
+
+// ---- In flight -------------------------------------------------------
+const inFlight = live.filter(
+  (e) =>
+    ['initiative', 'epic'].includes(e.data.kind ?? '') &&
+    e.data.status === 'living' &&
+    !isSuggestion(e),
+);
+
+// ---- On the table ----------------------------------------------------
+const topics = live.filter((e) => e.data.kind === 'topic');
+const ideas = live.filter((e) => e.data.kind === 'idea');
+
+// ---- Filter vocabulary (only kinds actually present) ------------------
+const presentKinds = [...new Set([
+  ...needsOperator.map(() => 'verdict'),
+  ...awaitingBet.map(() => 'pitch'),
+  ...awaitingConfirmation.map(() => 'insight'),
+  ...suggestions.map(() => 'draft'),
+  ...inFlight.map((e) => e.data.kind),
+  ...topics.map(() => 'topic'),
+  ...ideas.map(() => 'idea'),
+])];
+
+// ---- Orientation -----------------------------------------------------
+const were = sectionBullets('index.md', 'What changed', 3);
+const are = sectionBullets('brain/state.md', 'Now', 3);
+const going = sectionBullets('brain/state.md', 'Target', 3);
+
+// "Empty" means no project content yet — a born instance carries
+// the kernel's own trail (brain/ + org/ methodology), so page count
+// alone can't tell a fresh brain from a working one. Caught by the
+// delegated cold-start walk, 2026-07-12.
+const emptyCorpus = !live.some(
+  (e) =>
+    e.id !== 'index' &&
+    !e.id.startsWith('brain/') && e.id !== 'brain' &&
+    !e.id.startsWith('org/') && e.id !== 'org',
+);
+const PAGE = 8; // cards shown per band before "show all"
+---
+<App
+  title="Briefing"
+  description="What needs you, what's in flight, what's on the table."
+>
+  <h1 style="margin:0 0 .1rem; font-size:1.5em;">Briefing</h1>
+  <p style="margin:0 0 .9rem; color:var(--muted);">
+    The brain's judgement of what matters right now · v{version()}
+  </p>
+
+  {presentKinds.length > 1 && (
+    <div class="filters" id="filters">
+      <button class="on" data-filter="">all</button>
+      {presentKinds.map((k) => (
+        <button data-filter={k}>{k}</button>
+      ))}
+    </div>
+  )}
+
+  {emptyCorpus && (
+    <div class="empty">
+      <strong>This brain is empty — feed it.</strong> Point your agent
+      at something real: <code>/in &lt;repo-or-url&gt;</code> ingests a
+      source, <code>/capture</code> records a discussion, and the
+      briefing starts having opinions. The
+      <a href="/onboarding/">onboarding deck</a> explains the loop in
+      ten minutes.
+    </div>
+  )}
+
+  <section data-band>
+    <h2>Needs you
+      <span class="chip alert">{needsOperator.length + awaitingBet.length
+        + awaitingConfirmation.length + suggestions.length}</span>
+    </h2>
+    <ul class="cards">
+      {needsOperator.map((i) => (
+        <Card
+          title={i.summary}
+          reason={i.attention_reason}
+          kind="verdict"
+          target={i.id}
+          chips={[
+            { label: 'attention', tone: 'alert' },
+            { label: i.kind ?? 'item' },
+            i.route ? { label: i.route } : null,
+          ].filter(Boolean)}
+        />
+      ))}
+      {awaitingBet.map((e) => (
+        <Card
+          href={href(e)}
+          title={e.data.title}
+          summary={e.data.summary}
+          kind="pitch"
+          target={wikiPath(e)}
+          chips={[
+            { label: 'awaiting your bet', tone: 'warn' },
+            e.data.appetite
+              ? { label: `appetite: ${e.data.appetite}`, tone: 'accent' }
+              : null,
+            { label: age(e) },
+          ].filter(Boolean)}
+        />
+      ))}
+      {awaitingConfirmation.map((e) => (
+        <Card
+          href={href(e)}
+          title={e.data.title}
+          summary={e.data.summary}
+          kind="insight"
+          target={wikiPath(e)}
+          chips={[
+            { label: 'hypothesis — confirm or refute', tone: 'warn' },
+            { label: 'insight' },
+            { label: age(e) },
+          ]}
+        />
+      ))}
+      {suggestions.map((e) => (
+        <Card
+          href={href(e)}
+          title={e.data.title}
+          summary={e.data.summary}
+          kind="draft"
+          target={wikiPath(e)}
+          chips={[
+            { label: 'AI draft — review to graduate', tone: 'warn' },
+            { label: e.data.kind ?? 'draft' },
+          ]}
+        />
+      ))}
+    </ul>
+    {needsOperator.length + awaitingBet.length + awaitingConfirmation.length
+      + suggestions.length === 0 && (
+      <div class="empty">
+        Nothing needs your eyes. Verdicts from tended connector signal,
+        pitches awaiting a bet, and unconfirmed hypotheses land here.
+      </div>
+    )}
+    {(prejudged > 0 || unjudged > 0) && (
+      <p style="color:var(--muted); font-size:.88em;">
+        {prejudged > 0 && `${prejudged} queued item(s) pre-judged routine/fyi. `}
+        {unjudged > 0 && `${unjudged} item(s) not yet judged — tend to digest.`}
+      </p>
+    )}
+  </section>
+
+  <section data-band>
+    <h2>In flight <span class="chip accent">{inFlight.length}</span></h2>
+    <ul class="cards">
+      {inFlight.map((e) => (
+        <Card
+          href={href(e)}
+          title={e.data.title}
+          summary={e.data.summary}
+          kind={e.data.kind}
+          target={wikiPath(e)}
+          chips={[
+            { label: e.data.kind === 'epic' ? 'epic' : 'bet placed', tone: 'ok' },
+            { label: age(e) },
+            e.data.confidence ? { label: e.data.confidence } : null,
+          ].filter(Boolean)}
+        />
+      ))}
+    </ul>
+    {inFlight.length === 0 && (
+      <div class="empty">
+        No bets in flight. Shape one: tell your agent
+        <code>let's explore &lt;idea&gt;</code> and a pitch lands on the
+        table below.
+      </div>
+    )}
+  </section>
+
+  <section data-band>
+    <h2>On the table
+      <span class="chip">{topics.length + ideas.length}</span>
+    </h2>
+    <ul class="cards">
+      {topics.map((e) => (
+        <Card
+          href={href(e)}
+          title={e.data.title}
+          summary={e.data.summary}
+          kind="topic"
+          target={wikiPath(e)}
+          chips={[{ label: 'open discussion' }, { label: age(e) }]}
+        />
+      ))}
+      {ideas.map((e) => (
+        <Card
+          href={href(e)}
+          title={e.data.title}
+          summary={e.data.summary}
+          kind="idea"
+          target={wikiPath(e)}
+          chips={[{ label: 'idea' }, { label: age(e) }]}
+        />
+      ))}
+    </ul>
+    {topics.length + ideas.length === 0 && (
+      <div class="empty">
+        No open discussions. <code>/capture</code> starts a topic the
+        next time something is worth arguing about.
+      </div>
+    )}
+  </section>
+
+  <section class="orientation">
+    <h2>Orientation</h2>
+    <div class="tri">
+      <div>
+        <h3>Where we were</h3>
+        <ul>{were.map((b) => <li>{b}</li>)}</ul>
+      </div>
+      <div>
+        <h3>Where we are</h3>
+        <ul>{are.map((b) => <li>{b}</li>)}</ul>
+      </div>
+      <div>
+        <h3>Where we're going</h3>
+        <ul>{going.map((b) => <li>{b}</li>)}</ul>
+      </div>
+    </div>
+    <p style="color:var(--muted); font-size:.88em;">
+      Full record: <a href="/home/">corpus home</a> ·
+      <a href="/brain/state/">state</a> ·
+      <a href="/brain/roadmap/">roadmap</a> ·
+      views: <a href="/_views/custom/engineer/">engineer</a> ·
+      <a href="/_views/custom/pm/">pm</a> ·
+      <a href="/_views/custom/operator/">operator</a>
+    </p>
+  </section>
+</App>
+
+<style>
+  section { margin: 1.6rem 0; }
+  h2 {
+    font-size: 1.05em; margin: 0 0 .2rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .filters { display: flex; gap: .35rem; flex-wrap: wrap; margin: 0 0 .4rem; }
+  .filters button {
+    font: inherit; font-size: .82em; cursor: pointer;
+    background: var(--chip); color: var(--muted); border: 0;
+    border-radius: 99px; padding: .1rem .7rem;
+  }
+  .filters button.on { color: var(--fg); outline: 1px solid var(--accent); }
+  .orientation .tri {
+    display: grid; gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  }
+  .orientation h3 { font-size: .9em; margin: .6rem 0 .2rem;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: .05em; }
+  .orientation ul { margin: 0; padding-left: 1.1rem; }
+  .orientation li { margin: .3rem 0; font-size: .92em; }
+  .more {
+    font: inherit; font-size: .85em; cursor: pointer;
+    background: none; border: 1px dashed var(--line);
+    border-radius: .5rem; color: var(--muted);
+    padding: .3rem .9rem; margin: .2rem 0 0;
+  }
+</style>
+
+<script is:inline define:vars={{ PAGE }}>
+  // Type filter: hides cards whose data-kind doesn't match.
+  const filters = document.getElementById('filters');
+  let active = '';
+  function apply() {
+    document.querySelectorAll('[data-band]').forEach((band) => {
+      const cards = [...band.querySelectorAll('.card')];
+      let shown = 0;
+      const expanded = band.dataset.expanded === '1';
+      cards.forEach((c) => {
+        const match = !active || c.dataset.kind === active;
+        const withinPage = expanded || shown < PAGE;
+        c.style.display = match && (withinPage || !match) ? '' : 'none';
+        if (match && withinPage) shown++;
+        else if (match) c.style.display = 'none';
+      });
+      const matching = cards.filter(
+        (c) => !active || c.dataset.kind === active).length;
+      let btn = band.querySelector('.more');
+      if (matching > PAGE && !expanded) {
+        if (!btn) {
+          btn = document.createElement('button');
+          btn.className = 'more';
+          btn.addEventListener('click', () => {
+            band.dataset.expanded = '1';
+            apply();
+          });
+          band.querySelector('.cards').after(btn);
+        }
+        btn.textContent = `show all ${matching}`;
+        btn.style.display = '';
+      } else if (btn) {
+        btn.style.display = 'none';
+      }
+    });
+  }
+  if (filters) {
+    filters.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      active = b.dataset.filter;
+      filters.querySelectorAll('button').forEach((x) =>
+        x.classList.toggle('on', x === b));
+      apply();
+    });
+  }
+  apply();
+</script>

@@ -1,0 +1,38 @@
+{
+  "generated": "2026-07-10",
+  "totals": {
+    "pages": 2,
+    "tokens": 148
+  },
+  "by_kind": {
+    "meta": 2
+  },
+  "by_status": {
+    "draft": 2
+  },
+  "by_team": {
+    "(none)": 2
+  },
+  "by_repo": {},
+  "by_confidence": {
+    "high": 2
+  },
+  "pages": [
+    {
+      "path": "brain/index.md",
+      "kind": "meta",
+      "status": "draft",
+      "confidence": "high",
+      "updated": "2026-07-10",
+      "tokens": 78
+    },
+    {
+      "path": "org/index.md",
+      "kind": "meta",
+      "status": "draft",
+      "confidence": "high",
+      "updated": "2026-07-10",
+      "tokens": 70
+    }
+  ]
+}

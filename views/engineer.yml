@@ -1,0 +1,25 @@
+# Engineer view — recent decisions, deepening queue, production state.
+# Edit freely: blocks are shorthands (pages/state/inbox) or raw SQL
+# over the derived index (`brain.py index --schema` for the schema).
+title: "Engineer view"
+audience: team/engineer
+description: >
+  What changed in the decision trail, what the brain wants deepened,
+  and the production surfaces at a glance.
+blocks:
+  - title: "Recent decisions"
+    empty: "No decisions recorded yet."
+    pages: {kind: decision, status: accepted}
+    limit: 10
+  - title: "Research queue (deepening picks)"
+    empty: "No deepening picks queued — the link-health producer adds them."
+    inbox: {kind: research}
+  - title: "Load-bearing pages by inbound links"
+    sql: |
+      SELECT p.path, p.confidence, COUNT(l.src) AS inbound
+      FROM pages p JOIN links l ON l.dst = p.path
+      WHERE p.status NOT IN ('superseded', 'archived')
+      GROUP BY p.path ORDER BY inbound DESC, p.path
+    limit: 10
+  - title: "Production state (Datadog)"
+    state: datadog

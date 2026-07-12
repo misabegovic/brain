@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# brain — thin shell wrapper around tools/brain.py.
+#
+# Lets sibling-repo agents and operator shells call:
+#
+#     brain search 'authorization'
+#     brain stats
+#     brain install-sibling <repo>
+#
+# without typing `python3 ~/projects/brain/tools/brain.py` each time.
+#
+# Resolution order for the brain root:
+#   1. $BRAIN_DIR (if set)
+#   2. The directory that contains this script's parent (when called via
+#      its real path or a symlink resolved through `readlink -f`)
+#   3. $HOME/projects/brain (the documented default in AGENTS.md)
+#
+# Add to PATH for sibling shells:
+#
+#     ln -s ~/projects/brain/tools/brain ~/.local/bin/brain
+#
+# Or, if the operator prefers a function:
+#
+#     brain() { python3 "$BRAIN_DIR/tools/brain.py" "$@"; }
+
+set -euo pipefail
+
+# Resolve this script's real location even if invoked through a symlink.
+SCRIPT_PATH="$(readlink -f "$0" 2>/dev/null || python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$0")"
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+SCRIPT_PARENT="$(dirname "$SCRIPT_DIR")"
+
+# Pick the brain root. $BRAIN_DIR wins; otherwise infer from the script
+# location; otherwise fall back to ~/projects/brain.
+if [[ -n "${BRAIN_DIR:-}" && -d "$BRAIN_DIR" ]]; then
+  BRAIN_HOME="$BRAIN_DIR"
+elif [[ -f "$SCRIPT_PARENT/tools/brain.py" ]]; then
+  BRAIN_HOME="$SCRIPT_PARENT"
+elif [[ -f "$HOME/projects/brain/tools/brain.py" ]]; then
+  BRAIN_HOME="$HOME/projects/brain"
+else
+  echo "brain: cannot locate brain root (set \$BRAIN_DIR or place this script under <brain>/tools/)" >&2
+  exit 1
+fi
+
+export BRAIN_DIR="$BRAIN_HOME"
+
+# Convenience verbs that go beyond brain.py:
+#   brain                — THE app: serve + open the rendered knowledge
+#   brain tend [budget]  — open the agent in the brain with /tend
+#   brain dash           — serve + open the ops dashboard
+case "${1:-}" in
+  "")
+    ( sleep 1; xdg-open "http://localhost:${BRAIN_PORT:-8765}/workbench" 2>/dev/null \
+        || open "http://localhost:${BRAIN_PORT:-8765}/workbench" 2>/dev/null || true ) &
+    exec python3 "$BRAIN_HOME/tools/brain.py" serve
+    ;;
+  tend)
+    shift
+    if command -v claude >/dev/null; then
+      cd "$BRAIN_HOME"
+      exec claude "/tend ${*:-}"
+    fi
+    echo "brain tend: no agent CLI found on PATH." >&2
+    echo "  Open your agent in $BRAIN_HOME and run: /tend ${*:-}" >&2
+    exit 1
+    ;;
+  dash)
+    ( sleep 1; xdg-open "http://localhost:${BRAIN_PORT:-8765}/dash" 2>/dev/null \
+        || open "http://localhost:${BRAIN_PORT:-8765}/dash" 2>/dev/null || true ) &
+    exec python3 "$BRAIN_HOME/tools/brain.py" serve
+    ;;
+  workbench)
+    # Back-compat alias for the bare form.
+    ( sleep 1; xdg-open "http://localhost:${BRAIN_PORT:-8765}/workbench" 2>/dev/null \
+        || open "http://localhost:${BRAIN_PORT:-8765}/workbench" 2>/dev/null || true ) &
+    exec python3 "$BRAIN_HOME/tools/brain.py" serve
+    ;;
+esac
+
+exec python3 "$BRAIN_HOME/tools/brain.py" "$@"

@@ -1,0 +1,313 @@
+---
+title: "Brain — home"
+kind: meta
+status: draft
+updated: 2026-07-10
+confidence: high
+sources:
+  - ../AGENTS.md
+---
+
+# Brain — home
+
+An empty brain shell — an LLM-maintained knowledge base awaiting its
+organisation's content. Fill `brain.config.yml`, add per-repo
+shelves under `wiki/<repo>/`, and the dashboard sections below
+start filling in as the slash-command surface runs.
+
+## What changed
+
+<!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **delivered: operator-trust fixes (Viktor cluster).**
+  Producer death is now first-class health — a heartbeat lets
+  `doctor` fail distinctly when the accumulation loop stalls, and
+  the app strip says "producers stalled" instead of a calm "queue
+  clear". Recurring tend items gain `inbox ack` (suppress until the
+  page actually changes — no metadata falsified); `inbox
+  pending-grades` and a sample-sized dashboard stat make the
+  attention-calibration loop legible.
+- **2026-07-12** — **delivered: serving-mode hardening (Sam cluster).**
+  The ai-suggestions draft exclusion now holds on every read surface
+  in serving mode — the `brain.py serve` JSON API, `pages.json`,
+  `/views/*`, the `search` CLI, and a serving-mode static UI build —
+  not just the MCP. And the MCP HTTP surface gained the same loopback
+  `Host`-header guard `brain.py serve` uses, so anti-DNS-rebinding
+  holds by construction on both. SECURITY.md states each property
+  once.
+- **2026-07-12** — **delivered: reader-trust fixes (Priya cluster).**
+  Generated reading lists and the trail now mark superseded status
+  and render human titles instead of raw slugs; custom/role views
+  read like briefs (title links, purpose-first, human empty states,
+  generation note demoted to a footer); a build-time render-proof
+  fails the UI build if any AI-suggestion page loses its trust
+  banner. Three draft summaries fixed.
+- **2026-07-12** — **playthrough sweep: 8 AI-suggestions for review.**
+  A three-persona sweep (Viktor / Priya / Sam, six agent runs)
+  walked the product and landed eight `confidence: low` drafts under
+  [brain/ai-suggestions](brain/index.md#ai-suggestions-drafts-for-human-review)
+  plus a serving-mode insight. All security guarantees held under
+  Sam's adversarial probe.
+- **2026-07-12** — **0.19.4: fixed a governance misreport.** `doctor`
+  and `/dash` read `LOCAL_FIRST` by substring, matching the
+  commented `.env.example` boilerplate — so they reported
+  "local-first" after the flag was removed. Now anchored to the
+  canonical line test. Found by the Viktor daily-operator
+  playthrough.
+- **2026-07-12** — **0.19.3: PR mode + detector teeth.** The
+  operator removed LOCAL_FIRST — every change now lands via PR with
+  CI green. The internal-refs detector reads UI source strings
+  (catching a dangling deck reference immediately) and a
+  machine-local denylist closes the client-term leak class without
+  the terms ever entering the repo.
+- **2026-07-12** — **the repo is public.** The visibility gap on the
+  [market-readiness topic](brain/topics/market-readiness-gaps.md)
+  closes; security reports now go through GitHub private
+  vulnerability reporting (personal email removed from SECURITY.md
+  and packaging; repo-local git author switched to the noreply
+  address).
+- **2026-07-12** — **0.19.1: the delegated cold-start.** The
+  operator delegated the 1.0 gate's cold-start test; the full
+  tutorial ran against a born instance with a real OSS ingest
+  (transcript at
+  `sources/playthroughs/2026-07-12--delegated-cold-start--instance-tutorial.md`;
+  criteria 3 + 4 evidence on the
+  [topic](brain/topics/one-point-oh-criteria.md)). Fixed en route:
+  CI ran pytest before the UI build (main is green again), the
+  empty-brain guidance never fired on born instances, and `setup`
+  now ends with the next command verified to work. The
+  [insight](insights/quickstart-third-command-fragility.md) is
+  acted on.
+- **2026-07-12** — **0.19.0: onboarding surfaces.** The deck
+  rewritten to the current product (+ first-session tutorial);
+  README points at it; shelf homes render generated Project
+  overviews (reading path, open work, freshness, honest gaps) —
+  [ADR amendment](brain/adrs/human-legible-presentation-layer.md).
+  The refresh caught a leftover origin-org repo description in the
+  old deck (standalone guarantee).
+- **2026-07-12** — **0.18.0: the briefing becomes two-way.**
+  Filters + pagination, `/dashboard/` + `/trail/` + `/graph/`, and
+  the interactive channel — queue/comment clicks on any card or
+  page become inbox items the next tend digests
+  ([ADR amendment](brain/adrs/human-legible-presentation-layer.md)).
+  The presentation-layer bet closes.
+- **2026-07-12** — **0.17.0: the briefing is the UI.** The
+  presentation-layer bet shipped as a complete UI rewrite
+  ([PRD](brain/prds/human-legible-presentation-layer.md) ·
+  [ADR](brain/adrs/human-legible-presentation-layer.md)): the app's
+  root is now the brain's judgement — Needs you / In flight / On
+  the table + orientation — with executive summaries in the schema,
+  lifecycle chrome on every page, and attention verdicts
+  (`inbox judge`/`grade`) from the tend loop. The Priya playthrough
+  caught three defects in-session, including five shipped PRDs
+  still claiming in-flight.
+- **2026-07-12** — **pitch on the table: human-legible presentation
+  layer.** Big appetite, awaiting the operator's bet
+  ([pitch](brain/pitches/human-legible-presentation-layer.md)):
+  Shape Up-native opinionated UI, attention triage in the tend
+  loop, summaries as schema. The Ruby/Rust rewrite question was
+  answered no in the same conversation (capture cited in the
+  pitch).
+- **2026-07-12** — **0.16.0: the persona playthrough loop.** User
+  personas for the brain-as-product
+  ([PRD](brain/prds/persona-playthrough-loop.md) ·
+  [ADR](brain/adrs/persona-playthrough-loop.md)): `/playthrough`
+  executes scenarios for real, transcripts snapshot to
+  `sources/playthroughs/`, findings become `confidence: low`
+  insights until a human confirms, and every version bump queues a
+  sweep. The dogfood walk (Noor, cold-start) caught two defects —
+  non-tty setup auto-consent and a raw-JSON first-run app pane —
+  both fixed in-session, plus one open
+  [insight](insights/quickstart-third-command-fragility.md).
+- **2026-07-12** — **0.15.0: surfaces settle at MCP + CLI.** The
+  embedded terminal removed on the operator's call
+  ([superseding ADR](brain/adrs/mcp-cli-surface.md)) — it was an
+  arrangement of windows, not a capability, and the kernel's
+  largest security surface. The app page is now the rendered
+  knowledge under the ambient strip; the billing guard degrades to
+  a `doctor` warning. The
+  [topic](brain/topics/chat-surface-necessity.md) is settled twice
+  over.
+- **2026-07-12** — **0.14.1: license changed to MIT** (operator
+  direction; revised from Apache-2.0 pre-any-public-release).
+  NOTICE removed, packaging metadata updated,
+  [topic](brain/topics/market-readiness-gaps.md) amended.
+- **2026-07-12** — **0.14.0: surfaces simplified.** The chat pane
+  removed on the operator's call
+  ([superseding ADR](brain/adrs/mcp-cli-terminal-surface.md)) —
+  MCP + CLI + terminal cover it better; strip, entry point,
+  install-agent, billing guard kept. The
+  [topic](brain/topics/chat-surface-necessity.md) is settled.
+- **2026-07-12** — first two unattended days: both local timer runs
+  finished clean (1.0 criterion #2: 2/7). Dogfooding finding: the
+  inherited CI cron was a second runner auto-committing divergent
+  state — disarmed to manual-dispatch per the queue-and-tend ADR
+  (amendment recorded). Accumulation committed; inbox honestly
+  empty (grace period).
+- **2026-07-10** — **0.13.1: market-readiness.** Apache-2.0 adopted
+  (operator pick); CHANGELOG / CONTRIBUTING / SECURITY / NOTICE;
+  `pyproject.toml` packaging; first tagged release; docs-publish
+  workflow ready (gated on repo visibility). Name deferred by the
+  operator — [topic](brain/topics/market-readiness-gaps.md)
+  partially settled.
+- **2026-07-10** — **market-readiness gaps opened as a topic.** Six
+  repo-verified gaps between the kernel and a credible market entry
+  ([topic](brain/topics/market-readiness-gaps.md)): no LICENSE, a
+  generic un-ownable name, no releases/tags, no public docs, no
+  install artifact, no community files. Each queued as a
+  `market-gap-*` inbox item; license and name are operator
+  decisions, the rest sequence behind them.
+- **2026-07-10** — **harness workbench shipped (0.6.x).**
+  `brain workbench` puts your harness terminal beside the rendered
+  brain (loopback PTY bridge, one-click launches, live reload);
+  `install-agent` wires claude / cursor / codex / opencode to the
+  brain's MCP. Full trail:
+  [PRD](brain/prds/harness-workbench.md) ·
+  [ADR](brain/adrs/workbench-pty-bridge.md).
+- **2026-07-10** — tend sweep: the deepening picker's three research
+  items digested — both hub ADRs verified against the shipped
+  mechanism and promoted to `confidence: high` (verification note in
+  `sources/research/`); the workbench-pitch item cleared as moot by
+  its graduation.
+- **2026-07-10** — pitch captured + deepdived:
+  [harness workbench](brain/pitches/harness-workbench.md) — terminal
+  in the brain's local UI with per-harness launch/config adapters,
+  studied against prior art in the space. Pre-bet.
+- **2026-07-10** — **0.6 software half shipped: the serving plane.**
+  MCP streamable-HTTP transport, `BRAIN_SERVING=1` guardrails
+  (ai-suggestions excluded, query audit log), and the Datasette
+  pilot over the derived index. Deployment/SSO remains the
+  operator's infra choice.
+- **2026-07-10** — **0.5.0 shipped: composable role-fit views.**
+  Derived SQLite index + FTS5 riding every views run; SQL view
+  specs in `views/` rendering to
+  [custom views](_views/custom/engineer.md); `brain.py query`;
+  Datadog + Langfuse connectors. Full /shape trail:
+  [PRD](brain/prds/composable-role-views.md) ·
+  [ADR](brain/adrs/sql-views-over-derived-index.md).
+- **2026-07-10** — the views bet's
+  [ADR](brain/adrs/sql-views-over-derived-index.md) landed: SQL over
+  a derived disposable index, shorthands compile to SQL, index rides
+  the views pipeline.
+- **2026-07-10** — views pitch **graduated on the operator's bet**:
+  [PRD](brain/prds/composable-role-views.md) landed; ADR + build
+  follow in the same cycle.
+- **2026-07-10** — views pitch **deepdived**: five research notes
+  in `sources/research/` (SQLite/FTS5 mechanics incl. a live
+  prototype at 19 ms / 304 KB, Datasette pilot recommendation,
+  prior-art lessons from Obsidian Bases / Steampipe / Logseq,
+  Datadog + Langfuse API specifics) woven into the
+  [pitch](brain/pitches/composable-role-views.md) — decision-ready.
+- **2026-07-10** — pitch captured:
+  [composable role-fit views](brain/pitches/composable-role-views.md)
+  — per-role view assemblies over connector data (incl. proposed
+  Datadog / Langfuse connectors). Pre-bet; awaiting the operator's
+  call.
+- **2026-07-10** — **0.4.0 shipped: pruning + deepening.**
+  `brain.py links` link-graph health, per-kind half-life scanning,
+  orphan detection, the research picker (low confidence × high
+  centrality), and coverage-gap items — all deterministic
+  `inbox-refresh` producers feeding `/tend`.
+- **2026-07-10** — **0.3.0 shipped: connectors.** GitHub / Notion /
+  Slack pull connectors under one
+  [snapshot-writer contract](brain/adrs/connector-snapshot-contract.md) —
+  immutable dedup snapshots into `sources/`, cursors, inbox items
+  out, never a wiki write; all no-op until configured.
+- **2026-07-10** — **hands-off surface shipped (0.2.x).**
+  One-command `brain.py setup`, a `doctor` health checklist, a
+  server-rendered ops dashboard at `serve /dash`, and `brain tend` /
+  `brain dash` wrapper verbs — terminal users bootstrap in one
+  command; the dashboard covers everyone else.
+- **2026-07-10** — **0.2.0 shipped: queue-and-tend.**
+  `brain.py inbox` (per-item queue at `wiki/_state/inbox/`), the
+  `inbox-refresh` producer op, the [`/tend`](brain/adrs/queue-and-tend-inbox.md)
+  skill, session-start surfacing, a local-timer installer, and a
+  custom-producer template. Decision recorded as an accepted ADR.
+- **2026-07-10** — roadmap detail: the inbox is an open producer
+  contract (per-item JSON + `brain.py inbox add`, operator-defined
+  cron producers welcome), and agent-independence is a cross-cutting
+  principle — gates in git/CI, credential-scoped connectors,
+  per-harness adapters over one canonical protocol set.
+- **2026-07-10** — 0.x arc revised to the **queue-and-tend** model
+  per operator constraint: no scheduled LLM invocation — cron
+  accumulates deterministic work into an inbox, the operator's normal
+  terminal sessions digest it via a `/tend` skill; external access
+  goes MCP-first (consumers bring their own agent and inference).
+- **2026-07-10** — operator intent for the 0.x arc captured
+  (self-maintenance, connectors, pruning/deepening, external chat) —
+  see [brain/roadmap.md](brain/roadmap.md); the prior-art study
+  is snapshotted in `sources/conversations/`.
+- **2026-07-10** — kernel hardening from the ADR review: the
+  client-specific compliance countdown became a generic
+  `deadline-countdown` op over `wiki/_state/deadlines.json`, the
+  state-refresh schedule ops now bootstrap from `brain.config.yml`
+  and no-op cleanly on an empty shell, and a new `internal-refs`
+  reflection detector enforces the standalone guarantee.
+- **2026-07-10** — kernel decision trail ported: 11 brain-meta ADRs,
+  the authoring guidance page, and the org methodology shelf
+  (way-of-working, development playbook, superpowers) landed in
+  sanitized, organisation-agnostic form. The shell is now fully
+  standalone — every internal reference resolves.
+
+[See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
+
+## Open initiatives
+
+<!-- home-section; maintained-by: /shape -->
+- [Brain roadmap — the 0.x arc](brain/roadmap.md) — **0.2 through
+  0.8 shipped**; the arc from the operator's original intent is
+  complete. What remains is adoption: point it at a project.
+
+[See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
+
+## Recent decisions
+
+<!-- home-section; maintained-by: /shape -->
+- [SQL views over a derived index](brain/adrs/sql-views-over-derived-index.md)
+  — the composable-views bet, decided 2026-07-10.
+- [MCP + CLI surface](brain/adrs/mcp-cli-surface.md) — the
+  embedded terminal retires; surfaces settle, decided 2026-07-12.
+- [Workbench PTY bridge](brain/adrs/workbench-pty-bridge.md) — the
+  harness-workbench bet, decided 2026-07-10; superseded 2026-07-12.
+- [Kernel ADR trail](brain/index.md#adrs) — 11 mechanism decisions
+  (shape pitches, epics, deepdive pre-flight, parallelism, zoom-out,
+  home shape, UI substrate, operator lessons, competitor intel)
+  recorded 2026-07-10 as ports from the origin deployment.
+
+[See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
+
+## Drift surface
+
+<!-- home-section: empty; maintained-by: /groom -->
+*(empty — no /groom run yet)*
+
+[See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
+
+## Insights now
+
+<!-- home-section: empty; maintained-by: /feedback -->
+*(empty — no /feedback run yet)*
+
+[See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
+
+## Brain trajectory
+
+<!-- home-section; maintained-by: /groom -->
+- The 0.x arc is recorded at [brain/roadmap.md](brain/roadmap.md):
+  scheduled autonomy → connectors (Slack / Notion / GitHub) →
+  pruning + deepening → read-only chat plane → self-hosting profile.
+  Governance rail unchanged throughout; local-first stays default.
+
+[See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
+
+## Curated picks
+
+<!-- home-section: empty; maintained-by: /groom -->
+*(empty — no /groom run yet)*
+
+[See more in `wiki/_views/by-kind.md`](_views/by-kind.md)
+
+## Where to find things
+
+- [Brain — meta level](brain/index.md)
+- [Org — methodology + cross-product](org/index.md)
+- Per-repo shelves arrive as you add them: `wiki/<repo>/index.md`
