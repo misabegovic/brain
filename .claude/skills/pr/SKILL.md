@@ -156,6 +156,18 @@ would — plain prose a human wrote, not an LLM's lab notebook.** No
 robot-footer boilerplate, no emoji, no "This PR introduces…"; just
 what changed, why it matters, and a link to where it came from.
 
+**Concrete — dense vs. digestible.** Even short prose can be
+un-scannable. The fix is one idea per sentence, outcome first, and
+cut the meta-narration, dates, and paths a reader doesn't need.
+
+- *Too dense (still reads like an LLM):* "The PR template I added
+  last time still read like an LLM wrote it — rigid What/Why/Notes
+  headings that contradicted our own /pr skill, which has said since
+  May to write bodies as a short summary with no H2 scaffolding."
+- *Digestible:* "The PR template had What/Why/Notes headings that
+  fought our own house style. Replaced it with a one-line prompt for
+  a plain paragraph."
+
 PR descriptions are read at scan-speed by humans and agents.
 The diff is the source of truth for *what changed*; the linked
 PRD/ADR/source is the source of truth for *why*; the audit log
