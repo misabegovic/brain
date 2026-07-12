@@ -160,3 +160,7 @@
    diff: 21 files, +608/-6
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — a6933c9: shape(human-legible-presentation-layer): pitch on the table
+   diff: 7 files, +248/-2
+   restricted-paths: false
+   by: claude (fable 5)
