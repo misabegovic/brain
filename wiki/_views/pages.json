@@ -188,6 +188,20 @@
       "tokens": 1710
     },
     {
+      "path": "brain/adrs/no-personal-data-in-public-artifacts.md",
+      "title": "Public artifacts carry no personal data; a deterministic guard strips session URLs regardless of harness behaviour",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "summary": "PR descriptions, commit messages, and release notes must not contain session URLs or account-tied identifiers. Enforced by a commit-msg git hook and a /pr check (brain.py check-no-personal-data), so no harness directive can leak a session URL into a public repo. Operator-directed after real exposure.\n",
+      "sources": [
+        "../../../AGENTS.md",
+        "../../../CONTRIBUTING.md"
+      ],
+      "tokens": 689
+    },
+    {
       "path": "brain/adrs/operator-lesson-pattern.md",
       "title": "Operator lessons live as Lessons subsections on conventions pages plus one cross-cutting org page",
       "kind": "decision",
@@ -424,7 +438,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1975
+      "tokens": 2021
     },
     {
       "path": "brain/pitches/chat-first-app.md",

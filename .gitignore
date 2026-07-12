@@ -62,3 +62,4 @@ log/queries.log
 .reflection-denylist
 wiki/_state/producer-heartbeat.json
 wiki/_state/inbox-acks.json
+.personal-data-patterns

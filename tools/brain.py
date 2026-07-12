@@ -2119,6 +2119,60 @@ NOTION_WRITE_TOOLS = (
 )
 
 
+# Patterns that must never reach a public artifact (commit message,
+# PR/issue body, release notes). Session URLs tie the artifact to an
+# operator's private account. Add org-specific patterns via
+# .personal-data-patterns (git-ignored, one regex per line).
+PERSONAL_DATA_PATTERNS = [
+    r"https?://claude\.ai/code/session[_/][A-Za-z0-9_-]+",
+    r"https?://claude\.ai/chat/[A-Za-z0-9-]+",
+]
+
+
+def _personal_data_hits(text: str) -> list[str]:
+    pats = list(PERSONAL_DATA_PATTERNS)
+    extra = REPO / ".personal-data-patterns"
+    if extra.exists():
+        pats += [ln.strip() for ln in extra.read_text().splitlines()
+                 if ln.strip() and not ln.startswith("#")]
+    hits = []
+    for pat in pats:
+        try:
+            if re.search(pat, text):
+                hits.append(pat)
+        except re.error:
+            continue
+    return hits
+
+
+def cmd_check_no_personal_data(args) -> int:
+    """Reject personal data (session URLs, account-tied links) in a
+    commit message, PR/issue body, or release notes before it lands
+    in a public artifact. Reads from --file, or stdin.
+
+    Wired into the commit-msg git hook and the /pr skill so no
+    harness directive can leak a session URL into a public repo. The
+    matched value is NOT reprinted (that would re-leak it) — only the
+    pattern name.
+    """
+    src = getattr(args, "file", None)
+    if src:
+        text = Path(src).read_text(errors="ignore")
+    else:
+        text = sys.stdin.read()
+    hits = _personal_data_hits(text)
+    if hits:
+        print("ERROR  personal data must not appear in public "
+              "artifacts (commit message / PR body / release notes):",
+              file=sys.stderr)
+        for pat in hits:
+            print(f"  - matched forbidden pattern: {pat}", file=sys.stderr)
+        print("  Strip session URLs and account-tied links. Model "
+              "attribution (Co-Authored-By) is fine.", file=sys.stderr)
+        return 1
+    return 0
+
+
 def cmd_check_no_notion_writes(_args) -> int:
     """Enforce the read-only Notion doctrine.
 
@@ -2497,6 +2551,15 @@ def _doctor_checks() -> list[dict]:
             "not installed — validate/views run only in CI",
             "ln -s ../../tools/git-hooks/pre-commit .git/hooks/pre-commit")
 
+    msg_hook = REPO / ".git" / "hooks" / "commit-msg"
+    if msg_hook.is_symlink() or msg_hook.exists():
+        add("commit-msg", "personal-data guard", "ok", "installed")
+    else:
+        add("commit-msg", "personal-data guard", "warn",
+            "not installed — session URLs / account-tied links could "
+            "reach a public commit message",
+            "ln -s ../../tools/git-hooks/commit-msg .git/hooks/commit-msg")
+
     import hashlib as _hashlib
     instance = (re.sub(r"[^a-zA-Z0-9-]", "", REPO.name) + "-"
                 + _hashlib.sha1(str(REPO).encode()).hexdigest()[:6])
@@ -2649,6 +2712,11 @@ def cmd_setup(args) -> int:
     hook = REPO / ".git" / "hooks" / "pre-commit"
     step("pre-commit gate", (REPO / ".git").exists() and not hook.exists(),
          lambda: hook.symlink_to("../../tools/git-hooks/pre-commit"))
+
+    msg_hook = REPO / ".git" / "hooks" / "commit-msg"
+    step("commit-msg gate (personal-data guard)",
+         (REPO / ".git").exists() and not msg_hook.exists(),
+         lambda: msg_hook.symlink_to("../../tools/git-hooks/commit-msg"))
 
     try:
         import tiktoken  # noqa: F401
@@ -5874,6 +5942,7 @@ KERNEL_COPY_PATHS = [
     "views",
     "AGENTS.md",
     "SECURITY.md",
+    "CONTRIBUTING.md",
     "brain-schedule.yml",
     ".gitignore", ".dockerignore", ".env.example", ".mcp.json",
     "railway.toml", "VERSION",
@@ -7076,6 +7145,12 @@ def main() -> int:
                        help="skip if fewer than this many pages (default 10)")
     ap_cl.set_defaults(func=cmd_cluster)
 
+    ap_pd = sub.add_parser(
+        "check-no-personal-data",
+        help="reject session URLs / account-tied links in a commit "
+             "message or PR body (reads --file or stdin)")
+    ap_pd.add_argument("--file", default=None)
+    ap_pd.set_defaults(func=cmd_check_no_personal_data)
     sub.add_parser("check-no-notion-writes",
                    help="enforce Notion read-only doctrine"
                    ).set_defaults(func=cmd_check_no_notion_writes)

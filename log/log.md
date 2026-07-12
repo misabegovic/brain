@@ -240,3 +240,7 @@
    diff: graduation of 7 ai-suggestions + 1 insight; competitor content removed
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 merge — PR #10: Wire the no-personal-data guard into the harness
+   diff: 9 files, +190/-3
+   restricted-paths: true
+   by: claude (fable 5)

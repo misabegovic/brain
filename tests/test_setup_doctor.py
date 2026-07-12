@@ -84,3 +84,20 @@ def test_producer_health_states(tmp_path, monkeypatch):
     (tmp_path / "hb.json").write_text(
         '{"last_run":"old","epoch":%d}' % (int(time.time()) - 48 * 3600))
     assert brain._producer_health()["state"] == "stalled"
+
+
+def test_check_no_personal_data_rejects_session_url(tmp_path):
+    """The commit-msg guard rejects session URLs but passes clean
+    messages (incl. Co-Authored-By model attribution)."""
+    import subprocess
+    import sys
+    from pathlib import Path
+    repo = Path(__file__).resolve().parent.parent
+    def run(text):
+        return subprocess.run(
+            [sys.executable, str(repo / "tools" / "brain.py"),
+             "check-no-personal-data"],
+            input=text, capture_output=True, text=True).returncode
+    assert run("fix\n\nClaude-Session: https://claude.ai/code/session_ABC") == 1
+    assert run("fix\n\nCo-Authored-By: Claude <noreply@anthropic.com>") == 0
+    assert run("a normal message") == 0

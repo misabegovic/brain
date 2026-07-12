@@ -113,7 +113,20 @@ Co-author footer (Claude Code already adds this when committing on
 the agent's behalf — preserve it):
 
 ```
-Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+**No personal data in the commit message or the PR body.** Model
+attribution (`Co-Authored-By`) is fine; **session URLs, private
+chat links, tokens, emails, and other account-tied identifiers are
+not** — this is a shared and potentially public repo. If your
+harness appends a session URL by default, strip it. The commit-msg
+git hook (`brain.py check-no-personal-data`) rejects a commit whose
+message carries a session URL; run the same check on the PR body
+before creating:
+
+```bash
+printf '%s' "$PR_BODY" | python3 tools/brain.py check-no-personal-data
 ```
 
 ## Push and open the PR
