@@ -44,13 +44,3 @@ connectors:
     # .env — Langfuse keys are write-capable (no read-only type):
     # use a dedicated project's keys or self-host.
     host: ""
-
-
-# Harness billing guard. Harness subprocesses spawned by the app
-# (workbench terminal sessions) have API-key env vars stripped
-# (ANTHROPIC_API_KEY, OPENAI_API_KEY, ...) so runs bill your
-# logged-in subscription plan — never a metered API key that happens
-# to be in your shell. Set allow_api_keys: true only if you
-# explicitly want API-billed harness runs.
-chat:
-  allow_api_keys: false

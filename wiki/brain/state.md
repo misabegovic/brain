@@ -26,6 +26,15 @@ into the sections below.
 
 ## Now
 
+- **Surfaces settled at MCP + CLI (0.15.0, 2026-07-12).** The
+  embedded terminal removed by superseding ADR
+  ([mcp-cli-surface](adrs/mcp-cli-surface.md)) the same week as the
+  chat pane: the PTY bridge, websocket slice, xterm assets, and
+  launch registry are gone. The app page is the rendered knowledge
+  under the ambient strip; the operator's harness runs in their own
+  terminal over MCP. The billing guard degrades to a `doctor`
+  warning (nothing app-spawned remains to strip).
+
 - **Surfaces simplified (0.14.0, 2026-07-12).** MCP + CLI +
   terminal; the chat pane removed by superseding ADR on the
   operator's call. Strip, entry point, install-agent, billing

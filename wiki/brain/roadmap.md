@@ -335,6 +335,19 @@ entry, `install-agent`, and the billing guard (now governing every
 harness subprocess). A recorded reversal within days is the
 mechanism working — cheap corrections are what the trail is for.
 
+## 0.15.0 — surfaces settle at MCP + CLI — **shipped 2026-07-12**
+
+The same deletion test, one step further, on the operator's
+question: the embedded terminal was an arrangement of windows, not
+a capability — the operator's own terminal beside a browser tab
+reproduces it, and the PTY-over-websocket bridge was the kernel's
+largest security/maintenance surface relative to value. Removed via
+a superseding ADR ([mcp-cli-surface](adrs/mcp-cli-surface.md)); the
+app page becomes the rendered knowledge under the ambient strip
+(auto-reload kept), and the billing guard degrades honestly to a
+`doctor` warning. Every remaining first-party surface now survives
+the deletion test.
+
 ## Standing ideas (unversioned)
 
 Deliberately not adopted from the open-knowledge direction: a vector

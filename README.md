@@ -6,7 +6,7 @@ browsable wiki of what's true, what was decided, and why — accurate
 enough to regenerate the code from, surface cross-team overlaps, and
 serve as any agent's working memory.
 
-![the app — your agent beside the rendered knowledge](docs/workbench.png)
+![the app — the rendered knowledge under an ambient health strip](docs/workbench.png)
 
 ## How it works — three ideas
 
@@ -34,13 +34,12 @@ python3 tools/brain.py setup     # idempotent bootstrap: env, config, hooks, tim
 brain                            # opens the app
 ```
 
-That's the whole surface. The app is one window: your **agent
-harness in a terminal** (one-click: Claude Code, Codex, Cursor,
-OpenCode) beside the **rendered knowledge**, live-reloading as the
-agent works, with an ambient strip showing health and what's
-waiting. Prefer your own chat client? `python3 tools/brain.py
-install-agent --all` wires the brain's MCP server into any MCP-aware
-harness — same knowledge, your UI.
+That's the whole surface. The app is the **rendered knowledge** —
+live-reloading as the agent works, with an ambient strip showing
+health and what's waiting. Your agent runs where it already lives:
+`python3 tools/brain.py install-agent --all` wires the brain's MCP
+server into Claude Code, Codex, Cursor, OpenCode, or any MCP-aware
+client — put your terminal beside the app window and talk.
 
 Two guarantees worth knowing on day one:
 
@@ -48,11 +47,10 @@ Two guarantees worth knowing on day one:
   deterministic producers that *queue* work; your interactive
   session digests it ("tend the brain"). Nothing bills while you
   sleep.
-- **Billing guard.** The app strips API-key env vars from every
-  harness subprocess, so sessions bill your logged-in subscription —
-  never a metered key lurking in your shell
-  (`chat.allow_api_keys` opts back in; `doctor` warns if keys are
-  present).
+- **Nothing runs a shell for you.** The kernel spawns no harness
+  subprocesses and embeds no terminal — your sessions are your own,
+  on your logged-in subscription. `doctor` warns if metered API
+  keys sit in the environment you launch your harness from.
 
 ---
 
@@ -187,7 +185,6 @@ python3 tools/brain.py query '<sql>' # read-only SQL over the index
 python3 tools/brain.py setup        # one-command bootstrap (idempotent)
 python3 tools/brain.py doctor       # health checklist
 tools/brain dash                    # local ops dashboard (serve + open /dash)
-tools/brain workbench               # terminal + rendered brain, one page
 python3 tools/brain.py install-agent --all  # wire claude/cursor/codex/opencode to the MCP
 tools/brain tend                    # open the agent with /tend
 tools/install-timer.sh              # daily accumulation timer (systemd user / cron)

@@ -12,8 +12,8 @@ One infra-agnostic image, three read-only surfaces (per
 The selected surface binds the platform-injected `$PORT`; the other
 two start on internal ports (`BRAIN_MCP_PORT`/`BRAIN_UI_PORT`/
 `BRAIN_DS_PORT`) for private networking. `BRAIN_SERVING=1` is forced:
-ai-suggestions excluded, query audit log on, workbench structurally
-refused.
+ai-suggestions excluded, query audit log on, the local app page
+structurally unmounted.
 
 **Railway** (reference target): repo root `railway.toml` points the
 build at `deploy/Dockerfile`; set `BRAIN_SURFACE`, put your

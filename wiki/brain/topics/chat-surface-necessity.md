@@ -2,7 +2,7 @@
 title: "Does the kernel need its own chat surface, or do MCP + CLI + the terminal cover it?"
 kind: topic
 status: superseded
-superseded_by: brain/adrs/mcp-cli-terminal-surface.md
+superseded_by: brain/adrs/mcp-cli-surface.md
 updated: 2026-07-12
 confidence: medium
 sources:
@@ -41,9 +41,24 @@ load-bearing surface or a component that passes the deletion test?
   chat-authored product pages remain valid content. Removal is a
   *superseding* ADR (direction changes), not an amendment.
 
+- **2026-07-12** (`by: claude (fable 5)`) — the question reopened
+  the same day for the terminal: the operator asked whether the
+  embedded terminal should also go. Position: yes — it is an
+  arrangement of windows, not a capability (your own terminal
+  beside a browser tab reproduces it), and it is the kernel's
+  largest security/maintenance surface relative to value. Named
+  loss: the billing guard degrades from enforcement to a `doctor`
+  warning, since nothing is spawned to strip. The operator
+  approved. This supersedes the two-day-old ADR's explicit
+  rejection of "remove the terminal too" — the layout was
+  load-bearing, the component was not.
+
 ## Outcome
 
-**Settled 2026-07-12** — the operator decided: remove. Recorded as
-[adrs/mcp-cli-terminal-surface.md](../adrs/mcp-cli-terminal-surface.md),
-superseding the chat-print-mode-bridge decision. Strip, entry point,
-install-agent, and the billing guard survive.
+**Settled 2026-07-12, twice** — the operator decided: remove the
+chat pane (recorded as
+[adrs/mcp-cli-terminal-surface.md](../adrs/mcp-cli-terminal-surface.md)),
+then the embedded terminal the same week (recorded as
+[adrs/mcp-cli-surface.md](../adrs/mcp-cli-surface.md), which
+supersedes the former). The kernel's surfaces settle at MCP + CLI;
+the app page is the rendered knowledge under the ambient strip.

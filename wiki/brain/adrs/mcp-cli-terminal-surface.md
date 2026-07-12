@@ -1,7 +1,8 @@
 ---
 title: "The kernel's interaction surfaces are MCP, CLI, and the terminal — no first-party chat pane"
 kind: decision
-status: accepted
+status: superseded
+superseded_by: brain/adrs/mcp-cli-surface.md
 updated: 2026-07-12
 confidence: medium
 supersedes: brain/adrs/chat-print-mode-bridge.md

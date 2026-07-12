@@ -37,7 +37,8 @@ sanitized to organisation-agnostic form:
 - [Queue-and-tend inbox](adrs/queue-and-tend-inbox.md) — deterministic producers accumulate; `/tend` digests in-session; no scheduled LLM runs.
 - [Connector snapshot contract](adrs/connector-snapshot-contract.md) — connectors are pull-only snapshot-writers: immutable dedup files, cursors, inbox items out, never a wiki write.
 - [SQL views over a derived index](adrs/sql-views-over-derived-index.md) — view specs are SQL over a disposable SQLite index; shorthands compile to SQL; the index rides the views pipeline.
-- [Workbench PTY bridge](adrs/workbench-pty-bridge.md) — loopback browser page over a stdlib PTY bridge; harness launches + config adapters as data tables; never in serving mode.
+- [MCP + CLI surface](adrs/mcp-cli-surface.md) — the embedded terminal retires with the chat pane; the app page is the rendered knowledge under the ambient strip; billing guard degrades to a doctor warning.
+- [Workbench PTY bridge](adrs/workbench-pty-bridge.md) — **superseded** 2026-07-12 by mcp-cli-surface: the PTY bridge is removed from the kernel.
 - [Chat print-mode bridge](adrs/chat-print-mode-bridge.md) — chat as a per-harness print-mode registry; terminal demoted to a toggle; bare `brain` opens the app.
 - [Kernel-manifest instancing](adrs/kernel-manifest-instancing.md) — instances born by explicit manifest: mechanism + kernel trail cross, dogfood never does.
 - [Single-image serving profile](adrs/single-image-serving-profile.md) — one infra-agnostic image, env-selected surface; instance isolation via env ports + hashed timer units; Railway as reference, not dependency.
@@ -50,8 +51,9 @@ sanitized to organisation-agnostic form:
 
 ## Topics (discussions in flight)
 
-- [Chat-surface necessity](topics/chat-surface-necessity.md) — drop
-  the chat pane for MCP + CLI + terminal? Open, operator's call.
+- [Chat-surface necessity](topics/chat-surface-necessity.md) —
+  **settled twice** 2026-07-12: chat pane removed, then the embedded
+  terminal; surfaces settle at MCP + CLI.
 
 - [Phoenix-Architecture adoption depth](topics/regenerative-schema-extensions.md)
   — which further Fowler concepts earn schema weight. Open.

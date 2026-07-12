@@ -46,14 +46,14 @@ fi
 export BRAIN_DIR="$BRAIN_HOME"
 
 # Convenience verbs that go beyond brain.py:
-#   brain                — THE app: serve + open the chat workbench
+#   brain                — THE app: serve + open the rendered knowledge
 #   brain tend [budget]  — open the agent in the brain with /tend
 #   brain dash           — serve + open the ops dashboard
 case "${1:-}" in
   "")
     ( sleep 1; xdg-open "http://localhost:${BRAIN_PORT:-8765}/workbench" 2>/dev/null \
         || open "http://localhost:${BRAIN_PORT:-8765}/workbench" 2>/dev/null || true ) &
-    exec python3 "$BRAIN_HOME/tools/brain.py" serve --workbench
+    exec python3 "$BRAIN_HOME/tools/brain.py" serve
     ;;
   tend)
     shift
@@ -71,9 +71,10 @@ case "${1:-}" in
     exec python3 "$BRAIN_HOME/tools/brain.py" serve
     ;;
   workbench)
+    # Back-compat alias for the bare form.
     ( sleep 1; xdg-open "http://localhost:${BRAIN_PORT:-8765}/workbench" 2>/dev/null \
         || open "http://localhost:${BRAIN_PORT:-8765}/workbench" 2>/dev/null || true ) &
-    exec python3 "$BRAIN_HOME/tools/brain.py" serve --workbench
+    exec python3 "$BRAIN_HOME/tools/brain.py" serve
     ;;
 esac
 

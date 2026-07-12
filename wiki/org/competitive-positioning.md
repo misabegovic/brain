@@ -60,9 +60,10 @@ deliberately avoids (research notes, 2026-07-10, in
 - **Harness independence.** Gates live in git/CI, not in any one
   agent product; per-harness adapters (`install-agent`) and an
   MCP-first serving plane mean any agent harness works.
-- **Chat-as-interface.** Bare `brain` opens a conversation-first
-  app on the operator's existing subscription (billing-guarded),
-  beside the live knowledge — no terminal literacy required.
+- **Bring-your-own-harness.** Bare `brain` opens the live
+  knowledge with ambient health; any MCP-aware harness or chat
+  client is the conversation surface (`install-agent`) — the kernel
+  ships no chat, terminal, or per-seat AI billing of its own.
 
 The moat, in one line: competitors ship an editor or a codegen
 pipeline; the kernel ships the *institution* — rules, economics,

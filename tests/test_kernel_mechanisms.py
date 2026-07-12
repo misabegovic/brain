@@ -162,7 +162,7 @@ def test_instance_birth(tmp_path):
         capture_output=True, text=True, timeout=120)
     assert proc.returncode == 0, proc.stderr[:800]
     # Mechanism crossed.
-    for rel in ("tools/brain.py", "tools/workbench.py",
+    for rel in ("tools/brain.py",
                 ".claude/skills/tend/SKILL.md", "views/engineer.yml",
                 "wiki/brain/adrs/queue-and-tend-inbox.md",
                 "wiki/org/methodology/superpowers.md"):

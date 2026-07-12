@@ -4,6 +4,16 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.15.0 — 2026-07-12
+- Surfaces settle at MCP + CLI (superseding ADR mcp-cli-surface):
+  the embedded terminal removed — PTY bridge, websocket slice,
+  xterm.js assets, and harness-launch registry deleted. The app
+  page is the rendered knowledge under the ambient strip
+  (auto-reload kept). Billing guard degrades to a doctor warning;
+  `serve --workbench` becomes a deprecated no-op (the app page
+  mounts whenever BRAIN_SERVING is unset); static 404s now return
+  HTTP 404.
+
 ## 0.14.2 — 2026-07-12
 - README rewritten for cold-start readers: one-line pitch, app
   screenshot (`docs/workbench.png`), the three ideas, a true

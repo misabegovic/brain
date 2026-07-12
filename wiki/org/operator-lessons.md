@@ -36,9 +36,9 @@ brain, or the substrate's claim to be a working memory is theatre.
 The 0.x arc was built this way and the trail (pitches → PRDs → ADRs
 → audit log) is the proof.
 
-*How to apply* — when working on the brain itself: open the
-workbench (`brain workbench`) so the rendered corpus sits beside the
-terminal; capture intent before building (`/capture`, `/shape
+*How to apply* — when working on the brain itself: open the app
+(`brain`) so the rendered corpus sits beside your own terminal;
+capture intent before building (`/capture`, `/shape
 --pitch`); let `/tend` drive maintenance; record mechanism decisions
 as brain-meta ADRs and bump `VERSION` when a roadmap slice ships.
 Work products that live outside the repo (scratch files, untracked

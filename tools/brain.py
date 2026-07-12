@@ -1195,40 +1195,64 @@ def _render_dash(page_count: int) -> str:
 </body></html>"""
 
 
+def render_app_page(views: list | None = None) -> str:
+    """The app shell: rendered knowledge full-width under an ambient
+    strip (health + tend queue + auto-reload). The operator's harness
+    runs in their own terminal beside this window."""
+    view_links = "".join(
+        f'<button onclick="nav(\'/_views/custom/{v}/\')">{v}</button>'
+        for v in (views or []))
+    return f"""<!doctype html><html><head><meta charset="utf-8">
+<title>brain</title>
+<style>
+ :root {{ color-scheme: light dark; }}
+ body {{ margin: 0; font: 14px/1.45 system-ui, sans-serif;
+        display: flex; flex-direction: column; height: 100vh; }}
+ button {{ font: inherit; }}
+ #nav {{ padding: .35rem .6rem; display: flex; gap: .4rem;
+        align-items: center; border-bottom: 1px solid #8884; }}
+ #nav button {{ padding: .15rem .6rem; cursor: pointer; }}
+ #strip {{ margin-left: auto; opacity: .75; font-size: .85em; }}
+ #page {{ flex: 1; border: 0; }}
+</style></head><body>
+<div id="nav">
+  <button onclick="nav('/')">knowledge</button>
+  <button onclick="nav('/dash')">status</button>
+  {view_links}
+  <span id="strip">…</span>
+</div>
+<iframe id="page" src="/"></iframe>
+<script>
+ function nav(url) {{ document.getElementById('page').src = url; }}
+ let last = 0;
+ async function tick() {{
+   try {{
+     const r = await fetch('/workbench/status');
+     const s = await r.json();
+     document.getElementById('strip').textContent =
+       (s.fails ? '✗ ' + s.fails + ' failing · ' :
+        s.warns ? '− ' + s.warns + ' notice · ' : '✓ healthy · ')
+       + (s.inbox ? s.inbox + ' to tend' : 'queue clear');
+     if (last && s.mtime > last) nav(document.getElementById('page').src);
+     last = s.mtime;
+   }} catch (e) {{}}
+ }}
+ tick(); setInterval(tick, 8000);
+</script></body></html>"""
+
+
 def cmd_serve(args) -> int:
     """Read-only HTTP API for the brain. localhost only by default.
 
-    --workbench additionally mounts the PTY bridge + workbench page
-    (per wiki/brain/adrs/workbench-pty-bridge.md). The bridge refuses
-    serving mode and non-loopback binds by construction.
+    Outside serving mode (BRAIN_SERVING=1) it also mounts the app
+    page at /workbench — the rendered knowledge with an ambient
+    health strip. No shell, no websocket: the operator's harness
+    runs in their own terminal (per 
+    wiki/brain/adrs/mcp-cli-surface.md).
     """
     port = args.port
     host = args.host
-    workbench = getattr(args, "workbench", False)
-    wb = None
-    xterm_assets: dict[str, Path] = {}
-    if workbench:
-        if os.environ.get("BRAIN_SERVING") == "1":
-            print("serve: --workbench is structurally excluded from "
-                  "serving mode (BRAIN_SERVING=1)", file=sys.stderr)
-            return 1
-        if host not in ("127.0.0.1", "localhost", "::1"):
-            print(f"serve: --workbench refuses non-loopback host {host!r}",
-                  file=sys.stderr)
-            return 1
-        sys.path.insert(0, str(REPO / "tools"))
-        import workbench as wb  # noqa: F811
-        xterm_assets = {
-            "xterm.js": REPO / "ui/node_modules/@xterm/xterm/lib/xterm.js",
-            "xterm.css": REPO / "ui/node_modules/@xterm/xterm/css/xterm.css",
-            "addon-fit.js":
-                REPO / "ui/node_modules/@xterm/addon-fit/lib/addon-fit.js",
-        }
-        missing = [n for n, p in xterm_assets.items() if not p.exists()]
-        if missing:
-            print(f"serve: workbench assets missing ({', '.join(missing)}) "
-                  f"— run `cd ui && npm install`", file=sys.stderr)
-            return 1
+    workbench = os.environ.get("BRAIN_SERVING") != "1"
 
     rebuild_lock = threading.Lock()
     entries_cache: list[dict] = []
@@ -1318,8 +1342,10 @@ def cmd_serve(args) -> int:
                     target = target / "index.html"
                 if not target.exists() and not target.suffix:
                     target = target / "index.html"
+                code = 200
                 if not target.exists():
                     target = site / "404.html"
+                    code = 404
                     if not target.exists():
                         return False
                 ctypes = {".html": "text/html; charset=utf-8",
@@ -1331,7 +1357,7 @@ def cmd_serve(args) -> int:
                           ".ico": "image/x-icon", ".woff2": "font/woff2",
                           ".txt": "text/plain"}
                 data = target.read_bytes()
-                self.send_response(200)
+                self.send_response(code)
                 self.send_header("Content-Type", ctypes.get(
                     target.suffix, "application/octet-stream"))
                 self.send_header("Content-Length", str(len(data)))
@@ -1351,10 +1377,7 @@ def cmd_serve(args) -> int:
                         s.stem for s in VIEWS_SPEC_DIR.glob("*.yml")
                     ) if VIEWS_SPEC_DIR.exists() else []
                     self._send_text(
-                        200,
-                        wb.render_workbench_page(
-                            wb.SESSION_TOKEN, wb.TERMINAL_CLIS,
-                            len(entries_cache), view_names),
+                        200, render_app_page(view_names),
                         "text/html; charset=utf-8")
                     return
                 if path == "/workbench/status":
@@ -1389,51 +1412,6 @@ def cmd_serve(args) -> int:
                                      if c["status"] == "warn"),
                         "mtime": latest,
                     })
-                    return
-                if path.startswith("/workbench/assets/"):
-                    asset = xterm_assets.get(path.rsplit("/", 1)[-1])
-                    if asset is None:
-                        self._send_json(404, {"error": "unknown asset"})
-                        return
-                    ctype = ("text/css" if asset.suffix == ".css"
-                             else "application/javascript")
-                    self._send_text(200, asset.read_text(), ctype)
-                    return
-                if path == "/workbench/changed":
-                    latest = max(
-                        (p.stat().st_mtime for p in WIKI.rglob("*.md")),
-                        default=0)
-                    # Keep the rendered wiki fresh regardless of which
-                    # editor made the change: when the static build is
-                    # staler than the wiki, kick one background rebuild
-                    # (single-flight; the poll cycle picks up the result).
-                    built = REPO / "ui" / ".build-cache" / "index.html"
-                    build_mtime = built.stat().st_mtime if built.exists() else 0
-                    if latest > build_mtime and rebuild_lock.acquire(
-                            blocking=False):
-                        def _rebuild():
-                            try:
-                                subprocess.run(
-                                    ["bash", str(REPO / "tools/ui-build.sh")],
-                                    capture_output=True, timeout=120)
-                            finally:
-                                rebuild_lock.release()
-                        threading.Thread(target=_rebuild,
-                                         daemon=True).start()
-                    self._send_json(200, {"mtime": latest,
-                                          "rendered": build_mtime})
-                    return
-                if path == "/workbench/pty":
-                    if qs.get("token", [""])[0] != wb.SESSION_TOKEN:
-                        self._send_json(403, {"error": "bad token"})
-                        return
-                    if (self.headers.get("Upgrade") or "").lower() \
-                            != "websocket":
-                        self._send_json(400, {"error": "websocket upgrade "
-                                                       "required"})
-                        return
-                    wb.handle_ws_connection(self)
-                    self.close_connection = True
                     return
                 self._send_json(404, {"error": "unknown workbench route"})
                 return
@@ -1532,8 +1510,8 @@ def cmd_serve(args) -> int:
 
     class Server(socketserver.ThreadingTCPServer):
         # Reuse-addr: restarts must not trip over TIME_WAIT sockets.
-        # Threading: a long-lived workbench websocket must not block
-        # the JSON API and the page's change-signal polling.
+        # Threading: a background UI rebuild kicked from the status
+        # poll must not block the JSON API.
         allow_reuse_address = True
         daemon_threads = True
 
@@ -2394,16 +2372,15 @@ def _doctor_checks() -> list[dict]:
                           "OPENAI_API_KEY", "CURSOR_API_KEY",
                           "OPENCODE_API_KEY") if os.environ.get(v)]
     if leaked:
-        add("billing", "chat billing guard", "warn",
+        add("billing", "billing check", "warn",
             f"{', '.join(leaked)} set in this environment — harness "
-            f"CLIs would bill the API, not your subscription. The app "
-            f"strips these from chat/terminal subprocesses "
-            f"(chat.allow_api_keys overrides)",
-            "unset the key(s) or accept the app's stripping")
+            f"CLIs launched from this shell may bill the metered "
+            f"API instead of your logged-in subscription",
+            "unset the key(s) in the shell you run your harness from")
     else:
-        add("billing", "chat billing guard", "ok",
-            "no API-key env vars — harness turns bill your "
-            "subscription; the app strips keys defensively anyway")
+        add("billing", "billing check", "ok",
+            "no API-key env vars — harness sessions bill your "
+            "logged-in subscription")
 
     return checks
 
@@ -2531,9 +2508,8 @@ def cmd_setup(args) -> int:
 
 
 # One row per harness: where its MCP registration lives and how it
-# nests. Per the workbench-pty-bridge ADR: adapters are data tables,
-# not per-harness code paths; a new harness is one row here (plus a
-# launch row in tools/workbench.py).
+# nests. Per the mcp-cli-surface ADR: adapters are data
+# tables, not per-harness code paths; a new harness is one row here.
 AGENT_TARGETS = {
     "claude": {"path": ".mcp.json", "format": "json",
                "nest": ["mcpServers", "brain"],
@@ -6578,8 +6554,8 @@ def main() -> int:
     ap_serve.add_argument("--port", type=int,
                           default=int(os.environ.get("BRAIN_PORT", 8765)))
     ap_serve.add_argument("--workbench", action="store_true",
-                          help="mount the PTY workbench (loopback only; "
-                               "never in serving mode)")
+                          help="deprecated no-op: the app page mounts "
+                               "whenever BRAIN_SERVING is unset")
     ap_serve.set_defaults(func=cmd_serve)
 
     ap_prom = sub.add_parser("promote", help="scaffold initiative from insight")

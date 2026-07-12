@@ -1,8 +1,9 @@
 ---
 title: "The workbench is a loopback browser page over a stdlib PTY bridge; harness launches and config adapters are data tables; it never ships in serving mode"
 kind: decision
-status: accepted
-updated: 2026-07-10
+status: superseded
+superseded_by: brain/adrs/mcp-cli-surface.md
+updated: 2026-07-12
 confidence: medium
 sources:
   - ../prds/harness-workbench.md

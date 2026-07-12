@@ -18,6 +18,15 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **0.15.0: surfaces settle at MCP + CLI.** The
+  embedded terminal removed on the operator's call
+  ([superseding ADR](brain/adrs/mcp-cli-surface.md)) — it was an
+  arrangement of windows, not a capability, and the kernel's
+  largest security surface. The app page is now the rendered
+  knowledge under the ambient strip; the billing guard degrades to
+  a `doctor` warning. The
+  [topic](brain/topics/chat-surface-necessity.md) is settled twice
+  over.
 - **2026-07-12** — **0.14.1: license changed to MIT** (operator
   direction; revised from Apache-2.0 pre-any-public-release).
   NOTICE removed, packaging metadata updated,
@@ -220,8 +229,10 @@ start filling in as the slash-command surface runs.
 <!-- home-section; maintained-by: /shape -->
 - [SQL views over a derived index](brain/adrs/sql-views-over-derived-index.md)
   — the composable-views bet, decided 2026-07-10.
+- [MCP + CLI surface](brain/adrs/mcp-cli-surface.md) — the
+  embedded terminal retires; surfaces settle, decided 2026-07-12.
 - [Workbench PTY bridge](brain/adrs/workbench-pty-bridge.md) — the
-  harness-workbench bet, decided 2026-07-10.
+  harness-workbench bet, decided 2026-07-10; superseded 2026-07-12.
 - [Kernel ADR trail](brain/index.md#adrs) — 11 mechanism decisions
   (shape pitches, epics, deepdive pre-flight, parallelism, zoom-out,
   home shape, UI substrate, operator lessons, competitor intel)

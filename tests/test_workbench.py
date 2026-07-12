@@ -1,38 +1,20 @@
-"""Tests for the workbench PTY bridge + install-agent adapters
-(per wiki/brain/adrs/workbench-pty-bridge.md)."""
+"""Tests for the app page + install-agent adapters (per
+wiki/brain/adrs/mcp-cli-surface.md: no embedded
+terminal — the app is the rendered knowledge under an ambient strip)."""
 
 from __future__ import annotations
 
-import base64
 import json
 import os
-import socket
-import struct
 import subprocess
 import sys
 import time
 from pathlib import Path
 
-import pytest
-
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "tools"))
 
 import brain  # noqa: E402
-import workbench as wb  # noqa: E402
-
-
-def test_ws_accept_key_rfc_vector():
-    # RFC 6455 § 1.3 worked example.
-    assert wb.ws_accept_key("dGhlIHNhbXBsZSBub25jZQ==") == \
-        "s3pPLMBiTxaQ9kYGzzhZRbK+xOo="
-
-
-def test_terminal_clis_shape():
-    names = [r["name"] for r in wb.TERMINAL_CLIS]
-    assert names == sorted(set(names)), "registry rows must be unique+sorted"
-    for row in wb.TERMINAL_CLIS:
-        assert row["bin"] and isinstance(row["args"], list)
 
 
 def test_install_agent_idempotent_and_preserving(tmp_path):
@@ -60,39 +42,57 @@ def test_install_agent_toml_fence_replaces_not_duplicates(tmp_path):
     assert "[mcp_servers.brain]" in text
 
 
-def test_workbench_refuses_serving_mode():
-    proc = subprocess.run(
+def test_app_page_has_no_terminal():
+    """The embedded terminal is gone: no websocket, no xterm, no
+    harness-launch buttons — knowledge iframe + strip only."""
+    html = brain.render_app_page(["engineer"])
+    for gone in ("WebSocket", "xterm", "pty", "spawn(", 'id="term"'):
+        assert gone not in html, f"terminal remnant in app page: {gone}"
+    assert 'id="strip"' in html and 'id="page"' in html
+    assert ">knowledge</button>" in html and ">engineer</button>" in html
+
+
+def test_serving_mode_hides_app_page():
+    port = 8987
+    proc = subprocess.Popen(
         [sys.executable, str(REPO / "tools" / "brain.py"),
-         "serve", "--workbench", "--port", "8987"],
-        env={**os.environ, "BRAIN_SERVING": "1"},
-        capture_output=True, text=True, timeout=15)
-    assert proc.returncode == 1
-    assert "structurally excluded" in proc.stderr
+         "serve", "--port", str(port)],
+        env={**os.environ, "BRAIN_SERVING": "1"}, stderr=subprocess.PIPE)
+    try:
+        import urllib.error
+        import urllib.request
+        code = None
+        deadline = time.time() + 15
+        while time.time() < deadline:
+            try:
+                code = urllib.request.urlopen(
+                    f"http://127.0.0.1:{port}/api", timeout=5).status
+                break
+            except (urllib.error.URLError, ConnectionError):
+                if proc.poll() is not None:
+                    break
+                time.sleep(0.3)
+        assert code == 200, "server never became ready"
+        try:
+            urllib.request.urlopen(
+                f"http://127.0.0.1:{port}/workbench", timeout=5)
+            raise AssertionError("app page must not mount in serving mode")
+        except urllib.error.HTTPError:
+            pass
+    finally:
+        proc.terminate()
+        proc.wait(timeout=5)
 
 
-def test_workbench_refuses_non_loopback():
-    proc = subprocess.run(
-        [sys.executable, str(REPO / "tools" / "brain.py"),
-         "serve", "--workbench", "--host", "0.0.0.0", "--port", "8987"],
-        capture_output=True, text=True, timeout=15)
-    assert proc.returncode == 1
-    assert "non-loopback" in proc.stderr
-
-
-@pytest.mark.skipif(
-    not (REPO / "ui/node_modules/@xterm/xterm").exists(),
-    reason="xterm assets not installed")
-def test_pty_round_trip_over_websocket():
+def test_app_page_serves_locally():
     port = 8988
     proc = subprocess.Popen(
         [sys.executable, str(REPO / "tools" / "brain.py"),
-         "serve", "--workbench", "--port", str(port)],
-        stderr=subprocess.PIPE)
+         "serve", "--port", str(port)], stderr=subprocess.PIPE)
     try:
         import urllib.error
         import urllib.request
         page = None
-        last_exc = None
         deadline = time.time() + 15
         while time.time() < deadline:
             try:
@@ -100,74 +100,17 @@ def test_pty_round_trip_over_websocket():
                     f"http://127.0.0.1:{port}/workbench",
                     timeout=5).read().decode()
                 break
-            except (urllib.error.URLError, ConnectionError) as exc:
-                last_exc = exc
+            except (urllib.error.URLError, ConnectionError):
                 if proc.poll() is not None:
                     break
                 time.sleep(0.3)
-        if page is None:
-            server_err = ""
-            if proc.poll() is not None:
-                server_err = proc.stderr.read().decode()[:1500]
-            raise AssertionError(
-                f"serve --workbench never became ready: {last_exc!r}; "
-                f"server rc={proc.poll()} stderr={server_err!r}")
-        import re
-        token = re.search(r"token=([A-Za-z0-9_-]+)", page).group(1)
-
-        s = socket.create_connection(("127.0.0.1", port), timeout=10)
-        key = base64.b64encode(os.urandom(16)).decode()
-        s.sendall((f"GET /workbench/pty?token={token} HTTP/1.1\r\n"
-                   f"Host: localhost:{port}\r\nUpgrade: websocket\r\n"
-                   f"Connection: Upgrade\r\nSec-WebSocket-Key: {key}\r\n"
-                   f"Sec-WebSocket-Version: 13\r\n\r\n").encode())
-        assert b"101" in s.recv(4096).split(b"\r\n")[0]
-
-        def send(payload):
-            data = json.dumps(payload).encode()
-            mask = os.urandom(4)
-            masked = bytes(b ^ mask[i % 4] for i, b in enumerate(data))
-            header = bytes([0x81])
-            n = len(data)
-            if n < 126:
-                header += bytes([0x80 | n])
-            else:
-                header += bytes([0x80 | 126]) + struct.pack(">H", n)
-            s.sendall(header + mask + masked)
-
-        def exact(n):
-            buf = b""
-            while len(buf) < n:
-                c = s.recv(n - len(buf))
-                if not c:
-                    raise ConnectionError
-                buf += c
-            return buf
-
-        def recv_frame():
-            b1, b2 = exact(2)
-            n = b2 & 0x7F
-            if n == 126:
-                n = struct.unpack(">H", exact(2))[0]
-            elif n == 127:
-                n = struct.unpack(">Q", exact(8))[0]
-            return b1 & 0x0F, exact(n)
-
-        send({"type": "input", "data": " echo WB_$((7*6))\n"})
-        deadline = time.time() + 10
-        out = ""
-        while time.time() < deadline:
-            op, payload = recv_frame()
-            if op != 1:
-                continue
-            msg = json.loads(payload)
-            if msg.get("type") == "data":
-                out += msg["data"]
-                if "WB_42" in out:
-                    break
-        assert "WB_42" in out, f"no echo through the PTY; got {out[-200:]!r}"
-        send({"type": "kill"})
-        s.close()
+        assert page is not None, "app page never became ready"
+        assert 'id="strip"' in page
+        status = json.loads(urllib.request.urlopen(
+            f"http://127.0.0.1:{port}/workbench/status",
+            timeout=5).read())
+        for key in ("inbox", "fails", "warns", "mtime"):
+            assert key in status
     finally:
         proc.terminate()
         proc.wait(timeout=5)
@@ -239,31 +182,11 @@ def test_lint_page_flags_broken_link(tmp_path):
         rogue.unlink()
 
 
-def test_workbench_page_is_terminal_primary():
-    """Per mcp-cli-terminal-surface (supersedes chat-print-mode-bridge):
-    no chat pane; terminal primary; strip and nav survive."""
-    html = wb.render_workbench_page("tok", wb.TERMINAL_CLIS, 40,
-                                    ["engineer"])
-    assert "composer" not in html and "mdlite" not in html
-    assert 'id="term"' in html and 'id="strip"' in html
-    assert ">knowledge</button>" in html
-
-
-def test_billing_guard_strips_api_keys(monkeypatch):
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test-leak")
-    monkeypatch.setenv("OPENAI_API_KEY", "sk-test-leak2")
-    env = wb.billing_safe_env(allow_api_keys=False)
-    assert "ANTHROPIC_API_KEY" not in env
-    assert "OPENAI_API_KEY" not in env
-    assert wb.billing_safe_env(allow_api_keys=True)[
-        "ANTHROPIC_API_KEY"] == "sk-test-leak"
-
-
-def test_harness_subprocess_never_sees_api_key(monkeypatch):
-    """The billing guard now governs PTY sessions — probe via a real
-    subprocess using the same env builder the PTY uses."""
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test-leak")
-    out = subprocess.run(
-        ["sh", "-c", "echo ${ANTHROPIC_API_KEY:-STRIPPED}"],
-        env=wb.billing_safe_env(False), capture_output=True, text=True)
-    assert out.stdout.strip() == "STRIPPED"
+def test_no_pty_module_ships():
+    """The kernel must not carry a PTY/websocket bridge anywhere —
+    the decision is structural absence, not a disabled flag."""
+    assert not (REPO / "tools" / "workbench.py").exists()
+    text = (REPO / "tools" / "brain.py").read_text()
+    for gone in ("openpty", "Sec-WebSocket", "TERMINAL_CLIS",
+                 "billing_safe_env"):
+        assert gone not in text, f"PTY remnant in brain.py: {gone}"

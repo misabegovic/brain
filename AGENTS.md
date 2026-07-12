@@ -1168,25 +1168,22 @@ Example specs ship for engineer / pm / operator roles. The index is
 never committed and never load-bearing — delete-and-rebuild is
 always safe; consumers open read-only.
 
-### `brain workbench` / `install-agent` — the harness workbench
+### `brain` (the app) / `install-agent` — the harness surface
 
 ```bash
-brain workbench                        # serve + open the workbench page
-python3 tools/brain.py serve --workbench
+brain                                  # serve + open the app
 python3 tools/brain.py install-agent claude|cursor|codex|opencode [--all]
 ```
 
-Per `wiki/brain/adrs/workbench-pty-bridge.md`: the workbench page
-puts an embedded terminal (the operator's own login shell, xterm.js
-over a stdlib PTY-websocket bridge at loopback with a per-process
-token + Host check) beside the rendered brain, with one-click
-harness launches from the `TERMINAL_CLIS` registry
-(`tools/workbench.py`) and auto-reload of the rendered side on wiki
-changes. `install-agent` idempotently registers the brain's MCP
-server per harness from the `AGENT_TARGETS` fan-out table — JSON
-deep-merge or sentinel-fenced TOML; a new harness is one row in
-each table. The workbench refuses `BRAIN_SERVING=1` and
-non-loopback binds by construction.
+Per `wiki/brain/adrs/mcp-cli-surface.md`: the
+app page at `/workbench` is the rendered brain under an ambient
+strip (health + tend queue), auto-reloading as the wiki changes.
+There is no embedded terminal or chat — the operator runs their
+harness in their own terminal, wired to the brain over MCP.
+`install-agent` idempotently registers the brain's MCP server per
+harness from the `AGENT_TARGETS` fan-out table — JSON deep-merge or
+sentinel-fenced TOML; a new harness is one row in the table. The
+app page never mounts in serving mode (`BRAIN_SERVING=1`).
 
 ### `brain.py links` — link-graph health
 

@@ -11,9 +11,8 @@ Scope notes for reporters:
   proxy and carry no auth of their own — reports about missing auth
   on deliberately-proxied surfaces are working as designed, but
   bypasses of the read-only guarantees are very much in scope.
-- The workbench (PTY bridge, chat) is loopback-only with a
-  per-process token and Host checks, and is structurally excluded
-  from serving deployments. Escapes of any of those properties are
-  in scope.
-- Connector credentials are expected to be read-only-scoped; the
-  billing guard strips API-key env vars from harness subprocesses.
+- The app page (rendered knowledge + health strip) executes no
+  shell and carries no websocket; it is structurally excluded from
+  serving deployments (`BRAIN_SERVING=1`). Since 0.15.0 the kernel
+  ships no PTY bridge and spawns no harness subprocesses.
+- Connector credentials are expected to be read-only-scoped.
