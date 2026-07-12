@@ -356,7 +356,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1316,
+      "tokens": 1413,
       "affected_by": [
         "org/competitive-positioning.md",
         "org/competitors/codeplain/index.md"
@@ -428,6 +428,21 @@
       "tokens": 386
     },
     {
+      "path": "brain/pitches/persona-playthrough-loop.md",
+      "title": "Persona playthrough loop \u2014 synthetic users walk every release; findings become insights, never facts",
+      "kind": "pitch",
+      "status": "superseded",
+      "superseded_by": "brain/prds/persona-playthrough-loop.md",
+      "updated": "2026-07-12",
+      "appetite": "small",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md",
+        "../../org/operator-lessons.md"
+      ],
+      "tokens": 821
+    },
+    {
       "path": "brain/prds/chat-first-app.md",
       "title": "Chat-first app \u2014 conversation as the interface, ambient status, one command to open it all",
       "kind": "initiative",
@@ -485,6 +500,20 @@
         "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
       ],
       "tokens": 359
+    },
+    {
+      "path": "brain/prds/persona-playthrough-loop.md",
+      "title": "Persona playthrough loop \u2014 every release gets walked by synthetic users; findings route to insights below the human-confirmation line",
+      "kind": "initiative",
+      "status": "living",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "supersedes": "brain/pitches/persona-playthrough-loop.md",
+      "sources": [
+        "../pitches/persona-playthrough-loop.md",
+        "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md"
+      ],
+      "tokens": 689
     },
     {
       "path": "brain/roadmap.md",

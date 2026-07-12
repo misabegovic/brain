@@ -65,6 +65,10 @@ sanitized to organisation-agnostic form:
 
 ## Pitches (pre-bet)
 
+- [Persona playthrough loop](pitches/persona-playthrough-loop.md) —
+  **superseded** 2026-07-12: graduated same-day on the operator's
+  bet ("shape it and then build it").
+
 - [Instance birth](pitches/instance-birth.md) — **superseded**
   2026-07-10: graduated in the same directive.
 
@@ -77,6 +81,9 @@ sanitized to organisation-agnostic form:
 
 ## PRDs
 
+- [Persona playthrough loop](prds/persona-playthrough-loop.md) —
+  synthetic users walk every release; findings become insights,
+  capped below the human-confirmation line. Bet 2026-07-12.
 - [Chat-first app](prds/chat-first-app.md) — conversation as the
   interface; ambient status; bare `brain` opens the app. Bet
   2026-07-10.

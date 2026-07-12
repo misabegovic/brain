@@ -19,6 +19,7 @@ Committed work, proposals awaiting a bet, patterns from feedback, and what's que
 
 | path | title | status | confidence | updated |
 |---|---|---|---|---|
+| brain/prds/persona-playthrough-loop.md | Persona playthrough loop — every release gets walked by synthetic users; findings route to insights below the human-conf | living | medium | 2026-07-12 |
 | brain/prds/chat-first-app.md | Chat-first app — conversation as the interface, ambient status, one command to open it all | living | medium | 2026-07-10 |
 | brain/prds/composable-role-views.md | Composable role-fit views — SQL view specs over a derived index, with observability connectors | living | medium | 2026-07-10 |
 | brain/prds/harness-workbench.md | Harness workbench — the brain's local surface runs your harness terminal beside the rendered results | living | medium | 2026-07-10 |
