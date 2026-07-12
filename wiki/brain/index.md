@@ -107,4 +107,37 @@ sanitized to organisation-agnostic form:
 
 ## AI suggestions (drafts for human review)
 
-*(none yet)*
+Landed 2026-07-12 by a three-persona playthrough sweep (six agent
+runs). Each is `ai_suggestion: true`, `confidence: low` — proposals
+to review and graduate or discard, **not** decisions. See the
+[aggregate view](../_views/ai-suggestions.md).
+
+**Operator surface (Viktor — daily operator):**
+- [Acknowledge recurring tend items](ai-suggestions/adrs/acknowledge-recurring-tend-items.md)
+  — a re-verified signal producers respect, so operator judgement
+  leaves a trace the machine remembers.
+- [Producer death as first-class health](ai-suggestions/prds/producer-death-first-class-health.md)
+  — distinguish "queue clear because tended" from "clear because the
+  producer is dead".
+- [Attention-calibration operator surface](ai-suggestions/prds/attention-calibration-operator-surface.md)
+  — a pending-grades list + sample-size on the calibration stat.
+
+**Reader surface (Priya — non-terminal PM):**
+- [Status-honest generated reading lists](ai-suggestions/prds/status-honest-generated-reading-lists.md)
+  — mark the current record when overviews list superseded ADRs;
+  resolve raw slugs in trail links.
+- [The PM view should read like a brief](ai-suggestions/prds/pm-view-reads-like-a-brief.md)
+  — the surface named for the PM opens with maintainer text and raw
+  paths.
+- [Render-prove the AI-draft trust chrome](ai-suggestions/prds/priya-trust-banner-render-proof.md)
+  — fail the UI build when the ai-suggestion banner path goes
+  unexercised.
+
+**Security surface (Sam — security reviewer):**
+- [Uniform loopback Host-header guard](ai-suggestions/adrs/sam-uniform-loopback-host-guard.md)
+  — converge both HTTP surfaces on one anti-rebinding check.
+
+Related insight (Sam):
+[ai-suggestions exclusion is MCP-only](../insights/ai-suggestions-exclusion-mcp-only.md)
+— the serving-mode draft exclusion is enforced on the MCP surface
+but not on `brain.py serve` `/pages/` or the static UI build.
