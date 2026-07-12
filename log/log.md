@@ -212,3 +212,7 @@
    diff: 11 files, +144/-10
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — 9498167: Priya reading-journeys playthrough: transcript + 2 AI-suggestion PRDs
+   diff: 9 files, +586/-2
+   restricted-paths: false
+   by: claude subagent (priya playthrough)
