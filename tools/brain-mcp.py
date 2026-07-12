@@ -398,8 +398,11 @@ def serve_http(host: str, port: int) -> int:
     one JSON-RPC message, the response is plain JSON. Notifications
     get 202. Localhost by default; a deployment puts an
     identity-aware proxy in front — this process has no auth of its
-    own and no write tools to protect. Origin is checked to block
-    DNS-rebinding when bound to localhost."""
+    own and no write tools to protect. Host and Origin are both
+    checked against a loopback allow-list to block DNS-rebinding —
+    the same guard tools/brain.py serve applies, so the anti-rebinding
+    property holds identically on both HTTP surfaces (Sam
+    uniform-host-guard finding, 2026-07-12)."""
     import http.server
     import socketserver
 
@@ -417,9 +420,19 @@ def serve_http(host: str, port: int) -> int:
         def log_message(self, fmt, *args):
             sys.stderr.write(f"[brain-mcp] {fmt % args}\n")
 
+        def _loopback_host(self) -> bool:
+            # Anti-DNS-rebinding: the Host header must name loopback
+            # (or be absent, for direct-IP tooling) — mirrors
+            # brain.py serve's allow-list exactly.
+            host_hdr = (self.headers.get("Host") or "").split(":")[0]
+            return host_hdr in ("localhost", "127.0.0.1", "::1", "")
+
         def do_POST(self):  # noqa: N802
             if self.path.rstrip("/") not in ("", "/mcp"):
                 self._reply(404, {"error": "POST /mcp"})
+                return
+            if not self._loopback_host():
+                self._reply(403, {"error": "host not allowed"})
                 return
             origin = self.headers.get("Origin", "")
             if origin and not re.match(

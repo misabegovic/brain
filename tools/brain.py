@@ -75,6 +75,19 @@ ATTENTION_VERDICTS = ("needs-operator", "fyi", "routine")
 ATTENTION_GRADES_PATH = WIKI / "_state" / "attention-grades.json"
 
 
+def serving_mode() -> bool:
+    """BRAIN_SERVING=1 marks a deployment serving people outside the
+    product: ai-suggestion drafts are excluded from every read
+    surface. Mirrors tools/brain-mcp.py serving_mode() so the CLI,
+    the local HTTP server, and the MCP agree by construction
+    (Sam serving-mode finding, 2026-07-12)."""
+    return os.environ.get("BRAIN_SERVING", "") == "1"
+
+
+def _suggestion_path(rel: str) -> bool:
+    return "/ai-suggestions/" in ("/" + rel)
+
+
 def _local_first(env_path) -> bool:
     """True only when .env declares LOCAL_FIRST=true on its own line.
 
@@ -707,10 +720,16 @@ def cmd_stats(_args) -> int:
 
 
 def collect_pages_data() -> list[dict]:
-    """Build the structured per-page list used by views and serve."""
+    """Build the structured per-page list used by views and serve.
+
+    In serving mode, ai-suggestion drafts are excluded so /pages.json
+    and /views/* never surface them (Sam serving-mode finding)."""
     pages = wiki_pages()
+    serving = serving_mode()
     out = []
     for p in pages:
+        if serving and _suggestion_path(str(p.relative_to(WIKI))):
+            continue
         parsed = parse(p)
         if parsed is None:
             continue
@@ -1463,6 +1482,11 @@ def cmd_serve(args) -> int:
 
             if path.startswith("/pages/"):
                 rel = path[len("/pages/"):]
+                if serving_mode() and _suggestion_path(rel):
+                    self._send_json(403, {"error": "ai-suggestions are "
+                        "drafts pending human review and are excluded in "
+                        "serving mode"})
+                    return
                 target = WIKI / rel
                 if not target.exists() or ".." in rel:
                     self._send_json(404, {"error": "not found"})
@@ -6173,6 +6197,9 @@ def cmd_search(args) -> int:
         status = meta.get("status")
         if status in ("superseded", "archived") and not include_superseded:
             continue
+
+        if serving_mode() and _suggestion_path(rel):
+            continue  # drafts excluded from serving-mode search
 
         if kind_filter and meta.get("kind") != kind_filter:
             continue

@@ -11,12 +11,20 @@ import ProjectOverview from '../components/ProjectOverview.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('docs');
-  return entries.map((entry) => ({
-    params: {
-      slug: entry.id === 'index' ? 'home' : entry.id.replace(/\/index$/, ''),
-    },
-    props: { entry },
-  }));
+  // Serving-mode build (BRAIN_SERVING=1) omits ai-suggestion drafts
+  // entirely — the static site is a serving surface too (Sam
+  // serving-mode finding). Local builds keep them for the review flow.
+  const serving = process.env.BRAIN_SERVING === '1';
+  return entries
+    .filter((entry) => !(serving && (
+      entry.id.includes('ai-suggestions/') ||
+      entry.id === '_views/ai-suggestions')))
+    .map((entry) => ({
+      params: {
+        slug: entry.id === 'index' ? 'home' : entry.id.replace(/\/index$/, ''),
+      },
+      props: { entry },
+    }));
 }
 
 const { entry } = Astro.props;
