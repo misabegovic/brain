@@ -10,6 +10,13 @@ repos:
   - brain
 appetite: small
 confidence: low
+summary: >-
+  The Viktor playthrough found the judge/grade calibration loop works
+  end-to-end but is hard to operate: grading requires knowing the item
+  id (no pending-grades list), and a single grade renders as "100%
+  verdicts graded useful" with no sample size. Suggestion: a
+  pending-grades surface and a sample-size-aware calibration stat so
+  the loop is legible enough to actually use.
 sources:
   - sources/playthroughs/2026-07-12--viktor-daily-operator--daily-loop.md
   - ~/projects/brain/ui/src/pages/dashboard.astro

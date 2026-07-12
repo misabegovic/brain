@@ -8,9 +8,11 @@ description: >
   and the production surfaces at a glance.
 blocks:
   - title: "Recent decisions"
+    empty: "No decisions recorded yet."
     pages: {kind: decision, status: accepted}
     limit: 10
   - title: "Research queue (deepening picks)"
+    empty: "No deepening picks queued — the link-health producer adds them."
     inbox: {kind: research}
   - title: "Load-bearing pages by inbound links"
     sql: |

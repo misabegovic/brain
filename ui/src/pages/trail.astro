@@ -21,11 +21,16 @@ for (const it of entries) {
   if (!byDate.has(it.date)) byDate.set(it.date, []);
   byDate.get(it.date).push(it.e);
 }
+// Resolve a supersedes/superseded_by ref to the target page's human
+// title instead of a raw slug (Priya reader-trust finding).
+const titleByRef = new Map(
+  all.map((e) => [e.id.replace(/\/index$/, '') + '.md', e.data.title]),
+);
 const href = (e) =>
   '/' + (e.id === 'index' ? 'home' : e.id.replace(/\/index$/, '')) + '/';
 const refHref = (ref) =>
   '/' + ref.replace(/\.md$/, '').replace(/\/index$/, '') + '/';
-const refName = (ref) => ref.replace(/\.md$/, '').split('/').pop();
+const refName = (ref) => titleByRef.get(ref) ?? ref.replace(/\.md$/, '').split('/').pop();
 const tone = (e) =>
   e.data.status === 'superseded' || e.data.status === 'archived'
     ? 'warn'

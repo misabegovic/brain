@@ -48,8 +48,16 @@ const open = live.filter((e) =>
 const decisions = pages
   .filter((e) => e.data.kind === 'decision')
   .sort((a, b) => (dateOf(a) < dateOf(b) ? 1 : -1))
-  .slice(0, 4);
+  .slice(0, 5);
 const newest = pages.map(dateOf).sort().at(-1) ?? '';
+// Status tone so a superseded row can never read as the current
+// record (Priya reader-trust finding, 2026-07-12).
+const statusTone = (s) =>
+  s === 'superseded' || s === 'archived'
+    ? 'warn'
+    : s === 'living' || s === 'accepted'
+      ? 'ok'
+      : '';
 ---
 <aside class="overview">
   <h2>Project overview <span class="chip">{pages.length} pages ·
@@ -87,7 +95,11 @@ const newest = pages.map(dateOf).sort().at(-1) ?? '';
         <ul>
           {open.map((e) => (
             <li>
-              <span class="chip">{e.data.kind}</span>{' '}
+              <span class="chip">{e.data.kind}</span>
+              {e.data.status && e.data.status !== 'living' && (
+                <span class={`chip ${statusTone(e.data.status)}`}
+                >{e.data.status}</span>
+              )}{' '}
               <a href={href(e)}>{e.data.title}</a>
             </li>
           ))}
@@ -101,6 +113,8 @@ const newest = pages.map(dateOf).sort().at(-1) ?? '';
         <ul>
           {decisions.map((e) => (
             <li>
+              <span class={`chip ${statusTone(e.data.status)}`}
+              >{e.data.status ?? 'decision'}</span>
               <span class="chip">{dateOf(e)}</span>{' '}
               <a href={href(e)}>{e.data.title}</a>
             </li>
