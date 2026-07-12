@@ -18,6 +18,18 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **0.19.1: the delegated cold-start.** The
+  operator delegated the 1.0 gate's cold-start test; the full
+  tutorial ran against a born instance with a real OSS ingest
+  (transcript at
+  `sources/playthroughs/2026-07-12--delegated-cold-start--instance-tutorial.md`;
+  criteria 3 + 4 evidence on the
+  [topic](brain/topics/one-point-oh-criteria.md)). Fixed en route:
+  CI ran pytest before the UI build (main is green again), the
+  empty-brain guidance never fired on born instances, and `setup`
+  now ends with the next command verified to work. The
+  [insight](insights/quickstart-third-command-fragility.md) is
+  acted on.
 - **2026-07-12** — **0.19.0: onboarding surfaces.** The deck
   rewritten to the current product (+ first-session tutorial);
   README points at it; shelf homes render generated Project

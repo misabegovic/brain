@@ -55,6 +55,13 @@ centres, with no fallback shown at the failure point.
 
 ## Status
 
-Open. Awaiting a real cold-start run (the 1.0 gate's human test is
-the natural confirmation vehicle). Do not raise confidence on
-synthetic evidence alone.
+Acted on, 2026-07-12. The delegated cold-start walk
+(`sources/playthroughs/2026-07-12--delegated-cold-start--instance-tutorial.md`)
+reproduced the failure mode (non-interactive setup skips the PATH
+step → `brain` absent) and shipped the fix: `setup` now ends by
+printing the next command *verified to work* on that machine
+(`brain` or `tools/brain`). Confidence stays `low` per the
+playthrough honesty rule — the operator delegated the cold-start
+test to the agent, and that delegation is recorded rather than
+laundered into human confirmation. The macOS PATH leg remains
+unexecuted.

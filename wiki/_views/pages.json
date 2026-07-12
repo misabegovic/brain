@@ -677,7 +677,7 @@
       "sources": [
         "../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md"
       ],
-      "tokens": 363
+      "tokens": 536
     },
     {
       "path": "brain/topics/regenerative-schema-extensions.md",
@@ -707,7 +707,7 @@
       "sources": [
         "sources/playthroughs/2026-07-12--noor-cold-start-adopter--readme-quickstart.md"
       ],
-      "tokens": 478
+      "tokens": 591
     },
     {
       "path": "org/competitive-positioning.md",

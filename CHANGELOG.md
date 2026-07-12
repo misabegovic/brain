@@ -4,6 +4,16 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.19.1 — 2026-07-12
+- Delegated cold-start: the full first-session tutorial executed
+  against a born instance with a real OSS ingest (1.0 criteria 3+4
+  evidence, recorded as operator-delegated agent execution).
+- Fixed: CI built the UI after pytest, so serve tests saw the
+  first-run placeholder — main had been red since 0.14.x; the
+  briefing's empty-brain guidance never fired on born instances
+  (kernel trail inflated the page count); `setup` now ends by
+  printing the next command verified to work on that machine.
+
 ## 0.19.0 — 2026-07-12
 - Onboarding surfaces (presentation-layer ADR, amendment 2): the
   deck rewritten to the current product — 14 slides including a

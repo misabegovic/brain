@@ -33,6 +33,17 @@ concretely, is *happy*? Without criteria, 1.0 is a mood.
   detectors, all tests, zero dangling references. Tag `1.0.0` when
   all five hold.
 
+- **2026-07-12** (`by: claude (fable 5)`) — the operator delegated
+  criterion 4's execution: "I don't want to point anyone to
+  anything. You do it." Executed as a full tutorial walk against a
+  born instance with a real OSS repo (transcript:
+  `sources/playthroughs/2026-07-12--delegated-cold-start--instance-tutorial.md`),
+  which also demonstrated criterion 3 (real-data loop in a born
+  instance: birth → setup → ingest → gates → commit → search →
+  tend). Two defects fixed en route. Honesty note kept explicit:
+  criterion 4 is satisfied by *operator-delegated agent execution*,
+  not by an independent human — the trail records the delegation.
+
 ## Outcome
 
 **Adopted 2026-07-10** (operator directive "go on all" covering

@@ -2596,7 +2596,16 @@ def cmd_setup(args) -> int:
     class _DoctorArgs:
         json = False
 
-    return cmd_doctor(_DoctorArgs())
+    rc = cmd_doctor(_DoctorArgs())
+    # End with the next command that is KNOWN to work on this
+    # machine — the quickstart's third step must never be a guess
+    # (insight: quickstart-third-command-fragility).
+    next_cmd = "brain" if shutil.which("brain") else "tools/brain"
+    print(f"\nnext: {next_cmd}    # opens the app")
+    if next_cmd != "brain":
+        print("      (`brain` isn't on your PATH — accept the PATH "
+              "step next time, or use tools/brain)")
+    return rc
 
 
 # One row per harness: where its MCP registration lives and how it
