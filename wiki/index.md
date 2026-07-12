@@ -24,6 +24,12 @@ start filling in as the slash-command surface runs.
   [brain/ai-suggestions](brain/index.md#ai-suggestions-drafts-for-human-review)
   plus a serving-mode insight. All security guarantees held under
   Sam's adversarial probe.
+- **2026-07-12** — **0.19.4: fixed a governance misreport.** `doctor`
+  and `/dash` read `LOCAL_FIRST` by substring, matching the
+  commented `.env.example` boilerplate — so they reported
+  "local-first" after the flag was removed. Now anchored to the
+  canonical line test. Found by the Viktor daily-operator
+  playthrough.
 - **2026-07-12** — **0.19.3: PR mode + detector teeth.** The
   operator removed LOCAL_FIRST — every change now lands via PR with
   CI green. The internal-refs detector reads UI source strings
