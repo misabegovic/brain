@@ -7,6 +7,7 @@
 import { getCollection, render } from 'astro:content';
 import App from '../layouts/App.astro';
 import Actions from '../components/Actions.astro';
+import ProjectOverview from '../components/ProjectOverview.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('docs');
@@ -20,6 +21,21 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+// Shelf homes (wiki/<shelf>/index.md — the glob loader strips the
+// trailing /index, so their id is just the shelf name) get a
+// generated project overview appended — the shelf's onboarding
+// surface.
+const isShelfHome =
+  !entry.id.includes('/') && entry.id !== 'index' &&
+  !entry.id.startsWith('_');
+const shelfPages = isShelfHome
+  ? (await getCollection('docs')).filter(
+      (e) =>
+        e.id.startsWith(entry.id + '/') &&
+        !e.id.includes('ai-suggestions/'),
+    )
+  : [];
+const shelf = isShelfHome && shelfPages.length >= 0 ? entry.id : null;
 const d = entry.data;
 const isSuggestion =
   entry.id.includes('ai-suggestions/') || d.ai_suggestion === true;
@@ -61,11 +77,16 @@ const statusTone =
       </div>
     )}
     {d.summary && <p class="lead">{d.summary}</p>}
-    <Actions target={'wiki/' + entry.id + '.md'} />
+    <Actions target={(entry.filePath ?? '').replace(
+      /^src\/content\/docs\//, 'wiki/') || 'wiki/' + entry.id + '.md'} />
 
     <div class="prose">
       <Content />
     </div>
+
+    {shelf && (
+      <ProjectOverview shelf={shelf} pages={shelfPages} />
+    )}
 
     {d.supersedes && (
       <p class="trailnote">

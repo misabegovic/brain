@@ -393,6 +393,17 @@ custom header (CSRF-proof via unanswered preflight) and never
 mounts in serving mode. This also delivers the 0.17
 within-appetite remainders — the presentation-layer bet closes.
 
+## 0.19.0 — onboarding surfaces — **shipped 2026-07-12**
+
+Operator direction: proper onboarding for the tool and for the
+projects it tracks. The deck rewritten to the post-rewrite product
+(14 slides, six-step first-session tutorial, project-onboarding
+slide) — catching a leftover origin-org repo description in slide
+content (standalone guarantee); README points at the deck; every
+shelf home renders a generated Project overview (reading path, open
+work, recent decisions, freshness, honest gaps) per the
+presentation-layer ADR's second amendment.
+
 ## Standing ideas (unversioned)
 
 Deliberately not adopted from the open-knowledge direction: a vector

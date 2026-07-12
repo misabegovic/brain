@@ -4,6 +4,18 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.19.0 — 2026-07-12
+- Onboarding surfaces (presentation-layer ADR, amendment 2): the
+  deck rewritten to the current product — 14 slides including a
+  six-step first-session tutorial and project-onboarding guidance;
+  README gains an Onboarding section pointing at it. The refresh
+  removed a leftover origin-org repo description (standalone
+  guarantee).
+- Project overviews: every shelf home renders a generated panel —
+  start-here reading path, open work, recent decisions, freshness,
+  and honestly-stated gaps — derived at build time from the
+  shelf's own pages.
+
 ## 0.18.0 — 2026-07-12
 - The briefing becomes two-way (presentation-layer ADR amendment):
   queue/comment actions on cards and pages POST to the local

@@ -26,6 +26,12 @@ into the sections below.
 
 ## Now
 
+- **Onboarding is built in (0.19.0, 2026-07-12).** The deck teaches
+  the current product (incl. a first-session tutorial); the README
+  points to it; every shelf home doubles as a generated project
+  overview for team onboarding. A leftover origin-org repo
+  description in the old deck was caught and removed.
+
 - **The briefing is two-way (0.18.0, 2026-07-12).** Type filters +
   pagination, dashboard/trail/graph read surfaces, and the
   interactive channel: queue/comment clicks become inbox items

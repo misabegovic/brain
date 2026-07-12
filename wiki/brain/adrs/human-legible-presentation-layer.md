@@ -128,3 +128,17 @@ introduce state.
   within-appetite remainders (trail timeline, link-graph visual).
   Direction unchanged: humans act through their agent — the click
   is a faster way to hand the agent work.
+
+- **2026-07-12 — onboarding surfaces (operator direction).** The
+  onboarding deck is rewritten to the post-rewrite reality (the
+  briefing, MCP + CLI, queue-and-tend, playthroughs, the
+  interactive channel) and gains a six-step first-session tutorial;
+  the README's onboarding section points at it. Every shelf home
+  (`wiki/<shelf>/index.md`) now renders a generated **Project
+  overview** — start-here reading path, open work, recent
+  decisions, freshness, and honestly-stated gaps — derived at build
+  time from the shelf's own pages, so a project's wiki home doubles
+  as its team-onboarding page. Same derivation discipline: no new
+  store, empty shelves coach instead of blanking. The deck refresh
+  also removed a leftover origin-org repo description that had
+  survived the extraction sweeps (standalone guarantee).

@@ -17,7 +17,9 @@ const live = all.filter(
 );
 const href = (e) =>
   '/' + (e.id === 'index' ? 'home' : e.id.replace(/\/index$/, '')) + '/';
-const wikiPath = (e) => 'wiki/' + e.id + '.md';
+const wikiPath = (e) =>
+  (e.filePath ?? '').replace(/^src\/content\/docs\//, 'wiki/') ||
+  'wiki/' + e.id + '.md';
 const isSuggestion = (e) => e.id.includes('ai-suggestions/');
 const age = (e) => {
   const u = e.data.updated;

@@ -123,7 +123,7 @@
         "../prds/human-legible-presentation-layer.md",
         "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md"
       ],
-      "tokens": 1418
+      "tokens": 1613
     },
     {
       "path": "brain/adrs/kernel-manifest-instancing.md",
@@ -623,7 +623,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 5049
+      "tokens": 5174
     },
     {
       "path": "brain/state.md",
@@ -635,7 +635,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2230
+      "tokens": 2310
     },
     {
       "path": "brain/topics/chat-surface-necessity.md",

@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **0.19.0: onboarding surfaces.** The deck
+  rewritten to the current product (+ first-session tutorial);
+  README points at it; shelf homes render generated Project
+  overviews (reading path, open work, freshness, honest gaps) —
+  [ADR amendment](brain/adrs/human-legible-presentation-layer.md).
+  The refresh caught a leftover origin-org repo description in the
+  old deck (standalone guarantee).
 - **2026-07-12** — **0.18.0: the briefing becomes two-way.**
   Filters + pagination, `/dashboard/` + `/trail/` + `/graph/`, and
   the interactive channel — queue/comment clicks on any card or

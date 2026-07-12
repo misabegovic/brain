@@ -52,6 +52,22 @@ Two guarantees worth knowing on day one:
   on your logged-in subscription. `doctor` warns if metered API
   keys sit in the environment you launch your harness from.
 
+## Onboarding
+
+Two built-in paths, both inside the app (`brain`, then the nav):
+
+- **New to the brain?** Click **Onboarding** — a ~10-minute deck
+  covering the three ideas, governance, the daily loop, and a
+  step-by-step **first-session tutorial** (steps 1–6, from `setup`
+  to your first tend). It lives at `localhost:8765/onboarding/`.
+- **New to a project the brain tracks?** Open that project's shelf
+  home (e.g. `/your-repo/`) — every shelf renders a generated
+  **Project overview**: a start-here reading path (purpose →
+  architecture → state → conventions), open work, recent
+  decisions, and freshness. Gaps are stated honestly, with the
+  command that fills them. Send a new teammate the shelf link; ten
+  minutes of reading replaces the first week of asking around.
+
 ---
 
 Everything below is reference — the machinery your agent operates so
