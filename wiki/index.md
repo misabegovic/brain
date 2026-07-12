@@ -18,6 +18,16 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **0.17.0: the briefing is the UI.** The
+  presentation-layer bet shipped as a complete UI rewrite
+  ([PRD](brain/prds/human-legible-presentation-layer.md) ·
+  [ADR](brain/adrs/human-legible-presentation-layer.md)): the app's
+  root is now the brain's judgement — Needs you / In flight / On
+  the table + orientation — with executive summaries in the schema,
+  lifecycle chrome on every page, and attention verdicts
+  (`inbox judge`/`grade`) from the tend loop. The Priya playthrough
+  caught three defects in-session, including five shipped PRDs
+  still claiming in-flight.
 - **2026-07-12** — **pitch on the table: human-legible presentation
   layer.** Big appetite, awaiting the operator's bet
   ([pitch](brain/pitches/human-legible-presentation-layer.md)):

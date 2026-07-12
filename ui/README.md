@@ -1,24 +1,31 @@
-# ui — Astro + Starlight over brain/wiki
+# ui — the purpose-built Astro app over brain/wiki
 
 The production UI layer for the brain. Lives inside the brain repo
 at `ui/`, sibling to `wiki/`, `tools/`, `sources/`, and `log/`.
 
-Astro 5 + Starlight 0.30 + Pagefind, all npm-installed (no
-vendoring). Renders `wiki/` directly via the `src/content/docs`
-symlink. The home page (`wiki/index.md`) is an agent-maintained
-dashboard — see
-[`wiki/brain/adrs/home-content-shape.md`](../wiki/brain/adrs/home-content-shape.md).
+Astro 5 + Pagefind, all npm-installed (no vendoring, no theme — per
+[`wiki/brain/adrs/human-legible-presentation-layer.md`](../wiki/brain/adrs/human-legible-presentation-layer.md)).
+Renders `wiki/` directly via the `src/content/docs` symlink. The
+app root is the **briefing** (`src/pages/index.astro`) — judgement
+bands + orientation derived at build time from `pages.json`, the
+inbox, and `state.md`; wiki pages render at their existing paths
+via `src/pages/[...slug].astro` with lifecycle chrome; the wiki
+home (`wiki/index.md`) renders at `/home/`.
 
 ## Layout
 
 ```
 ui/
 ├── src/
-│   ├── content.config.ts            (extends Starlight's docsSchema with brain frontmatter)
+│   ├── content.config.ts            (glob collection + brain frontmatter schema)
+│   ├── layouts/App.astro            (app shell: header/nav/theme)
+│   ├── components/Card.astro        (lifecycle-aware card)
+│   ├── lib/data.mjs                 (build-time readers: inbox, state sections, VERSION)
+│   ├── pages/                       (index=briefing, [...slug]=wiki pages, search, 404, onboarding)
 │   └── content/
 │       └── docs           -> ../../../wiki   (symlink, tracked)
-├── astro.config.mjs                 (Starlight integration; default outDir ./dist)
-├── package.json                     (astro, @astrojs/starlight, pagefind, github-slugger)
+├── astro.config.mjs                 (no integrations; remark link rewriting)
+├── package.json                     (astro, pagefind, github-slugger)
 ├── package-lock.json
 ├── tsconfig.json                    (extends astro/tsconfigs/strict)
 ├── Dockerfile
@@ -27,7 +34,7 @@ ui/
 └── README.md                        (this file)
 ```
 
-The `src/content/docs` symlink lets Starlight read the brain corpus
+The `src/content/docs` symlink lets the app read the brain corpus
 without copying. Edit pages in `wiki/`; rebuild here.
 
 ## Build

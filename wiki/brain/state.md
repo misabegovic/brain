@@ -26,6 +26,14 @@ into the sections below.
 
 ## Now
 
+- **The briefing is the UI (0.17.0, 2026-07-12).** Complete UI
+  rewrite on the operator's bet: Starlight out, purpose-built Astro
+  app in — the root is the partner's briefing (attention verdicts,
+  bets, discussions, orientation), pages carry lifecycle chrome and
+  executive summaries, and the tend loop judges connector signal
+  (`inbox judge`/`grade`, routine-by-default). Follow-ups within
+  appetite: trail timeline, link-graph visual.
+
 - **The playthrough loop is live (0.16.0, 2026-07-12).** Synthetic
   users walk every release: personas in
   `.claude/personas/users/`, `/playthrough` protocol, transcripts

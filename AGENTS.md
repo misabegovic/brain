@@ -462,7 +462,7 @@ brain/
 ├── wiki/               # synthesis layer
 ├── log/                # operations log
 ├── tools/              # brain.py CLI, sync, hooks, templates
-└── ui/                 # Astro 5 + Starlight + Pagefind (src/content/docs symlinked to ../wiki)
+└── ui/                 # purpose-built Astro app: briefing + corpus + Pagefind (src/content/docs symlinked to ../wiki)
 ```
 
 ## The three levels — brain, org, repo
@@ -1291,14 +1291,22 @@ Lets sibling-repo agents and operator shells call `brain
 
 ## Browseable UI
 
-A production UI lives at `ui/` — Astro 5 + Starlight 0.30 + Pagefind
-with `src/content/docs` symlinked to `../../../wiki`. Build details
-(`npm install`, `npm run build`) are in `ui/README.md`. **Local-first**
-— sharing happens via the repo paths in `wiki/`, not a hosted URL.
-Mobile-native is a non-negotiable rule for any UI iteration.
+A production UI lives at `ui/` — a purpose-built Astro 5 app (per
+`wiki/brain/adrs/human-legible-presentation-layer.md`) with
+`src/content/docs` symlinked to `../../../wiki`. The root is the
+**briefing**: three judgement bands (Needs you — attention verdicts,
+pitches awaiting a bet, unconfirmed insights, AI drafts; In flight —
+living post-bet work; On the table — open topics and ideas) over a
+were/are/going orientation strip. Wiki pages render at their
+existing paths with lifecycle chrome (kind/status/confidence/
+appetite chips, the `summary:` lead, ai-suggestion and superseded
+banners); the wiki home renders at `/home/`; Pagefind search at
+`/search/`. Build: `npm run build` (Astro + Pagefind; details in
+`ui/README.md`). **Local-first** — sharing happens via the repo
+paths in `wiki/`, not a hosted URL. Mobile-native is a
+non-negotiable rule for any UI iteration.
 
 An onboarding deck at `/onboarding/` (rendered by
-`ui/src/pages/onboarding.astro`, outside Starlight's docs collection)
-walks colleagues new to the brain through the three missions, three
-layers, three levels, governance, and slash-command surface in ~10
-minutes.
+`ui/src/pages/onboarding.astro`) walks colleagues new to the brain
+through the three missions, three layers, three levels, governance,
+and slash-command surface in ~10 minutes.

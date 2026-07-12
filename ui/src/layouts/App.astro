@@ -63,7 +63,8 @@ const current = Astro.url.pathname;
         background: var(--bg-soft); }
       nav.top a[aria-current="page"] { color: var(--fg);
         background: var(--bg-soft); font-weight: 600; }
-      main { max-width: 72rem; margin: 0 auto; padding: 1.25rem 1rem 4rem; }
+      main { max-width: 72rem; margin: 0 auto; padding: 1.25rem 1rem 4rem;
+        overflow-wrap: break-word; }
       footer.app {
         max-width: 72rem; margin: 0 auto; padding: 1rem;
         color: var(--muted); font-size: .85em; border-top: 1px solid var(--line);
@@ -79,7 +80,7 @@ const current = Astro.url.pathname;
       .chip.accent { color: var(--accent); }
       .cards {
         display: grid; gap: .75rem;
-        grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
         padding: 0; margin: .75rem 0; list-style: none;
       }
       .card {

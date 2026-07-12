@@ -4,6 +4,23 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.17.0 — 2026-07-12
+- Human-legible presentation layer (pitch → PRD → ADR → build, one
+  bet, corrected mid-shaping to a full rewrite): Starlight retired;
+  ui/ is a purpose-built Astro app. Root = the briefing (Needs you /
+  In flight / On the table + were/are/going orientation, guiding
+  empty states); wiki pages keep their URLs and gain lifecycle
+  chrome (chips, summary lead, AI-draft + superseded banners);
+  Pagefind search at /search/. Build ~30s → ~2s.
+- `summary:` frontmatter in the schema (validated; authored across
+  37 card-kind pages; exported via pages.json); groom checks drift.
+- Attention judgement: `inbox judge` (needs-operator/fyi/routine +
+  one-line reason, in-session only) and `inbox grade`
+  (useful/noise calibration at wiki/_state/attention-grades.json);
+  tend judges external signal, routine-by-default.
+- JSON /search API claims its path only with ?q= (route collision
+  with the UI search page); shipped PRDs groomed to superseded.
+
 ## 0.16.0 — 2026-07-12
 - Persona playthrough loop (pitch → PRD → ADR → build, one bet):
   four brain-as-product user personas, the `/playthrough` skill

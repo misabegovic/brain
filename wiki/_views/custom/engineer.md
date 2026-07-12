@@ -46,8 +46,8 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 | org/operator-lessons.md | high | 4 |
 | brain/adrs/connector-snapshot-contract.md | medium | 3 |
 | brain/adrs/home-content-shape.md | medium | 3 |
+| brain/adrs/human-legible-presentation-layer.md | medium | 3 |
 | brain/adrs/operator-lesson-pattern.md | medium | 3 |
-| brain/adrs/parallel-efforts-on-request.md | medium | 3 |
 
 ## Production state (Datadog)
 

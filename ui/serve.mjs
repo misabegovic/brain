@@ -1,5 +1,5 @@
 // Production static server for the brain UI.
-// Serves the built Astro+Starlight site from ./dist on $PORT
+// Serves the built Astro site from ./dist on $PORT
 // (Railway provides this). Uses serve-handler — a tiny dep installed
 // in the runtime stage of the Dockerfile.
 

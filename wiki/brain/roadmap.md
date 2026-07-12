@@ -361,6 +361,23 @@ sweep per shipped release. The first dogfood walk paid for the
 mechanism immediately — two cold-start defects fixed in-session,
 one hypothesis routed to the insights shelf.
 
+## 0.17.0 — human-legible presentation layer — **shipped 2026-07-12**
+
+The operator's bet, corrected mid-shaping to a complete UI rewrite
+([pitch](pitches/human-legible-presentation-layer.md) →
+[PRD](prds/human-legible-presentation-layer.md) →
+[ADR](adrs/human-legible-presentation-layer.md)): Starlight retired;
+`ui/` is a purpose-built Astro app whose root is the briefing —
+Needs you / In flight / On the table over a were/are/going
+orientation strip. `summary:` in the schema (authored across 37
+card pages), lifecycle chrome on every page, `inbox judge`/`grade`
+for in-session attention verdicts with operator calibration, and
+Pagefind search. Build time fell ~30s → ~2s. The Priya playthrough
+in the shipping session caught a route collision, a duplicate-H1
+defect, and five shipped PRDs still claiming in-flight — the
+opinionated surface doing its job on day one. Within-appetite
+follow-ups: trail timeline, link-graph visual.
+
 ## Standing ideas (unversioned)
 
 Deliberately not adopted from the open-knowledge direction: a vector

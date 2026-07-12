@@ -622,7 +622,7 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
-      "tokens": 4600
+      "tokens": 4846
     },
     {
       "path": "brain/state.md",
@@ -634,7 +634,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2017
+      "tokens": 2127
     },
     {
       "path": "brain/topics/chat-surface-necessity.md",

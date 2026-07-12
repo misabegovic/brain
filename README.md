@@ -74,7 +74,8 @@ The **kernel** — mechanism, no content:
   `/rfc`, `/pr`, `/review`, `/spawn`, `/rebase`, …) as skills, plus
   the three agent personas (PM / Tech Lead / Developer) that drive
   Shape Up.
-- **`ui/`** — Astro 5 + Starlight + Pagefind browse surface with an
+- **`ui/`** — the purpose-built Astro app: the briefing (opinionated
+  home), lifecycle-aware page rendering, Pagefind search, and an
   onboarding deck at `/onboarding/`.
 - **`.github/workflows/`** — the validate gates and the daily
   scheduled-operations runner.
@@ -136,7 +137,7 @@ sources/            # raw, immutable inputs (additive only)
 wiki/               # synthesis layer — per-repo + org + brain-meta
 log/                # append-only operations log (log.md)
 tools/              # brain.py CLI, sync-siblings, hooks, templates
-ui/                 # Astro 5 + Starlight + Pagefind — src/content/docs symlinks ../../wiki
+ui/                 # purpose-built Astro app (briefing + corpus + search) — src/content/docs symlinks ../wiki
 tests/              # kernel invariant tests (pytest)
 ```
 
@@ -252,6 +253,10 @@ npm run build                       # production build
 npm run dev                         # local dev server
 ```
 
-`ui/src/content/docs` symlinks to `../wiki`, so the wiki renders as a
-Starlight site with Pagefind search. Local-first — share via repo
-paths, not a hosted URL.
+`ui/src/content/docs` symlinks to `../wiki`. The app's root is the
+**briefing** — the brain's judgement of what needs you, what's in
+flight, and what's on the table — and every wiki page renders inside
+the app with lifecycle chrome (kind/status/confidence chips,
+executive summary, AI-draft and superseded banners). Pagefind search
+at `/search/`. Local-first — share via repo paths, not a hosted
+URL.
