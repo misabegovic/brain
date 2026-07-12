@@ -70,3 +70,17 @@ def test_local_first_detection_is_anchored(tmp_path):
     absent = tmp_path / "env-none"
     active.write_text("BRAIN_PORT=8765\n")
     assert brain._local_first(tmp_path / "nope") is False
+
+
+def test_producer_health_states(tmp_path, monkeypatch):
+    """Producer freshness is distinct from timer-installed: a stalled
+    heartbeat is a fail (empty queue = silence, not calm)."""
+    import brain
+    import time
+    monkeypatch.setattr(brain, "PRODUCER_HEARTBEAT", tmp_path / "hb.json")
+    assert brain._producer_health()["state"] == "never"
+    brain._producer_touch()
+    assert brain._producer_health()["state"] == "current"
+    (tmp_path / "hb.json").write_text(
+        '{"last_run":"old","epoch":%d}' % (int(time.time()) - 48 * 3600))
+    assert brain._producer_health()["state"] == "stalled"

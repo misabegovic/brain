@@ -43,6 +43,12 @@ const hubs = Object.entries(graph.inbound)
 const activity = logActivity(30);
 const maxAct = Math.max(1, ...activity.series.map((s) => s.n));
 const grades = gradeStats();
+// Judged attention items not yet graded — the calibration to-do
+// (Viktor attention-calibration finding).
+const gradedIds = new Set(grades.ids ?? []);
+const pendingGrades = inboxItems().filter(
+  (i) => i.attention && !gradedIds.has(i.id),
+).length;
 
 // sparkline path (SVG, 300x48)
 const W = 300, H = 48;
@@ -69,8 +75,11 @@ const pageHref = (f) => '/' + f.replace(/\.md$/, '').replace(/\/index$/, '').rep
       <b>{grades.useful + grades.noise === 0
         ? '—'
         : Math.round((grades.useful / (grades.useful + grades.noise)) * 100) + '%'}</b>
-      <span>verdicts graded useful</span>
+      <span>verdicts useful{grades.useful + grades.noise > 0
+        ? ` (n=${grades.useful + grades.noise})` : ' — no grades yet'}</span>
     </div>
+    <div class="stat"><b>{pendingGrades}</b>
+      <span>judged, awaiting your grade</span></div>
   </div>
 
   <div class="panels">

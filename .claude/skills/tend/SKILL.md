@@ -85,6 +85,16 @@ audit-log line, exactly as any other operation):
 python3 tools/brain.py inbox done <id>
 ```
 
+When the operator (or you, on their behalf) has **reviewed a
+recurring producer item and judged it fine as-is** — a half-life
+page that's still accurate, an orphan that's intentional — use
+`brain.py inbox ack <id>` instead of `done`. Ack suppresses the
+item until the underlying page actually changes (or 90 days pass),
+so the deterministic producers stop re-adding it every run without
+anyone falsifying `updated:` or `confidence:` to silence it. Plain
+`done` is for work you actually completed; `ack` is for
+"reviewed, no change needed".
+
 Clear the item **in the same commit** as its synthesis where
 practical — the diff then tells the whole story (work + queue
 removal together). An item that turns out to be moot (trigger no

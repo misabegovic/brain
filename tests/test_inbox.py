@@ -132,3 +132,56 @@ def test_inbox_judge_and_grade_round_trip():
             grades_path.write_text(grades_before)
         else:
             grades_path.unlink(missing_ok=True)
+
+
+def test_ack_suppresses_producer_rere_add_until_trigger_changes(monkeypatch, tmp_path):
+    """inbox ack records a trigger-fingerprinted acknowledgement the
+    reconciler respects; editing the page (fingerprint change) drops
+    it so the item re-surfaces honestly."""
+    import brain
+    import json as _json
+    monkeypatch.setattr(brain, "INBOX_ACKS", tmp_path / "acks.json")
+    # A scratch wiki page we control the updated: date of.
+    scratch = brain.WIKI / "_test_ack_page.md"
+    scratch.write_text("---\ntitle: t\nkind: meta\nstatus: draft\n"
+                       "updated: 2026-07-01\nsources: []\n---\nbody\n")
+    item = {"kind": "groom", "summary": "half-life x",
+            "source": "wiki/_test_ack_page.md"}
+    (brain.INBOX_DIR / "hl-x.json").write_text(
+        _json.dumps({**item, "id": "hl-x"}))
+    try:
+        import types
+        assert brain._is_acked("hl-x", item, brain._load_acks()) is False
+        assert brain.cmd_inbox(types.SimpleNamespace(
+            op="ack", id="hl-x", note="verified")) == 0
+        acks = brain._load_acks()
+        assert brain._is_acked("hl-x", item, acks) is True
+        # Editing the page changes updated: → fingerprint mismatch → stale.
+        scratch.write_text(scratch.read_text().replace(
+            "2026-07-01", "2026-07-12"))
+        assert brain._is_acked("hl-x", item, acks) is False
+    finally:
+        (brain.INBOX_DIR / "hl-x.json").unlink(missing_ok=True)
+        scratch.unlink(missing_ok=True)
+
+
+def test_pending_grades_lists_judged_ungraded(monkeypatch, tmp_path):
+    import brain
+    import json as _json
+    import types
+    monkeypatch.setattr(brain, "ATTENTION_GRADES_PATH", tmp_path / "g.json")
+    iid = "pg-item"
+    (brain.INBOX_DIR / f"{iid}.json").write_text(_json.dumps({
+        "id": iid, "kind": "custom", "summary": "s",
+        "attention": "needs-operator", "attention_reason": "look"}))
+    try:
+        import contextlib
+        import io
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            brain.cmd_inbox(types.SimpleNamespace(
+                op="pending-grades", json=True))
+        out = _json.loads(buf.getvalue())
+        assert any(i["id"] == iid for i in out)
+    finally:
+        (brain.INBOX_DIR / f"{iid}.json").unlink(missing_ok=True)

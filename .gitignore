@@ -60,3 +60,5 @@ wiki/_views/index.db.tmp
 # Serving-mode query audit log (local, append-only)
 log/queries.log
 .reflection-denylist
+wiki/_state/producer-heartbeat.json
+wiki/_state/inbox-acks.json

@@ -124,5 +124,6 @@ export function gradeStats() {
   return {
     useful: grades.filter((g) => g.grade === 'useful').length,
     noise: grades.filter((g) => g.grade === 'noise').length,
+    ids: grades.map((g) => g.id),
   };
 }

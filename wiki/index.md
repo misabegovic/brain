@@ -18,6 +18,14 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **delivered: operator-trust fixes (Viktor cluster).**
+  Producer death is now first-class health — a heartbeat lets
+  `doctor` fail distinctly when the accumulation loop stalls, and
+  the app strip says "producers stalled" instead of a calm "queue
+  clear". Recurring tend items gain `inbox ack` (suppress until the
+  page actually changes — no metadata falsified); `inbox
+  pending-grades` and a sample-sized dashboard stat make the
+  attention-calibration loop legible.
 - **2026-07-12** — **playthrough sweep: 8 AI-suggestions for review.**
   A three-persona sweep (Viktor / Priya / Sam, six agent runs)
   walked the product and landed eight `confidence: low` drafts under

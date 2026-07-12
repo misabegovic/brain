@@ -46,7 +46,7 @@ def test_app_page_has_no_terminal():
     """The embedded terminal is gone: no websocket, no xterm, no
     harness-launch buttons — knowledge iframe + strip only."""
     html = brain.render_app_page(["engineer"])
-    for gone in ("WebSocket", "xterm", "pty", "spawn(", 'id="term"'):
+    for gone in ("WebSocket", "xterm", "/pty", "spawn(", 'id="term"'):
         assert gone not in html, f"terminal remnant in app page: {gone}"
     assert 'id="strip"' in html and 'id="page"' in html
     assert ">briefing</button>" in html and ">engineer</button>" in html

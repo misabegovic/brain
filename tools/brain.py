@@ -75,6 +75,37 @@ ATTENTION_VERDICTS = ("needs-operator", "fyi", "routine")
 ATTENTION_GRADES_PATH = WIKI / "_state" / "attention-grades.json"
 
 
+PRODUCER_HEARTBEAT = WIKI / "_state" / "producer-heartbeat.json"
+PRODUCER_STALE_HOURS = 36  # a daily timer past this is stalled, not calm
+
+
+def _producer_touch() -> None:
+    """Heartbeat written by `schedule run-due` (what the timer runs)
+    so producer freshness is observable without depending on any one
+    OS (Viktor producer-death finding, 2026-07-12)."""
+    import time
+    PRODUCER_HEARTBEAT.parent.mkdir(parents=True, exist_ok=True)
+    PRODUCER_HEARTBEAT.write_text(json.dumps(
+        {"last_run": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+         "epoch": int(time.time())}, indent=2) + "\n")
+
+
+def _producer_health() -> dict:
+    """state: 'current' (ran within the window), 'stalled' (heartbeat
+    older than the window — producers likely dead), 'never' (no
+    heartbeat yet — fresh install or hand-run only)."""
+    import time
+    if not PRODUCER_HEARTBEAT.exists():
+        return {"state": "never", "hours": None}
+    try:
+        data = json.loads(PRODUCER_HEARTBEAT.read_text())
+        age_h = (int(time.time()) - int(data["epoch"])) / 3600
+    except (ValueError, KeyError, OSError):
+        return {"state": "never", "hours": None}
+    return {"state": "current" if age_h <= PRODUCER_STALE_HOURS
+            else "stalled", "hours": round(age_h, 1)}
+
+
 def _local_first(env_path) -> bool:
     """True only when .env declares LOCAL_FIRST=true on its own line.
 
@@ -1267,10 +1298,16 @@ def render_app_page(views: list | None = None) -> str:
    try {{
      const r = await fetch('/workbench/status');
      const s = await r.json();
+     // "queue clear" only means calm when producers are alive; a
+     // stalled accumulation loop makes a cleared queue read as
+     // silence, not calm (Viktor producer-death finding).
+     const queue = s.inbox ? s.inbox + ' to tend'
+       : (s.producers === 'stalled' ? '⚠ producers stalled (queue may be stale)'
+          : 'queue clear');
      document.getElementById('strip').textContent =
        (s.fails ? '✗ ' + s.fails + ' failing · ' :
         s.warns ? '− ' + s.warns + ' notice · ' : '✓ healthy · ')
-       + (s.inbox ? s.inbox + ' to tend' : 'queue clear');
+       + queue;
      if (last && s.mtime > last) nav(document.getElementById('page').src);
      last = s.mtime;
    }} catch (e) {{}}
@@ -1448,6 +1485,7 @@ def cmd_serve(args) -> int:
                                      if c["status"] == "fail"),
                         "warns": sum(1 for c in checks
                                      if c["status"] == "warn"),
+                        "producers": _producer_health()["state"],
                         "mtime": latest,
                     })
                     return
@@ -2453,6 +2491,28 @@ def _doctor_checks() -> list[dict]:
             "no local timer — producers only run when invoked by hand",
             "tools/install-timer.sh")
 
+    # Producer freshness is distinct from timer-installed: a timer can
+    # be active while its runs silently fail, and then an empty queue
+    # is silence, not calm (Viktor producer-death finding). A stalled
+    # heartbeat is a fail — the queue's emptiness can't be trusted.
+    ph = _producer_health()
+    if ph["state"] == "stalled":
+        add("producers", "producer freshness", "fail",
+            f"last accumulation run was {ph['hours']}h ago "
+            f"(>{PRODUCER_STALE_HOURS}h) — producers appear dead; an "
+            f"empty tend queue may be silence, not calm",
+            "check the timer/service: systemctl --user status "
+            f"{timer_unit.replace('.timer', '.service')} — or run "
+            "`brain.py schedule run-due` by hand")
+    elif ph["state"] == "current":
+        add("producers", "producer freshness", "ok",
+            f"accumulation ran {ph['hours']}h ago")
+    else:
+        add("producers", "producer freshness", "warn",
+            "no producer run recorded yet — the queue reflects hand "
+            "runs only until the timer's first daily run",
+            "tools/install-timer.sh, or `brain.py schedule run-due`")
+
     if (REPO / "ui" / "node_modules").exists():
         add("ui", "browse UI", "ok", "dependencies installed")
     else:
@@ -2736,6 +2796,51 @@ INBOX_KINDS = {"ingest", "groom", "research", "custom"}
 INBOX_PRIORITIES = {"high", "normal", "low"}
 
 
+INBOX_ACKS = WIKI / "_state" / "inbox-acks.json"
+# Even an unchanged page re-surfaces after this long, so an ack can
+# never suppress a stale page forever.
+ACK_MAX_DAYS = 90
+
+
+def _ack_fingerprint(item: dict) -> str:
+    """A trigger-state fingerprint so an ack auto-expires when the
+    underlying thing changes. For items about a wiki page, that's the
+    page's `updated:` date (editing the page drops the ack and
+    re-evaluates); otherwise the summary text."""
+    src = (item.get("source") or "").removeprefix("wiki/")
+    page = WIKI / src
+    if src and src.endswith(".md") and page.exists():
+        meta = parse(page)[0] if parse(page) else {}
+        return f"updated:{meta.get('updated')}"
+    return "summary:" + str(item.get("summary", ""))[:200]
+
+
+def _load_acks() -> dict:
+    if INBOX_ACKS.exists():
+        try:
+            return json.loads(INBOX_ACKS.read_text()).get("acks", {})
+        except (ValueError, OSError):
+            return {}
+    return {}
+
+
+def _is_acked(id: str, item: dict, acks: dict) -> bool:
+    """A producer item is suppressed when the operator acked it, the
+    trigger state is unchanged since, and the max re-check window
+    hasn't elapsed. Anything else means the ack is stale — the caller
+    should drop it and let the item re-surface."""
+    rec = acks.get(id)
+    if not rec:
+        return False
+    if rec.get("fingerprint") != _ack_fingerprint(item):
+        return False
+    try:
+        acked = dt.date.fromisoformat(rec["acked"])
+    except (KeyError, ValueError):
+        return False
+    return (today_utc() - acked).days <= ACK_MAX_DAYS
+
+
 def _inbox_items() -> list[dict]:
     if not INBOX_DIR.exists():
         return []
@@ -2857,6 +2962,47 @@ def cmd_inbox(args) -> int:
             return 1
         path.unlink()
         print(f"inbox: cleared {args.id}")
+        return 0
+
+    if op == "ack":
+        path = INBOX_DIR / f"{args.id}.json"
+        if not path.exists():
+            print(f"inbox ack: no item {args.id!r}", file=sys.stderr)
+            return 1
+        item = json.loads(path.read_text())
+        acks = _load_acks()
+        acks[args.id] = {
+            "acked": today_utc().isoformat(),
+            "fingerprint": _ack_fingerprint(item),
+            "note": args.note or "",
+        }
+        INBOX_ACKS.parent.mkdir(parents=True, exist_ok=True)
+        INBOX_ACKS.write_text(json.dumps({"acks": acks}, indent=2) + "\n")
+        path.unlink()
+        print(f"inbox: acknowledged {args.id} — suppressed until the "
+              f"underlying page changes or {ACK_MAX_DAYS}d elapse")
+        return 0
+
+    if op == "pending-grades":
+        # Judged attention items the operator has not yet graded — the
+        # calibration surface (Viktor attention-calibration finding).
+        graded_ids = set()
+        if ATTENTION_GRADES_PATH.exists():
+            graded_ids = {g["id"] for g in json.loads(
+                ATTENTION_GRADES_PATH.read_text()).get("grades", [])}
+        pending = [i for i in _inbox_items()
+                   if i.get("attention") and i["id"] not in graded_ids]
+        if getattr(args, "json", False):
+            print(json.dumps(pending, indent=2))
+            return 0
+        if not pending:
+            print("inbox: no judged items awaiting a grade")
+            return 0
+        print(f"{len(pending)} judged item(s) awaiting your grade "
+              f"(brain.py inbox grade <id> --grade useful|noise):")
+        for i in pending:
+            print(f"  [{i.get('attention')}] {i['id']} — "
+                  f"{i.get('attention_reason', '')}")
         return 0
 
     if op == "judge":
@@ -5180,12 +5326,27 @@ def _schedule_run_inbox_refresh() -> int:
             "priority": "high",
         }
 
-    added = updated_n = 0
+    # Operator acknowledgements the producers respect: an acked item
+    # whose trigger state is unchanged stays suppressed (Viktor
+    # acknowledgement finding). Stale acks (page changed, or window
+    # elapsed) are pruned so the item re-surfaces honestly.
+    acks = _load_acks()
+    acked_now = {}
+    added = updated_n = suppressed = 0
     for id, fields in current.items():
+        if _is_acked(id, fields, acks):
+            acked_now[id] = acks[id]
+            (INBOX_DIR / f"{id}.json").unlink(missing_ok=True)
+            suppressed += 1
+            continue
         existed = (INBOX_DIR / f"{id}.json").exists()
         inbox_add(id=id, produced_by="inbox-refresh", update=True, **fields)
         added += 0 if existed else 1
         updated_n += 1 if existed else 0
+    # Persist only the acks that still apply (prunes expired/stale).
+    if acked_now != acks:
+        INBOX_ACKS.parent.mkdir(parents=True, exist_ok=True)
+        INBOX_ACKS.write_text(json.dumps({"acks": acked_now}, indent=2) + "\n")
 
     removed = 0
     for item in _inbox_items():
@@ -5614,6 +5775,8 @@ def cmd_schedule(args) -> int:
                 rc = subprocess.run(handler, shell=True, cwd=REPO).returncode
             if rc != 0:
                 rc_total = rc
+        if rc_total == 0:
+            _producer_touch()  # heartbeat: the accumulation loop is alive
         return rc_total
 
     print(f"unknown schedule op: {op}", file=sys.stderr)
@@ -6940,6 +7103,14 @@ def main() -> int:
                           choices=("useful", "noise"))
     ib_grade.add_argument("--note", default="")
     ib_done.add_argument("id")
+    ib_ack = ib_sub.add_parser(
+        "ack", help="acknowledge a producer item — suppress it until the "
+                    "underlying page changes (no metadata falsified)")
+    ib_ack.add_argument("id")
+    ib_ack.add_argument("--note", default="")
+    ib_pg = ib_sub.add_parser(
+        "pending-grades", help="judged attention items awaiting a grade")
+    ib_pg.add_argument("--json", action="store_true")
     ap_ib.set_defaults(func=cmd_inbox)
 
     ap_sc = sub.add_parser("sync-cursor",

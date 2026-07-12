@@ -1244,6 +1244,8 @@ python3 tools/brain.py inbox add --id <slug> --kind ingest|groom|research|custom
 python3 tools/brain.py inbox list [--json]
 python3 tools/brain.py inbox summary     # one line; wired to session start
 python3 tools/brain.py inbox done <id>
+python3 tools/brain.py inbox ack <id>       # reviewed, no change — suppress re-add until the page changes
+python3 tools/brain.py inbox pending-grades  # judged attention items awaiting a grade
 ```
 
 One JSON file per item at `wiki/_state/inbox/<id>.json` — merge-safe,
