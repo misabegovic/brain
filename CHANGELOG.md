@@ -4,6 +4,14 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.19.4 — 2026-07-12
+- Fixed: `doctor` / `/dash` operating-mode check read LOCAL_FIRST as
+  a substring, matching the commented `.env.example` boilerplate —
+  it reported local-first after the operator removed the flag.
+  Anchored to the canonical `^LOCAL_FIRST=true$` test via a shared
+  `_local_first()` helper. Found by the Viktor daily-operator
+  playthrough sweep.
+
 ## 0.19.3 — 2026-07-12
 - Standalone-guarantee detectors: internal-refs scans ui/src source
   strings (.astro/.mjs/.ts) — immediately caught a dangling ADR

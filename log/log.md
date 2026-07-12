@@ -216,3 +216,7 @@
    diff: 3 files, +3/-3
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 merge — PR #5: 0.19.4 — fix LOCAL_FIRST detection (governance misreport)
+   diff: 6 files, +52/-5
+   restricted-paths: true
+   by: claude (fable 5)

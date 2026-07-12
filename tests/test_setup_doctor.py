@@ -51,3 +51,22 @@ def test_dash_renders_core_sections():
         assert needle in html, f"dash missing {needle!r}"
     # Escaping sanity: no raw template braces or python reprs leak.
     assert "{esc(" not in html
+
+
+def test_local_first_detection_is_anchored(tmp_path):
+    """LOCAL_FIRST must be read anchored — a substring scan also
+    matches the commented .env.example boilerplate, which made
+    doctor report local-first after the operator removed the flag
+    (Viktor playthrough, 2026-07-12)."""
+    import brain
+    commented = tmp_path / "env-commented"
+    commented.write_text(
+        "# LOCAL_FIRST=true suspends the PR ritual\n"
+        "# LOCAL_FIRST=true\nBRAIN_PORT=8765\n")
+    assert brain._local_first(commented) is False
+    active = tmp_path / "env-active"
+    active.write_text("LOCAL_FIRST=true\n")
+    assert brain._local_first(active) is True
+    absent = tmp_path / "env-none"
+    active.write_text("BRAIN_PORT=8765\n")
+    assert brain._local_first(tmp_path / "nope") is False
