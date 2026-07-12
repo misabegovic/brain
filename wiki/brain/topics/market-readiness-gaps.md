@@ -65,6 +65,13 @@ this machine at the kernel.
   — 'brain' stays the working name and the CLI command; rename
   remains cheap until the first public release.
 
+- **2026-07-12** (`by: claude (fable 5)`) — license changed on the
+  operator's direction: **Apache-2.0 → MIT** (two days after
+  adoption, before any public release, so no downstream reliance
+  existed). MIT is the maximum-simplicity end of the permissive
+  spectrum — shorter, universally understood, no NOTICE mechanism,
+  no explicit patent grant (the trade against Apache-2.0).
+
 ## Outcome
 
 `(open)` — the license and the name are operator decisions; the rest

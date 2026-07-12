@@ -8,8 +8,8 @@
 name = "brain-kernel"
 description = "An LLM-maintained knowledge substrate: governed markdown wiki, queue-and-tend self-maintenance, connectors, composable SQL views, MCP serving, and a chat-first workbench."
 readme = "README.md"
-license = "Apache-2.0"
-license-files = ["LICENSE", "NOTICE"]
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 authors = [{ name = "Muhamed Isabegovic", email = "m.isabegovic@hotmail.com" }]
 dependencies = ["pyyaml>=6"]

@@ -18,6 +18,10 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **0.14.1: license changed to MIT** (operator
+  direction; revised from Apache-2.0 pre-any-public-release).
+  NOTICE removed, packaging metadata updated,
+  [topic](brain/topics/market-readiness-gaps.md) amended.
 - **2026-07-12** — **0.14.0: surfaces simplified.** The chat pane
   removed on the operator's call
   ([superseding ADR](brain/adrs/mcp-cli-terminal-surface.md)) —

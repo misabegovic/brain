@@ -4,6 +4,10 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.14.1 — 2026-07-12
+- License changed to MIT (from Apache-2.0; no public release had
+  occurred, so no downstream reliance). NOTICE removed.
+
 ## 0.14.0 — 2026-07-12
 - Surfaces simplified: first-party chat pane removed (superseding
   ADR mcp-cli-terminal-surface) — MCP + CLI + terminal cover it;
