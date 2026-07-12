@@ -212,3 +212,7 @@
    diff: 11 files, +144/-10
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 merge — PR #2: Neutralise origin-namespace examples in tool comments
+   diff: 3 files, +3/-3
+   restricted-paths: true
+   by: claude (fable 5)
