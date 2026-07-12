@@ -194,12 +194,17 @@ def test_playthrough_cursor_initialises_silently(tmp_path):
         else None
     if PLAYTHROUGH_CURSOR.exists():
         PLAYTHROUGH_CURSOR.unlink()
+    version = (REPO / "VERSION").read_text().strip()
+    item = REPO / "wiki" / "_state" / "inbox" / (
+        "playthrough-" + version.replace(".", "-") + ".json")
+    # Order-independence: another test's inbox-refresh may have queued
+    # this item earlier in the session. Clear it so we assert on THIS
+    # call's behaviour, not accumulated state.
+    item.unlink(missing_ok=True)
     try:
         brain._playthrough_queue_slice()
         state = json.loads(PLAYTHROUGH_CURSOR.read_text())
-        assert state["version"] == (REPO / "VERSION").read_text().strip()
-        item = REPO / "wiki" / "_state" / "inbox" / (
-            "playthrough-" + state["version"].replace(".", "-") + ".json")
+        assert state["version"] == version
         assert not item.exists(), "first run must not queue a sweep"
     finally:
         if existed is not None:
