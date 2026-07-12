@@ -50,6 +50,9 @@ sanitized to organisation-agnostic form:
 
 ## Topics (discussions in flight)
 
+- [Chat-surface necessity](topics/chat-surface-necessity.md) — drop
+  the chat pane for MCP + CLI + terminal? Open, operator's call.
+
 - [Phoenix-Architecture adoption depth](topics/regenerative-schema-extensions.md)
   — which further Fowler concepts earn schema weight. Open.
 - [1.0 criteria](topics/one-point-oh-criteria.md) — the five-point

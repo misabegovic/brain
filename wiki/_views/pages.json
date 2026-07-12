@@ -325,7 +325,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1214,
+      "tokens": 1250,
       "affected_by": [
         "org/competitive-positioning.md",
         "org/competitors/codeplain/index.md"
@@ -481,6 +481,19 @@
         "../../AGENTS.md"
       ],
       "tokens": 1728
+    },
+    {
+      "path": "brain/topics/chat-surface-necessity.md",
+      "title": "Does the kernel need its own chat surface, or do MCP + CLI + the terminal cover it?",
+      "kind": "topic",
+      "status": "living",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/conversations/2026-07-12--chat-surface-reconsidered.md",
+        "../adrs/chat-print-mode-bridge.md"
+      ],
+      "tokens": 402
     },
     {
       "path": "brain/topics/market-readiness-gaps.md",

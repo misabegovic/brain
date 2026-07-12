@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — topic opened:
+  [chat-surface necessity](brain/topics/chat-surface-necessity.md)
+  — operator reconsidering the chat pane; agent position recorded
+  (remove; keep strip, billing guard, install-agent). Awaiting the
+  operator's outcome.
 - **2026-07-12** — first two unattended days: both local timer runs
   finished clean (1.0 criterion #2: 2/7). Dogfooding finding: the
   inherited CI cron was a second runner auto-committing divergent
