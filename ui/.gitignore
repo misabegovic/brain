@@ -1,0 +1,11 @@
+# Astro build output
+dist/
+
+# Astro generated types
+.astro/
+
+# Node deps
+node_modules/
+
+# Pagefind index
+pagefind/

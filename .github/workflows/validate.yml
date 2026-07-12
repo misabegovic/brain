@@ -1,0 +1,126 @@
+name: validate
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history so check-home-fresh can `git diff
+          # origin/main...HEAD` against the base branch — actions/checkout
+          # defaults to fetch-depth: 1 which doesn't carry the base ref.
+          # Cheap on this repo (~70 markdown pages, ~150 commits).
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        # tiktoken is required so brain.py views computes the same
+        # per-page token counts as developers' local mempalace venv;
+        # otherwise the views-up-to-date check would diff on tokens.
+        # pytest is used by tests/ (PR D).
+        run: pip install --quiet pyyaml tiktoken pytest
+
+      - name: Validate frontmatter, sections, references
+        run: python3 tools/brain.py validate
+
+      - name: Verify source citations resolve (no network)
+        run: python3 tools/brain.py check --no-net
+
+      # Optional sanity: regenerate views and confirm no diff vs committed.
+      # If wiki/_views/pages.json drifts from what's in the repo, the
+      # author forgot to run `brain.py views` before pushing.
+      - name: Check views are up-to-date
+        run: |
+          python3 tools/brain.py views > /dev/null
+          if ! git diff --exit-code --quiet wiki/_views/; then
+            echo "::error::wiki/_views/ is out of date. Run 'python3 tools/brain.py views' and commit the result."
+            git diff wiki/_views/
+            exit 1
+          fi
+
+      # Notion write enforcement guard. The harness deny list in
+      # .claude/settings.json is the runtime enforcement. This guard
+      # is the static check: no Notion write tool name should appear
+      # in tracked files except inside the deny list itself, and the
+      # deny list must contain every known Notion write tool.
+      - name: Check Notion writes are deny-listed
+        run: python3 tools/brain.py check-no-notion-writes
+
+      # Home staleness CI guard. Per
+      # wiki/brain/adrs/home-content-shape.md, the brain UI's home
+      # page (wiki/index.md) is an agent-maintained dashboard;
+      # every wiki/ edit must be paired with a wiki/index.md edit so
+      # the relevant section stays current. The local Stop hook
+      # (tools/home-staleness.sh) catches accidents during a session;
+      # this CI check is the load-bearing enforcement that catches
+      # bypasses and multi-session gaps. PRs only — push to main is
+      # post-merge and the merge already preserves the pairing.
+      - name: Check home page is paired with wiki/ edits
+        if: github.event_name == 'pull_request'
+        run: python3 tools/brain.py check-home-fresh --base origin/${{ github.base_ref }}
+
+      # README staleness CI guard. Per user direction 2026-05-03
+      # question #9, README freshness is enforced at PR time (hard
+      # gate) — in-session hooks were removed in favour of CI-only
+      # enforcement so local sessions run without interruption. The
+      # trigger set covers governance / tooling / schema / hooks /
+      # skills / UI substrate / new ai-suggestions shelves / new
+      # auto-generated views (see tools/brain.py § _is_readme_trigger).
+      # PRs only.
+      - name: Check README is paired with significant changes
+        if: github.event_name == 'pull_request'
+        run: python3 tools/brain.py check-readme-fresh --base origin/${{ github.base_ref }}
+
+      # UI build BEFORE pytest: the serve tests exercise the rendered
+      # site (and would otherwise see the first-run placeholder).
+      # Same wrapper script the local hook runs.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Install UI dependencies
+        run: npm --prefix ui ci
+
+      - name: Smoke-build the UI
+        run: bash tools/ui-build.sh
+
+      # brain.py round-trip + consistency tests (PR D). Catches
+      # drift between AGENTS.md, skill frontmatter, and brain.py
+      # internals. Also exercises cmd_check_no_notion_writes against
+      # a planted violation.
+      - name: Run pytest
+        run: python3 -m pytest tests/ -v
+
+      # Reflection-check: deterministic drift detectors per
+      # wiki/brain/ai-suggestions/prds/reflection-validator-suite.md.
+      # 9 sub-checks: links / confidence-floor / active-scope /
+      # supersedes-cycles / page-size / sources-exist / sync-drift /
+      # epic-children / sources-immutability. Surface findings as
+      # warnings; non-blocking for now (calibration phase). Move to
+      # blocking once each sub-check is proven false-positive-free
+      # against the live brain.
+      - name: Reflection-check (warnings, non-blocking)
+        run: |
+          python3 tools/brain.py reflection-check || true
+        continue-on-error: true
+
+      # (UI build moved before pytest — the serve tests assert the
+      # rendered site, and since 0.15.0 a missing build serves the
+      # first-run placeholder instead of erroring, which read as a
+      # test failure here. See wiki/brain/adrs/ui-auto-refresh-hook.md.)

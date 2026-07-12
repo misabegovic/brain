@@ -1,0 +1,5 @@
+# >>> brain:managed >>>
+[mcp_servers.brain]
+command = "python3"
+args = ["./tools/brain-mcp.py"]
+# <<< brain:managed <<<
