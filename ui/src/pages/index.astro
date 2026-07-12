@@ -73,7 +73,16 @@ const were = sectionBullets('index.md', 'What changed', 3);
 const are = sectionBullets('brain/state.md', 'Now', 3);
 const going = sectionBullets('brain/state.md', 'Target', 3);
 
-const emptyCorpus = live.length <= 2;
+// "Empty" means no project content yet — a born instance carries
+// the kernel's own trail (brain/ + org/ methodology), so page count
+// alone can't tell a fresh brain from a working one. Caught by the
+// delegated cold-start walk, 2026-07-12.
+const emptyCorpus = !live.some(
+  (e) =>
+    e.id !== 'index' &&
+    !e.id.startsWith('brain/') && e.id !== 'brain' &&
+    !e.id.startsWith('org/') && e.id !== 'org',
+);
 const PAGE = 8; // cards shown per band before "show all"
 ---
 <App

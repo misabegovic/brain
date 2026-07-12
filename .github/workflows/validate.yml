@@ -84,6 +84,22 @@ jobs:
         if: github.event_name == 'pull_request'
         run: python3 tools/brain.py check-readme-fresh --base origin/${{ github.base_ref }}
 
+      # UI build BEFORE pytest: the serve tests exercise the rendered
+      # site (and would otherwise see the first-run placeholder).
+      # Same wrapper script the local hook runs.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Install UI dependencies
+        run: npm --prefix ui ci
+
+      - name: Smoke-build the UI
+        run: bash tools/ui-build.sh
+
       # brain.py round-trip + consistency tests (PR D). Catches
       # drift between AGENTS.md, skill frontmatter, and brain.py
       # internals. Also exercises cmd_check_no_notion_writes against
@@ -104,19 +120,7 @@ jobs:
           python3 tools/brain.py reflection-check || true
         continue-on-error: true
 
-      # UI auto-refresh smoke build. Same wrapper script the local
-      # Claude Code hook runs (.claude/settings.json hooks.PostToolUse);
-      # CI confirms the wiki + Quartz still compose end-to-end on
-      # every PR. See wiki/brain/adrs/ui-auto-refresh-hook.md.
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: ui/package-lock.json
-
-      - name: Install UI dependencies
-        run: npm --prefix ui ci
-
-      - name: Smoke-build the UI
-        run: bash tools/ui-build.sh
+      # (UI build moved before pytest — the serve tests assert the
+      # rendered site, and since 0.15.0 a missing build serves the
+      # first-run placeholder instead of erroring, which read as a
+      # test failure here. See wiki/brain/adrs/ui-auto-refresh-hook.md.)
