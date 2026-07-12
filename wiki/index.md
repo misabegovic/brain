@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **0.19.3: PR mode + detector teeth.** The
+  operator removed LOCAL_FIRST — every change now lands via PR with
+  CI green. The internal-refs detector reads UI source strings
+  (catching a dangling deck reference immediately) and a
+  machine-local denylist closes the client-term leak class without
+  the terms ever entering the repo.
 - **2026-07-12** — **the repo is public.** The visibility gap on the
   [market-readiness topic](brain/topics/market-readiness-gaps.md)
   closes; security reports now go through GitHub private
