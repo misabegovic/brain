@@ -136,3 +136,7 @@
    diff: 17 files changed, 211 insertions(+), 330 deletions(-)
    restricted-paths: true
    by: claude (fable 5), operator decided removal
+2026-07-12 commit — cd8f31d: 0.14.1 — license Apache-2.0 → MIT (operator direction)
+   diff: 8 files changed, 40 insertions(+), 208 deletions(-)
+   restricted-paths: true
+   by: claude (fable 5), operator picked MIT
