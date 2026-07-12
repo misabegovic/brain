@@ -19,6 +19,7 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 
 | path | title | status | confidence | updated |
 |---|---|---|---|---|
+| brain/adrs/human-legible-presentation-layer.md | The briefing is a build-time derivation; summaries live in frontmatter; attention verdicts live on inbox items | accepted | medium | 2026-07-12 |
 | brain/adrs/mcp-cli-surface.md | The kernel's interaction surfaces are MCP and the CLI — the embedded terminal retires with the chat pane | accepted | medium | 2026-07-12 |
 | brain/adrs/persona-playthrough-loop.md | Playthroughs are executed skills with immutable transcripts; synthetic findings are confidence-capped insights | accepted | medium | 2026-07-12 |
 | brain/adrs/competitor-intel-ingestion.md | Competitor intel lives at wiki/org/competitors/<competitor>/index.md, ingested via the existing wiki-ingest classifier w | accepted | medium | 2026-07-10 |
@@ -28,7 +29,6 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 | brain/adrs/multi-prd-epic-shape.md | Epics are single-page umbrella artifacts with parent_epic linkage, validator-enforced no-umbrella-ADR, epic-aware briefs | accepted | high | 2026-07-10 |
 | brain/adrs/operator-lesson-pattern.md | Operator lessons live as Lessons subsections on conventions pages plus one cross-cutting org page | accepted | medium | 2026-07-10 |
 | brain/adrs/parallel-efforts-on-request.md | Opt-in parallel efforts via a /spawn skill that creates per-effort worktrees and a wiki/_state/efforts/ registry, with e | accepted | medium | 2026-07-10 |
-| brain/adrs/parallel-execution-agent-teams.md | Parallel-first execution: every /spawn dispatches a background owner subagent (opt-out via --no-owner), helper fan-out i | accepted | medium | 2026-07-10 |
 
 ## Research queue (deepening picks)
 

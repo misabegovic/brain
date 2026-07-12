@@ -108,6 +108,20 @@
       "tokens": 1351
     },
     {
+      "path": "brain/adrs/human-legible-presentation-layer.md",
+      "title": "The briefing is a build-time derivation; summaries live in frontmatter; attention verdicts live on inbox items",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-07-12",
+      "confidence": "medium",
+      "summary": "Three bets: executive summaries are a frontmatter field flowing through the views pipeline; the briefing is a dependency-free build-time Astro page over pages.json + inbox + state.md and becomes the app's landing surface; attention judgement is two small verbs on the existing inbox (judge, grade), recorded only in-session.\n",
+      "sources": [
+        "../prds/human-legible-presentation-layer.md",
+        "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md"
+      ],
+      "tokens": 941
+    },
+    {
       "path": "brain/adrs/kernel-manifest-instancing.md",
       "title": "Instances are born by manifest: init --full copies the mechanism and the kernel's decision trail, scaffolds the rest fresh",
       "kind": "decision",
@@ -369,7 +383,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1546,
+      "tokens": 1588,
       "affected_by": [
         "org/competitive-positioning.md",
         "org/competitors/codeplain/index.md"
