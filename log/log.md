@@ -132,3 +132,7 @@
 2026-07-12 commit — 2dabb01: chat-surface-necessity topic opened (operator reconsidering; agent position: remove)
    diff: 6 files changed, 83 insertions(+), 1 deletion(-)
    by: claude (fable 5)
+2026-07-12 commit — 20d43d3: 0.14.0 — chat pane removed (superseding ADR); MCP + CLI + terminal
+   diff: 17 files changed, 211 insertions(+), 330 deletions(-)
+   restricted-paths: true
+   by: claude (fable 5), operator decided removal
