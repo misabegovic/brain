@@ -75,6 +75,24 @@ ATTENTION_VERDICTS = ("needs-operator", "fyi", "routine")
 ATTENTION_GRADES_PATH = WIKI / "_state" / "attention-grades.json"
 
 
+def _local_first(env_path) -> bool:
+    """True only when .env declares LOCAL_FIRST=true on its own line.
+
+    Anchored to match AGENTS.md's canonical test
+    (`grep -q '^LOCAL_FIRST=true$'`) — a substring scan also matches
+    the commented boilerplate in .env.example, which made doctor and
+    /dash report local-first after the operator removed the flag
+    (found by the Viktor daily-operator playthrough, 2026-07-12).
+    """
+    try:
+        for line in env_path.read_text().splitlines():
+            if line.strip() == "LOCAL_FIRST=true":
+                return True
+    except OSError:
+        pass
+    return False
+
+
 def today_utc() -> dt.date:
     """Today's date in UTC.
 
@@ -1145,7 +1163,7 @@ def _render_dash(page_count: int) -> str:
         pass
     env_path = REPO / ".env"
     mode = ("local-first" if env_path.exists()
-            and "LOCAL_FIRST=true" in env_path.read_text() else "PR-gated")
+            and _local_first(env_path) else "PR-gated")
 
     icon = {"ok": "✓", "warn": "−", "fail": "✗"}
     check_rows = ""
@@ -2364,7 +2382,7 @@ def _doctor_checks() -> list[dict]:
 
     env_path = REPO / ".env"
     if env_path.exists():
-        local_first = "LOCAL_FIRST=true" in env_path.read_text()
+        local_first = _local_first(env_path)
         add("env", "operating mode", "ok",
             "local-first (single operator)" if local_first
             else "PR-gated (multi-agent)")
