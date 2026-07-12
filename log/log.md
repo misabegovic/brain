@@ -156,3 +156,7 @@
    diff: 6 files, +101/-3
    restricted-paths: false
    by: claude (fable 5)
+2026-07-12 commit — 93712e8: 0.16.0 — shape(persona-playthrough-loop) Phase 3: build + first walk
+   diff: 21 files, +608/-6
+   restricted-paths: true
+   by: claude (fable 5)
