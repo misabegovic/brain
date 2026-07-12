@@ -200,7 +200,7 @@ export BRAIN_PROJECTS_ROOT="$HOME/work"
 python3 tools/brain.py validate     # frontmatter + section conformance
 python3 tools/brain.py check        # source citations resolve
 python3 tools/brain.py stats        # corpus shape
-python3 tools/brain.py views        # regen wiki/_views/ (by-kind, by-team, by-repo, pages.json, ai-suggestions)
+python3 tools/brain.py views        # regen wiki/_views/ (by-kind/team/repo, pages.json, ai-suggestions, custom role views as reader-facing briefs)
 python3 tools/brain.py search '<q>' # hybrid keyword search
 python3 tools/brain.py status       # single-pane health dashboard
 python3 tools/brain.py inbox summary # the tend queue in one line
