@@ -204,6 +204,8 @@ python3 tools/brain.py views        # regen wiki/_views/ (by-kind, by-team, by-r
 python3 tools/brain.py search '<q>' # hybrid keyword search
 python3 tools/brain.py status       # single-pane health dashboard
 python3 tools/brain.py inbox summary # the tend queue in one line
+python3 tools/brain.py inbox ack <id> # reviewed, no change — suppress a recurring item until the page changes
+python3 tools/brain.py inbox pending-grades # judged attention items awaiting a grade
 python3 tools/brain.py links        # link-graph health (orphans / hubs / suggestions)
 python3 tools/brain.py index --schema # the derived-index schema (for view specs)
 python3 tools/brain.py query '<sql>' # read-only SQL over the index
