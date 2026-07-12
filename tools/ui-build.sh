@@ -34,3 +34,17 @@ npx astro build --outDir .build-cache >/dev/null
 # Pagefind indexes the fresh build so /search/ works everywhere the
 # static site is served.
 npx pagefind --site .build-cache >/dev/null 2>&1 || true
+
+# Trust-banner render-proof (Priya): the AI-suggestion banner is
+# load-bearing trust chrome — verify every built ai-suggestion page
+# actually renders it, so the distinction can't silently regress.
+missing_banner=0
+while IFS= read -r page; do
+  if ! grep -q "AI suggestion." "$page"; then
+    echo "ui-build: ai-suggestion page missing trust banner: $page" >&2
+    missing_banner=1
+  fi
+done < <(find .build-cache -path '*/ai-suggestions/*' -name index.html 2>/dev/null)
+if [ "$missing_banner" = "1" ]; then
+  exit 1
+fi

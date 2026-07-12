@@ -224,3 +224,7 @@
    diff: 16 files, +900/-4
    restricted-paths: false
    by: claude (fable 5)
+2026-07-12 merge — PR #7: Deliver: reader-trust fixes + draft summaries (Priya cluster)
+   diff: 14 files, +180/-40
+   restricted-paths: true
+   by: claude (fable 5)

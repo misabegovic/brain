@@ -26,6 +26,13 @@ start filling in as the slash-command surface runs.
   `Host`-header guard `brain.py serve` uses, so anti-DNS-rebinding
   holds by construction on both. SECURITY.md states each property
   once.
+- **2026-07-12** — **delivered: reader-trust fixes (Priya cluster).**
+  Generated reading lists and the trail now mark superseded status
+  and render human titles instead of raw slugs; custom/role views
+  read like briefs (title links, purpose-first, human empty states,
+  generation note demoted to a footer); a build-time render-proof
+  fails the UI build if any AI-suggestion page loses its trust
+  banner. Three draft summaries fixed.
 - **2026-07-12** — **playthrough sweep: 8 AI-suggestions for review.**
   A three-persona sweep (Viktor / Priya / Sam, six agent runs)
   walked the product and landed eight `confidence: low` drafts under
