@@ -164,3 +164,7 @@
    diff: 7 files, +248/-2
    restricted-paths: false
    by: claude (fable 5)
+2026-07-12 commit — 9bfe2fd: shape(human-legible-presentation-layer) Phase 1: PRD
+   diff: 6 files, +128/-10
+   restricted-paths: false
+   by: claude (fable 5)
