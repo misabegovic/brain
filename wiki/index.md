@@ -18,6 +18,17 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **Priya reading-journeys playthrough.** The
+  non-terminal PM persona walked the rendered site read-only
+  (briefing, decision trace, dashboard/trail/graph, search, PM
+  view, shelf home — transcript at
+  `sources/playthroughs/2026-07-12--priya-non-terminal-pm--reading-journeys.md`).
+  The decision trace passed in two clicks; two findings filed as
+  AI-suggestion PRDs:
+  [status-honest generated reading lists](brain/ai-suggestions/prds/status-honest-generated-reading-lists.md)
+  (Project overview shows superseded ADRs undistinguished) and
+  [role views read like briefs](brain/ai-suggestions/prds/pm-view-reads-like-a-brief.md)
+  (PM view opens in spec-editor voice).
 - **2026-07-12** — **0.19.3: PR mode + detector teeth.** The
   operator removed LOCAL_FIRST — every change now lands via PR with
   CI green. The internal-refs detector reads UI source strings
