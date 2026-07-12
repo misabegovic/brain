@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — first two unattended days: both local timer runs
+  finished clean (1.0 criterion #2: 2/7). Dogfooding finding: the
+  inherited CI cron was a second runner auto-committing divergent
+  state — disarmed to manual-dispatch per the queue-and-tend ADR
+  (amendment recorded). Accumulation committed; inbox honestly
+  empty (grace period).
 - **2026-07-10** — **0.13.1: market-readiness.** Apache-2.0 adopted
   (operator pick); CHANGELOG / CONTRIBUTING / SECURITY / NOTICE;
   `pyproject.toml` packaging; first tagged release; docs-publish

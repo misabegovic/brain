@@ -131,3 +131,13 @@ than only appended, so machine items never go stale in the queue.
   knowledge, never of ink that is still wet. Verification-driven
   promotion to high remains the clearing mechanism for everything
   else.
+
+- **2026-07-12 — one runner, enforced** (dogfooding finding;
+  direction unchanged). The first two unattended days revealed a
+  second runner: the CI cron inherited from the origin deployment
+  woke on push and auto-committed its own state refreshes, diverging
+  from the local timer's output and rejecting the operator-side
+  push — precisely the coordination failure this decision's
+  local-timer-never-CI clause exists to prevent. The workflow is now
+  manual-dispatch only; the local timer is the sole scheduled
+  runner, and committing its accumulation is part of tending.

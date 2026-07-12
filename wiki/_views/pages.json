@@ -188,7 +188,7 @@
         ".claude/skills/tend/SKILL.md",
         "../../../brain-schedule.yml"
       ],
-      "tokens": 1553
+      "tokens": 1685
     },
     {
       "path": "brain/adrs/shape-deepdive-pre-flight.md",

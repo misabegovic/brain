@@ -1,16 +1,14 @@
 name: scheduled
 
-# Per `wiki/brain/ai-suggestions/prds/scheduled-operations-and-tracking.md` § Open
-# questions #1: GitHub Actions cron is the v1 runner. Daily at 06:00 UTC,
-# `brain.py schedule run-due` invokes every enabled operation in
-# brain-schedule.yml. Output JSONs (`wiki/_state/*.json`) are committed back
-# via a follow-up auto-PR for audit trail.
+# Manual-only. Per wiki/brain/adrs/queue-and-tend-inbox.md the
+# accumulation runner is a LOCAL timer, never CI: sibling repos and
+# connector credentials exist only on the operator's machine, and a
+# second runner produces exactly the divergent auto-commits this
+# workflow created on 2026-07-11/12 (see the ADR's amendments).
+# Kept dispatchable for operators who deliberately want a one-off
+# CI-side refresh.
 
 on:
-  schedule:
-    # Daily at 06:00 UTC. Adjust if a specific cadence (weekly /
-    # monthly) per operation matters more than per-day idempotency.
-    - cron: "0 6 * * *"
   workflow_dispatch:
 
 permissions:
