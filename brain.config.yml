@@ -1,0 +1,46 @@
+# brain.config.yml — per-organisation configuration for the brain kernel.
+#
+# The kernel (tools/, .claude/, ui/) reads this file so the code stays
+# content-agnostic. Fill it in when you adopt the shell for a project.
+
+# Human-readable organisation name. Used by docs and the UI title.
+org: ""
+
+# Sibling repos this brain actively tracks. Each entry gets a
+# `wiki/<repo>/` shelf and is valid in `repos:` / `affects:`
+# frontmatter. Resolved on disk under $BRAIN_PROJECTS_ROOT
+# (default: ~/projects/).
+active_repos: []
+
+# Repos that were tracked once and are now archived. Still valid in
+# frontmatter (for history) but excluded from the active corpus.
+archived_repos: []
+
+# Connector configuration (0.3 — snapshot-writers). Each connector is
+# pull-only, no-ops until configured here, and writes immutable
+# dedup-keyed snapshots into sources/<connector>/. Credentials live in
+# .env (read-only-scoped tokens), never in this file.
+connectors:
+  github:
+    # Extra owner/repo slugs to watch. Repos in active_repos are
+    # auto-discovered from their sibling checkouts' origin remotes.
+    repos: []
+  notion:
+    # Page ids or URLs to watch; re-snapshotted when last_edited moves.
+    # Needs NOTION_TOKEN in .env.
+    pages: []
+  slack:
+    # Channel names to pull. Needs SLACK_TOKEN in .env (read-only
+    # scopes: channels:history, channels:read).
+    channels: []
+  datadog:
+    # Datadog site (e.g. datadoghq.com, datadoghq.eu). Empty = off.
+    # Needs DD_API_KEY + DD_APP_KEY in .env; scope the app key to
+    # monitors_read + slos_read.
+    site: ""
+  langfuse:
+    # Langfuse host (e.g. https://cloud.langfuse.com or self-host).
+    # Empty = off. Needs LANGFUSE_PUBLIC_KEY + LANGFUSE_SECRET_KEY in
+    # .env — Langfuse keys are write-capable (no read-only type):
+    # use a dedicated project's keys or self-host.
+    host: ""

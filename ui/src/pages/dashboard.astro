@@ -1,0 +1,165 @@
+---
+// Numbers and graphs over the corpus — dependency-free HTML/SVG
+// computed at build time (presentation-layer ADR amendment).
+import { getCollection } from 'astro:content';
+import App from '../layouts/App.astro';
+import { inboxItems, linkGraph, logActivity, gradeStats, version }
+  from '../lib/data.mjs';
+
+const all = (await getCollection('docs')).filter(
+  (e) => !e.id.startsWith('_'),
+);
+const count = (arr, key) => {
+  const m = new Map();
+  for (const e of arr) {
+    const k = key(e) ?? '—';
+    m.set(k, (m.get(k) ?? 0) + 1);
+  }
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+};
+const byKind = count(all, (e) => e.data.kind);
+const byStatus = count(all, (e) => e.data.status);
+const byConfidence = count(all, (e) => e.data.confidence);
+const maxKind = Math.max(...byKind.map(([, n]) => n));
+const maxStatus = Math.max(...byStatus.map(([, n]) => n));
+const maxConf = Math.max(...byConfidence.map(([, n]) => n));
+
+const stale = all.filter((e) => {
+  if (['superseded', 'archived'].includes(e.data.status ?? '')) return false;
+  const u = e.data.updated;
+  if (!u) return false;
+  const d = typeof u === 'string' ? new Date(u) : u;
+  return (Date.now() - d.getTime()) / 86400000 > 30;
+}).length;
+
+const items = inboxItems();
+const graph = linkGraph();
+const orphans = graph.files.filter(
+  (f) => graph.inbound[f] === 0 && !f.endsWith('index.md'),
+).length;
+const hubs = Object.entries(graph.inbound)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 5);
+const activity = logActivity(30);
+const maxAct = Math.max(1, ...activity.series.map((s) => s.n));
+const grades = gradeStats();
+// Judged attention items not yet graded — the calibration to-do
+// (Viktor attention-calibration finding).
+const gradedIds = new Set(grades.ids ?? []);
+const pendingGrades = inboxItems().filter(
+  (i) => i.attention && !gradedIds.has(i.id),
+).length;
+
+// sparkline path (SVG, 300x48)
+const W = 300, H = 48;
+const step = W / Math.max(1, activity.series.length - 1);
+const points = activity.series
+  .map((s, i) => `${(i * step).toFixed(1)},${(H - 4 - (s.n / maxAct) * (H - 8)).toFixed(1)}`)
+  .join(' ');
+const pageHref = (f) => '/' + f.replace(/\.md$/, '').replace(/\/index$/, '').replace(/^index$/, 'home') + '/';
+---
+<App title="Dashboard" description="Corpus health in numbers.">
+  <h1 style="font-size:1.4em; margin:.2rem 0 .1rem;">Dashboard</h1>
+  <p style="margin:0 0 1.2rem; color:var(--muted);">
+    The corpus in numbers · v{version()}
+  </p>
+
+  <div class="stats">
+    <div class="stat"><b>{all.length}</b><span>pages</span></div>
+    <div class="stat"><b>{graph.edges.length}</b><span>links</span></div>
+    <div class="stat"><b>{orphans}</b><span>orphans</span></div>
+    <div class="stat"><b>{stale}</b><span>pages &gt;30d old</span></div>
+    <div class="stat"><b>{items.length}</b><span>inbox pending</span></div>
+    <div class="stat"><b>{activity.total}</b><span>audited ops</span></div>
+    <div class="stat">
+      <b>{grades.useful + grades.noise === 0
+        ? '—'
+        : Math.round((grades.useful / (grades.useful + grades.noise)) * 100) + '%'}</b>
+      <span>verdicts useful{grades.useful + grades.noise > 0
+        ? ` (n=${grades.useful + grades.noise})` : ' — no grades yet'}</span>
+    </div>
+    <div class="stat"><b>{pendingGrades}</b>
+      <span>judged, awaiting your grade</span></div>
+  </div>
+
+  <div class="panels">
+    <section>
+      <h2>Activity — audited operations, last 30 days</h2>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none"
+           style="width:100%; height:4rem;">
+        <polyline points={points} fill="none" stroke="var(--accent)"
+                  stroke-width="1.8" />
+      </svg>
+    </section>
+
+    <section>
+      <h2>Pages by kind</h2>
+      {byKind.map(([k, n]) => (
+        <div class="bar">
+          <span class="lbl">{k}</span>
+          <span class="track"><i style={`width:${(n / maxKind) * 100}%`}></i></span>
+          <span class="n">{n}</span>
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2>Pages by status</h2>
+      {byStatus.map(([k, n]) => (
+        <div class="bar">
+          <span class="lbl">{k}</span>
+          <span class="track"><i style={`width:${(n / maxStatus) * 100}%`}></i></span>
+          <span class="n">{n}</span>
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2>Pages by confidence</h2>
+      {byConfidence.map(([k, n]) => (
+        <div class="bar">
+          <span class="lbl">{k}</span>
+          <span class="track"><i style={`width:${(n / maxConf) * 100}%`}></i></span>
+          <span class="n">{n}</span>
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2>Most-linked pages (hubs)</h2>
+      <ol class="hubs">
+        {hubs.map(([f, n]) => (
+          <li><a href={pageHref(f)}>{f.replace(/\.md$/, '')}</a>
+            <span class="chip">{n} inbound</span></li>
+        ))}
+      </ol>
+    </section>
+  </div>
+</App>
+
+<style>
+  .stats {
+    display: grid; gap: .6rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(9.5rem, 100%), 1fr));
+    margin-bottom: 1.4rem;
+  }
+  .stat {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: .7rem; padding: .7rem .9rem;
+  }
+  .stat b { display: block; font-size: 1.6em; line-height: 1.1; }
+  .stat span { color: var(--muted); font-size: .82em; }
+  .panels { display: grid; gap: 1.2rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); }
+  section h2 { font-size: .95em; margin: 0 0 .5rem; }
+  .bar { display: flex; align-items: center; gap: .5rem;
+    margin: .25rem 0; font-size: .88em; }
+  .bar .lbl { flex: 0 0 6.5rem; color: var(--muted); text-align: right; }
+  .bar .track { flex: 1; background: var(--chip); border-radius: 99px;
+    height: .55rem; overflow: hidden; }
+  .bar .track i { display: block; height: 100%; background: var(--accent);
+    border-radius: 99px; }
+  .bar .n { flex: 0 0 2rem; color: var(--muted); }
+  .hubs { margin: 0; padding-left: 1.2rem; font-size: .9em; }
+  .hubs li { margin: .3rem 0; }
+</style>

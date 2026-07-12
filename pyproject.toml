@@ -1,0 +1,32 @@
+# Packaging for the brain kernel. The repo itself is the artifact —
+# a brain lives as a checkout (or a born instance) because the CLI
+# resolves everything relative to the repository root. This manifest
+# makes `pip install -e .` provide the `brain` console script per
+# checkout (editable installs only, by design), and gives releases
+# canonical metadata.
+[project]
+name = "brain-kernel"
+description = "An LLM-maintained knowledge substrate: governed markdown wiki, queue-and-tend self-maintenance, connectors, composable SQL views, MCP serving, and a chat-first workbench."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+authors = [{ name = "Muhamed Isabegovic" }]
+dependencies = ["pyyaml>=6"]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+full = ["tiktoken", "datasette", "pytest"]
+
+[project.scripts]
+brain = "tools.brain:main"
+
+[tool.setuptools]
+packages = ["tools"]
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"

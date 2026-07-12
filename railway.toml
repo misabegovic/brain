@@ -1,0 +1,13 @@
+# Railway — reference deployment target (single instance). The image
+# is infra-agnostic (see deploy/); Railway just builds and runs it.
+# Pick the public surface with BRAIN_SURFACE (ui | mcp | datasette);
+# Railway injects PORT. Put access control in front (Railway private
+# networking + your identity-aware proxy) — the brain's serving
+# processes are read-only and carry no auth of their own.
+[build]
+builder = "dockerfile"
+dockerfilePath = "deploy/Dockerfile"
+
+[deploy]
+healthcheckPath = "/"
+restartPolicyType = "on_failure"

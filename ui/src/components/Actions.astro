@@ -1,0 +1,88 @@
+---
+// The interactive channel (presentation-layer ADR amendment): both
+// actions POST to the local server's /api/act, which queues a normal
+// inbox item for the next tend session. On a static/serving
+// deployment the POST fails and the UI says so — the channel is
+// local-only by construction.
+interface Props {
+  target: string; // wiki page path or inbox item id
+}
+const { target } = Astro.props;
+---
+<div class="actions" data-target={target}>
+  <button type="button" class="act-execute" title="Queue for the agent">
+    ⚑ queue
+  </button>
+  <details>
+    <summary>💬 comment</summary>
+    <form class="act-comment">
+      <textarea rows="2" placeholder="For the agent — lands in the tend queue"
+        required></textarea>
+      <button type="submit">send</button>
+    </form>
+  </details>
+  <span class="act-status" role="status"></span>
+</div>
+
+<style>
+  .actions {
+    display: flex; gap: .5rem; align-items: baseline; flex-wrap: wrap;
+    font-size: .82em; margin-top: .15rem;
+  }
+  .actions button {
+    font: inherit; color: var(--muted); background: var(--chip);
+    border: 0; border-radius: 99px; padding: .1rem .6rem; cursor: pointer;
+  }
+  .actions button:hover { color: var(--fg); }
+  .actions summary {
+    cursor: pointer; color: var(--muted); list-style: none;
+    background: var(--chip); border-radius: 99px; padding: .1rem .6rem;
+    display: inline-block;
+  }
+  .actions summary::-webkit-details-marker { display: none; }
+  .actions details[open] { flex-basis: 100%; }
+  .actions form { display: flex; gap: .4rem; margin-top: .35rem; }
+  .actions textarea {
+    flex: 1; font: inherit; background: var(--bg-soft); color: var(--fg);
+    border: 1px solid var(--line); border-radius: .45rem; padding: .35rem .5rem;
+  }
+  .act-status { color: var(--ok); }
+  .act-status.err { color: var(--alert); }
+</style>
+
+<script is:inline>
+  if (!window.__brainAct) {
+    window.__brainAct = true;
+    async function act(root, action, note) {
+      const status = root.querySelector('.act-status');
+      try {
+        const r = await fetch('/api/act', {
+          method: 'POST',
+          headers: { 'X-Brain-Act': '1', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, target: root.dataset.target, note }),
+        });
+        if (!r.ok) throw new Error();
+        const d = await r.json();
+        status.textContent = `queued for the agent (${d.queued})`;
+        status.classList.remove('err');
+        const det = root.querySelector('details');
+        if (det) det.open = false;
+      } catch {
+        status.textContent = 'not available here (read-only deployment?)';
+        status.classList.add('err');
+      }
+    }
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('.act-execute');
+      if (b) act(b.closest('.actions'), 'execute', '');
+    });
+    document.addEventListener('submit', (e) => {
+      const f = e.target.closest('.act-comment');
+      if (!f) return;
+      e.preventDefault();
+      const root = f.closest('.actions');
+      act(root, 'comment', f.querySelector('textarea').value.trim());
+      f.querySelector('textarea').value = '';
+    });
+  }
+</script>

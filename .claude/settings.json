@@ -1,0 +1,109 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mempalace search:*)",
+      "Bash(mempalace status)",
+      "Bash(mempalace status:*)",
+      "Bash(mempalace wake-up)",
+      "Bash(mempalace wake-up:*)",
+      "Bash(mempalace mine:*)",
+      "Bash(mempalace split:*)",
+      "Bash(/home/muhamed/.local/share/mempalace-venv/bin/python3 tools/brain.py:*)",
+      "Bash(python3 tools/brain.py:*)",
+      "Bash(python tools/brain.py:*)",
+      "Bash(tools/brain:*)",
+      "Bash(./tools/brain:*)",
+      "Bash(brain:*)",
+      "Bash(python3 tools/brain-mcp.py:*)",
+      "Bash(tools/sync-siblings.sh:*)",
+      "Bash(./tools/sync-siblings.sh:*)",
+      "Bash(bash tools/sync-siblings.sh:*)",
+      "Bash(tools/ui-build.sh:*)",
+      "Bash(./tools/ui-build.sh:*)",
+      "Bash(bash tools/ui-build.sh:*)",
+      "Bash(tools/home-staleness.sh:*)",
+      "Bash(./tools/home-staleness.sh:*)",
+      "Bash(bash tools/home-staleness.sh:*)",
+      "Bash(tools/preflight.sh)",
+      "Bash(./tools/preflight.sh)",
+      "Bash(bash tools/preflight.sh)",
+      "Bash(gh:*)"
+    ],
+    "deny": [
+      "mcp__claude_ai_Notion__notion-create-pages",
+      "mcp__claude_ai_Notion__notion-create-database",
+      "mcp__claude_ai_Notion__notion-create-comment",
+      "mcp__claude_ai_Notion__notion-create-view",
+      "mcp__claude_ai_Notion__notion-update-page",
+      "mcp__claude_ai_Notion__notion-update-data-source",
+      "mcp__claude_ai_Notion__notion-update-view",
+      "mcp__claude_ai_Notion__notion-duplicate-page",
+      "mcp__claude_ai_Notion__notion-move-pages"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "brain"
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command // empty' 2>/dev/null); case \"$cmd\" in *\"git push\"*|*\"gh pr create\"*) root=$(git rev-parse --show-toplevel 2>/dev/null || echo .); script=\"$root/tools/preflight.sh\"; if [ -x \"$script\" ]; then \"$script\" >&2 || { echo \"preflight blocked: $cmd\" >&2; exit 2; }; fi ;; esac; exit 0"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r \".tool_input.file_path // .tool_response.filePath // empty\" 2>/dev/null); if [ -n \"$f\" ] && echo \"$f\" | grep -q \"/wiki/\"; then python3 tools/brain.py lint-page \"$f\" 2>/dev/null || true; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r \".tool_input.file_path // .tool_response.filePath // empty\" 2>/dev/null); if [ -n \"$f\" ] && echo \"$f\" | grep -q \"/wiki/\"; then bash tools/ui-build.sh; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash tools/home-staleness.sh post"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash tools/home-staleness.sh stop"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 tools/brain.py inbox summary 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}
