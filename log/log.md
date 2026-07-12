@@ -129,3 +129,6 @@
    diff: 4 files changed, 24 insertions(+), 10 deletions(-)
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — 2dabb01: chat-surface-necessity topic opened (operator reconsidering; agent position: remove)
+   diff: 6 files changed, 83 insertions(+), 1 deletion(-)
+   by: claude (fable 5)
