@@ -180,3 +180,7 @@
    diff: 43 files, +263/-0
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — fbcfd3b: build(presentation-layer) slice B: the UI rewrite
+   diff: 24 files, +715/-1541
+   restricted-paths: true
+   by: claude (fable 5)
