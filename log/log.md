@@ -188,3 +188,7 @@
    diff: 16 files, +189/-35
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 commit — 8103aa2: 0.18.0 — the briefing becomes two-way; presentation bet closes
+   diff: 25 files, +890/-29
+   restricted-paths: true
+   by: claude (fable 5)
