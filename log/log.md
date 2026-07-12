@@ -208,3 +208,7 @@
    diff: 7 files, +30/-6
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 merge — PR #1: 0.19.3 — standalone-guarantee detectors; PR mode begins
+   diff: 11 files, +144/-10
+   restricted-paths: true
+   by: claude (fable 5)
