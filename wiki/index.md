@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-12** — **pitch on the table: human-legible presentation
+  layer.** Big appetite, awaiting the operator's bet
+  ([pitch](brain/pitches/human-legible-presentation-layer.md)):
+  Shape Up-native opinionated UI, attention triage in the tend
+  loop, summaries as schema. The Ruby/Rust rewrite question was
+  answered no in the same conversation (capture cited in the
+  pitch).
 - **2026-07-12** — **0.16.0: the persona playthrough loop.** User
   personas for the brain-as-product
   ([PRD](brain/prds/persona-playthrough-loop.md) ·

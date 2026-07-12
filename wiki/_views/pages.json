@@ -369,7 +369,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 1448,
+      "tokens": 1510,
       "affected_by": [
         "org/competitive-positioning.md",
         "org/competitors/codeplain/index.md"
@@ -425,6 +425,20 @@
         "../adrs/sql-views-over-derived-index.md"
       ],
       "tokens": 951
+    },
+    {
+      "path": "brain/pitches/human-legible-presentation-layer.md",
+      "title": "Human-legible presentation layer \u2014 an opinionated, Shape Up-native UI that triages attention",
+      "kind": "pitch",
+      "status": "draft",
+      "updated": "2026-07-12",
+      "appetite": "big",
+      "confidence": "medium",
+      "sources": [
+        "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md",
+        "../../insights/quickstart-third-command-fragility.md"
+      ],
+      "tokens": 1787
     },
     {
       "path": "brain/pitches/instance-birth.md",

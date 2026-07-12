@@ -27,7 +27,9 @@ Committed work, proposals awaiting a bet, patterns from feedback, and what's que
 
 ## Pitches awaiting a bet
 
-*(no rows)*
+| path | title | status | confidence | updated |
+|---|---|---|---|---|
+| brain/pitches/human-legible-presentation-layer.md | Human-legible presentation layer — an opinionated, Shape Up-native UI that triages attention | draft | medium | 2026-07-12 |
 
 ## Insights
 

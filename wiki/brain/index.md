@@ -66,6 +66,11 @@ sanitized to organisation-agnostic form:
 
 ## Pitches (pre-bet)
 
+- [Human-legible presentation layer](pitches/human-legible-presentation-layer.md)
+  — **awaiting a bet** (big appetite): opinionated Shape Up-native
+  UI — summaries as schema, the partner's briefing home, lifecycle
+  components, attention judgement in the tend loop.
+
 - [Persona playthrough loop](pitches/persona-playthrough-loop.md) —
   **superseded** 2026-07-12: graduated same-day on the operator's
   bet ("shape it and then build it").
