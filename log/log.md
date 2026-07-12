@@ -140,3 +140,7 @@
    diff: 8 files changed, 40 insertions(+), 208 deletions(-)
    restricted-paths: true
    by: claude (fable 5), operator picked MIT
+2026-07-12 commit — a4a0b54: 0.14.2 — README for cold-start readers + quickstart made true
+   diff: 5 files, +97/-36
+   restricted-paths: true
+   by: claude (fable 5)
