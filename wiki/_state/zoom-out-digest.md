@@ -1,12 +1,12 @@
 ---
-title: "Brain zoom-out digest — 2026-07-11"
+title: "Brain zoom-out digest — 2026-07-12"
 kind: meta
 status: living
-updated: 2026-07-11
+updated: 2026-07-12
 sources: []
 ---
 
-# Brain zoom-out digest — 2026-07-11
+# Brain zoom-out digest — 2026-07-12
 
 
 ## Recent log entries (this month, last 30)
