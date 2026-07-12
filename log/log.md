@@ -220,3 +220,7 @@
    diff: 6 files, +52/-5
    restricted-paths: true
    by: claude (fable 5)
+2026-07-12 merge — PR #6: Playthrough sweep — 8 AI-suggestions from 3 personas (drafts for review)
+   diff: 16 files, +900/-4
+   restricted-paths: false
+   by: claude (fable 5)
