@@ -1,19 +1,16 @@
 ---
-title: "Brain zoom-out digest — 2026-07-12"
+title: "Brain zoom-out digest — 2026-07-13"
 kind: meta
 status: living
-updated: 2026-07-12
+updated: 2026-07-13
 sources: []
 ---
 
-# Brain zoom-out digest — 2026-07-12
+# Brain zoom-out digest — 2026-07-13
 
 
 ## Recent log entries (this month, last 30)
 
-2026-07-12 tend — first two unattended timer runs committed (views drift, overlap reports, digest); inbox empty
-2026-07-12 commit — bcf1d98: tend — unattended-run accumulation landed
-2026-07-12 commit — ff875f0: CI cron disarmed (one-runner enforcement; queue-and-tend amendment 2)
 2026-07-12 commit — 2dabb01: chat-surface-necessity topic opened (operator reconsidering; agent position: remove)
 2026-07-12 commit — 20d43d3: 0.14.0 — chat pane removed (superseding ADR); MCP + CLI + terminal
 2026-07-12 commit — cd8f31d: 0.14.1 — license Apache-2.0 → MIT (operator direction)
@@ -41,6 +38,9 @@ sources: []
 2026-07-12 merge — PR #7: Deliver: reader-trust fixes + draft summaries (Priya cluster)
 2026-07-12 merge — PR #8: Deliver: serving-mode hardening (Sam security cluster)
 2026-07-12 merge — PR #9: Deliver: operator-trust fixes (Viktor cluster)
+2026-07-12 commit — (squash): graduate 8 playthrough drafts to approved shelves; purge competitor + origin-client references for the public repo
+2026-07-12 merge — PR #10: Wire the no-personal-data guard into the harness
+2026-07-12 merge — PR #11: Simplify the PR template to a plain-English executive summary
 
 ## AI-suggestion backlog (0 pending review)
 
