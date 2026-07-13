@@ -114,7 +114,12 @@ sanitized to organisation-agnostic form:
 
 ## AI suggestions (drafts for human review)
 
-*(none pending — the 2026-07-12 playthrough sweep's eight suggestions
+- [A conversation surface over the inbox](ai-suggestions/prds/conversation-surface-over-inbox.md)
+  — Slack-shaped async channels (topics as channels, inbox as
+  messages, replies during tend); explicitly *not* the removed chat
+  pane. Operator-requested 2026-07-13, awaiting review.
+
+*(the 2026-07-12 playthrough sweep's eight suggestions
 were all reviewed, delivered, and graduated to the ADR/PRD shelves
 below; see the trail.)*
 

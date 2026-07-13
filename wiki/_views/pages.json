@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-12",
+  "generated": "2026-07-13",
   "home_sections": [
     {
       "anchor": "what-changed",
@@ -416,6 +416,29 @@
       "tokens": 1756
     },
     {
+      "path": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "title": "A conversation surface over the inbox \u2014 Slack-shaped channels for talking to the agent through the brain, asynchronously",
+      "kind": "initiative",
+      "status": "suggested",
+      "ai_suggestion": true,
+      "updated": "2026-07-13",
+      "team": "(inferred)",
+      "division": "(inferred)",
+      "repos": [
+        "brain"
+      ],
+      "appetite": "big",
+      "confidence": "low",
+      "summary": "A threaded, async surface where you post to a channel (a topic) or comment on a page and the agent replies during the next tend \u2014 with an Activity tab for what needs you and reminders for follow-ups. Not live chat (that stays the harness); it's the inbox write-channel grown into threads, reusing topics, attention verdicts, and the briefing.\n",
+      "sources": [
+        "../../../../sources/conversations/2026-07-13--slack-shaped-conversation-surface.md",
+        "../../adrs/mcp-cli-surface.md",
+        "../../topics/chat-surface-necessity.md",
+        "../../adrs/human-legible-presentation-layer.md"
+      ],
+      "tokens": 1967
+    },
+    {
       "path": "brain/authoring-adrs-and-prds.md",
       "title": "Authoring ADRs and PRDs",
       "kind": "meta",
@@ -438,7 +461,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2021
+      "tokens": 2087
     },
     {
       "path": "brain/pitches/chat-first-app.md",

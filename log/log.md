@@ -248,3 +248,7 @@
    diff: 4 files, +30/-25
    restricted-paths: true
    by: claude (fable 5)
+2026-07-13 merge — PR #12: AI-suggestion: an async conversation surface over the inbox
+   diff: 4 files, +180/-2
+   restricted-paths: false
+   by: claude (fable 5)

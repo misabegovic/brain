@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-13** — **AI-suggestion: an async conversation surface.**
+  On the operator's Slack-shaped-UI question, a draft
+  ([suggestion](brain/ai-suggestions/prds/conversation-surface-over-inbox.md))
+  proposes threaded channels over the existing inbox — topics as
+  channels, replies during tend, an Activity tab — explicitly *not*
+  the chat pane the brain removed twice. `confidence: low`, awaiting
+  review.
 - **2026-07-12** — **personal-data guard wired into the harness.** A
   `commit-msg` git hook + a `/pr` check
   ([`brain.py check-no-personal-data`], [ADR](brain/adrs/no-personal-data-in-public-artifacts.md))

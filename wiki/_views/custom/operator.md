@@ -2,7 +2,7 @@
 title: "Operator view"
 kind: meta
 status: living
-updated: 2026-07-12
+updated: 2026-07-13
 confidence: high
 sources:
   - ../../../views/operator.yml

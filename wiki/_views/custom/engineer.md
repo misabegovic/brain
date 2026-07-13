@@ -2,7 +2,7 @@
 title: "Engineer view"
 kind: meta
 status: living
-updated: 2026-07-12
+updated: 2026-07-13
 confidence: high
 sources:
   - ../../../views/engineer.yml
@@ -34,7 +34,7 @@ No deepening picks queued — the link-health producer adds them.
 
 | path | confidence | inbound |
 |---|---|---|
-| brain/adrs/mcp-cli-surface.md | medium | 5 |
+| brain/adrs/mcp-cli-surface.md | medium | 6 |
 | brain/adrs/multi-prd-epic-shape.md | high | 4 |
 | brain/adrs/queue-and-tend-inbox.md | high | 4 |
 | brain/adrs/successor-ssg-for-ui.md | high | 4 |
