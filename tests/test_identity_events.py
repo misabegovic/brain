@@ -208,3 +208,100 @@ def test_local_mode_unchanged_no_events(monkeypatch, tmp_path):
     monkeypatch.delenv("BRAIN_HOSTED", raising=False)
     assert brain.hosted_mode() is False
     assert not brain.EVENTS_DIR.exists()
+
+
+# --- child 2: owner-subscription wake --------------------------------
+
+def test_subscriptions_fold_and_unsubscribe(monkeypatch, tmp_path):
+    _isolate(monkeypatch, tmp_path)
+    brain.agent_key_issue("prod")
+    brain.subscribe("prod", "repo:*", "http://8.8.8.8/hook")
+    subs = brain._active_subscriptions()
+    assert subs == [{"agent": "prod", "pattern": "repo:*",
+                     "wake_url": "http://8.8.8.8/hook"}]
+    # Empty URL unsubscribes.
+    brain.subscribe("prod", "repo:*", "")
+    assert brain._active_subscriptions() == []
+
+
+def test_match_globs_ref(monkeypatch, tmp_path):
+    _isolate(monkeypatch, tmp_path)
+    brain.agent_key_issue("prod")
+    brain.subscribe("prod", "repo:*", "http://8.8.8.8/h")
+    assert brain._match_subscriptions({"kind": "drift", "ref": "repo:brain"})
+    assert not brain._match_subscriptions({"kind": "post", "ref": "channel:x"})
+    # A subscribe event never triggers a wake.
+    assert brain._match_subscriptions({"kind": "subscribe", "ref": "repo:brain"}) == []
+
+
+def test_ssrf_guard(monkeypatch):
+    monkeypatch.delenv("BRAIN_WAKE_ALLOW_LOOPBACK", raising=False)
+    assert brain._wake_url_ok("http://8.8.8.8/h") is True
+    assert brain._wake_url_ok("file:///etc/passwd") is False
+    assert brain._wake_url_ok("http://127.0.0.1/h") is False
+    assert brain._wake_url_ok("http://169.254.169.254/latest") is False  # metadata
+    assert brain._wake_url_ok("http://10.0.0.5/h") is False
+    # Loopback opt-in relaxes ONLY loopback, never metadata/private.
+    monkeypatch.setenv("BRAIN_WAKE_ALLOW_LOOPBACK", "1")
+    assert brain._wake_url_ok("http://127.0.0.1/h") is True
+    assert brain._wake_url_ok("http://169.254.169.254/latest") is False
+    assert brain._wake_url_ok("http://10.0.0.5/h") is False
+
+
+def test_deliver_wakes_end_to_end(monkeypatch, tmp_path):
+    import http.server
+    import threading
+    import time
+    _isolate(monkeypatch, tmp_path)
+    monkeypatch.setenv("BRAIN_WAKE_ALLOW_LOOPBACK", "1")
+    got = []
+
+    class _Hook(http.server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            n = int(self.headers.get("Content-Length", 0))
+            got.append(json.loads(self.rfile.read(n)))
+            self.send_response(200)
+            self.end_headers()
+
+        def log_message(self, *a):
+            pass
+
+    srv = http.server.HTTPServer(("127.0.0.1", 0), _Hook)
+    port = srv.server_address[1]
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        secret = brain.agent_key_issue("prod")
+        brain.agent_key_issue("connector")
+        brain.subscribe("prod", "repo:*", f"http://127.0.0.1:{port}/hook")
+
+        ev = brain.event_emit("connector", "drift", "repo:brain")
+        assert brain.deliver_wakes(ev) == 1
+        time.sleep(0.3)
+        assert len(got) == 1
+        w = got[0]
+        assert w["seq"] == ev["seq"] and w["ref"] == "repo:brain"
+        # The hint is signed with the subscriber's key (proves it came
+        # from the boundary), and carries no payload.
+        expected = hmac.new(bytes.fromhex(secret),
+                            f"wake:{w['seq']}:{w['ref']}".encode(),
+                            hashlib.sha256).hexdigest()
+        assert hmac.compare_digest(expected, w["sig"])
+        assert "message" not in w and "note" not in w
+
+        # A non-matching event wakes nobody.
+        ev2 = brain.event_emit("connector", "post", "channel:x")
+        assert brain.deliver_wakes(ev2) == 0
+    finally:
+        srv.shutdown()
+
+
+def test_wake_refused_to_unsafe_url(monkeypatch, tmp_path):
+    _isolate(monkeypatch, tmp_path)
+    monkeypatch.delenv("BRAIN_WAKE_ALLOW_LOOPBACK", raising=False)
+    brain.agent_key_issue("prod")
+    brain.agent_key_issue("connector")
+    # Subscribe with a loopback URL; without the opt-in the guard refuses
+    # to POST, so nobody is woken (the cursor remains the backstop).
+    brain.subscribe("prod", "repo:*", "http://127.0.0.1:9/hook")
+    ev = brain.event_emit("connector", "drift", "repo:brain")
+    assert brain.deliver_wakes(ev) == 0

@@ -26,6 +26,23 @@ into the sections below.
 
 ## Now
 
+- **The event-driven loop is closed — owner-subscription wake ships
+  (0.28.0, 2026-07-14).** The [event-driven epic](epics/event-driven-agent-triggers.md)
+  is complete. An agent subscribes to a thread, repo, or producer
+  (`subscribe --agent --pattern --wake-url`, a signed subscribe event on
+  the child-1 stream); when a matching event lands, the hosted tier
+  wakes the owner with a **webhook hint** — the event's seq + ref,
+  signed with the subscriber's own key, never a payload — fired off the
+  request path in a daemon thread. An **SSRF guard** vets every
+  agent-supplied URL (rejects loopback/private/link-local/reserved and
+  non-http(s); refused the cloud-metadata endpoint in tests;
+  `BRAIN_WAKE_ALLOW_LOOPBACK=1` relaxes only loopback for same-host
+  dev). Delivery is at-least-once and best-effort — a failed webhook is
+  logged and dropped, and the per-agent cursor catches the agent up on
+  its next read. Fan-out capped at 32/event; the wake never invokes the
+  agent; local-first has no subscriptions and fires nothing. An agent's
+  action now wakes the agents who care, end to end.
+
 - **Per-agent identity + a signed event stream ship (0.27.0,
   2026-07-14).** The first build of the [event-driven epic](epics/event-driven-agent-triggers.md)
   — the agentic-future backbone. A hosted brain (`BRAIN_HOSTED=1`) now

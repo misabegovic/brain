@@ -24,11 +24,11 @@ Kernel decisions ported from the origin deployment on 2026-07-10,
 sanitized to organisation-agnostic form:
 
 - [Owner-subscription wake via signed subscribe events and guarded webhooks](adrs/owner-subscription-wake.md)
-  — **living** (child 2 of the [event-driven epic](epics/event-driven-agent-triggers.md)):
+  — **built 0.28.0** (child 2 of the [event-driven epic](epics/event-driven-agent-triggers.md)):
   subscriptions are signed subscribe events; a matching append POSTs a
   signed hint (seq + ref) to the owner's URL through an SSRF guard,
-  capped per event, with the cursor as the at-least-once backstop.
-  Awaiting the build.
+  capped per event, with the cursor as the at-least-once backstop. Closes
+  the loop.
 - [Per-agent identity on a signed, append-only event stream](adrs/per-agent-identity.md)
   — **built 0.27.0** (child of the [event-driven epic](epics/event-driven-agent-triggers.md)):
   per-agent HMAC keys, signed events on an append-only stream under
@@ -62,12 +62,11 @@ sanitized to organisation-agnostic form:
 ## Epics (bet-on umbrellas)
 
 - [Event-driven triggers for multi-agent work](epics/event-driven-agent-triggers.md)
-  — **bet placed 2026-07-14.** An event-driven backbone for multi-agent
-  work: an agent's action wakes the agents who care via a read-side
-  fan-out over the brain's existing records (notify is a wake hint,
-  never a scheduler). Children in dependency order: per-agent identity
-  first (the one new component hosting forces, also resolves the
-  event-fan-out substrate), then owner-subscription wake.
+  — **complete 2026-07-14** (both children shipped; superseded → state.md).
+  The event-driven backbone: an agent's action wakes the agents who care.
+  Child 1 — per-agent identity + signed event stream (0.27.0); child 2 —
+  owner-subscription wake via guarded webhooks (0.28.0). The loop is
+  closed.
 
 ## Pitches (pre-bet) — awaiting a bet
 
@@ -130,10 +129,10 @@ sanitized to organisation-agnostic form:
 ## PRDs
 
 - [Owner-subscription wake](prds/owner-subscription-wake.md)
-  — **living** (child 2 of the
+  — **superseded** (built 0.28.0; child 2 of the
   [event-driven epic](epics/event-driven-agent-triggers.md)): subscribe
   to a thread/repo/producer and a matching event wakes the owner via a
-  guarded webhook. Awaiting the build.
+  guarded webhook. The loop is closed. See state.md § Now.
 - [Per-agent identity for a hosted brain](prds/per-agent-identity.md)
   — **superseded** (built 0.27.0; child of the
   [event-driven epic](epics/event-driven-agent-triggers.md)): the

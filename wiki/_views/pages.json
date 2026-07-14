@@ -219,7 +219,7 @@
       "path": "brain/adrs/owner-subscription-wake.md",
       "title": "Owner-subscription wake via signed subscribe events and guarded webhooks",
       "kind": "decision",
-      "status": "draft",
+      "status": "living",
       "updated": "2026-07-14",
       "team": "brain kernel",
       "division": "(brain)",
@@ -234,7 +234,7 @@
         "../adrs/per-agent-identity.md",
         "../epics/event-driven-agent-triggers.md"
       ],
-      "tokens": 1013
+      "tokens": 1391
     },
     {
       "path": "brain/adrs/parallel-efforts-on-request.md",
@@ -549,7 +549,8 @@
       "path": "brain/epics/event-driven-agent-triggers.md",
       "title": "Event-driven triggers for multi-agent work",
       "kind": "epic",
-      "status": "living",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
       "updated": "2026-07-14",
       "team": "brain kernel",
       "division": "(brain)",
@@ -564,7 +565,7 @@
         "../adrs/queue-and-tend-inbox.md",
         "../adrs/connector-snapshot-contract.md"
       ],
-      "tokens": 1264,
+      "tokens": 1388,
       "child_prds": [
         "brain/prds/owner-subscription-wake.md",
         "brain/prds/per-agent-identity.md"
@@ -584,7 +585,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 3004
+      "tokens": 3017
     },
     {
       "path": "brain/pitches/chat-first-app.md",
@@ -816,7 +817,8 @@
       "path": "brain/prds/owner-subscription-wake.md",
       "title": "Owner-subscription wake \u2014 the headline agentic win",
       "kind": "initiative",
-      "status": "living",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
       "updated": "2026-07-14",
       "team": "brain kernel",
       "division": "(brain)",
@@ -980,7 +982,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 4152
+      "tokens": 4437
     },
     {
       "path": "brain/topics/chat-surface-necessity.md",
