@@ -340,3 +340,7 @@
    diff: 11 files, +520/-2
    restricted-paths: true
    by: claude (fable 5)
+2026-07-14 merge — PR #33: Refresh the README and onboarding deck to current state
+   diff: 2 files, +60/-16
+   restricted-paths: false
+   by: claude (fable 5)
