@@ -236,6 +236,11 @@
       "provenance": "inferred"
     },
     {
+      "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "target": "brain/state.md",
+      "provenance": "extracted"
+    },
+    {
       "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
       "target": "brain/prds/attention-calibration-operator-surface.md",
       "provenance": "inferred"

@@ -442,8 +442,9 @@
       "path": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
       "title": "Ground the brain's architecture 'Now' against a deterministic structure extractor \u2014 Enola as reference implementation",
       "kind": "initiative",
-      "status": "suggested",
+      "status": "superseded",
       "ai_suggestion": true,
+      "superseded_by": "brain/state.md",
       "updated": "2026-07-14",
       "team": "(inferred)",
       "division": "(inferred)",
@@ -460,7 +461,7 @@
         "../../adrs/queue-and-tend-inbox.md",
         "../../adrs/sql-views-over-derived-index.md"
       ],
-      "tokens": 1863
+      "tokens": 1956
     },
     {
       "path": "brain/ai-suggestions/prds/edge-provenance-tags.md",
@@ -837,7 +838,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2731
+      "tokens": 3019
     },
     {
       "path": "brain/topics/chat-surface-necessity.md",
@@ -909,7 +910,7 @@
         "../../../sources/research/2026-07-14--enola-deterministic-architecture-extractor.md",
         "../../../sources/research/2026-07-14--graphify-llm-knowledge-graph.md"
       ],
-      "tokens": 3154
+      "tokens": 3280
     },
     {
       "path": "insights/ai-suggestions-exclusion-mcp-only.md",

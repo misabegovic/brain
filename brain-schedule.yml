@@ -117,6 +117,13 @@ operations:
     output: sources/langfuse/
     enabled: true
 
+  - name: structure-pull
+    description: Deterministic code-shape snapshot per target repo; queue architectural-drift inbox items; reconcile drift a wiki page now cites. No network, no external binary, no LLM.
+    cadence: daily
+    handler: python3 tools/brain.py schedule run structure-pull
+    output: sources/structure/
+    enabled: true
+
   # ---- Ingestion + intersection-finding -------------------------
 
   - name: notion-walk

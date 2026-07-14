@@ -18,6 +18,16 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Built: a deterministic structure connector
+  (0.22.0).** A sixth built-in connector snapshots a repo's code shape
+  (source-file inventory + package counts, exact; Python top-level
+  symbols via `ast`) — no network, no external binary, no LLM — and
+  turns architectural drift into inbox items via a baseline diff.
+  Drift auto-clears by citation once a wiki page cites the snapshot
+  that raised it. Vendor-neutral (the brain computes the facts
+  itself), guarded (scrubbed env, read-only git, secret-scan,
+  structural-only summaries), and shipped off — this instance has no
+  active sibling repos. Second of the three ingest-driven builds.
 - **2026-07-14** — **Built: the link graph carries per-edge
   provenance (0.21.0).** `brain.py` emits one tagged edge list to
   `wiki/_views/graph.json` — authored links/`depends_on` are

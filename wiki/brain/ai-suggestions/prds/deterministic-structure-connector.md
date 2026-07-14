@@ -1,8 +1,9 @@
 ---
 title: "Ground the brain's architecture 'Now' against a deterministic structure extractor — Enola as reference implementation"
 kind: initiative
-status: suggested
+status: superseded
 ai_suggestion: true
+superseded_by: brain/state.md
 updated: 2026-07-14
 team: "(inferred)"
 division: "(inferred)"
@@ -28,12 +29,17 @@ sources:
 
 # Ground the brain's architecture 'Now' against a deterministic structure extractor — Enola as reference implementation
 
-> **AI-suggested PRD.** Does **not** reflect a human-approved
-> initiative and does **not** record committed work or upcoming
-> product changes. Agent-authored synthesis from a directed research
-> deepdive — a *suggestion* to review, iterate on, and either
-> graduate or supersede. Treat the shape and metrics as the agent's
-> hypothesis, not the team's commitment.
+> **Built (0.22.0, 2026-07-14) — superseded by
+> [`brain/state.md`](../../state.md) § Now.** The operator directed
+> this build. It shipped **vendor-neutral** (the RFC's lead craft
+> finding): rather than depend on the pre-1.0 Enola binary, the brain
+> computes the structure facts itself, deterministically, from
+> read-only git + `ast`. The RFC's other gates landed as code — a
+> citation-based drift reconciler, the security guards (scrubbed env,
+> read-only sibling with a git-clean post-condition, secret-scan,
+> structural-only summaries, brain-computed filenames), and the
+> honest accuracy tier (exact Python symbols, file-level elsewhere).
+> Ships off; the live capability is described in `state.md`.
 
 ## Why the agent suggests this
 

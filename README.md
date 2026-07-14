@@ -260,6 +260,7 @@ personal data, no boilerplate.
 |-------------------|----------------------|----------------------------------------------------------------|
 | Datadog / Langfuse | ✅ pull connectors | Monitor+SLO state / prompt inventory → snapshots + state extracts for view tiles. |
 | GitHub / Notion / Slack | ✅ pull connectors | Snapshot-writers: immutable files into `sources/`, inbox items out. Configure `connectors:` in `brain.config.yml` + read-only tokens in `.env`. |
+| Structure           | ✅ pull connector  | Deterministic code-shape snapshots (source inventory + Python symbols) → architectural-drift inbox items via baseline diff; drift auto-clears once a wiki page cites the snapshot. No network / binary / LLM; read-only git with a clean-tree guard. Configure `connectors.structure.repos`. |
 | GitHub            | via `gh` CLI         | Pre-allowed in `.claude/settings.json`.                        |
 | MCP               | ✅ `tools/brain-mcp.py` | Read-only; stdio or `--http` (loopback Host + Origin checks); `BRAIN_SERVING=1` excludes ai-suggestion drafts across *every* read surface (MCP, serve JSON API, search CLI, static build) + query audit log. |
 | Datasette         | ✅ pilot             | `tools/serve-datasette.sh` — faceted browse + SQL + JSON API over the derived index (immutable mode). |
