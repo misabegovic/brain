@@ -336,3 +336,7 @@
    diff: 8 files, +330/-4
    restricted-paths: true
    by: claude (fable 5)
+2026-07-14 merge — PR #32: Specialized agents + a local emulation of the whole agentic loop
+   diff: 11 files, +520/-2
+   restricted-paths: true
+   by: claude (fable 5)
