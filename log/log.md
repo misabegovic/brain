@@ -260,3 +260,7 @@
    diff: 4 files, +240/-2
    restricted-paths: false
    by: claude (fable 5)
+2026-07-14 merge — PR #15: Synthesis: how the three ingested ideas + the brain evolve together
+   diff: 3 files, +120/-2
+   restricted-paths: false
+   by: claude (fable 5)
