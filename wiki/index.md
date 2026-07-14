@@ -18,6 +18,15 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **RFC: the "one loop" synthesis didn't survive
+  review.** Five personas deepdived
+  [the topic](brain/topics/three-ideas-compose.md); unanimous verdict:
+  the loop framing is an overfit narrative (the pieces touch disjoint
+  graphs; the real bus is the inbox, which exists). Revised to three
+  independent bets — connector (drift) gated, conversation surface a
+  no-go on prompt-injection + settled-decision grounds, provenance
+  tags standalone with a corrected design. The review dismantling the
+  synthesis is the value.
 - **2026-07-14** — **synthesis: the three ideas are one loop.** A
   [topic](brain/topics/three-ideas-compose.md) ties the async
   conversation surface, the deterministic structure connector, and
