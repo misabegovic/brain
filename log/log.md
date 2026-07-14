@@ -256,3 +256,7 @@
    diff: 5 files, +290/-2
    restricted-paths: false
    by: claude (fable 5)
+2026-07-14 merge — PR #14: Ingest Graphify: deepdive + how the brain can benefit
+   diff: 4 files, +240/-2
+   restricted-paths: false
+   by: claude (fable 5)
