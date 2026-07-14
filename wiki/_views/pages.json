@@ -508,7 +508,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2319
+      "tokens": 2350
     },
     {
       "path": "brain/pitches/chat-first-app.md",
@@ -899,15 +899,16 @@
       "status": "living",
       "updated": "2026-07-14",
       "confidence": "low",
-      "summary": "The async conversation surface, the deterministic structure connector, and edge-provenance tags aren't three features \u2014 they're a loop. Provenance is the connective tissue: the connector emits EXTRACTED facts, synthesis adds INFERRED edges, drift flags AMBIGUOUS, and the conversation surface routes AMBIGUOUS to a human. Sequence it provenance \u2192 connector \u2192 conversation; the conversation surface earns its build only after the other two give it something worth discussing.\n",
+      "summary": "Original synthesis: the three ideas are \"one loop bound by provenance.\" A five-persona RFC (2026-07-14) rejected that framing as an overfit narrative \u2014 the pieces touch disjoint graphs and the real bus is the inbox, which already exists. Revised verdict: three independent bets, not an epic. The connector (drift) is the only latent-valuable one and is multiply gated; the conversation surface is a no-go (re-litigates a settled decision + completes a prompt-injection trifecta); provenance tags proceed standalone with a corrected design.\n",
       "sources": [
+        "../../../sources/conversations/2026-07-14--three-ideas-rfc-pass.md",
         "../ai-suggestions/prds/conversation-surface-over-inbox.md",
         "../ai-suggestions/prds/deterministic-structure-connector.md",
         "../ai-suggestions/prds/edge-provenance-tags.md",
         "../../../sources/research/2026-07-14--enola-deterministic-architecture-extractor.md",
         "../../../sources/research/2026-07-14--graphify-llm-knowledge-graph.md"
       ],
-      "tokens": 1393
+      "tokens": 2877
     },
     {
       "path": "insights/ai-suggestions-exclusion-mcp-only.md",
