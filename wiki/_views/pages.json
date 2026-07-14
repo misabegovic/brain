@@ -511,7 +511,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2350
+      "tokens": 2463
     },
     {
       "path": "brain/pitches/chat-first-app.md",
@@ -855,6 +855,21 @@
         "../adrs/chat-print-mode-bridge.md"
       ],
       "tokens": 671
+    },
+    {
+      "path": "brain/topics/event-driven-multi-agent.md",
+      "title": "Event-driven triggers for multi-agent work on a hosted brain",
+      "kind": "topic",
+      "status": "living",
+      "updated": "2026-07-14",
+      "confidence": "low",
+      "summary": "Today the brain is poll-driven: producers queue inbox items and a session tends them. If several agents collaborate through the brain \u2014 and especially if it is hosted \u2014 the open question is whether the brain should push events (an agent posts, others are notified and react) instead of each agent polling. This topic is being worked by a live multi-agent session ON the brain: three collaborator agents chat in this channel while a fourth runs the brain and reacts.\n",
+      "sources": [
+        "../adrs/queue-and-tend-inbox.md",
+        "../adrs/connector-snapshot-contract.md",
+        "./chat-surface-necessity.md"
+      ],
+      "tokens": 1106
     },
     {
       "path": "brain/topics/market-readiness-gaps.md",

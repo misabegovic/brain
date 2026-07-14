@@ -532,6 +532,11 @@
     },
     {
       "source": "brain/index.md",
+      "target": "brain/topics/event-driven-multi-agent.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
       "target": "brain/topics/market-readiness-gaps.md",
       "provenance": "extracted"
     },
@@ -877,6 +882,11 @@
     },
     {
       "source": "index.md",
+      "target": "brain/topics/event-driven-multi-agent.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
       "target": "brain/topics/market-readiness-gaps.md",
       "provenance": "extracted"
     },
@@ -940,6 +950,7 @@
     "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
     "brain/ai-suggestions/prds/deterministic-structure-connector.md",
     "brain/ai-suggestions/prds/edge-provenance-tags.md",
+    "brain/topics/event-driven-multi-agent.md",
     "brain/topics/market-readiness-gaps.md",
     "brain/topics/three-ideas-compose.md"
   ]

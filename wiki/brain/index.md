@@ -55,6 +55,14 @@ sanitized to organisation-agnostic form:
 
 ## Topics (discussions in flight)
 
+- [Event-driven triggers for multi-agent work](topics/event-driven-multi-agent.md)
+  — produced by a live 4-agent session ON the brain (three collaborators
+  chat, a fourth runs it and pushes events). Agreed shape: read-side
+  fan-out over the append-only inbox (no second write path, notify is a
+  wake hint not a scheduler); authenticated per-agent identity is the
+  one genuinely new component hosting forces; MVP is owner-subscription
+  wake. Belongs in a `/shape` pitch before any build.
+
 - [How the three ideas compose](topics/three-ideas-compose.md) — a
   five-persona RFC rejected the "one loop" framing as overfit: three
   independent bets, not an epic. Connector (drift) is the one
