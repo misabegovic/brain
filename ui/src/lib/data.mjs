@@ -63,6 +63,35 @@ export function sectionBullets(relPage, section, max = 3) {
   return bullets;
 }
 
+// The opening prose of a `## <section>` (first paragraph or two),
+// markdown flattened to plain text and truncated — the executive
+// summary of a section for a human at a collaboration point.
+export function sectionText(relPage, section, maxChars = 400) {
+  const file = path.join(WIKI, relPage);
+  if (!fs.existsSync(file)) return '';
+  const text = fs.readFileSync(file, 'utf8');
+  const m = text.match(new RegExp(`^#{2,3} ${section}\\s*$`, 'm'));
+  if (!m) return '';
+  const rest = text.slice(m.index + m[0].length);
+  const end = rest.search(/^#{2,3} /m);
+  const body = (end === -1 ? rest : rest.slice(0, end)).trim();
+  // Take paragraphs until we hit a list or the char budget.
+  const paras = body.split(/\n\s*\n/);
+  let out = '';
+  for (const p of paras) {
+    if (/^\s*[-*|]/.test(p)) break; // stop at a list or table
+    const flat = p
+      .replace(/\s*\n\s*/g, ' ')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      .replace(/[*`]/g, '')
+      .trim();
+    if (!flat) continue;
+    out = out ? out + ' ' + flat : flat;
+    if (out.length >= maxChars) break;
+  }
+  return out.length > maxChars ? out.slice(0, maxChars - 1).trimEnd() + '…' : out;
+}
+
 export function version() {
   const f = path.join(REPO, 'VERSION');
   return fs.existsSync(f) ? fs.readFileSync(f, 'utf8').trim() : '';

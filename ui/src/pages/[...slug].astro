@@ -8,6 +8,7 @@ import { getCollection, render } from 'astro:content';
 import App from '../layouts/App.astro';
 import Collaborate from '../components/Collaborate.astro';
 import ProjectOverview from '../components/ProjectOverview.astro';
+import { sectionText } from '../lib/data.mjs';
 
 export async function getStaticPaths() {
   const entries = await getCollection('docs');
@@ -68,6 +69,10 @@ const threadSlug = entry.id.split('/').pop();
 const collabTarget =
   (entry.filePath ?? '').replace(/^src\/content\/docs\//, 'wiki/') ||
   'wiki/' + entry.id + '.md';
+// Executive brief for a topic: what's being decided (the Question) so a
+// human can respond without reading the whole discussion. The full body
+// collapses below.
+const topicQuestion = isTopic ? sectionText(entry.id + '.md', 'Question', 380) : '';
 ---
 <App title={d.title} description={d.summary ?? ''}>
   <article>
@@ -97,20 +102,32 @@ const collabTarget =
     {d.summary && <p class="lead">{d.summary}</p>}
     {!isTopic && <Collaborate target={collabTarget} />}
 
-    <div class="prose">
-      <Content />
-    </div>
-
-    {isTopic && (
-      <section class="thread">
-        <h2>Thread</h2>
-        <p class="thread-note">
-          Posts land in the tend queue; the agent's reply is appended to
-          the discussion above on the next tend. Async by design — not a
-          live chat.
-        </p>
-        <Collaborate target={collabTarget} thread={threadSlug} />
-      </section>
+    {isTopic ? (
+      <>
+        {topicQuestion && (
+          <div class="brief">
+            <span class="brief-label">What's being decided</span>
+            <p>{topicQuestion}</p>
+          </div>
+        )}
+        <section class="thread">
+          <h2>Respond</h2>
+          <p class="thread-note">
+            Post lands in the tend queue; the agent replies in-thread on
+            the next tend. Read the full discussion below if you need the
+            detail — you don't have to, to weigh in.
+          </p>
+          <Collaborate target={collabTarget} thread={threadSlug} />
+        </section>
+        <details class="fulltext">
+          <summary>Read the full discussion</summary>
+          <div class="prose"><Content /></div>
+        </details>
+      </>
+    ) : (
+      <div class="prose">
+        <Content />
+      </div>
     )}
 
     {shelf && (
@@ -160,7 +177,24 @@ const collabTarget =
     margin: 1rem 0; padding: .1rem 0 .1rem .9rem;
     color: var(--muted); }
   .prose :global(img) { max-width: 100%; }
-  .thread { margin-top: 1.8rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+  .thread { margin-top: 1.5rem; }
   .thread h2 { font-size: 1.15em; margin: 0 0 .3rem; }
   .thread-note { color: var(--muted); font-size: .85em; margin: 0 0 .8rem; max-width: 60ch; }
+  .brief {
+    background: var(--bg-soft); border: 1px solid var(--line);
+    border-left: 3px solid var(--accent); border-radius: .6rem;
+    padding: .7rem .9rem; margin: 0 0 1.2rem;
+  }
+  .brief-label {
+    display: block; font-size: .72em; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: .25rem;
+  }
+  .brief p { margin: 0; }
+  .fulltext { margin-top: 1.6rem; border-top: 1px solid var(--line); padding-top: .8rem; }
+  .fulltext > summary {
+    cursor: pointer; color: var(--muted); font-size: .9em; list-style: none;
+  }
+  .fulltext > summary::-webkit-details-marker { display: none; }
+  .fulltext > summary::before { content: '▸ '; }
+  .fulltext[open] > summary::before { content: '▾ '; }
 </style>

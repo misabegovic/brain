@@ -26,6 +26,17 @@ into the sections below.
 
 ## Now
 
+- **Topics lead with an executive brief, not a wall of text (0.25.0,
+  2026-07-14).** A human arriving to weigh in on a topic used to face
+  the full discussion before reaching the compose box. A topic page now
+  opens with its summary (the TL;DR), a "what's being decided" callout
+  (the Question), and the Respond control right there — the full
+  discussion collapses behind one "Read the full discussion" toggle. A
+  companion fix: the compose form is properly hidden until you open it
+  (a CSS rule had been overriding the hidden state, so every collab
+  control rendered its box open). Second of the three review
+  improvements.
+
 - **Collaboration is one control everywhere (0.24.0, 2026-07-14).**
   The operator's ways of contributing — comment, queue, post to a
   thread — were split across cards, pages, and channels, and none of
