@@ -268,3 +268,7 @@
    diff: 4 files, +180/-15
    restricted-paths: false
    by: claude (fable 5)
+2026-07-14 merge — PR #17: Tag the link graph with per-edge provenance
+   diff: 17 files, +1204/-40
+   restricted-paths: true
+   by: claude (fable 5)
