@@ -264,3 +264,7 @@
    diff: 3 files, +120/-2
    restricted-paths: false
    by: claude (fable 5)
+2026-07-14 merge — PR #16: RFC: five-persona review of the three-ideas synthesis
+   diff: 4 files, +180/-15
+   restricted-paths: false
+   by: claude (fable 5)
