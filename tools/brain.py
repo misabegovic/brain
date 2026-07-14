@@ -4735,6 +4735,9 @@ def _provenance_graph() -> dict:
         p for p, m in meta.items()
         if m.get("confidence") == "low"
         and len(inbound.get(p, ())) >= AMBIGUOUS_MIN_INBOUND)
+    # Stable order — the input dict walk order is filesystem-dependent,
+    # so sort before emitting or the committed graph.json churns per host.
+    edges.sort(key=lambda e: (e["source"], e["target"], e["provenance"]))
     return {"edges": edges, "ambiguous_nodes": ambiguous}
 
 

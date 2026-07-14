@@ -65,6 +65,12 @@ def test_provenance_graph_shape():
         assert meta.get("confidence") == "low", rel
         assert len(inbound.get(rel, ())) >= brain.AMBIGUOUS_MIN_INBOUND, rel
 
+    # Edges are emitted in a stable, host-independent order — the input
+    # dict walk is filesystem-dependent, so the committed graph.json
+    # would churn per host without this sort.
+    keys = [(e["source"], e["target"], e["provenance"]) for e in g["edges"]]
+    assert keys == sorted(keys), "graph.json edges must be sorted"
+
 
 def test_provenance_graph_serving_excludes_drafts(monkeypatch):
     """In serving mode the emitted graph must drop ai-suggestion nodes
