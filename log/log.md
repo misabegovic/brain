@@ -288,3 +288,7 @@
    diff: 8 files, +99/-18
    restricted-paths: false
    by: claude (fable 5)
+2026-07-14 merge — PR #22: Surface graph provenance and drift as page trust signals
+   diff: 8 files, +92/-6
+   restricted-paths: false
+   by: claude (fable 5)
