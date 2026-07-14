@@ -280,3 +280,7 @@
    diff: 23 files, +662/-27
    restricted-paths: true
    by: claude (fable 5)
+2026-07-14 merge — PR #20: Unify collaboration into one control with full CRUD
+   diff: 13 files, +369/-194
+   restricted-paths: true
+   by: claude (fable 5)
