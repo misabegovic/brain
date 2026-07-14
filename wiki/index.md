@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **ADR (child 1 bet): per-agent identity on a signed,
+  append-only event stream.** The operator picked a new append-only
+  event stream under `wiki/_state/events` (over tombstoned inbox items
+  and audit-log fan-out) for cursor stability; the auth boundary rejects
+  forged appends at write time and verifies attribution on read.
+  [ADR](brain/adrs/per-agent-identity.md) + PRD graduated to living;
+  awaiting the build.
 - **2026-07-14** — **PRD (child 1): per-agent identity for a hosted
   brain.** The epic's first child and true first dependency — a minimal
   identity layer to authenticate and attribute agents, plus the choice

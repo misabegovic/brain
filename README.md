@@ -111,9 +111,12 @@ cd ~/projects/my-brain && python3 tools/brain.py setup
 ```
 
 `init --full` births a complete instance from the kernel manifest —
-the whole mechanism plus the kernel's decision trail, none of this
-repo's self-tracking content — git-initialised and gate-passing.
-Then, inside the instance:
+the whole mechanism plus the kernel's reusable decision trail, none of
+this repo's self-tracking content — git-initialised and gate-passing.
+The seeded trail is the schema/governance ADRs; the brain's own
+in-flight feature work (epics and any `parent_epic`-linked children) is
+filtered out, so an adopter inherits reusable decisions, not the brain
+team's backlog. Then, inside the instance:
 
 ```bash
 python3 tools/brain.py setup     # one command: .env, org, repos, hook, timer, UI deps

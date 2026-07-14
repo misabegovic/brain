@@ -1,7 +1,7 @@
 ---
 title: "Per-agent identity for a hosted brain"
 kind: initiative
-status: draft
+status: living
 updated: 2026-07-14
 team: brain kernel
 division: "(brain)"
@@ -9,7 +9,7 @@ appetite: medium
 parent_epic: event-driven-agent-triggers
 repos:
   - brain
-confidence: low
+confidence: medium
 summary: >
   The first child of the event-driven epic and its true first
   dependency: a minimal per-agent identity layer so a hosted brain can
@@ -154,3 +154,12 @@ append-only event stream vs fan-out over the audit log vs tombstoned
 inbox items), and **where the auth boundary lives and what each half
 guarantees** (write-time rejection of forged appends, read-time
 verification of attribution, or both — and why).
+
+## Decision
+
+Both bets are made in [`per-agent-identity`](../adrs/per-agent-identity.md)
+(ADR, 2026-07-14). The operator picked a **new append-only event
+stream** under `wiki/_state/events` (over tombstoned inbox items and
+audit-log fan-out) for cursor stability, and the auth boundary does
+**both** — rejects forged appends at write time and verifies
+attribution on read.
