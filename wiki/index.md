@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Built: topics lead with an executive brief
+  (0.25.0).** Arriving to weigh in on a topic no longer means reading
+  the whole discussion first. The page opens with the summary, a
+  "what's being decided" callout (the Question), and the Respond
+  control; the full discussion collapses behind one toggle. Also fixed:
+  the compose box now stays hidden until you open it.
 - **2026-07-14** — **Built: one unified collaboration control
   (0.24.0).** Comment, queue, and post-to-thread were scattered across
   cards, pages, and channels with no way to edit or undo them. Now a
