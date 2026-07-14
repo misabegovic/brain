@@ -302,3 +302,7 @@
    restricted-paths: false
    by: claude (fable 5)
 2026-07-14 shape — pitch → wiki/brain/epics/event-driven-agent-triggers.md (PM agent, --epic; bet graduated the pitch)
+2026-07-14 merge — PR #25: Graduate the pitch into an epic on the bet
+   diff: 6 files, +110/-13
+   restricted-paths: false
+   by: claude (fable 5)
