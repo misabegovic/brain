@@ -1,17 +1,16 @@
 ---
-title: "Brain zoom-out digest — 2026-07-13"
+title: "Brain zoom-out digest — 2026-07-14"
 kind: meta
 status: living
-updated: 2026-07-13
+updated: 2026-07-14
 sources: []
 ---
 
-# Brain zoom-out digest — 2026-07-13
+# Brain zoom-out digest — 2026-07-14
 
 
 ## Recent log entries (this month, last 30)
 
-2026-07-12 commit — 2dabb01: chat-surface-necessity topic opened (operator reconsidering; agent position: remove)
 2026-07-12 commit — 20d43d3: 0.14.0 — chat pane removed (superseding ADR); MCP + CLI + terminal
 2026-07-12 commit — cd8f31d: 0.14.1 — license Apache-2.0 → MIT (operator direction)
 2026-07-12 commit — a4a0b54: 0.14.2 — README for cold-start readers + quickstart made true
@@ -41,9 +40,11 @@ sources: []
 2026-07-12 commit — (squash): graduate 8 playthrough drafts to approved shelves; purge competitor + origin-client references for the public repo
 2026-07-12 merge — PR #10: Wire the no-personal-data guard into the harness
 2026-07-12 merge — PR #11: Simplify the PR template to a plain-English executive summary
+2026-07-13 merge — PR #12: AI-suggestion: an async conversation surface over the inbox
 
-## AI-suggestion backlog (0 pending review)
+## AI-suggestion backlog (1 pending review)
 
+- [A conversation surface over the inbox — Slack-shaped channels for talking to the agent through the brain, asynchronously](brain/ai-suggestions/prds/conversation-surface-over-inbox.md)
 
 ## Reflection-check summary
 

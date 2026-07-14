@@ -18,6 +18,16 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **ingested Enola; deepdive + benefit suggestion.**
+  A four-agent directed-research deepdive of
+  [Enola](https://github.com/enola-labs/enola) — a deterministic,
+  LLM-free code-structure extractor. It's the brain's inverse: it
+  extracts the *what*, the brain synthesizes the *why*. Strongest
+  fit is a deterministic structure *connector*
+  ([suggestion](brain/ai-suggestions/prds/deterministic-structure-connector.md))
+  that turns architecture drift into inbox items — gated on the
+  tool's pre-1.0 solo maturity. Full deepdive in
+  `sources/research/2026-07-14--enola-deterministic-architecture-extractor.md`.
 - **2026-07-13** — **AI-suggestion: an async conversation surface.**
   On the operator's Slack-shaped-UI question, a draft
   ([suggestion](brain/ai-suggestions/prds/conversation-surface-over-inbox.md))
