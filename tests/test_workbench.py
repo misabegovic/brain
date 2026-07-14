@@ -243,6 +243,77 @@ def test_ui_action_endpoint_queues_inbox_item():
         proc.wait(timeout=5)
 
 
+def test_ui_action_edit_remove_and_pending():
+    """The unified collaboration control's full CRUD: create → list via
+    /api/pending → edit in place → unqueue (remove). Only ui-action
+    items, and edits keep the same id."""
+    import urllib.error
+    import urllib.request
+    port = 8995
+    proc = subprocess.Popen(
+        [sys.executable, str(REPO / "tools" / "brain.py"),
+         "serve", "--port", str(port)], stderr=subprocess.PIPE)
+    created = []
+
+    def call(payload):
+        req = urllib.request.Request(
+            f"http://127.0.0.1:{port}/api/act",
+            data=json.dumps(payload).encode(),
+            headers={"X-Brain-Act": "1", "Content-Type": "application/json"},
+            method="POST")
+        return json.loads(urllib.request.urlopen(req, timeout=5).read())
+
+    def pending(target):
+        return json.loads(urllib.request.urlopen(
+            f"http://127.0.0.1:{port}/api/pending?target={target}",
+            timeout=5).read())["pending"]
+
+    try:
+        deadline = time.time() + 15
+        while time.time() < deadline:
+            try:
+                urllib.request.urlopen(f"http://127.0.0.1:{port}/api", timeout=5)
+                break
+            except OSError:
+                if proc.poll() is not None:
+                    break
+                time.sleep(0.3)
+
+        tgt = "wiki/brain/roadmap.md"
+        iid = call({"action": "comment", "target": tgt, "note": "v1"})["queued"]
+        created.append(iid)
+        rows = pending(tgt)
+        assert any(r["id"] == iid and r["message"] == "v1" for r in rows)
+
+        # Edit keeps the id and updates the text + summary.
+        assert call({"action": "edit", "id": iid, "note": "v2"})["edited"] == iid
+        rows = pending(tgt)
+        row = next(r for r in rows if r["id"] == iid)
+        assert row["message"] == "v2" and "v2" in row["summary"]
+        assert row["edited_at"]
+
+        # A non-ui-action item cannot be edited/removed through the API.
+        (REPO / "wiki" / "_state" / "inbox" / "prod-guard-x.json").write_text(
+            json.dumps({"id": "prod-guard-x", "kind": "custom", "summary": "s",
+                        "produced_by": "inbox-refresh"}))
+        created.append("prod-guard-x")
+        try:
+            call({"action": "remove", "id": "prod-guard-x"})
+            raise AssertionError("must refuse to remove a non-ui-action item")
+        except urllib.error.HTTPError as e:
+            assert e.code == 403
+
+        # Remove clears the pending item.
+        assert call({"action": "remove", "id": iid})["removed"] == iid
+        assert all(r["id"] != iid for r in pending(tgt))
+    finally:
+        for iid in created:
+            (REPO / "wiki" / "_state" / "inbox" / f"{iid}.json").unlink(
+                missing_ok=True)
+        proc.terminate()
+        proc.wait(timeout=5)
+
+
 def test_ui_action_absent_in_serving_mode():
     import urllib.request
     port = 8994

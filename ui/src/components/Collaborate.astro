@@ -1,0 +1,172 @@
+---
+// One collaboration control, used everywhere (briefing cards, wiki
+// pages, topic threads). Every operator action — comment, queue, post
+// to a thread — becomes a pending inbox item you can then edit or
+// unqueue, all through the local server's /api/act + /api/pending. The
+// inbox stays the only write surface; this just unifies the verbs and
+// gives them full CRUD instead of scattering half of them across
+// different sections. Degrades to a read-only note off the local
+// server.
+interface Props {
+  target: string; // wiki page path (comment/queue source)
+  thread?: string; // topic slug — present => the comment verb posts to the thread
+  compact?: boolean; // briefing cards use a tighter layout
+}
+const { target, thread = '', compact = false } = Astro.props;
+const verb = thread ? 'Post' : 'Comment';
+---
+<div class:list={['collab', { compact }]} data-target={target} data-thread={thread}>
+  <div class="collab-bar">
+    <button type="button" class="c-open" data-mode="comment">💬 {verb}</button>
+    <button type="button" class="c-open" data-mode="queue">⚑ Queue</button>
+    <span class="c-status" role="status"></span>
+  </div>
+  <form class="c-form" hidden>
+    <textarea rows="2" required
+      placeholder={thread ? 'Message for this thread — the agent replies here on the next tend'
+        : 'For the agent — lands in the tend queue'}></textarea>
+    <div class="c-row">
+      <button type="submit" class="c-send">Send</button>
+      <button type="button" class="c-cancel">Cancel</button>
+    </div>
+  </form>
+  <ul class="c-pending" hidden></ul>
+</div>
+
+<style>
+  .collab { font-size: .85em; margin-top: .3rem; }
+  .collab-bar { display: flex; gap: .4rem; align-items: baseline; flex-wrap: wrap; }
+  .collab button {
+    font: inherit; color: var(--muted); background: var(--chip);
+    border: 0; border-radius: 99px; padding: .12rem .7rem; cursor: pointer;
+  }
+  .collab button:hover { color: var(--fg); }
+  .c-status { color: var(--ok); }
+  .c-status.err { color: var(--alert); }
+  .c-form { display: grid; gap: .4rem; margin-top: .45rem; max-width: 56ch; }
+  .c-form textarea {
+    font: inherit; background: var(--bg-soft); color: var(--fg);
+    border: 1px solid var(--line); border-radius: .5rem; padding: .4rem .55rem;
+  }
+  .c-row { display: flex; gap: .45rem; }
+  .c-send { background: var(--accent, var(--chip)) !important; color: var(--fg) !important; }
+  ul.c-pending { list-style: none; padding: 0; margin: .55rem 0 0; display: grid; gap: .4rem; }
+  ul.c-pending li {
+    background: var(--bg-soft); border: 1px solid var(--line);
+    border-left: 3px solid var(--warn); border-radius: .5rem; padding: .4rem .6rem;
+  }
+  ul.c-pending .p-text { white-space: pre-wrap; }
+  ul.c-pending .p-meta { color: var(--muted); font-size: .82em; margin-left: .1rem; }
+  ul.c-pending .p-actions { display: flex; gap: .5rem; margin-top: .3rem; }
+  ul.c-pending .p-actions button {
+    background: none; padding: 0; color: var(--muted); text-decoration: underline;
+  }
+  ul.c-pending textarea {
+    width: 100%; font: inherit; background: var(--bg); color: var(--fg);
+    border: 1px solid var(--line); border-radius: .4rem; padding: .35rem .5rem;
+  }
+</style>
+
+<script is:inline>
+  if (!window.__brainCollab) {
+    window.__brainCollab = true;
+    const H = { 'X-Brain-Act': '1', 'Content-Type': 'application/json' };
+    async function act(payload) {
+      const r = await fetch('/api/act', { method: 'POST', headers: H, body: JSON.stringify(payload) });
+      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'failed');
+      return r.json();
+    }
+    function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
+    let ALL = [];
+    async function loadPending() {
+      try {
+        const r = await fetch('/api/pending');
+        if (!r.ok) return; // read-only deployment: leave the lists hidden
+        ALL = (await r.json()).pending || [];
+      } catch { return; }
+      document.querySelectorAll('.collab').forEach(renderPending);
+    }
+    function renderPending(root) {
+      const t = root.dataset.target || '', th = root.dataset.thread || '';
+      // A thread control shows posts to that thread; a page control
+      // shows comments/queues whose source is this page.
+      const rows = ALL.filter((p) =>
+        th ? p.thread === th : (!p.thread && p.source === t));
+      const ul = root.querySelector('.c-pending');
+      ul.innerHTML = rows.map((p) => `
+        <li data-id="${p.id}">
+          <div class="p-text">${esc(p.message || p.summary)}</div>
+          <div class="p-meta">queued ${p.produced_at}${p.edited_at ? ' · edited ' + p.edited_at : ''}${p.channel_post ? ' · awaiting reply' : ''}</div>
+          <div class="p-actions"><button class="p-edit">edit</button><button class="p-remove">remove</button></div>
+        </li>`).join('');
+      ul.hidden = rows.length === 0;
+    }
+    document.addEventListener('DOMContentLoaded', loadPending);
+    document.addEventListener('click', async (e) => {
+      const open = e.target.closest('.c-open');
+      if (open) {
+        const root = open.closest('.collab');
+        root.querySelector('.c-form').hidden = false;
+        root.querySelector('.c-form').dataset.mode = open.dataset.mode;
+        root.querySelector('textarea').focus();
+        return;
+      }
+      if (e.target.closest('.c-cancel')) {
+        const f = e.target.closest('.c-form'); f.hidden = true; f.querySelector('textarea').value = '';
+        return;
+      }
+      const rm = e.target.closest('.p-remove');
+      if (rm) {
+        const li = rm.closest('li');
+        try { await act({ action: 'remove', id: li.dataset.id }); await loadPending(); }
+        catch { rm.textContent = 'error'; }
+        return;
+      }
+      const ed = e.target.closest('.p-edit');
+      if (ed) {
+        const li = ed.closest('li');
+        const cur = li.querySelector('.p-text').textContent;
+        li.querySelector('.p-actions').innerHTML =
+          `<button class="p-save">save</button><button class="p-editcancel">cancel</button>`;
+        const ta = document.createElement('textarea'); ta.value = cur;
+        li.querySelector('.p-text').replaceWith(ta);
+        ta.focus();
+        return;
+      }
+      if (e.target.closest('.p-editcancel')) { await loadPending(); return; }
+      const sv = e.target.closest('.p-save');
+      if (sv) {
+        const li = sv.closest('li');
+        const note = li.querySelector('textarea').value.trim();
+        if (!note) return;
+        try { await act({ action: 'edit', id: li.dataset.id, note }); await loadPending(); }
+        catch { sv.textContent = 'error'; }
+      }
+    });
+    document.addEventListener('submit', async (e) => {
+      const f = e.target.closest('.c-form');
+      if (!f) return;
+      e.preventDefault();
+      const root = f.closest('.collab');
+      const status = root.querySelector('.c-status');
+      const note = f.querySelector('textarea').value.trim();
+      const mode = f.dataset.mode || 'comment';
+      const thread = root.dataset.thread;
+      const target = root.dataset.target;
+      let payload;
+      if (mode === 'queue') payload = { action: 'execute', target, note };
+      else if (thread) payload = { action: 'post', thread, note };
+      else payload = { action: 'comment', target, note };
+      try {
+        const d = await act(payload);
+        status.textContent = `queued (${d.queued})`;
+        status.classList.remove('err');
+        f.hidden = true; f.querySelector('textarea').value = '';
+        await loadPending();
+      } catch (err) {
+        status.textContent = 'not available here (read-only deployment?)';
+        status.classList.add('err');
+      }
+    });
+  }
+</script>

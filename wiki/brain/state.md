@@ -26,6 +26,19 @@ into the sections below.
 
 ## Now
 
+- **Collaboration is one control everywhere (0.24.0, 2026-07-14).**
+  The operator's ways of contributing — comment, queue, post to a
+  thread — were split across cards, pages, and channels, and none of
+  them could be undone or edited. They are now a single `Collaborate`
+  control used on every card, page, and topic thread, backed only by
+  the inbox, with full CRUD: comment / queue / post **plus edit and
+  unqueue (remove)** of your own pending items, while they are still
+  pending (a tend session clearing them is what makes them final).
+  `/api/act` gained `edit` and `remove` actions (ui-action items only,
+  guarded) and a `/api/pending` read lists your contributions for a
+  page or thread. The old split `Actions` component and the bespoke
+  thread compose box are gone.
+
 - **An async conversation surface ships over the inbox (0.23.0,
   2026-07-14).** Channels ARE topics: a `/channels/` surface lists
   every topic as a channel, and each topic page grows a Thread panel

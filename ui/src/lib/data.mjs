@@ -38,14 +38,6 @@ export function channels() {
   }
 }
 
-// Pending (un-replied) posts for one thread slug, oldest first — what a
-// channel view shows below the topic thread until the agent replies.
-export function channelPosts(slug) {
-  return inboxItems()
-    .filter((i) => i.channel_post && i.thread === slug)
-    .sort((a, b) => (a.produced_at || '').localeCompare(b.produced_at || ''));
-}
-
 // First `max` top-level bullets of a `## <section>` in a wiki page,
 // markdown links stripped to their text.
 export function sectionBullets(relPage, section, max = 3) {

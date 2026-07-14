@@ -1427,6 +1427,29 @@ def cmd_serve(args) -> int:
                                 "text/html; charset=utf-8")
                 return
 
+            # Your pending contributions for a target (a page path) or a
+            # thread — what the unified collaboration control lists so
+            # you can edit or unqueue them before a tend session lands.
+            # ui-action items only; withheld in serving mode.
+            if workbench and path == "/api/pending":
+                tgt = (qs.get("target") or [""])[0]
+                thr = (qs.get("thread") or [""])[0]
+                out = []
+                for it in _inbox_items():
+                    if it.get("produced_by") != "ui-action":
+                        continue
+                    if tgt and it.get("source") != tgt:
+                        continue
+                    if thr and it.get("thread") != thr:
+                        continue
+                    out.append({k: it.get(k) for k in (
+                        "id", "summary", "message", "source", "thread",
+                        "author", "produced_at", "edited_at",
+                        "channel_post", "priority")})
+                out.sort(key=lambda x: x.get("produced_at", ""))
+                self._send_json(200, {"pending": out})
+                return
+
             # The rendered wiki serves at ROOT as the fallback for any
             # path the JSON API doesn't own — the Astro build links
             # assets and pages absolutely (/_astro/…, /brain/…), so a
@@ -1671,20 +1694,61 @@ def cmd_serve(args) -> int:
                 except (KeyError, ValueError, json.JSONDecodeError):
                     self._send_json(400, {"error": "bad action body"})
                     return
-                if action not in ("execute", "comment", "post"):
+                if action not in ("execute", "comment", "post",
+                                  "edit", "remove"):
                     self._send_json(400, {"error": "unknown action"})
                     return
+
+                # Manage an existing pending contribution (unqueue / edit).
+                # Only ui-action items, only while still pending — a tend
+                # session clearing the item is what makes it final. Agent-
+                # and connector-produced items are never editable here.
+                if action in ("edit", "remove"):
+                    mid = str(body.get("id", ""))
+                    if not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", mid):
+                        self._send_json(400, {"error": "bad id"})
+                        return
+                    p = INBOX_DIR / f"{mid}.json"
+                    if not p.exists():
+                        self._send_json(404, {"error": "no such pending item"})
+                        return
+                    try:
+                        it = json.loads(p.read_text())
+                    except json.JSONDecodeError:
+                        self._send_json(500, {"error": "unparseable item"})
+                        return
+                    if it.get("produced_by") != "ui-action":
+                        self._send_json(403, {"error": "only your own "
+                            "pending items can be changed"})
+                        return
+                    if action == "remove":
+                        p.unlink()
+                        self._send_json(200, {"removed": mid})
+                        return
+                    if not note.strip():
+                        self._send_json(400, {"error": "empty message"})
+                        return
+                    kind_ = ("post" if it.get("channel_post")
+                             else "execute" if mid.startswith("ui-execute-")
+                             else "comment")
+                    it["message"] = note
+                    it["summary"] = _ui_action_summary(
+                        kind_, it.get("source", ""), note,
+                        it.get("thread", ""), it.get("author", "operator"))
+                    if it.get("channel_post"):
+                        it["message_fenced"] = _fence_untrusted(note)
+                    it["edited_at"] = today_utc().isoformat()
+                    _inbox_write(it)
+                    self._send_json(200, {"edited": mid})
+                    return
+
                 stamp = _dt_now_compact()
                 item_id = f"ui-{action}-{stamp}"
-                extra = None
+                thread = author = ""
+                extra = {"message": note}
                 if action == "execute":
-                    summary = (f"operator queued {target or 'work'} for "
-                               f"execution from the briefing"
-                               + (f' — "{note}"' if note else ""))
                     priority = "high"
                 elif action == "comment":
-                    summary = (f'operator comment on {target or "the brain"}:'
-                               f' "{note}"')
                     priority = "normal"
                 else:  # post — a channel message for the conversation surface
                     thread = str(body.get("thread", "")).strip().lower()
@@ -1695,13 +1759,13 @@ def cmd_serve(args) -> int:
                         self._send_json(400, {"error": "empty message"})
                         return
                     author = _machine_author()  # server-stamped, not client
-                    summary = (f'{author} posted to #{thread} '
-                               f'({len(note)} chars) — reply in-thread on tend')
                     priority = "normal"
                     extra = {"thread": thread, "author": author,
                              "message": note,
                              "message_fenced": _fence_untrusted(note),
                              "channel_post": True}
+                summary = _ui_action_summary(action, target, note,
+                                             thread, author or "operator")
                 try:
                     inbox_add(id=item_id, kind="custom", summary=summary,
                               route="/tend " + item_id, priority=priority,
@@ -3081,6 +3145,19 @@ def _channel_thread_ok(slug: str) -> bool:
     """A thread id is a safe slug (a topic slug or a new-channel slug);
     it never escapes the topics tree."""
     return bool(re.fullmatch(r"[a-z0-9][a-z0-9-]{0,80}", slug))
+
+
+def _ui_action_summary(action: str, target: str, text: str,
+                       thread: str = "", author: str = "operator") -> str:
+    """One place that phrases the inbox summary for every operator UI
+    action — so create and edit produce identical wording."""
+    if action == "execute":
+        return (f"operator queued {target or 'work'} for execution"
+                + (f' — "{text}"' if text else ""))
+    if action == "post":
+        return (f"{author} posted to #{thread} ({len(text)} chars) — "
+                f"reply in-thread on tend")
+    return f'operator comment on {target or "the brain"}: "{text}"'
 
 
 def _channels_data() -> dict:

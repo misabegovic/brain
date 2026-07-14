@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Built: one unified collaboration control
+  (0.24.0).** Comment, queue, and post-to-thread were scattered across
+  cards, pages, and channels with no way to edit or undo them. Now a
+  single control appears everywhere with full CRUD — comment / queue /
+  post plus **edit** and **unqueue** of your own pending items — all
+  backed by the inbox. New `edit`/`remove` actions and a `/api/pending`
+  read support it.
 - **2026-07-14** — **Built: an async conversation surface over the
   inbox (0.23.0).** A `/channels/` surface renders every topic as a
   channel; each topic grows a Thread panel with a compose box. A post

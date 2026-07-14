@@ -6,9 +6,8 @@
 // renders at /home/ since the briefing owns the root.
 import { getCollection, render } from 'astro:content';
 import App from '../layouts/App.astro';
-import Actions from '../components/Actions.astro';
+import Collaborate from '../components/Collaborate.astro';
 import ProjectOverview from '../components/ProjectOverview.astro';
-import { channelPosts } from '../lib/data.mjs';
 
 export async function getStaticPaths() {
   const entries = await getCollection('docs');
@@ -60,14 +59,15 @@ const statusTone =
       ? 'ok'
       : '';
 // A topic doubles as a conversation channel: the dated discussion
-// trail above is the thread; posts awaiting a reply and a compose box
-// render below it. Not shown in serving builds (the write channel is
-// local-only). The thread slug is the page's basename.
+// trail above is the thread; the unified collaboration control renders
+// the compose box + your pending posts below it (runtime-fetched, so
+// it degrades cleanly on the static/serving build). The thread slug is
+// the page's basename.
 const isTopic = d.kind === 'topic' && !isSuggestion;
 const threadSlug = entry.id.split('/').pop();
-const pending = isTopic && process.env.BRAIN_SERVING !== '1'
-  ? channelPosts(threadSlug)
-  : [];
+const collabTarget =
+  (entry.filePath ?? '').replace(/^src\/content\/docs\//, 'wiki/') ||
+  'wiki/' + entry.id + '.md';
 ---
 <App title={d.title} description={d.summary ?? ''}>
   <article>
@@ -95,41 +95,21 @@ const pending = isTopic && process.env.BRAIN_SERVING !== '1'
       </div>
     )}
     {d.summary && <p class="lead">{d.summary}</p>}
-    <Actions target={(entry.filePath ?? '').replace(
-      /^src\/content\/docs\//, 'wiki/') || 'wiki/' + entry.id + '.md'} />
+    {!isTopic && <Collaborate target={collabTarget} />}
 
     <div class="prose">
       <Content />
     </div>
 
     {isTopic && (
-      <section class="thread" data-thread={threadSlug}>
+      <section class="thread">
         <h2>Thread</h2>
         <p class="thread-note">
           Posts land in the tend queue; the agent's reply is appended to
           the discussion above on the next tend. Async by design — not a
           live chat.
         </p>
-        {pending.length > 0 && (
-          <ul class="pending">
-            {pending.map((p) => (
-              <li>
-                <span class="who">{p.author || 'operator'}</span>
-                <span class="when">{p.produced_at}</span>
-                <span class="await">awaiting reply</span>
-                <p class="msg">{p.message}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-        <form class="thread-compose">
-          <textarea rows="3" required
-            placeholder="Reply in this channel — the agent answers in-thread on the next tend"></textarea>
-          <div class="row">
-            <button type="submit">Post to #{threadSlug}</button>
-            <span class="post-status" role="status"></span>
-          </div>
-        </form>
+        <Collaborate target={collabTarget} thread={threadSlug} />
       </section>
     )}
 
@@ -183,55 +163,4 @@ const pending = isTopic && process.env.BRAIN_SERVING !== '1'
   .thread { margin-top: 1.8rem; border-top: 1px solid var(--line); padding-top: 1rem; }
   .thread h2 { font-size: 1.15em; margin: 0 0 .3rem; }
   .thread-note { color: var(--muted); font-size: .85em; margin: 0 0 .8rem; max-width: 60ch; }
-  ul.pending { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; gap: .5rem; }
-  ul.pending li {
-    background: var(--bg-soft); border: 1px solid var(--line);
-    border-left: 3px solid var(--warn); border-radius: .5rem; padding: .5rem .7rem;
-  }
-  ul.pending .who { font-weight: 600; }
-  ul.pending .when { color: var(--muted); font-size: .8em; margin-left: .5rem; }
-  ul.pending .await { color: var(--warn); font-size: .78em; margin-left: .5rem; }
-  ul.pending .msg { margin: .35rem 0 0; white-space: pre-wrap; }
-  .thread-compose { display: grid; gap: .5rem; max-width: 60ch; }
-  .thread-compose textarea {
-    font: inherit; background: var(--bg-soft); color: var(--fg);
-    border: 1px solid var(--line); border-radius: .5rem; padding: .45rem .6rem;
-  }
-  .thread-compose .row { display: flex; gap: .6rem; align-items: center; }
-  .thread-compose button {
-    font: inherit; background: var(--accent, var(--chip)); color: var(--fg);
-    border: 0; border-radius: 99px; padding: .35rem 1rem; cursor: pointer;
-  }
-  .post-status { font-size: .85em; color: var(--ok); }
-  .post-status.err { color: var(--alert); }
 </style>
-
-<script is:inline>
-  (function () {
-    document.addEventListener('submit', async (e) => {
-      const form = e.target.closest('.thread-compose');
-      if (!form) return;
-      e.preventDefault();
-      const section = form.closest('.thread');
-      const status = form.querySelector('.post-status');
-      const note = form.querySelector('textarea').value.trim();
-      const thread = section?.dataset.thread;
-      if (!note || !thread) return;
-      try {
-        const r = await fetch('/api/act', {
-          method: 'POST',
-          headers: { 'X-Brain-Act': '1', 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'post', thread, note }),
-        });
-        if (!r.ok) throw new Error();
-        const d = await r.json();
-        status.textContent = `posted — the agent replies in-thread on the next tend (${d.queued})`;
-        status.classList.remove('err');
-        form.querySelector('textarea').value = '';
-      } catch {
-        status.textContent = 'not available here (read-only deployment?)';
-        status.classList.add('err');
-      }
-    });
-  })();
-</script>
