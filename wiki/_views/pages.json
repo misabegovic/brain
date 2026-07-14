@@ -511,7 +511,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2463
+      "tokens": 2588
     },
     {
       "path": "brain/pitches/chat-first-app.md",
@@ -550,6 +550,27 @@
         "../../../brain-schedule.yml"
       ],
       "tokens": 1638
+    },
+    {
+      "path": "brain/pitches/event-driven-agent-triggers.md",
+      "title": "Event-driven triggers for multi-agent work \u2014 an agentic future for a hosted brain",
+      "kind": "pitch",
+      "status": "draft",
+      "updated": "2026-07-14",
+      "team": "brain kernel",
+      "division": "(brain)",
+      "appetite": "big",
+      "repos": [
+        "brain"
+      ],
+      "confidence": "low",
+      "sources": [
+        "../topics/event-driven-multi-agent.md",
+        "../adrs/queue-and-tend-inbox.md",
+        "../adrs/connector-snapshot-contract.md",
+        "../adrs/mcp-cli-surface.md"
+      ],
+      "tokens": 1896
     },
     {
       "path": "brain/pitches/harness-workbench.md",
@@ -869,7 +890,7 @@
         "../adrs/connector-snapshot-contract.md",
         "./chat-surface-necessity.md"
       ],
-      "tokens": 1106
+      "tokens": 1208
     },
     {
       "path": "brain/topics/market-readiness-gaps.md",
