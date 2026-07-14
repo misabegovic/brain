@@ -26,6 +26,19 @@ into the sections below.
 
 ## Now
 
+- **The graph and connector reflect as page-level trust signals
+  (0.26.0, 2026-07-14).** The edge-provenance graph and the structure
+  connector were agent/maintainer plumbing with no user-facing payoff —
+  a `/graph/` page and MCP tags, nothing on the pages people read. Now
+  every page carries the signal where it's read: a "N pages rely on
+  this" chip (authored-inbound centrality, linking to `/graph/`) and,
+  on a page flagged AMBIGUOUS (low-confidence yet load-bearing), an
+  "⚑ Uncertain but load-bearing — verify before building on this"
+  banner (suppressed on superseded/archived trail). A repo shelf page
+  surfaces structure-connector **drift** inline once a repo is
+  configured — dormant on this instance (no active sibling repos), but
+  wired. Third and last of the three review improvements.
+
 - **Topics lead with an executive brief, not a wall of text (0.25.0,
   2026-07-14).** A human arriving to weigh in on a topic used to face
   the full discussion before reaching the compose box. A topic page now
