@@ -25,6 +25,27 @@ export function inboxItems() {
     .filter(Boolean);
 }
 
+// The conversation surface: channels (topics) + pending posts. Reads
+// the channels.json view brain.py emits; the pending posts are inbox
+// channel-post items awaiting an in-thread reply on the next tend.
+export function channels() {
+  const p = path.join(WIKI, '_views', 'channels.json');
+  if (!fs.existsSync(p)) return { channels: [], activity: { pending_posts: 0 } };
+  try {
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch {
+    return { channels: [], activity: { pending_posts: 0 } };
+  }
+}
+
+// Pending (un-replied) posts for one thread slug, oldest first — what a
+// channel view shows below the topic thread until the agent replies.
+export function channelPosts(slug) {
+  return inboxItems()
+    .filter((i) => i.channel_post && i.thread === slug)
+    .sort((a, b) => (a.produced_at || '').localeCompare(b.produced_at || ''));
+}
+
 // First `max` top-level bullets of a `## <section>` in a wiki page,
 // markdown links stripped to their text.
 export function sectionBullets(relPage, section, max = 3) {

@@ -202,6 +202,11 @@
     },
     {
       "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/state.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
       "target": "brain/topics/chat-surface-necessity.md",
       "provenance": "extracted"
     },

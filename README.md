@@ -290,5 +290,8 @@ the app with lifecycle chrome (kind/status/confidence chips,
 executive summary, AI-draft and superseded banners). `/graph/`
 renders the link graph with per-edge provenance — solid for authored
 edges, dashed-faint for machine-suggested ones, a ⚑ mark on
-low-confidence pages the graph leans on. Pagefind search at
-`/search/`. Local-first — share via repo paths, not a hosted URL.
+low-confidence pages the graph leans on. `/channels/` is the async
+conversation surface: every topic is a channel, a post is an inbox
+write, and the agent replies in-thread on the next tend (no live
+chat). Pagefind search at `/search/`. Local-first — share via repo
+paths, not a hosted URL.

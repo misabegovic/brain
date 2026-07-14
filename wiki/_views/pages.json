@@ -419,9 +419,10 @@
       "path": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
       "title": "A conversation surface over the inbox \u2014 Slack-shaped channels for talking to the agent through the brain, asynchronously",
       "kind": "initiative",
-      "status": "suggested",
+      "status": "superseded",
       "ai_suggestion": true,
-      "updated": "2026-07-13",
+      "superseded_by": "brain/state.md",
+      "updated": "2026-07-14",
       "team": "(inferred)",
       "division": "(inferred)",
       "repos": [
@@ -436,7 +437,7 @@
         "../../topics/chat-surface-necessity.md",
         "../../adrs/human-legible-presentation-layer.md"
       ],
-      "tokens": 1967
+      "tokens": 2051
     },
     {
       "path": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
@@ -838,7 +839,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 3019
+      "tokens": 3305
     },
     {
       "path": "brain/topics/chat-surface-necessity.md",
@@ -910,7 +911,7 @@
         "../../../sources/research/2026-07-14--enola-deterministic-architecture-extractor.md",
         "../../../sources/research/2026-07-14--graphify-llm-knowledge-graph.md"
       ],
-      "tokens": 3280
+      "tokens": 3415
     },
     {
       "path": "insights/ai-suggestions-exclusion-mcp-only.md",
