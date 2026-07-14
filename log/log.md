@@ -297,3 +297,7 @@
    restricted-paths: false
    by: claude (fable 5)
 2026-07-14 shape — pitch → wiki/brain/pitches/event-driven-agent-triggers.md (PM agent, --pitch)
+2026-07-14 merge — PR #24: Shape the event-driven multi-agent topic into a pitch
+   diff: 11 files, +291/-3
+   restricted-paths: false
+   by: claude (fable 5)
