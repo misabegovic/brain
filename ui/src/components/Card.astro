@@ -2,7 +2,7 @@
 // One lifecycle-aware card. `chips` entries: { label, tone? }.
 // `target` enables the interactive channel; `kind` feeds the
 // briefing's type filter.
-import Actions from './Actions.astro';
+import Collaborate from './Collaborate.astro';
 interface Props {
   href?: string;
   title: string;
@@ -21,5 +21,5 @@ const { href, title, summary, chips = [], reason, target, kind } = Astro.props;
   <h3>{href ? <a href={href}>{title}</a> : title}</h3>
   {reason && <p><strong>Why:</strong> {reason}</p>}
   {summary && <p>{summary}</p>}
-  {target && <Actions target={target} />}
+  {target && <Collaborate target={target} compact />}
 </li>

@@ -293,5 +293,7 @@ edges, dashed-faint for machine-suggested ones, a ⚑ mark on
 low-confidence pages the graph leans on. `/channels/` is the async
 conversation surface: every topic is a channel, a post is an inbox
 write, and the agent replies in-thread on the next tend (no live
-chat). Pagefind search at `/search/`. Local-first — share via repo
-paths, not a hosted URL.
+chat). One **collaboration control** appears on every card, page, and
+thread — comment / queue / post, plus edit and unqueue of your own
+pending items — all backed by the inbox. Pagefind search at
+`/search/`. Local-first — share via repo paths, not a hosted URL.
