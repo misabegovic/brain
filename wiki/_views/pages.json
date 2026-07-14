@@ -216,6 +216,27 @@
       "tokens": 1516
     },
     {
+      "path": "brain/adrs/owner-subscription-wake.md",
+      "title": "Owner-subscription wake via signed subscribe events and guarded webhooks",
+      "kind": "decision",
+      "status": "draft",
+      "updated": "2026-07-14",
+      "team": "brain kernel",
+      "division": "(brain)",
+      "parent_epic": "event-driven-agent-triggers",
+      "repos": [
+        "brain"
+      ],
+      "confidence": "medium",
+      "summary": "Subscriptions are signed subscribe events on the child-1 stream, carrying a glob match pattern and a wake URL. When a matching event lands, the hosted write path POSTs a signed hint (seq + ref, no payload) to each owner's URL, capped per event, through an SSRF guard (scheme allowlist, no loopback/private hosts, no redirects, short timeout). Delivery is at-least-once; the per-agent cursor is the durable backstop. Webhook was the operator's pick over SSE and long-poll on 2026-07-14.\n",
+      "sources": [
+        "../prds/owner-subscription-wake.md",
+        "../adrs/per-agent-identity.md",
+        "../epics/event-driven-agent-triggers.md"
+      ],
+      "tokens": 1013
+    },
+    {
       "path": "brain/adrs/parallel-efforts-on-request.md",
       "title": "Opt-in parallel efforts via a /spawn skill that creates per-effort worktrees and a wiki/_state/efforts/ registry, with existing skills becoming worktree-aware",
       "kind": "decision",
@@ -543,11 +564,13 @@
         "../adrs/queue-and-tend-inbox.md",
         "../adrs/connector-snapshot-contract.md"
       ],
-      "tokens": 1227,
+      "tokens": 1264,
       "child_prds": [
+        "brain/prds/owner-subscription-wake.md",
         "brain/prds/per-agent-identity.md"
       ],
       "child_adrs": [
+        "brain/adrs/owner-subscription-wake.md",
         "brain/adrs/per-agent-identity.md"
       ]
     },
@@ -561,7 +584,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2824
+      "tokens": 3004
     },
     {
       "path": "brain/pitches/chat-first-app.md",
@@ -788,6 +811,28 @@
         "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
       ],
       "tokens": 359
+    },
+    {
+      "path": "brain/prds/owner-subscription-wake.md",
+      "title": "Owner-subscription wake \u2014 the headline agentic win",
+      "kind": "initiative",
+      "status": "living",
+      "updated": "2026-07-14",
+      "team": "brain kernel",
+      "division": "(brain)",
+      "appetite": "medium",
+      "parent_epic": "event-driven-agent-triggers",
+      "repos": [
+        "brain"
+      ],
+      "confidence": "medium",
+      "summary": "The epic's second child and the win it was for: an agent subscribes to a thread, repo, or producer, and when a matching event lands the brain wakes it \u2014 so a connector's drift event pings the owning agent instead of every agent polling. Subscriptions are signed subscribe events on the child-1 stream; the wake is a webhook POST of a hint (seq + ref, never a payload); the per-agent cursor is the durable at-least-once backstop. Closes the event-driven loop end to end.\n",
+      "sources": [
+        "../epics/event-driven-agent-triggers.md",
+        "../adrs/per-agent-identity.md",
+        "../topics/event-driven-multi-agent.md"
+      ],
+      "tokens": 1500
     },
     {
       "path": "brain/prds/per-agent-identity.md",

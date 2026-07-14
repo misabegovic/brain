@@ -321,3 +321,5 @@
    diff: 21 files, +735/-41
    restricted-paths: true
    by: claude (fable 5)
+2026-07-14 shape — pitch → wiki/brain/prds/owner-subscription-wake.md (PM agent, child of event-driven-agent-triggers epic)
+2026-07-14 shape — wiki/brain/prds/owner-subscription-wake.md → wiki/brain/adrs/owner-subscription-wake.md (Tech Lead agent; operator picked the webhook wake channel)

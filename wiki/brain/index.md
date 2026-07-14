@@ -23,6 +23,12 @@ tooling, governance.
 Kernel decisions ported from the origin deployment on 2026-07-10,
 sanitized to organisation-agnostic form:
 
+- [Owner-subscription wake via signed subscribe events and guarded webhooks](adrs/owner-subscription-wake.md)
+  — **living** (child 2 of the [event-driven epic](epics/event-driven-agent-triggers.md)):
+  subscriptions are signed subscribe events; a matching append POSTs a
+  signed hint (seq + ref) to the owner's URL through an SSRF guard,
+  capped per event, with the cursor as the at-least-once backstop.
+  Awaiting the build.
 - [Per-agent identity on a signed, append-only event stream](adrs/per-agent-identity.md)
   — **built 0.27.0** (child of the [event-driven epic](epics/event-driven-agent-triggers.md)):
   per-agent HMAC keys, signed events on an append-only stream under
@@ -123,6 +129,11 @@ sanitized to organisation-agnostic form:
 
 ## PRDs
 
+- [Owner-subscription wake](prds/owner-subscription-wake.md)
+  — **living** (child 2 of the
+  [event-driven epic](epics/event-driven-agent-triggers.md)): subscribe
+  to a thread/repo/producer and a matching event wakes the owner via a
+  guarded webhook. Awaiting the build.
 - [Per-agent identity for a hosted brain](prds/per-agent-identity.md)
   — **superseded** (built 0.27.0; child of the
   [event-driven epic](epics/event-driven-agent-triggers.md)): the
