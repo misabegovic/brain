@@ -1007,6 +1007,11 @@
     },
     {
       "source": "brain/state.md",
+      "target": "brain/epics/event-driven-agent-triggers.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/state.md",
       "target": "brain/roadmap.md",
       "provenance": "extracted"
     },

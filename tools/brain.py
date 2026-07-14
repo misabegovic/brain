@@ -37,9 +37,11 @@ import ast
 import collections
 import datetime as dt
 import hashlib
+import hmac
 import http.server
 import json
 import os
+import secrets
 import re
 import shutil
 import socketserver
@@ -1450,6 +1452,25 @@ def cmd_serve(args) -> int:
                 self._send_json(200, {"pending": out})
                 return
 
+            # Hosted tier: an authenticated agent reads verified events
+            # since a cursor. Read-time verification drops any tampered or
+            # revoked-agent line. Only mounts in hosted mode — the local
+            # tool has no event stream.
+            if workbench and hosted_mode() and path == "/api/events":
+                try:
+                    since = int((qs.get("since") or ["0"])[0] or 0)
+                except ValueError:
+                    self._send_json(400, {"error": "since must be an integer"})
+                    return
+                agent = self.headers.get("X-Agent-Id", "")
+                ts = self.headers.get("X-Agent-Ts", "")
+                sig = self.headers.get("X-Agent-Sig", "")
+                if not _agent_verify_message(agent, f"read:{since}:{ts}", sig):
+                    self._send_json(401, {"error": "agent auth failed"})
+                    return
+                self._send_json(200, {"events": event_read(since)})
+                return
+
             # The rendered wiki serves at ROOT as the fallback for any
             # path the JSON API doesn't own — the Astro build links
             # assets and pages absolutely (/_astro/…, /brain/…), so a
@@ -1699,6 +1720,21 @@ def cmd_serve(args) -> int:
                     self._send_json(400, {"error": "unknown action"})
                     return
 
+                # Hosted tier: every write authenticates as a known agent.
+                # Writes that append an event authenticate through
+                # event_append (it verifies the event signature); edit /
+                # remove authenticate a signed action message. Local-first
+                # (hosted off) keeps the machine-stamped author and no auth
+                # beyond the header + host checks above.
+                hosted = hosted_mode()
+                hagent = self.headers.get("X-Agent-Id", "")
+                hts = self.headers.get("X-Agent-Ts", "")
+                hsig = self.headers.get("X-Agent-Sig", "")
+                if hosted and not (hagent and hts and hsig):
+                    self._send_json(401, {"error": "hosted tier requires "
+                        "X-Agent-Id / X-Agent-Ts / X-Agent-Sig"})
+                    return
+
                 # Manage an existing pending contribution (unqueue / edit).
                 # Only ui-action items, only while still pending — a tend
                 # session clearing the item is what makes it final. Agent-
@@ -1720,6 +1756,10 @@ def cmd_serve(args) -> int:
                     if it.get("produced_by") != "ui-action":
                         self._send_json(403, {"error": "only your own "
                             "pending items can be changed"})
+                        return
+                    if hosted and not _agent_verify_message(
+                            hagent, f"{action}:{mid}:{hts}", hsig):
+                        self._send_json(401, {"error": "agent auth failed"})
                         return
                     if action == "remove":
                         p.unlink()
@@ -1748,8 +1788,10 @@ def cmd_serve(args) -> int:
                 extra = {"message": note}
                 if action == "execute":
                     priority = "high"
+                    ev_kind, ev_ref = "note", target or "brain"
                 elif action == "comment":
                     priority = "normal"
+                    ev_kind, ev_ref = "note", target or "brain"
                 else:  # post — a channel message for the conversation surface
                     thread = str(body.get("thread", "")).strip().lower()
                     if not _channel_thread_ok(thread):
@@ -1758,9 +1800,26 @@ def cmd_serve(args) -> int:
                     if not note.strip():
                         self._send_json(400, {"error": "empty message"})
                         return
-                    author = _machine_author()  # server-stamped, not client
                     priority = "normal"
-                    extra = {"thread": thread, "author": author,
+                    ev_kind, ev_ref = "post", f"channel:{thread}"
+
+                # Hosted tier: the write IS a signed event on the stream —
+                # event_append is the write-time auth boundary, and the
+                # authenticated agent (not the machine) is the author.
+                event_seq = None
+                if hosted:
+                    try:
+                        ev = event_append(hagent, ev_kind, ev_ref, hts, hsig)
+                    except (PermissionError, ValueError) as exc:
+                        self._send_json(401, {"error": f"agent auth failed: {exc}"})
+                        return
+                    event_seq = ev["seq"]
+                    author = hagent
+                elif action == "post":
+                    author = _machine_author()  # local: server-stamped
+
+                if action == "post":
+                    extra = {"thread": thread, "author": author or "operator",
                              "message": note,
                              "message_fenced": _fence_untrusted(note),
                              "channel_post": True}
@@ -1774,7 +1833,10 @@ def cmd_serve(args) -> int:
                 except ValueError as exc:
                     self._send_json(400, {"error": str(exc)})
                     return
-                self._send_json(200, {"queued": item_id})
+                resp = {"queued": item_id}
+                if event_seq is not None:
+                    resp["event_seq"] = event_seq
+                self._send_json(200, resp)
                 return
             self._send_json(405, {"error": "read-only"})
 
@@ -3203,6 +3265,311 @@ def _channels_data() -> dict:
         "new_channels": new_threads,
     }
     return {"channels": channels, "activity": activity}
+
+
+# --- per-agent identity + signed event stream (0.27) -------------------
+#
+# Implements wiki/brain/adrs/per-agent-identity.md, the first child of
+# the event-driven epic. Three parts:
+#   1. A per-agent keyring — issue / rotate / revoke a symmetric key per
+#      agent (HMAC-SHA256; stdlib only). The keyring holds secrets, so
+#      it is git-ignored and mode-0600.
+#   2. An append-only, line-oriented event stream under
+#      wiki/_state/events/<period>.jsonl — one signed event per line,
+#      seq-addressable, rolled by month. Git-ignored: high-volume hosted
+#      events are runtime state, not the git audit trail (that stays the
+#      inbox + log/log.md).
+#   3. The auth boundary, both halves: event_append REJECTS a forged or
+#      unsigned append at WRITE time; event_read VERIFIES attribution on
+#      READ and drops anything that fails. Per-agent cursors (reusing the
+#      connector-cursor shape) track each reader's position.
+# Local-first is untouched: with no keyring and no hosted tier, none of
+# this runs and the machine-stamped author stays the default. The legacy
+# "operator" principal is honoured — see _machine_author.
+
+AGENT_KEYS = WIKI / "_state" / "agent-keys.json"        # SECRETS — git-ignored
+EVENTS_DIR = WIKI / "_state" / "events"                 # append-only jsonl — git-ignored
+EVENT_CURSORS = WIKI / "_state" / "event-cursors.json"  # per-agent read cursors
+AGENT_ID_RE = re.compile(r"[a-z0-9][a-z0-9-]{0,63}")
+EVENT_KINDS = {"post", "drift", "release", "note", "subscribe"}
+
+
+def hosted_mode() -> bool:
+    """The hosted, writable, authenticated tier (distinct from the
+    read-only BRAIN_SERVING tier). When off, identity/events are dormant
+    and the brain behaves exactly as the local-first tool it is."""
+    return os.environ.get("BRAIN_HOSTED") == "1"
+
+
+def _load_agent_keys() -> dict:
+    if AGENT_KEYS.exists():
+        try:
+            return json.loads(AGENT_KEYS.read_text())
+        except json.JSONDecodeError:
+            pass
+    return {}
+
+
+def _save_agent_keys(data: dict) -> None:
+    AGENT_KEYS.parent.mkdir(parents=True, exist_ok=True)
+    AGENT_KEYS.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+    try:
+        AGENT_KEYS.chmod(0o600)
+    except OSError:
+        pass
+
+
+def agent_key_issue(agent_id: str, rotate: bool = False) -> str:
+    """Issue (or rotate) a per-agent secret; returns it once. Rotation
+    keeps the issue date and stamps a rotated date."""
+    if not AGENT_ID_RE.fullmatch(agent_id):
+        raise ValueError(f"agent id must be a lowercase slug, got {agent_id!r}")
+    keys = _load_agent_keys()
+    if agent_id in keys and keys[agent_id].get("secret") and not rotate:
+        raise ValueError(f"{agent_id} already has a key — use rotate")
+    entry = keys.get(agent_id, {})
+    entry["secret"] = secrets.token_hex(32)
+    entry.setdefault("issued", today_utc().isoformat())
+    entry.pop("revoked", None)
+    if rotate:
+        entry["rotated"] = today_utc().isoformat()
+    keys[agent_id] = entry
+    _save_agent_keys(keys)
+    return entry["secret"]
+
+
+def agent_key_revoke(agent_id: str) -> bool:
+    """Revoke an agent: drop its secret and mark it revoked. Its past
+    events stay in the stream but no longer verify, and it can neither
+    append nor be re-verified until re-issued."""
+    keys = _load_agent_keys()
+    if agent_id not in keys:
+        return False
+    keys[agent_id]["revoked"] = today_utc().isoformat()
+    keys[agent_id].pop("secret", None)
+    _save_agent_keys(keys)
+    return True
+
+
+def _agent_secret(agent_id: str) -> str | None:
+    entry = _load_agent_keys().get(agent_id)
+    if not entry or entry.get("revoked") or not entry.get("secret"):
+        return None
+    return entry["secret"]
+
+
+def _event_canonical(agent_id: str, kind: str, ref: str, ts: str) -> bytes:
+    """The bytes an agent signs — the content it controls, never the
+    brain-assigned seq."""
+    return json.dumps({"agent": agent_id, "kind": kind, "ref": ref,
+                       "ts": ts}, sort_keys=True,
+                      separators=(",", ":")).encode()
+
+
+def _event_sign(secret: str, agent_id: str, kind: str, ref: str,
+                ts: str) -> str:
+    return hmac.new(bytes.fromhex(secret),
+                    _event_canonical(agent_id, kind, ref, ts),
+                    hashlib.sha256).hexdigest()
+
+
+def _event_files() -> list[Path]:
+    if not EVENTS_DIR.exists():
+        return []
+    return sorted(EVENTS_DIR.glob("*.jsonl"))
+
+
+def _event_count() -> int:
+    total = 0
+    for f in _event_files():
+        with f.open() as fh:
+            total += sum(1 for line in fh if line.strip())
+    return total
+
+
+def _event_period() -> str:
+    return today_utc().isoformat()[:7]  # YYYY-MM
+
+
+def event_append(agent_id: str, kind: str, ref: str, ts: str,
+                 sig: str) -> dict:
+    """WRITE-time auth boundary: reject an append whose signature does
+    not match the claimed agent's live key. Assigns the monotonic seq
+    and appends one line. Returns the stored event."""
+    if kind not in EVENT_KINDS:
+        raise ValueError(f"event kind must be one of {sorted(EVENT_KINDS)}")
+    secret = _agent_secret(agent_id)
+    if secret is None:
+        raise PermissionError(f"unknown or revoked agent: {agent_id}")
+    if not hmac.compare_digest(
+            _event_sign(secret, agent_id, kind, ref, ts), sig):
+        raise PermissionError("signature rejected")
+    event = {"seq": _event_count(), "ts": ts, "agent": agent_id,
+             "kind": kind, "ref": ref, "sig": sig}
+    EVENTS_DIR.mkdir(parents=True, exist_ok=True)
+    with (EVENTS_DIR / f"{_event_period()}.jsonl").open("a") as fh:
+        fh.write(json.dumps(event, sort_keys=True) + "\n")
+    return event
+
+
+def event_emit(agent_id: str, kind: str, ref: str) -> dict:
+    """Sign with the agent's own key and append — the local/CLI path
+    (the agent holds its secret; the boundary still verifies)."""
+    secret = _agent_secret(agent_id)
+    if secret is None:
+        raise PermissionError(f"unknown or revoked agent: {agent_id}")
+    ts = today_utc().isoformat()
+    sig = _event_sign(secret, agent_id, kind, ref, ts)
+    return event_append(agent_id, kind, ref, ts, sig)
+
+
+def _agent_verify_message(agent_id: str, message: str, sig: str) -> bool:
+    """Verify an agent signed an arbitrary message — used to authenticate
+    read requests and edit/remove on the hosted tier (writes that append
+    an event authenticate through event_append instead)."""
+    secret = _agent_secret(agent_id)
+    if secret is None:
+        return False
+    return hmac.compare_digest(
+        hmac.new(bytes.fromhex(secret), message.encode(),
+                 hashlib.sha256).hexdigest(), sig or "")
+
+
+def _event_verify(event: dict) -> bool:
+    secret = _agent_secret(event.get("agent", ""))
+    if secret is None:
+        return False
+    return hmac.compare_digest(
+        _event_sign(secret, event.get("agent", ""), event.get("kind", ""),
+                    event.get("ref", ""), event.get("ts", "")),
+        event.get("sig", ""))
+
+
+def event_read(since_seq: int = 0, verify: bool = True) -> list[dict]:
+    """READ-time verification: return events with seq >= since_seq,
+    dropping any line whose signature no longer verifies (a tampered or
+    revoked-agent event is never delivered to a reader)."""
+    out = []
+    for f in _event_files():
+        for line in f.read_text().splitlines():
+            if not line.strip():
+                continue
+            try:
+                ev = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if ev.get("seq", -1) < since_seq:
+                continue
+            if verify and not _event_verify(ev):
+                continue
+            out.append(ev)
+    return sorted(out, key=lambda e: e.get("seq", 0))
+
+
+def _load_event_cursors() -> dict:
+    if EVENT_CURSORS.exists():
+        try:
+            return json.loads(EVENT_CURSORS.read_text())
+        except json.JSONDecodeError:
+            pass
+    return {}
+
+
+def event_cursor_get(agent_id: str) -> int:
+    return int(_load_event_cursors().get(agent_id, 0))
+
+
+def event_cursor_set(agent_id: str, seq: int) -> None:
+    cur = _load_event_cursors()
+    cur[agent_id] = int(seq)
+    EVENT_CURSORS.parent.mkdir(parents=True, exist_ok=True)
+    EVENT_CURSORS.write_text(json.dumps(cur, indent=2, sort_keys=True) + "\n")
+
+
+def events_since(agent_id: str, advance: bool = True) -> list[dict]:
+    """The per-agent read: verified events since this agent's cursor,
+    advancing the cursor past what was delivered."""
+    evs = event_read(event_cursor_get(agent_id))
+    if evs and advance:
+        event_cursor_set(agent_id, max(e["seq"] for e in evs) + 1)
+    return evs
+
+
+def cmd_agent_key(args) -> int:
+    """Manage the per-agent keyring (identity for the hosted tier)."""
+    op = args.op
+    if op == "issue" or op == "rotate":
+        try:
+            secret = agent_key_issue(args.agent, rotate=(op == "rotate"))
+        except ValueError as exc:
+            print(f"agent-key {op}: {exc}", file=sys.stderr)
+            return 1
+        verb = "rotated" if op == "rotate" else "issued"
+        print(f"{verb} key for agent {args.agent!r}. Secret (shown once — "
+              f"store it in the agent's env, never in git):")
+        print(f"  {secret}")
+        return 0
+    if op == "revoke":
+        ok = agent_key_revoke(args.agent)
+        print(f"revoked {args.agent!r}" if ok else f"no such agent {args.agent!r}")
+        return 0 if ok else 1
+    # list
+    keys = _load_agent_keys()
+    if not keys:
+        print("no agents (the keyring is empty; local-first needs none)")
+        return 0
+    for aid in sorted(keys):
+        e = keys[aid]
+        state = "revoked" if e.get("revoked") else "active"
+        extra = f", rotated {e['rotated']}" if e.get("rotated") else ""
+        print(f"  {aid:24} {state}  issued {e.get('issued','?')}{extra}")
+    return 0
+
+
+def cmd_events(args) -> int:
+    """Emit to / read from the signed event stream."""
+    op = args.op
+    if op == "emit":
+        try:
+            ev = event_emit(args.agent, args.kind, args.ref)
+        except (PermissionError, ValueError) as exc:
+            print(f"events emit: {exc}", file=sys.stderr)
+            return 1
+        print(f"appended event seq={ev['seq']} {ev['kind']} by {ev['agent']}")
+        return 0
+    if op == "since":
+        evs = events_since(args.agent, advance=not args.no_advance)
+        if args.json:
+            print(json.dumps(evs, indent=2))
+        else:
+            for e in evs:
+                print(f"  seq={e['seq']} {e['ts']} {e['kind']:8} "
+                      f"by {e['agent']} → {e['ref']}")
+            if not evs:
+                print("(no new events)")
+        return 0
+    # verify — integrity report over the whole stream
+    total = raw = 0
+    forged = []
+    for f in _event_files():
+        for line in f.read_text().splitlines():
+            if not line.strip():
+                continue
+            raw += 1
+            try:
+                ev = json.loads(line)
+            except json.JSONDecodeError:
+                forged.append("(unparseable line)")
+                continue
+            if _event_verify(ev):
+                total += 1
+            else:
+                forged.append(f"seq={ev.get('seq','?')} by {ev.get('agent','?')}")
+    print(f"events verify: {total}/{raw} verify; "
+          f"{len(forged)} fail" + (":" if forged else ""))
+    for f in forged[:20]:
+        print(f"  ✗ {f}")
+    return 1 if forged else 0
 
 
 def cmd_inbox(args) -> int:
@@ -7819,6 +8186,40 @@ def main() -> int:
         "pending-grades", help="judged attention items awaiting a grade")
     ib_pg.add_argument("--json", action="store_true")
     ap_ib.set_defaults(func=cmd_inbox)
+
+    ap_ak = sub.add_parser(
+        "agent-key",
+        help="per-agent identity keyring for the hosted tier "
+             "(wiki/_state/agent-keys.json; git-ignored secrets)")
+    ak_sub = ap_ak.add_subparsers(dest="op", required=True)
+    ak_issue = ak_sub.add_parser("issue", help="issue a new per-agent key")
+    ak_issue.add_argument("agent")
+    ak_rotate = ak_sub.add_parser("rotate", help="rotate an agent's key")
+    ak_rotate.add_argument("agent")
+    ak_revoke = ak_sub.add_parser("revoke", help="revoke an agent")
+    ak_revoke.add_argument("agent")
+    ak_sub.add_parser("list", help="list agents + key state")
+    ap_ak.set_defaults(func=cmd_agent_key)
+
+    ap_ev = sub.add_parser(
+        "events",
+        help="the signed append-only event stream "
+             "(wiki/_state/events/; git-ignored runtime state)")
+    ev_sub = ap_ev.add_subparsers(dest="op", required=True)
+    ev_emit = ev_sub.add_parser(
+        "emit", help="sign with the agent's key and append an event")
+    ev_emit.add_argument("--agent", required=True)
+    ev_emit.add_argument("--kind", required=True, choices=sorted(EVENT_KINDS))
+    ev_emit.add_argument("--ref", required=True,
+                         help="what the event concerns (thread, repo, path)")
+    ev_since = ev_sub.add_parser(
+        "since", help="verified events since this agent's cursor")
+    ev_since.add_argument("--agent", required=True)
+    ev_since.add_argument("--json", action="store_true")
+    ev_since.add_argument("--no-advance", action="store_true",
+                          help="peek without advancing the cursor")
+    ev_sub.add_parser("verify", help="integrity report over the whole stream")
+    ap_ev.set_defaults(func=cmd_events)
 
     ap_sc = sub.add_parser("sync-cursor",
                            help="manage sibling-repo sync cursors "
