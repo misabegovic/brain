@@ -63,3 +63,10 @@ log/queries.log
 wiki/_state/producer-heartbeat.json
 wiki/_state/inbox-acks.json
 .personal-data-patterns
+
+# Hosted-tier identity + event stream — runtime state, never committed.
+# agent-keys.json holds SECRETS; the event stream is high-volume runtime
+# data (the git audit trail stays the inbox + log/log.md).
+wiki/_state/agent-keys.json
+wiki/_state/events/
+wiki/_state/event-cursors.json

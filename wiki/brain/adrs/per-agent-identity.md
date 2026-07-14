@@ -1,7 +1,7 @@
 ---
 title: "Per-agent identity on a signed, append-only event stream"
 kind: decision
-status: draft
+status: living
 updated: 2026-07-14
 team: brain kernel
 division: "(brain)"
@@ -144,6 +144,38 @@ ships, then graduates to `living` with build notes.
 - **Leaves** the durable storage engine, the key format, and the wake
   channel itself as deliberately-open build- or child-level decisions,
   bounded by the invariants named above.
+
+## Build notes
+
+Shipped 0.27.0 (2026-07-14), in `tools/brain.py`. Where the ADR left a
+choice open, the build made it:
+
+- **Key format: symmetric HMAC-SHA256** (stdlib only, no crypto
+  dependency). The keyring at `wiki/_state/agent-keys.json` maps an
+  agent to a 256-bit secret; it is git-ignored and written mode-0600.
+  Asymmetric keys were not worth a third-party dependency for this
+  threat model (reject forged appends, verify attribution).
+- **Storage engine: month-partitioned JSONL** under
+  `wiki/_state/events/<YYYY-MM>.jsonl`, one signed event per line, with
+  a global monotonic `seq` (the running event count) as the
+  cursor-addressable position. Git-ignored runtime state; the git audit
+  trail stays the inbox and `log/log.md`.
+- **The auth boundary is the `BRAIN_HOSTED=1` tier.** On the hosted
+  tier, every `/api/act` write authenticates: a post/comment/queue is a
+  signed event (`event_append` is the write-time rejection), and the
+  authenticated agent — not the machine — is the author. `edit`/`remove`
+  authenticate a signed action message. A new authenticated
+  `GET /api/events?since=<seq>` is the read side, and read-time
+  verification drops any tampered or revoked-agent line. Rotation
+  invalidates prior signatures by construction (they were signed under
+  the old secret).
+- **Local-first is byte-for-byte unchanged.** With `BRAIN_HOSTED` unset
+  there is no keyring, no stream, no daemon, and posts stay
+  machine-authored. The legacy `operator` principal is honoured.
+
+CLI: `brain.py agent-key issue|rotate|revoke|list` and `brain.py events
+emit|since|verify`. The subscription-and-wake that reads these cursors
+is the epic's second child, still to shape.
 
 ## Linked PRD
 

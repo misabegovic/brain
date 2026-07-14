@@ -26,6 +26,23 @@ into the sections below.
 
 ## Now
 
+- **Per-agent identity + a signed event stream ship (0.27.0,
+  2026-07-14).** The first build of the [event-driven epic](epics/event-driven-agent-triggers.md)
+  — the agentic-future backbone. A hosted brain (`BRAIN_HOSTED=1`) now
+  authenticates agents: per-agent HMAC keys (`agent-key
+  issue|rotate|revoke`), and a signed, append-only event stream under
+  `wiki/_state/events` that agents read per-agent cursors over
+  (`events emit|since|verify`). The auth boundary does both halves —
+  `event_append` rejects a forged or unsigned append at write time, and
+  reads drop any tampered or revoked-agent line. On the hosted tier a
+  `/api/act` write is a signed event authored by the authenticated
+  agent, and `GET /api/events?since=<seq>` is the authenticated read.
+  Local-first is byte-for-byte unchanged: no keyring, no stream, no
+  daemon, posts stay machine-authored. Secrets + the stream are
+  git-ignored runtime state; the audit trail stays the inbox +
+  `log/log.md`. Only the owner-subscription wake (epic child 2) remains
+  before the loop closes end to end.
+
 - **The graph and connector reflect as page-level trust signals
   (0.26.0, 2026-07-14).** The edge-provenance graph and the structure
   connector were agent/maintainer plumbing with no user-facing payoff —

@@ -209,6 +209,9 @@ python3 tools/brain.py status       # single-pane health dashboard
 python3 tools/brain.py inbox summary # the tend queue in one line
 python3 tools/brain.py inbox ack <id> # reviewed, no change — suppress a recurring item until the page changes
 python3 tools/brain.py inbox pending-grades # judged attention items awaiting a grade
+python3 tools/brain.py agent-key issue <agent> # hosted-tier identity: per-agent HMAC key (git-ignored secret)
+python3 tools/brain.py events emit --agent <a> --kind post --ref <r> # append a signed event
+python3 tools/brain.py events since --agent <a> # verified events since the agent's cursor
 python3 tools/brain.py links        # link-graph health (orphans / hubs / suggestions)
 python3 tools/brain.py index --schema # the derived-index schema (for view specs)
 python3 tools/brain.py query '<sql>' # read-only SQL over the index
@@ -266,6 +269,7 @@ personal data, no boilerplate.
 | Structure           | ✅ pull connector  | Deterministic code-shape snapshots (source inventory + Python symbols) → architectural-drift inbox items via baseline diff; drift auto-clears once a wiki page cites the snapshot. No network / binary / LLM; read-only git with a clean-tree guard. Configure `connectors.structure.repos`. |
 | GitHub            | via `gh` CLI         | Pre-allowed in `.claude/settings.json`.                        |
 | MCP               | ✅ `tools/brain-mcp.py` | Read-only; stdio or `--http` (loopback Host + Origin checks); `BRAIN_SERVING=1` excludes ai-suggestion drafts across *every* read surface (MCP, serve JSON API, search CLI, static build) + query audit log. |
+| Hosted tier       | ✅ `BRAIN_HOSTED=1`  | Authenticated, writable multi-agent tier. Per-agent HMAC keys; `/api/act` writes are signed events authored by the authenticated agent; `GET /api/events?since=<seq>` is the authenticated read; the auth boundary rejects forged appends at write time and drops tampered lines on read. Off by default — local-first is byte-for-byte unchanged. |
 | Datasette         | ✅ pilot             | `tools/serve-datasette.sh` — faceted browse + SQL + JSON API over the derived index (immutable mode). |
 | mempalace         | optional             | Verbatim / semantic-recall layer.                              |
 
