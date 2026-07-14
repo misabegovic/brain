@@ -305,3 +305,64 @@ def test_wake_refused_to_unsafe_url(monkeypatch, tmp_path):
     brain.subscribe("prod", "repo:*", "http://127.0.0.1:9/hook")
     ev = brain.event_emit("connector", "drift", "repo:brain")
     assert brain.deliver_wakes(ev) == 0
+
+
+def _load_spoke_client():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "brain_agent", REPO / "tools" / "brain-agent.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def test_spoke_client_round_trip(tmp_path):
+    """The spoke client (tools/brain-agent.py) emits, pulls its cursor,
+    and subscribes against a hosted hub over HTTP — the hub-and-spoke
+    loop end to end."""
+    assert not brain.AGENT_KEYS.exists(), "test assumes no live keyring"
+    ba = _load_spoke_client()
+    ba.CURSORS = tmp_path / "cursors.json"
+    port = 8803
+    conn_secret = brain.agent_key_issue("connector")
+    proc = subprocess.Popen(
+        [sys.executable, str(REPO / "tools" / "brain.py"), "serve",
+         "--port", str(port)],
+        env={**os.environ, "BRAIN_HOSTED": "1"},
+        stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+    try:
+        for _ in range(40):
+            try:
+                urllib.request.urlopen(f"http://127.0.0.1:{port}/api", timeout=3)
+                break
+            except OSError:
+                if proc.poll() is not None:
+                    raise AssertionError("hub died")
+                time.sleep(0.3)
+        os.environ.update(BRAIN_URL=f"http://127.0.0.1:{port}",
+                          BRAIN_AGENT_ID="connector",
+                          BRAIN_AGENT_SECRET=conn_secret)
+
+        # Emit through the client, then pull it back (cursor advances).
+        assert ba.emit("drift", "repo:brain")["seq"] == 0
+        evs = ba.pull()
+        assert [(e["seq"], e["kind"], e["ref"]) for e in evs] == \
+            [(0, "drift", "repo:brain")]
+        assert ba.pull() == []  # cursor advanced past what was delivered
+
+        # A forged secret is rejected by the hub's write boundary.
+        os.environ["BRAIN_AGENT_SECRET"] = "00" * 32
+        raised = False
+        try:
+            ba.emit("drift", "repo:x")
+        except SystemExit:
+            raised = True
+        assert raised, "hub must reject a bad secret"
+    finally:
+        proc.terminate()
+        proc.wait(timeout=5)
+        brain.AGENT_KEYS.unlink(missing_ok=True)
+        brain.EVENT_CURSORS.unlink(missing_ok=True)
+        shutil.rmtree(brain.EVENTS_DIR, ignore_errors=True)
+        for k in ("BRAIN_URL", "BRAIN_AGENT_ID", "BRAIN_AGENT_SECRET"):
+            os.environ.pop(k, None)

@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Built (0.29.0): the spoke client — hub-and-spoke,
+  both halves.** `tools/brain-agent.py` is the missing client half: an
+  agent in any harness can `emit` / `pull` / `subscribe` / `listen`
+  against a hosted brain, mirroring the server's signing. The server
+  gained `POST /api/events` (the agent write endpoint). Work can start
+  in the brain, dispatch to an agent in its harness via a wake, run
+  there, and land back — without the brain being a harness.
 - **2026-07-14** — **Built (0.28.0): owner-subscription wake — the loop
   is closed.** The [event-driven epic](brain/epics/event-driven-agent-triggers.md)
   is complete. Subscribe to a thread/repo/producer and a matching event
