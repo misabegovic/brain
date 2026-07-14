@@ -18,6 +18,14 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **synthesis: the three ideas are one loop.** A
+  [topic](brain/topics/three-ideas-compose.md) ties the async
+  conversation surface, the deterministic structure connector, and
+  edge-provenance tags into a single arc: provenance is the
+  connective tissue (connector → EXTRACTED, synthesis → INFERRED,
+  drift → AMBIGUOUS, conversation resolves it). Sequence it
+  provenance → connector → conversation; the conversation surface
+  earns its build only after the other two make it worth it.
 - **2026-07-14** — **ingested Graphify; deepdive + benefit suggestion.**
   A four-agent deepdive of
   [Graphify](https://github.com/Graphify-Labs/graphify) — a

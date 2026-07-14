@@ -508,7 +508,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2260
+      "tokens": 2319
     },
     {
       "path": "brain/pitches/chat-first-app.md",
@@ -891,6 +891,23 @@
         "../../../sources/web/aicoding-fowler-phoenix--f0e11r.md"
       ],
       "tokens": 278
+    },
+    {
+      "path": "brain/topics/three-ideas-compose.md",
+      "title": "How the three ideas compose \u2014 a conversational, provenance-aware knowledge graph grounded in deterministic facts",
+      "kind": "topic",
+      "status": "living",
+      "updated": "2026-07-14",
+      "confidence": "low",
+      "summary": "The async conversation surface, the deterministic structure connector, and edge-provenance tags aren't three features \u2014 they're a loop. Provenance is the connective tissue: the connector emits EXTRACTED facts, synthesis adds INFERRED edges, drift flags AMBIGUOUS, and the conversation surface routes AMBIGUOUS to a human. Sequence it provenance \u2192 connector \u2192 conversation; the conversation surface earns its build only after the other two give it something worth discussing.\n",
+      "sources": [
+        "../ai-suggestions/prds/conversation-surface-over-inbox.md",
+        "../ai-suggestions/prds/deterministic-structure-connector.md",
+        "../ai-suggestions/prds/edge-provenance-tags.md",
+        "../../../sources/research/2026-07-14--enola-deterministic-architecture-extractor.md",
+        "../../../sources/research/2026-07-14--graphify-llm-knowledge-graph.md"
+      ],
+      "tokens": 1393
     },
     {
       "path": "insights/ai-suggestions-exclusion-mcp-only.md",
