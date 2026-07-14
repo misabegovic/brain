@@ -276,3 +276,7 @@
    diff: 18 files, +449/-18
    restricted-paths: true
    by: claude (fable 5)
+2026-07-14 merge — PR #19: Add an async conversation surface over the inbox
+   diff: 23 files, +662/-27
+   restricted-paths: true
+   by: claude (fable 5)
