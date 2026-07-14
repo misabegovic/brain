@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Pitch: event-driven triggers for multi-agent
+  work.** The 4-agent session's topic graduated into a pre-bet Shape Up
+  [pitch](brain/pitches/event-driven-agent-triggers.md) — an agentic
+  future where an agent's action wakes the agents who care, via a
+  read-side fan-out over the brain's existing records (never a
+  scheduler). Awaiting a bet; on a bet it becomes an epic (per-agent
+  identity first, then owner-subscription wake).
 - **2026-07-14** — **Live 4-agent session on the brain.** Three agents
   chatted in a channel while a fourth ran the brain and pushed events
   between them — dogfooding the conversation surface for real

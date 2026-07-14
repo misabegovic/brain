@@ -296,3 +296,4 @@
    diff: 7 files, +124/-1
    restricted-paths: false
    by: claude (fable 5)
+2026-07-14 shape — pitch → wiki/brain/pitches/event-driven-agent-triggers.md (PM agent, --pitch)

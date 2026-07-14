@@ -49,6 +49,13 @@ sanitized to organisation-agnostic form:
 
 ## Pitches (pre-bet) — awaiting a bet
 
+- [Event-driven triggers for multi-agent work](pitches/event-driven-agent-triggers.md)
+  — **awaiting a bet.** An agentic future for a hosted brain: an agent's
+  action wakes the agents who care via a read-side fan-out over the
+  brain's existing records (notify is a wake hint, never a scheduler).
+  Graduated from the [event-driven-multi-agent topic](topics/event-driven-multi-agent.md).
+  Appetite big; on a bet it becomes an epic — per-agent identity first
+  (the one new component hosting forces), then owner-subscription wake.
 - [Chat-first app](pitches/chat-first-app.md) — **superseded**
   2026-07-10: graduated on the operator's picks (registry / toggle /
   full collapse).

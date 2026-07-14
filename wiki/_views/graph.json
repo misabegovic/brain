@@ -22,6 +22,11 @@
     },
     {
       "source": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "target": "brain/pitches/event-driven-agent-triggers.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/acknowledge-recurring-tend-items.md",
       "target": "brain/prds/attention-calibration-operator-surface.md",
       "provenance": "inferred"
     },
@@ -102,6 +107,11 @@
     },
     {
       "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "target": "brain/pitches/event-driven-agent-triggers.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
       "target": "brain/prds/attention-calibration-operator-surface.md",
       "provenance": "inferred"
     },
@@ -177,6 +187,11 @@
     },
     {
       "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/pitches/event-driven-agent-triggers.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
       "target": "brain/prds/attention-calibration-operator-surface.md",
       "provenance": "inferred"
     },
@@ -217,6 +232,11 @@
     },
     {
       "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "target": "brain/pitches/event-driven-agent-triggers.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
       "target": "brain/prds/attention-calibration-operator-surface.md",
       "provenance": "inferred"
     },
@@ -244,6 +264,11 @@
       "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
       "target": "brain/state.md",
       "provenance": "extracted"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "target": "brain/pitches/event-driven-agent-triggers.md",
+      "provenance": "inferred"
     },
     {
       "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
@@ -442,6 +467,11 @@
     },
     {
       "source": "brain/index.md",
+      "target": "brain/pitches/event-driven-agent-triggers.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
       "target": "brain/pitches/harness-workbench.md",
       "provenance": "extracted"
     },
@@ -558,6 +588,36 @@
     {
       "source": "brain/index.md",
       "target": "insights/ai-suggestions-exclusion-mcp-only.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/pitches/event-driven-agent-triggers.md",
+      "target": "brain/prds/attention-calibration-operator-surface.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/pitches/event-driven-agent-triggers.md",
+      "target": "brain/prds/pm-view-reads-like-a-brief.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/pitches/event-driven-agent-triggers.md",
+      "target": "brain/prds/priya-trust-banner-render-proof.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/pitches/event-driven-agent-triggers.md",
+      "target": "brain/prds/producer-death-first-class-health.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/pitches/event-driven-agent-triggers.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/pitches/event-driven-agent-triggers.md",
+      "target": "brain/topics/event-driven-multi-agent.md",
       "provenance": "extracted"
     },
     {
@@ -746,6 +806,11 @@
       "provenance": "extracted"
     },
     {
+      "source": "brain/topics/event-driven-multi-agent.md",
+      "target": "brain/pitches/event-driven-agent-triggers.md",
+      "provenance": "extracted"
+    },
+    {
       "source": "brain/topics/market-readiness-gaps.md",
       "target": "brain/topics/one-point-oh-criteria.md",
       "provenance": "extracted"
@@ -838,6 +903,11 @@
     {
       "source": "index.md",
       "target": "brain/pitches/composable-role-views.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/pitches/event-driven-agent-triggers.md",
       "provenance": "extracted"
     },
     {
@@ -950,6 +1020,7 @@
     "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
     "brain/ai-suggestions/prds/deterministic-structure-connector.md",
     "brain/ai-suggestions/prds/edge-provenance-tags.md",
+    "brain/pitches/event-driven-agent-triggers.md",
     "brain/topics/event-driven-multi-agent.md",
     "brain/topics/market-readiness-gaps.md",
     "brain/topics/three-ideas-compose.md"
