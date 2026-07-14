@@ -47,15 +47,21 @@ sanitized to organisation-agnostic form:
 - [Kernel-manifest instancing](adrs/kernel-manifest-instancing.md) — instances born by explicit manifest: mechanism + kernel trail cross, dogfood never does.
 - [Single-image serving profile](adrs/single-image-serving-profile.md) — one infra-agnostic image, env-selected surface; instance isolation via env ports + hashed timer units; Railway as reference, not dependency.
 
+## Epics (bet-on umbrellas)
+
+- [Event-driven triggers for multi-agent work](epics/event-driven-agent-triggers.md)
+  — **bet placed 2026-07-14.** An event-driven backbone for multi-agent
+  work: an agent's action wakes the agents who care via a read-side
+  fan-out over the brain's existing records (notify is a wake hint,
+  never a scheduler). Children in dependency order: per-agent identity
+  first (the one new component hosting forces, also resolves the
+  event-fan-out substrate), then owner-subscription wake.
+
 ## Pitches (pre-bet) — awaiting a bet
 
 - [Event-driven triggers for multi-agent work](pitches/event-driven-agent-triggers.md)
-  — **awaiting a bet.** An agentic future for a hosted brain: an agent's
-  action wakes the agents who care via a read-side fan-out over the
-  brain's existing records (notify is a wake hint, never a scheduler).
-  Graduated from the [event-driven-multi-agent topic](topics/event-driven-multi-agent.md).
-  Appetite big; on a bet it becomes an epic — per-agent identity first
-  (the one new component hosting forces), then owner-subscription wake.
+  — **superseded** 2026-07-14: the bet graduated it into the
+  [epic](epics/event-driven-agent-triggers.md) above.
 - [Chat-first app](pitches/chat-first-app.md) — **superseded**
   2026-07-10: graduated on the operator's picks (registry / toggle /
   full collapse).

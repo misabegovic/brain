@@ -18,6 +18,11 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Bet placed: event-driven triggers for multi-agent
+  work.** The pitch graduated into an
+  [epic](brain/epics/event-driven-agent-triggers.md) — the brain's
+  first. Children spawn in dependency order: per-agent identity first
+  (the one new component hosting forces), then owner-subscription wake.
 - **2026-07-14** — **Pitch: event-driven triggers for multi-agent
   work.** The 4-agent session's topic graduated into a pre-bet Shape Up
   [pitch](brain/pitches/event-driven-agent-triggers.md) — an agentic
