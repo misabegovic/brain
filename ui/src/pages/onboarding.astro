@@ -10,9 +10,11 @@
 // Run locally with `npm run dev` from ui/. Reachable at /onboarding/.
 
 type SlideLink = { label: string; href: string };
+// n / total are derived at render time from the array index and length;
+// the optional fields below are vestigial and ignored.
 type Slide = {
-  n: number;
-  total: number;
+  n?: number;
+  total?: number;
   kicker: string;
   title: string;
   body?: string;
@@ -21,7 +23,7 @@ type Slide = {
   links?: SlideLink[];
 };
 
-const TOTAL = 14;
+const TOTAL = 0; // vestigial; the render derives numbering from the array
 
 const slides: Slide[] = [
   {
@@ -132,14 +134,26 @@ const slides: Slide[] = [
     kicker: 'The app',
     title: 'The briefing is the front page — and it listens.',
     bullets: [
-      'Briefing — what needs you, what\'s in flight, what\'s on the table, plus were/are/going orientation. Filter by type; every card carries an executive summary.',
-      'Dashboard (numbers + graphs), Trail (the decision timeline), Graph (the link graph), Corpus (the full wiki), Search.',
-      'It\'s interactive: ⚑ queue and 💬 comment on any card or page hand work to the agent — clicks become inbox items the next session digests.',
+      'Briefing — what needs you, what\'s in flight, what\'s on the table, plus were/are/going orientation. Every card carries an executive summary; filter by type.',
+      'Read surfaces: Dashboard (numbers), Trail (the decision timeline), Graph (the link graph with per-edge provenance), Corpus (the full wiki), Search.',
+      'One collaboration control on every card, page, and thread — comment / queue / post, plus edit and unqueue of your own pending items. Every click is an inbox item the next tend digests; the inbox is the only write.',
+      'Every page shows trust signals from the graph: how many pages rely on it, and an "uncertain but load-bearing" flag on low-confidence pages others depend on.',
     ],
     links: [
       { label: 'Briefing', href: '/' },
       { label: 'Dashboard', href: '/dashboard/' },
     ],
+  },
+  {
+    kicker: 'Talking to it, async',
+    title: 'Channels — threads with the agent.',
+    body: 'Every topic is a channel. Post a message and the agent replies in the thread on the next tend — asynchronous by design, not a live chat (that stays your harness).',
+    bullets: [
+      'A topic page leads with an executive brief — the summary and the question being decided — with the full discussion collapsed. Weigh in without reading the wall of text.',
+      'A post is an inbox write; the agent\'s reply appends to the thread. The Activity band shows what\'s awaiting a reply.',
+      'Attribution is server-stamped; post text is fenced as untrusted data before it reaches the agent. On the hosted tier, posts are signed events.',
+    ],
+    links: [{ label: 'Channels', href: '/channels/' }],
   },
   {
     n: 10,
@@ -151,6 +165,17 @@ const slides: Slide[] = [
       'Talk naturally — the agent dispatches the right operation: "what do we know about X?", "note this decision", "tend the brain", "walk the product as a user".',
       'The slash commands (/in, /capture, /ask, /shape, /tend, /groom, /playthrough, …) exist so you can recognise what\'s running — most users never type them.',
     ],
+  },
+  {
+    kicker: 'Advanced — the agentic tier',
+    title: 'The brain as a coordination hub for many agents.',
+    body: 'Off by default and local-first-preserving. Turn on the hosted tier and the brain coordinates many agents that run in their own harnesses — it is never a harness itself.',
+    bullets: [
+      'Each agent has a signed identity. Agents write a signed, append-only event stream and read it from a per-agent cursor; forged or tampered events are rejected.',
+      'An agent subscribes to what it cares about — a repo, a thread, a producer — and is woken when a matching event lands. A wake is a hint, never an invocation; the agent reacts on its own next tend.',
+      'Specialized agents (a drift-reconciler; an observability-triage agent for Sentry / Datadog / Langfuse) subscribe and react deterministically. See the whole loop locally, no deployment: run tools/emulate-agentic.py.',
+    ],
+    callout: 'The two lines that never move: no scheduled LLM (a wake is a hint), and the brain is the hub, not a harness.',
   },
   {
     n: 11,
@@ -415,11 +440,11 @@ const slides: Slide[] = [
   <body>
     <a class="skip" href="/" aria-label="Exit to home">Exit ↗</a>
     <main class="deck" role="main">
-      {slides.map((slide) => (
-        <section class="slide" aria-labelledby={`slide-${slide.n}-title`}>
+      {slides.map((slide, i) => (
+        <section class="slide" aria-labelledby={`slide-${i + 1}-title`}>
           <div class="slide-inner">
             <p class="kicker">{slide.kicker}</p>
-            <h1 class="title" id={`slide-${slide.n}-title`}>{slide.title}</h1>
+            <h1 class="title" id={`slide-${i + 1}-title`}>{slide.title}</h1>
             {slide.body && <p class="body">{slide.body}</p>}
             {slide.bullets && (
               <ul class="bullets">
@@ -433,7 +458,7 @@ const slides: Slide[] = [
               </ul>
             )}
           </div>
-          <span class="pager" aria-hidden="true">{slide.n} / {slide.total}</span>
+          <span class="pager" aria-hidden="true">{i + 1} / {slides.length}</span>
         </section>
       ))}
     </main>

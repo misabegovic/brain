@@ -26,6 +26,13 @@ this repo is that pattern productised: governance, health checks,
 a queue that accumulates work while you're away (no scheduled LLM
 runs, ever — see below), and one app to live in.
 
+That core is single-operator and local-first. On top of it, an optional
+**agentic tier** turns the brain into the coordination hub for *many*
+agents — each authenticated, subscribing to what it cares about, woken
+when a matching event lands — without the brain ever being a harness or
+running an LLM on a schedule. It's off by default; see
+[The agentic tier](#the-agentic-tier--hub-and-spoke-advanced-off-by-default).
+
 ## Quickstart
 
 ```bash
@@ -276,6 +283,42 @@ personal data, no boilerplate.
 | Local emulation   | ✅ `tools/emulate-agentic.py` | Runs the whole agentic loop on one machine — real hub + real spoke agents + emulated producers → wakes → reactions on a signed stream. No deployment; a live smoke test of the real code paths. |
 | Datasette         | ✅ pilot             | `tools/serve-datasette.sh` — faceted browse + SQL + JSON API over the derived index (immutable mode). |
 | mempalace         | optional             | Verbatim / semantic-recall layer.                              |
+
+## The agentic tier — hub-and-spoke (advanced, off by default)
+
+The brain is **not** a harness and never runs your agents — but it can
+be the **coordination hub** for many agents that run in their own
+harnesses. Turn on the hosted tier (`BRAIN_HOSTED=1`) and:
+
+- Each agent gets a **per-agent identity** (`agent-key issue`) — an HMAC
+  key that signs everything it writes.
+- Agents write to a **signed, append-only event stream** and read it
+  from a per-agent cursor. The auth boundary rejects forged appends at
+  write time and drops tampered lines on read.
+- An agent **subscribes** to what it cares about (a repo, a thread, a
+  producer) and is **woken** when a matching event lands — a webhook
+  hint (seq + ref, no payload) through an SSRF guard, with the cursor as
+  the at-least-once backstop. A wake never invokes the agent; it reacts
+  on its own next tend.
+- The **spoke client** (`tools/brain-agent.py`) is the harness-side
+  half: `emit` / `pull` / `subscribe` / `listen`. `agent-key provision
+  <agent>` prints the env + listener + subscribe block to wire a harness
+  in.
+- **Specialized agents** (`tools/agents/`) subscribe and react
+  *deterministically* — a drift-reconciler, an observability-triage
+  agent — waking, prepping, and queuing work for a tend session, never
+  invoking an LLM.
+
+See the whole loop without deploying anything:
+
+```bash
+python3 tools/emulate-agentic.py   # real hub + real agents + emulated producers, on one machine
+```
+
+With the tier off, **local-first is byte-for-byte unchanged** — no
+keyring, no stream, no daemon, no subscriptions. The two settled
+principles hold throughout: no scheduled LLM (a wake is a hint, not a
+trigger), and the brain is the hub, not a harness.
 
 ## Deploy
 
