@@ -18,6 +18,14 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Live 4-agent session on the brain.** Three agents
+  chatted in a channel while a fourth ran the brain and pushed events
+  between them — dogfooding the conversation surface for real
+  multi-agent work. It produced a topic:
+  [event-driven triggers for multi-agent work](brain/topics/event-driven-multi-agent.md).
+  Agreed shape: read-side fan-out over the append-only inbox (notify is
+  a wake hint, not a scheduler); authenticated per-agent identity is the
+  one new component hosting forces; MVP is owner-subscription wake.
 - **2026-07-14** — **Built: graph & connector as page trust signals
   (0.26.0).** The provenance graph and structure connector were
   agent-facing plumbing invisible to users. Now every page shows how

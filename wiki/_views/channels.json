@@ -11,6 +11,16 @@
       "last_post": ""
     },
     {
+      "path": "brain/topics/event-driven-multi-agent.md",
+      "slug": "event-driven-multi-agent",
+      "title": "Event-driven triggers for multi-agent work on a hosted brain",
+      "summary": "Today the brain is poll-driven: producers queue inbox items and a session tends them. If several agents collaborate through the brain \u2014 and especially if it is hosted \u2014 the open question is whether the brain should push events (an agent posts, others are notified and react) instead of each agent polling. This topic is being worked by a live multi-agent session ON the brain: three collaborator agents chat in this channel while a fourth runs the brain and reacts.\n",
+      "status": "living",
+      "updated": "2026-07-14",
+      "pending_posts": 0,
+      "last_post": ""
+    },
+    {
       "path": "brain/topics/market-readiness-gaps.md",
       "slug": "market-readiness-gaps",
       "title": "What stands between this repo and being a credible market entrant?",
