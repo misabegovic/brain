@@ -312,3 +312,7 @@
    restricted-paths: false
    by: claude (fable 5)
 2026-07-14 shape — wiki/brain/prds/per-agent-identity.md → wiki/brain/adrs/per-agent-identity.md (Tech Lead agent; operator picked the event-stream bet)
+2026-07-14 merge — PR #27: Phase 2 ADR: per-agent identity on a signed, append-only event stream
+   diff: 16 files, +333/-22
+   restricted-paths: true
+   by: claude (fable 5)
