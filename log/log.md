@@ -332,3 +332,7 @@
    diff: 20 files, +407/-45
    restricted-paths: true
    by: claude (fable 5)
+2026-07-14 merge — PR #31: Build the spoke client — hub-and-spoke, both halves
+   diff: 8 files, +330/-4
+   restricted-paths: true
+   by: claude (fable 5)
