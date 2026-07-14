@@ -292,3 +292,7 @@
    diff: 8 files, +92/-6
    restricted-paths: false
    by: claude (fable 5)
+2026-07-14 merge — PR #23: Capture the event-driven multi-agent topic from a live session
+   diff: 7 files, +124/-1
+   restricted-paths: false
+   by: claude (fable 5)
