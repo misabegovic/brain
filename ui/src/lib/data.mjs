@@ -38,6 +38,39 @@ export function channels() {
   }
 }
 
+// Page-level trust signals derived from the provenance graph: how many
+// pages depend on this one (authored inbound edges — a centrality/trust
+// signal), whether it's flagged AMBIGUOUS (low-confidence yet
+// load-bearing — verify before trusting), and how many of its own
+// outbound links are machine-suggested rather than authored.
+export function pageProvenance(relPath) {
+  const p = path.join(WIKI, '_views', 'graph.json');
+  const empty = { dependents: 0, ambiguous: false, suggestedLinks: 0 };
+  if (!fs.existsSync(p)) return empty;
+  let g;
+  try {
+    g = JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch {
+    return empty;
+  }
+  const edges = g.edges || [];
+  return {
+    dependents: edges.filter((e) => e.target === relPath && e.provenance === 'extracted').length,
+    ambiguous: (g.ambiguous_nodes || []).includes(relPath),
+    suggestedLinks: edges.filter((e) => e.source === relPath && e.provenance === 'inferred').length,
+  };
+}
+
+// Pending structure-connector drift for one repo/shelf: the inbox items
+// the connector queues when a repo's code shape moves. Dormant until a
+// repo is configured (connectors.structure.repos); surfaced inline on
+// the repo's shelf page when present.
+export function structureDrift(repoSlug) {
+  return inboxItems().filter(
+    (i) => i.produced_by === 'structure-pull' && i.id === `structure-drift-${repoSlug}`,
+  );
+}
+
 // First `max` top-level bullets of a `## <section>` in a wiki page,
 // markdown links stripped to their text.
 export function sectionBullets(relPage, section, max = 3) {

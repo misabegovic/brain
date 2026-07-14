@@ -295,5 +295,8 @@ conversation surface: every topic is a channel, a post is an inbox
 write, and the agent replies in-thread on the next tend (no live
 chat). One **collaboration control** appears on every card, page, and
 thread — comment / queue / post, plus edit and unqueue of your own
-pending items — all backed by the inbox. Pagefind search at
-`/search/`. Local-first — share via repo paths, not a hosted URL.
+pending items — all backed by the inbox. Every page carries
+**trust signals** from the provenance graph — how many pages rely on
+it, and an "uncertain but load-bearing" flag on low-confidence pages
+others depend on. Pagefind search at `/search/`. Local-first — share
+via repo paths, not a hosted URL.

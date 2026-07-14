@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Built: graph & connector as page trust signals
+  (0.26.0).** The provenance graph and structure connector were
+  agent-facing plumbing invisible to users. Now every page shows how
+  many pages rely on it, and an "⚑ Uncertain but load-bearing" banner
+  on low-confidence pages others depend on; a repo page surfaces
+  structure drift inline once a repo is configured. Answers "how does
+  this reflect for our users."
 - **2026-07-14** — **Built: topics lead with an executive brief
   (0.25.0).** Arriving to weigh in on a topic no longer means reading
   the whole discussion first. The page opens with the summary, a
