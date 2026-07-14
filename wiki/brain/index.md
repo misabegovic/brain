@@ -55,10 +55,12 @@ sanitized to organisation-agnostic form:
 
 ## Topics (discussions in flight)
 
-- [How the three ideas compose](topics/three-ideas-compose.md) — the
-  conversation surface + structure connector + edge-provenance tags
-  are one loop, bound by provenance; sequence it provenance →
-  connector → conversation. Open, operator's bet.
+- [How the three ideas compose](topics/three-ideas-compose.md) — a
+  five-persona RFC rejected the "one loop" framing as overfit: three
+  independent bets, not an epic. Connector (drift) is the one
+  latent-valuable bet and is gated; conversation surface is a no-go
+  (prompt-injection trifecta); provenance tags proceed with a
+  corrected design.
 
 - [Chat-surface necessity](topics/chat-surface-necessity.md) —
   **settled twice** 2026-07-12: chat pane removed, then the embedded
