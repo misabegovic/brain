@@ -463,6 +463,29 @@
       "tokens": 1863
     },
     {
+      "path": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "title": "Give the brain's link graph per-edge provenance tags \u2014 push uncertainty from the page down to the relationship",
+      "kind": "initiative",
+      "status": "suggested",
+      "ai_suggestion": true,
+      "updated": "2026-07-14",
+      "team": "(inferred)",
+      "division": "(inferred)",
+      "repos": [
+        "brain"
+      ],
+      "appetite": "small",
+      "confidence": "low",
+      "summary": "The brain's confidence lives per page; its graph edges (depends_on, affects, authored links, suggested links) carry none. Borrow Graphify's EXTRACTED / INFERRED / AMBIGUOUS edge-provenance tags \u2014 deterministically, no LLM \u2014 and render them on the existing build-time /graph/ SVG. A small bundled second item: emit the page graph as GraphML/Cypher for external analysis.\n",
+      "sources": [
+        "../../../../sources/research/2026-07-14--graphify-llm-knowledge-graph.md",
+        "../../adrs/human-legible-presentation-layer.md",
+        "../../adrs/sql-views-over-derived-index.md",
+        "../../adrs/queue-and-tend-inbox.md"
+      ],
+      "tokens": 1747
+    },
+    {
       "path": "brain/authoring-adrs-and-prds.md",
       "title": "Authoring ADRs and PRDs",
       "kind": "meta",
@@ -485,7 +508,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2170
+      "tokens": 2260
     },
     {
       "path": "brain/pitches/chat-first-app.md",
