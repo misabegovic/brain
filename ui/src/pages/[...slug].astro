@@ -8,7 +8,7 @@ import { getCollection, render } from 'astro:content';
 import App from '../layouts/App.astro';
 import Collaborate from '../components/Collaborate.astro';
 import ProjectOverview from '../components/ProjectOverview.astro';
-import { sectionText } from '../lib/data.mjs';
+import { sectionText, pageProvenance, structureDrift } from '../lib/data.mjs';
 
 export async function getStaticPaths() {
   const entries = await getCollection('docs');
@@ -73,6 +73,9 @@ const collabTarget =
 // human can respond without reading the whole discussion. The full body
 // collapses below.
 const topicQuestion = isTopic ? sectionText(entry.id + '.md', 'Question', 380) : '';
+// Page-level trust signals from the provenance graph + connector.
+const prov = pageProvenance(entry.id + '.md');
+const drift = isShelfHome ? structureDrift(entry.id) : [];
 ---
 <App title={d.title} description={d.summary ?? ''}>
   <article>
@@ -82,8 +85,30 @@ const topicQuestion = isTopic ? sectionText(entry.id + '.md', 'Question', 380) :
       {d.confidence && <span class="chip">confidence: {d.confidence}</span>}
       {d.appetite && <span class="chip">appetite: {d.appetite}</span>}
       {updated && <span class="chip">updated {updated}</span>}
+      {prov.dependents > 0 && (
+        <a class="chip trust" href="/graph/"
+          title="Pages that link here (authored edges). A higher count means more of the brain rests on this page.">
+          {prov.dependents} {prov.dependents === 1 ? 'page relies' : 'pages rely'} on this
+        </a>
+      )}
     </div>
     <h1>{d.title}</h1>
+
+    {prov.ambiguous && d.status !== 'superseded' && d.status !== 'archived' && (
+      <div class="banner warn trust-flag">
+        <strong>⚑ Uncertain but load-bearing.</strong> This page is
+        marked low-confidence, yet other pages rely on it. Treat its
+        claims as provisional and verify before building on them.
+      </div>
+    )}
+    {drift.length > 0 && (
+      <div class="banner warn">
+        <strong>Structure drift detected.</strong> The connector found
+        this repo's code shape moved since the wiki was last synced —
+        {' '}{drift[0].summary}. Tend it to reconcile
+        <code>architecture.md</code> against the snapshot.
+      </div>
+    )}
 
     {isSuggestion && (
       <div class="banner warn">
@@ -155,6 +180,11 @@ const topicQuestion = isTopic ? sectionText(entry.id + '.md', 'Question', 380) :
     background: var(--bg-soft);
   }
   .banner.warn { border-color: var(--warn); }
+  .banner.trust-flag { background: var(--warn-soft, var(--bg-soft)); }
+  .chip.trust {
+    text-decoration: none; border: 1px dashed var(--line); color: var(--muted);
+  }
+  .chip.trust:hover { color: var(--fg); border-color: var(--accent); }
   .trailnote { color: var(--muted); font-size: .88em; }
   /* The chrome already renders the title; the body's own leading
      H1 would duplicate it (Starlight used to strip it). */
