@@ -18,6 +18,16 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **ingested Graphify; deepdive + benefit suggestion.**
+  A four-agent deepdive of
+  [Graphify](https://github.com/Graphify-Labs/graphify) — a
+  code-graph tool with an optional LLM doc layer, a viral (~85k-star,
+  pre-1.0, hype-heavy) near-peer. It mostly *validates* the brain
+  (token thesis, deterministic/LLM split, provenance discipline). One
+  genuinely-new borrow: per-edge provenance tags
+  ([suggestion](brain/ai-suggestions/prds/edge-provenance-tags.md)),
+  deterministic, rendered on the existing /graph/ SVG. Full deepdive
+  in `sources/research/2026-07-14--graphify-llm-knowledge-graph.md`.
 - **2026-07-14** — **ingested Enola; deepdive + benefit suggestion.**
   A four-agent directed-research deepdive of
   [Enola](https://github.com/enola-labs/enola) — a deterministic,

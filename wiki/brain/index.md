@@ -114,6 +114,12 @@ sanitized to organisation-agnostic form:
 
 ## AI suggestions (drafts for human review)
 
+- [Per-edge provenance tags for the link graph](ai-suggestions/prds/edge-provenance-tags.md)
+  — borrow Graphify's EXTRACTED/INFERRED/AMBIGUOUS edge tags (no
+  LLM), rendered on the build-time /graph/ SVG; push uncertainty from
+  the page down to the edge. Directed-research ingest 2026-07-14,
+  awaiting review.
+
 - [Ground architecture 'Now' against a deterministic structure extractor](ai-suggestions/prds/deterministic-structure-connector.md)
   — Enola (a deterministic, LLM-free code-structure extractor) as a
   connector: ground-truth snapshots into sources/, baseline-diff →
