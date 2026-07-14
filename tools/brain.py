@@ -1696,6 +1696,38 @@ def cmd_serve(args) -> int:
 
         def do_POST(self):  # noqa: N802
             url = urllib.parse.urlparse(self.path)
+
+            # Hosted tier: the agent write endpoint. An authenticated
+            # agent appends any signed event (drift, subscribe, post, …)
+            # — the general spoke-client counterpart to the UI's
+            # /api/act. event_append is the write-time auth boundary;
+            # matching owners are woken off the request path.
+            if workbench and hosted_mode() and url.path == "/api/events":
+                agent = self.headers.get("X-Agent-Id", "")
+                try:
+                    n = int(self.headers.get("Content-Length") or 0)
+                    body = json.loads(self.rfile.read(min(n, 65536)))
+                    kind = str(body["kind"])
+                    ref = str(body["ref"])
+                    ts = str(body["ts"])
+                    sig = str(body["sig"])
+                except (KeyError, ValueError, json.JSONDecodeError):
+                    self._send_json(400, {"error": "bad event body "
+                        "(need kind, ref, ts, sig)"})
+                    return
+                try:
+                    ev = event_append(agent, kind, ref, ts, sig)
+                except PermissionError as exc:
+                    self._send_json(401, {"error": f"agent auth failed: {exc}"})
+                    return
+                except ValueError as exc:
+                    self._send_json(400, {"error": str(exc)})
+                    return
+                threading.Thread(target=deliver_wakes, args=(ev,),
+                                 daemon=True).start()
+                self._send_json(200, {"seq": ev["seq"]})
+                return
+
             # The UI's single write surface (presentation-layer ADR,
             # 2026-07-12 amendment): an action becomes an inbox item
             # the next tend session digests. Never mounted in serving

@@ -1166,9 +1166,16 @@ on read. **Owner-subscription wake**: an agent `subscribe`s to a
 ref-pattern with a wake URL (a signed subscribe event); a matching
 append POSTs a signed hint (seq + ref, no payload) to the owner through
 an SSRF guard, capped per event, with the per-agent cursor as the
-at-least-once backstop — the wake never invokes the agent. Off by
-default — local-first is byte-for-byte unchanged, with no keyring, no
-stream, and no subscriptions. **Datasette pilot**:
+at-least-once backstop — the wake never invokes the agent. The agent
+write endpoint is `POST /api/events` (authenticated, any signed event
+kind), the counterpart to the UI's `/api/act`. The harness-side half is
+`tools/brain-agent.py` — the **spoke client** an agent runs to `emit` /
+`pull` / `subscribe` / `listen` against a hosted brain: the brain is the
+coordination hub, the harness stays the execution spoke, so work starts
+in the brain, dispatches to an agent via a wake, runs in its harness,
+and lands back as a signed event. Off by default — local-first is
+byte-for-byte unchanged, with no keyring, no stream, and no
+subscriptions. **Datasette pilot**:
 `tools/serve-datasette.sh` serves the derived index in immutable mode
 with canned queries (`tools/datasette/metadata.yml`) — the
 faceted-browse/SQL/JSON tier of the serving plane.

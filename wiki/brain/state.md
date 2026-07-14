@@ -26,6 +26,23 @@ into the sections below.
 
 ## Now
 
+- **The spoke client lands — hub-and-spoke, both halves (0.29.0,
+  2026-07-14).** On the operator's hub-and-spoke direction (the brain is
+  the coordination + memory hub; the harness stays the execution spoke),
+  `tools/brain-agent.py` is the missing client half of the event tier: a
+  stdlib-only client an agent in *any* harness runs to `emit` signed
+  events, `pull` verified events from its cursor, `subscribe` to what it
+  cares about, and `listen` for wakes (verify → pull → hand off, with an
+  `--on-wake` command hook). It mirrors the server's signing and talks
+  HTTP to a `BRAIN_HOSTED` brain (config via `BRAIN_URL` /
+  `BRAIN_AGENT_ID` / `BRAIN_AGENT_SECRET`). The server gained the
+  matching agent write endpoint (`POST /api/events`, authenticated, any
+  event kind) alongside the UI's `/api/act`. Work can now start in the
+  brain (an event), dispatch to an agent in its harness (a wake), run
+  there, and land back in the brain (a signed event) — without the brain
+  being a harness. Next: deploy the hub, then one specialized agent
+  (a drift-reconciler) as proof.
+
 - **The event-driven loop is closed — owner-subscription wake ships
   (0.28.0, 2026-07-14).** The [event-driven epic](epics/event-driven-agent-triggers.md)
   is complete. An agent subscribes to a thread, repo, or producer
