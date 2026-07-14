@@ -6473,7 +6473,11 @@ KERNEL_COPY_PATHS = [
     "brain-schedule.yml",
     ".gitignore", ".dockerignore", ".env.example", ".mcp.json",
     "railway.toml", "VERSION",
-    # the kernel's own documentation trail
+    # the kernel's own documentation trail (schema/governance ADRs).
+    # Initiative pages — the brain's own in-flight feature work: epics,
+    # PRDs, and any ADR carrying parent_epic — are filtered out on copy
+    # (see _init_full); an adopter inherits the reusable decisions, not
+    # the brain team's feature backlog.
     "wiki/brain/adrs",
     "wiki/brain/authoring-adrs-and-prds.md",
     "wiki/org/methodology",
@@ -6501,6 +6505,17 @@ def _init_full(target: Path, org: str) -> int:
                     "dist", "*.pyc", ".pytest_cache"))
         else:
             shutil.copy2(src, dst)
+
+    # Drop the brain's own initiative children from the seeded ADR trail:
+    # an ADR carrying parent_epic dangles without its epic (intentionally
+    # not copied — an adopter inherits reusable decisions, not the brain
+    # team's feature backlog). Keeps the copied trail self-consistent.
+    copied_adrs = target / "wiki" / "brain" / "adrs"
+    if copied_adrs.exists():
+        for p in copied_adrs.glob("*.md"):
+            parsed = parse(p)
+            if parsed and parsed[0].get("parent_epic"):
+                p.unlink()
 
     (target / "CLAUDE.md").symlink_to("AGENTS.md")
     (target / "sources").mkdir(exist_ok=True)
