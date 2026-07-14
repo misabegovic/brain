@@ -252,3 +252,7 @@
    diff: 4 files, +180/-2
    restricted-paths: false
    by: claude (fable 5)
+2026-07-14 merge — PR #13: Ingest Enola: deepdive + how the brain can benefit
+   diff: 5 files, +290/-2
+   restricted-paths: false
+   by: claude (fable 5)
