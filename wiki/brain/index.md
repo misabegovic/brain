@@ -117,6 +117,11 @@ sanitized to organisation-agnostic form:
 
 ## PRDs
 
+- [Per-agent identity for a hosted brain](prds/per-agent-identity.md)
+  — **draft** (child of the [event-driven epic](epics/event-driven-agent-triggers.md)):
+  a minimal identity layer so a hosted brain can authenticate and
+  attribute agents, and the choice of where signed events durably live.
+  The epic's first dependency.
 - [Human-legible presentation layer](prds/human-legible-presentation-layer.md)
   — the UI becomes the partner's briefing: opinionated, Shape
   Up-native, attention-first. Bet 2026-07-12.

@@ -39,11 +39,11 @@ No deepening picks queued — the link-health producer adds them.
 | brain/adrs/multi-prd-epic-shape.md | high | 4 |
 | brain/adrs/queue-and-tend-inbox.md | high | 4 |
 | brain/adrs/successor-ssg-for-ui.md | high | 4 |
+| brain/epics/event-driven-agent-triggers.md | low | 4 |
 | brain/topics/one-point-oh-criteria.md | medium | 4 |
 | brain/adrs/connector-snapshot-contract.md | medium | 3 |
 | brain/adrs/home-content-shape.md | medium | 3 |
 | brain/adrs/human-legible-presentation-layer.md | medium | 3 |
-| brain/adrs/operator-lesson-pattern.md | medium | 3 |
 
 ## Production state (Datadog)
 

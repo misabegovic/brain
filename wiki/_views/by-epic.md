@@ -18,4 +18,6 @@ Aggregates every `kind: epic` umbrella with its children (`parent_epic:` reverse
 
 ## [Event-driven triggers for multi-agent work](../brain/epics/event-driven-agent-triggers.md) — *living*
 
-*(no children yet)*
+### PRDs
+
+- [Per-agent identity for a hosted brain](../brain/prds/per-agent-identity.md) — *draft*

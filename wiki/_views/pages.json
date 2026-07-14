@@ -520,7 +520,10 @@
         "../adrs/queue-and-tend-inbox.md",
         "../adrs/connector-snapshot-contract.md"
       ],
-      "tokens": 1144
+      "tokens": 1152,
+      "child_prds": [
+        "brain/prds/per-agent-identity.md"
+      ]
     },
     {
       "path": "brain/index.md",
@@ -532,7 +535,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2644
+      "tokens": 2720
     },
     {
       "path": "brain/pitches/chat-first-app.md",
@@ -759,6 +762,29 @@
         "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
       ],
       "tokens": 359
+    },
+    {
+      "path": "brain/prds/per-agent-identity.md",
+      "title": "Per-agent identity for a hosted brain",
+      "kind": "initiative",
+      "status": "draft",
+      "updated": "2026-07-14",
+      "team": "brain kernel",
+      "division": "(brain)",
+      "appetite": "medium",
+      "parent_epic": "event-driven-agent-triggers",
+      "repos": [
+        "brain"
+      ],
+      "confidence": "low",
+      "summary": "The first child of the event-driven epic and its true first dependency: a minimal per-agent identity layer so a hosted brain can authenticate and attribute agents \u2014 issue and rotate per-agent keys, sign events, verify on read, reject forged appends at the write boundary. Also settles the event-fan-out substrate (the inbox is not append-only), since signed events need somewhere durable to live. Not a full IAM; local-first stays unchanged.\n",
+      "sources": [
+        "../epics/event-driven-agent-triggers.md",
+        "../pitches/event-driven-agent-triggers.md",
+        "../adrs/mcp-cli-surface.md",
+        "../adrs/queue-and-tend-inbox.md"
+      ],
+      "tokens": 1355
     },
     {
       "path": "brain/prds/persona-playthrough-loop.md",

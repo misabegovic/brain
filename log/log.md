@@ -306,3 +306,4 @@
    diff: 6 files, +110/-13
    restricted-paths: false
    by: claude (fable 5)
+2026-07-14 shape — pitch → wiki/brain/prds/per-agent-identity.md (PM agent, child of event-driven-agent-triggers epic)
