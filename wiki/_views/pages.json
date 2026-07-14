@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-13",
+  "generated": "2026-07-14",
   "home_sections": [
     {
       "anchor": "what-changed",
@@ -439,6 +439,30 @@
       "tokens": 1967
     },
     {
+      "path": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "title": "Ground the brain's architecture 'Now' against a deterministic structure extractor \u2014 Enola as reference implementation",
+      "kind": "initiative",
+      "status": "suggested",
+      "ai_suggestion": true,
+      "updated": "2026-07-14",
+      "team": "(inferred)",
+      "division": "(inferred)",
+      "repos": [
+        "brain"
+      ],
+      "appetite": "medium",
+      "confidence": "low",
+      "summary": "A deterministic, LLM-free code-structure extractor (Enola is the reference implementation) could run as a brain connector: it writes a ground-truth \"Now\" snapshot into sources/, and its baseline-diff turns architectural drift into inbox items \u2014 a strict upgrade over the git-name-only sync-cursor diff. Fits the connector contract and queue-and-tend by construction. Gated on the tool's pre-1.0 solo maturity; the pattern matters more than the specific binary.\n",
+      "sources": [
+        "../../../../sources/research/2026-07-14--enola-deterministic-architecture-extractor.md",
+        "../../../../sources/web/enola-labs-enola--e01a2b.md",
+        "../../adrs/connector-snapshot-contract.md",
+        "../../adrs/queue-and-tend-inbox.md",
+        "../../adrs/sql-views-over-derived-index.md"
+      ],
+      "tokens": 1863
+    },
+    {
       "path": "brain/authoring-adrs-and-prds.md",
       "title": "Authoring ADRs and PRDs",
       "kind": "meta",
@@ -461,7 +485,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2087
+      "tokens": 2170
     },
     {
       "path": "brain/pitches/chat-first-app.md",

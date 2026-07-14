@@ -2,7 +2,7 @@
 title: "Engineer view"
 kind: meta
 status: living
-updated: 2026-07-13
+updated: 2026-07-14
 confidence: high
 sources:
   - ../../../views/engineer.yml

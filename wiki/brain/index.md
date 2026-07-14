@@ -114,6 +114,12 @@ sanitized to organisation-agnostic form:
 
 ## AI suggestions (drafts for human review)
 
+- [Ground architecture 'Now' against a deterministic structure extractor](ai-suggestions/prds/deterministic-structure-connector.md)
+  — Enola (a deterministic, LLM-free code-structure extractor) as a
+  connector: ground-truth snapshots into sources/, baseline-diff →
+  drift inbox items. Directed-research ingest 2026-07-14, awaiting
+  review.
+
 - [A conversation surface over the inbox](ai-suggestions/prds/conversation-surface-over-inbox.md)
   — Slack-shaped async channels (topics as channels, inbox as
   messages, replies during tend); explicitly *not* the removed chat
