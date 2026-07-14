@@ -20,4 +20,8 @@ Aggregates every `kind: epic` umbrella with its children (`parent_epic:` reverse
 
 ### PRDs
 
-- [Per-agent identity for a hosted brain](../brain/prds/per-agent-identity.md) — *draft*
+- [Per-agent identity for a hosted brain](../brain/prds/per-agent-identity.md) — *living*
+
+### ADRs
+
+- [Per-agent identity on a signed, append-only event stream](../brain/adrs/per-agent-identity.md) — *draft*
