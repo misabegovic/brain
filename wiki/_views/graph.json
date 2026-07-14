@@ -37,6 +37,11 @@
     },
     {
       "source": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "target": "brain/prds/per-agent-identity.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/acknowledge-recurring-tend-items.md",
       "target": "brain/prds/pm-view-reads-like-a-brief.md",
       "provenance": "inferred"
     },
@@ -127,6 +132,11 @@
     },
     {
       "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "target": "brain/prds/per-agent-identity.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
       "target": "brain/prds/pm-view-reads-like-a-brief.md",
       "provenance": "inferred"
     },
@@ -212,6 +222,11 @@
     },
     {
       "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/prds/per-agent-identity.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
       "target": "brain/prds/pm-view-reads-like-a-brief.md",
       "provenance": "inferred"
     },
@@ -262,6 +277,11 @@
     },
     {
       "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "target": "brain/prds/per-agent-identity.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
       "target": "brain/prds/pm-view-reads-like-a-brief.md",
       "provenance": "inferred"
     },
@@ -298,6 +318,11 @@
     {
       "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
       "target": "brain/prds/attention-calibration-operator-surface.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "target": "brain/prds/per-agent-identity.md",
       "provenance": "inferred"
     },
     {
@@ -354,6 +379,11 @@
       "source": "brain/epics/event-driven-agent-triggers.md",
       "target": "brain/prds/attention-calibration-operator-surface.md",
       "provenance": "inferred"
+    },
+    {
+      "source": "brain/epics/event-driven-agent-triggers.md",
+      "target": "brain/prds/per-agent-identity.md",
+      "provenance": "extracted"
     },
     {
       "source": "brain/epics/event-driven-agent-triggers.md",
@@ -582,6 +612,11 @@
     },
     {
       "source": "brain/index.md",
+      "target": "brain/prds/per-agent-identity.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
       "target": "brain/prds/persona-playthrough-loop.md",
       "provenance": "extracted"
     },
@@ -662,6 +697,11 @@
     },
     {
       "source": "brain/pitches/event-driven-agent-triggers.md",
+      "target": "brain/prds/per-agent-identity.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/pitches/event-driven-agent-triggers.md",
       "target": "brain/prds/pm-view-reads-like-a-brief.md",
       "provenance": "inferred"
     },
@@ -684,6 +724,11 @@
       "source": "brain/pitches/event-driven-agent-triggers.md",
       "target": "brain/topics/event-driven-multi-agent.md",
       "provenance": "extracted"
+    },
+    {
+      "source": "brain/prds/attention-calibration-operator-surface.md",
+      "target": "brain/prds/per-agent-identity.md",
+      "provenance": "inferred"
     },
     {
       "source": "brain/prds/attention-calibration-operator-surface.md",
@@ -719,6 +764,31 @@
       "source": "brain/prds/human-legible-presentation-layer.md",
       "target": "brain/pitches/human-legible-presentation-layer.md",
       "provenance": "extracted"
+    },
+    {
+      "source": "brain/prds/per-agent-identity.md",
+      "target": "brain/epics/event-driven-agent-triggers.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/prds/per-agent-identity.md",
+      "target": "brain/prds/pm-view-reads-like-a-brief.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/per-agent-identity.md",
+      "target": "brain/prds/priya-trust-banner-render-proof.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/per-agent-identity.md",
+      "target": "brain/prds/producer-death-first-class-health.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/per-agent-identity.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "inferred"
     },
     {
       "source": "brain/prds/persona-playthrough-loop.md",
@@ -1007,6 +1077,11 @@
     },
     {
       "source": "index.md",
+      "target": "brain/prds/per-agent-identity.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
       "target": "brain/prds/persona-playthrough-loop.md",
       "provenance": "extracted"
     },
@@ -1092,6 +1167,7 @@
     "brain/ai-suggestions/prds/edge-provenance-tags.md",
     "brain/epics/event-driven-agent-triggers.md",
     "brain/pitches/event-driven-agent-triggers.md",
+    "brain/prds/per-agent-identity.md",
     "brain/topics/event-driven-multi-agent.md",
     "brain/topics/market-readiness-gaps.md",
     "brain/topics/three-ideas-compose.md"

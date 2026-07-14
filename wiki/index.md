@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **PRD (child 1): per-agent identity for a hosted
+  brain.** The epic's first child and true first dependency — a minimal
+  identity layer to authenticate and attribute agents, plus the choice
+  of where signed events durably live (the inbox is not append-only).
+  [Draft PRD](brain/prds/per-agent-identity.md) awaiting approval before
+  its ADR.
 - **2026-07-14** — **Bet placed: event-driven triggers for multi-agent
   work.** The pitch graduated into an
   [epic](brain/epics/event-driven-agent-triggers.md) — the brain's

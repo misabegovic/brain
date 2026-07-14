@@ -109,8 +109,9 @@ In the umbrella:
 
 ## Children
 
-- **Per-agent identity for a hosted brain** — *spawning next* (the first
-  dependency; also resolves the event-fan-out substrate).
+- [Per-agent identity for a hosted brain](../prds/per-agent-identity.md)
+  — *draft* (the first dependency; also resolves the event-fan-out
+  substrate).
 - **Owner-subscription wake** — *not yet spawned* (built on identity;
   the headline win).
 
