@@ -311,3 +311,4 @@
    diff: 5 files, +190/-6
    restricted-paths: false
    by: claude (fable 5)
+2026-07-14 shape — wiki/brain/prds/per-agent-identity.md → wiki/brain/adrs/per-agent-identity.md (Tech Lead agent; operator picked the event-stream bet)

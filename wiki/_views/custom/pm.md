@@ -15,7 +15,7 @@ Committed work, proposals awaiting a bet, patterns from feedback, and what's que
 
 ## Open initiatives
 
-No committed work in flight — a pitch on the briefing graduates here on a bet.
+- [Per-agent identity for a hosted brain](/brain/prds/per-agent-identity/) — living · updated 2026-07-14
 
 ## Pitches awaiting a bet
 

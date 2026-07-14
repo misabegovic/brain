@@ -246,6 +246,29 @@
       "tokens": 1774
     },
     {
+      "path": "brain/adrs/per-agent-identity.md",
+      "title": "Per-agent identity on a signed, append-only event stream",
+      "kind": "decision",
+      "status": "draft",
+      "updated": "2026-07-14",
+      "team": "brain kernel",
+      "division": "(brain)",
+      "parent_epic": "event-driven-agent-triggers",
+      "repos": [
+        "brain"
+      ],
+      "confidence": "medium",
+      "summary": "The hosted brain authenticates and attributes agents with per-agent keys, and signed events live on a new append-only event stream under wiki/_state/events that agents read per-agent cursors over. The auth boundary both rejects forged appends at write time and verifies attribution on read. Local-first is untouched. Chosen over tombstoned inbox items and audit-log fan-out; the operator picked the event stream on 2026-07-14.\n",
+      "sources": [
+        "../prds/per-agent-identity.md",
+        "../epics/event-driven-agent-triggers.md",
+        "../adrs/queue-and-tend-inbox.md",
+        "../adrs/connector-snapshot-contract.md",
+        "../adrs/mcp-cli-surface.md"
+      ],
+      "tokens": 1381
+    },
+    {
       "path": "brain/adrs/persona-playthrough-loop.md",
       "title": "Playthroughs are executed skills with immutable transcripts; synthetic findings are confidence-capped insights",
       "kind": "decision",
@@ -520,9 +543,12 @@
         "../adrs/queue-and-tend-inbox.md",
         "../adrs/connector-snapshot-contract.md"
       ],
-      "tokens": 1152,
+      "tokens": 1196,
       "child_prds": [
         "brain/prds/per-agent-identity.md"
+      ],
+      "child_adrs": [
+        "brain/adrs/per-agent-identity.md"
       ]
     },
     {
@@ -535,7 +561,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2720
+      "tokens": 2816
     },
     {
       "path": "brain/pitches/chat-first-app.md",
@@ -767,7 +793,7 @@
       "path": "brain/prds/per-agent-identity.md",
       "title": "Per-agent identity for a hosted brain",
       "kind": "initiative",
-      "status": "draft",
+      "status": "living",
       "updated": "2026-07-14",
       "team": "brain kernel",
       "division": "(brain)",
@@ -776,7 +802,7 @@
       "repos": [
         "brain"
       ],
-      "confidence": "low",
+      "confidence": "medium",
       "summary": "The first child of the event-driven epic and its true first dependency: a minimal per-agent identity layer so a hosted brain can authenticate and attribute agents \u2014 issue and rotate per-agent keys, sign events, verify on read, reject forged appends at the write boundary. Also settles the event-fan-out substrate (the inbox is not append-only), since signed events need somewhere durable to live. Not a full IAM; local-first stays unchanged.\n",
       "sources": [
         "../epics/event-driven-agent-triggers.md",
@@ -784,7 +810,7 @@
         "../adrs/mcp-cli-surface.md",
         "../adrs/queue-and-tend-inbox.md"
       ],
-      "tokens": 1355
+      "tokens": 1451
     },
     {
       "path": "brain/prds/persona-playthrough-loop.md",

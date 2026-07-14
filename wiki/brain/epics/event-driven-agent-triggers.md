@@ -110,8 +110,10 @@ In the umbrella:
 ## Children
 
 - [Per-agent identity for a hosted brain](../prds/per-agent-identity.md)
-  — *draft* (the first dependency; also resolves the event-fan-out
-  substrate).
+  — *living* (PRD + [ADR](../adrs/per-agent-identity.md) landed; the
+  bet is a signed append-only event stream + per-agent keys). The first
+  dependency; also resolves the event-fan-out substrate. Awaiting the
+  build (Phase 3).
 - **Owner-subscription wake** — *not yet spawned* (built on identity;
   the headline win).
 

@@ -23,6 +23,12 @@ tooling, governance.
 Kernel decisions ported from the origin deployment on 2026-07-10,
 sanitized to organisation-agnostic form:
 
+- [Per-agent identity on a signed, append-only event stream](adrs/per-agent-identity.md)
+  — **draft** (child of the [event-driven epic](epics/event-driven-agent-triggers.md)):
+  per-agent keys, signed events on a new append-only stream under
+  `wiki/_state/events` with per-agent cursors, the auth boundary
+  rejecting forged appends at write time and verifying on read.
+  Awaiting the build.
 - [Shape Up pitches](adrs/shape-up-pitches.md) — pre-bet pitch pages as a first-class kind.
 - [Acknowledge recurring tend items](adrs/acknowledge-recurring-tend-items.md) — an operator ack the producers respect; suppress until the page changes, no metadata falsified. Delivered 2026-07-12.
 - [Uniform loopback Host-header guard](adrs/sam-uniform-loopback-host-guard.md) — one anti-DNS-rebinding Host check across both HTTP surfaces. Delivered 2026-07-12.
