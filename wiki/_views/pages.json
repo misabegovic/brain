@@ -249,7 +249,7 @@
       "path": "brain/adrs/per-agent-identity.md",
       "title": "Per-agent identity on a signed, append-only event stream",
       "kind": "decision",
-      "status": "draft",
+      "status": "living",
       "updated": "2026-07-14",
       "team": "brain kernel",
       "division": "(brain)",
@@ -266,7 +266,7 @@
         "../adrs/connector-snapshot-contract.md",
         "../adrs/mcp-cli-surface.md"
       ],
-      "tokens": 1381
+      "tokens": 1826
     },
     {
       "path": "brain/adrs/persona-playthrough-loop.md",
@@ -543,7 +543,7 @@
         "../adrs/queue-and-tend-inbox.md",
         "../adrs/connector-snapshot-contract.md"
       ],
-      "tokens": 1196,
+      "tokens": 1227,
       "child_prds": [
         "brain/prds/per-agent-identity.md"
       ],
@@ -561,7 +561,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2816
+      "tokens": 2824
     },
     {
       "path": "brain/pitches/chat-first-app.md",
@@ -793,7 +793,8 @@
       "path": "brain/prds/per-agent-identity.md",
       "title": "Per-agent identity for a hosted brain",
       "kind": "initiative",
-      "status": "living",
+      "status": "superseded",
+      "superseded_by": "brain/state.md",
       "updated": "2026-07-14",
       "team": "brain kernel",
       "division": "(brain)",
@@ -934,7 +935,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 3873
+      "tokens": 4152
     },
     {
       "path": "brain/topics/chat-surface-necessity.md",

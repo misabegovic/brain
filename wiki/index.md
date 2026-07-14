@@ -18,6 +18,14 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Built (0.27.0): per-agent identity + a signed
+  event stream.** The [event-driven epic's](brain/epics/event-driven-agent-triggers.md)
+  first child ships — the agentic-future backbone. A hosted brain
+  (`BRAIN_HOSTED=1`) authenticates agents with per-agent HMAC keys and
+  a signed append-only event stream (`wiki/_state/events`) they read
+  cursors over; the auth boundary rejects forged appends at write time
+  and drops tampered lines on read. Local-first byte-for-byte
+  unchanged. Only owner-subscription wake (child 2) remains.
 - **2026-07-14** — **ADR (child 1 bet): per-agent identity on a signed,
   append-only event stream.** The operator picked a new append-only
   event stream under `wiki/_state/events` (over tombstoned inbox items

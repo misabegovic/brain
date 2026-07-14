@@ -110,12 +110,13 @@ In the umbrella:
 ## Children
 
 - [Per-agent identity for a hosted brain](../prds/per-agent-identity.md)
-  — *living* (PRD + [ADR](../adrs/per-agent-identity.md) landed; the
-  bet is a signed append-only event stream + per-agent keys). The first
-  dependency; also resolves the event-fan-out substrate. Awaiting the
-  build (Phase 3).
+  — **built** 0.27.0 ([ADR](../adrs/per-agent-identity.md)): per-agent
+  HMAC keys, a signed append-only event stream under
+  `wiki/_state/events`, per-agent cursors, and the hosted auth boundary
+  (`BRAIN_HOSTED=1`) that rejects forged appends and verifies on read.
+  The first dependency, done; the event-fan-out substrate is settled.
 - **Owner-subscription wake** — *not yet spawned* (built on identity;
-  the headline win).
+  the headline win) — now unblocked.
 
 Children spawn via forward `/shape` with `parent_epic:
 event-driven-agent-triggers`; this list gains a link and a status as

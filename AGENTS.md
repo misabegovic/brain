@@ -1155,10 +1155,18 @@ appended to `log/queries.log` (git-ignored, append-only). A
 deployment for people outside the product runs `--http` with
 `BRAIN_SERVING=1` against a read-only checkout, behind an
 identity-aware proxy — the process itself has no auth and no write
-tools. **Datasette pilot**: `tools/serve-datasette.sh` serves the
-derived index in immutable mode with canned queries
-(`tools/datasette/metadata.yml`) — the faceted-browse/SQL/JSON tier
-of the serving plane.
+tools. **Hosted tier** (`BRAIN_HOSTED=1`): the authenticated, writable,
+multi-agent counterpart to read-only serving. Agents hold per-agent
+HMAC keys (`agent-key issue|rotate|revoke`); on this tier every
+`/api/act` write is a signed event on the append-only stream under
+`wiki/_state/events` (authored by the authenticated agent), and
+`GET /api/events?since=<seq>` is the authenticated read. The auth
+boundary rejects forged appends at write time and drops tampered lines
+on read. Off by default — local-first is byte-for-byte unchanged, with
+no keyring and no stream. **Datasette pilot**:
+`tools/serve-datasette.sh` serves the derived index in immutable mode
+with canned queries (`tools/datasette/metadata.yml`) — the
+faceted-browse/SQL/JSON tier of the serving plane.
 
 ### `brain.py init <path>` — scaffold an empty brain shell
 
