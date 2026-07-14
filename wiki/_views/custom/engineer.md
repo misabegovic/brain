@@ -35,10 +35,10 @@ No deepening picks queued — the link-health producer adds them.
 | path | confidence | inbound |
 |---|---|---|
 | brain/adrs/mcp-cli-surface.md | medium | 6 |
+| brain/state.md | medium | 5 |
 | brain/adrs/multi-prd-epic-shape.md | high | 4 |
 | brain/adrs/queue-and-tend-inbox.md | high | 4 |
 | brain/adrs/successor-ssg-for-ui.md | high | 4 |
-| brain/state.md | medium | 4 |
 | brain/topics/one-point-oh-criteria.md | medium | 4 |
 | brain/adrs/connector-snapshot-contract.md | medium | 3 |
 | brain/adrs/home-content-shape.md | medium | 3 |

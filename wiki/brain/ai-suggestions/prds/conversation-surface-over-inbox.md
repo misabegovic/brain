@@ -1,9 +1,10 @@
 ---
 title: "A conversation surface over the inbox — Slack-shaped channels for talking to the agent through the brain, asynchronously"
 kind: initiative
-status: suggested
+status: superseded
 ai_suggestion: true
-updated: 2026-07-13
+superseded_by: brain/state.md
+updated: 2026-07-14
 team: "(inferred)"
 division: "(inferred)"
 repos:
@@ -26,12 +27,17 @@ sources:
 
 # A conversation surface over the inbox — Slack-shaped channels for talking to the agent through the brain, asynchronously
 
-> **AI-suggested PRD.** Does **not** reflect a human-approved
-> initiative and does **not** record committed work or upcoming
-> product changes. This page is **agent-authored synthesis** —
-> a *suggestion* a human can review, iterate on, and either
-> graduate or supersede. Treat the problem, shape, and metrics
-> below as **the agent's hypothesis**, not the team's commitment.
+> **Built (0.23.0, 2026-07-14) — superseded by
+> [`brain/state.md`](../../state.md) § Now.** The operator directed
+> this build. The RFC had marked it *no-go* on prompt-injection and
+> settled-decision grounds; per the operator's direction those
+> verdicts are set aside, and the RFC's craft conditions are met
+> instead of vetoing: it ships **async through the inbox** (no live
+> chat, inbox-only-write intact), attribution is **server-stamped**
+> (unforgeable by a browser page), post text is **fenced as untrusted
+> data** before reaching the tending agent, and the write endpoint is
+> withheld in serving mode. The live capability is described in
+> `state.md`.
 
 ## Why the agent suggests this
 

@@ -255,6 +255,14 @@ disjoint edge populations, and the real bus connecting them is the
    *named real operator* hits thread-shaped friction the comment box
    cannot hold — and only with structural injection guards plus an
    identity layer the local-first posture currently refuses.
+   **→ Built 0.23.0 (2026-07-14).** The operator directed the build;
+   the RFC's two preconditions were treated as a build spec rather
+   than a veto and both landed as code — structural injection guards
+   (post text fenced as untrusted data, role-label lines flagged) and
+   an identity layer (server-stamped attribution a browser page cannot
+   forge). It ships async-through-the-inbox (inbox-only-write intact,
+   no live chat, no scheduled LLM) with the write endpoint withheld in
+   serving mode. See [`brain/state.md`](../state.md) § Now.
 
 The review did its job: it dismantled the synthesis. That is the
 value — a satisfying narrative met five lenses and only the
