@@ -26,6 +26,22 @@ into the sections below.
 
 ## Now
 
+- **The link graph carries per-edge provenance (0.21.0,
+  2026-07-14).** `brain.py` emits one tagged edge list to
+  `wiki/_views/graph.json` — EXTRACTED for authored links and
+  `depends_on`, INFERRED for machine-suggested links (shared
+  `repos:`/`affects:`) — plus AMBIGUOUS node flags (a low-confidence
+  page ≥2 others lean on). `/graph/` renders it (solid authored /
+  dashed-faint suggested edges, ⚑ dashed AMBIGUOUS nodes with a
+  legend); the UI now reads that one list instead of re-deriving an
+  untagged graph, closing the two-implementation gap. MCP page reads
+  surface the same tags (an agent sees which links are suggested, not
+  authored, and whether a page is AMBIGUOUS), and serving mode strips
+  ai-suggestion nodes *and* every edge touching one before any
+  read/render. The first of the three ingest-driven builds
+  ([three ideas](ai-suggestions/prds/edge-provenance-tags.md), Graphify
+  borrow); deterministic, no LLM in the producer.
+
 - **PR mode is the operating mode (2026-07-12).** The operator
   removed `LOCAL_FIRST` from this brain's `.env`: agents work on
   feature branches, every change lands via PR with CI green, and
