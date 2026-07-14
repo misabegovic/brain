@@ -899,6 +899,19 @@ def cmd_views(_args) -> int:
     }
     (views_dir / "pages.json").write_text(json.dumps(json_out, indent=2))
 
+    # Provenance-tagged edge list for the /graph/ render + MCP. In
+    # serving mode, ai-suggestion drafts and any edge touching them are
+    # excluded so the graph/export cannot disclose a draft (Sam's
+    # serving-mode finding on node+edge exclusion).
+    graph = _provenance_graph()
+    if serving_mode():
+        graph["edges"] = [e for e in graph["edges"]
+                          if not _suggestion_path(e["source"])
+                          and not _suggestion_path(e["target"])]
+        graph["ambiguous_nodes"] = [n for n in graph["ambiguous_nodes"]
+                                    if not _suggestion_path(n)]
+    (views_dir / "graph.json").write_text(json.dumps(graph, indent=2))
+
     print(f"wrote {views_dir.relative_to(REPO)}/by-kind.md, by-team.md, "
           f"by-repo.md, by-epic.md, ai-suggestions.md, pages.json")
     print(f"  {len(entries)} pages indexed; "
@@ -4663,6 +4676,68 @@ def _link_graph() -> tuple[dict[str, set[str]], dict[str, set[str]]]:
     return outbound, inbound
 
 
+# The three provenance tiers for graph edges/nodes, borrowed from
+# Graphify (Graphify-Labs/graphify) and adapted deterministically —
+# no LLM. Per the RFC, authorship is the honest axis for edges and
+# AMBIGUOUS is a node property, not an edge tag:
+#   EXTRACTED  — a human authored this edge (a markdown link, or a
+#                depends_on frontmatter edge).
+#   INFERRED   — the machine suggested it (two pages share repos:/
+#                affects: but nobody linked them).
+#   AMBIGUOUS  — a NODE flag: a low-confidence page the graph leans on
+#                (>=2 inbound), so its relationships are worth
+#                double-checking.
+AMBIGUOUS_MIN_INBOUND = 2
+
+
+def _provenance_graph() -> dict:
+    """Deterministic provenance-tagged graph over wiki pages:
+    EXTRACTED/INFERRED edges + AMBIGUOUS node flags. Emitted to
+    wiki/_views/graph.json so the UI reads one tagged edge list
+    instead of re-deriving an untagged one."""
+    outbound, inbound = _link_graph()
+    edges = []
+    seen = set()
+
+    def add(a, b, prov):
+        key = (a, b) if prov == "extracted" else tuple(sorted((a, b)))
+        if key in seen:
+            return
+        seen.add(key)
+        edges.append({"source": a, "target": b, "provenance": prov})
+
+    # EXTRACTED: authored markdown links.
+    for a, dsts in outbound.items():
+        for b in sorted(dsts):
+            add(a, b, "extracted")
+    # EXTRACTED: authored depends_on frontmatter edges (page -> page).
+    meta = {}
+    for p in outbound:
+        parsed = parse(WIKI / p)
+        if parsed:
+            meta[p] = parsed[0]
+            for dep in parsed[0].get("depends_on") or []:
+                if dep in outbound:
+                    add(p, dep, "extracted")
+    # INFERRED: suggested links (shared repos:/affects:, not linked).
+    tags = {p: set(m.get("repos") or []) | set(m.get("affects") or [])
+            for p, m in meta.items()}
+    is_index = lambda x: Path(x).name == "index.md"  # noqa: E731
+    paths = sorted(tags)
+    for i, a in enumerate(paths):
+        for b in paths[i + 1:]:
+            if not tags[a] or is_index(a) or is_index(b):
+                continue
+            if tags[a] & tags[b] and b not in outbound[a] and a not in outbound[b]:
+                add(a, b, "inferred")
+    # AMBIGUOUS: node flag — low-confidence page the graph leans on.
+    ambiguous = sorted(
+        p for p, m in meta.items()
+        if m.get("confidence") == "low"
+        and len(inbound.get(p, ())) >= AMBIGUOUS_MIN_INBOUND)
+    return {"edges": edges, "ambiguous_nodes": ambiguous}
+
+
 def page_context(rel: str) -> dict:
     """Graph context for one wiki page — the lesson
     that every read should be a briefing: backlinks, outbound links,
@@ -4686,6 +4761,20 @@ def page_context(rel: str) -> dict:
                     break
         except json.JSONDecodeError:
             pass
+    graph_json = WIKI / "_views" / "graph.json"
+    if graph_json.exists():
+        try:
+            g = json.loads(graph_json.read_text())
+            serving = serving_mode()
+            ctx["ambiguous"] = rel in set(g.get("ambiguous_nodes", ()))
+            inferred_out = sorted({
+                e["target"] for e in g.get("edges", ())
+                if e.get("source") == rel and e.get("provenance") == "inferred"
+                and not (serving and _suggestion_path(e["target"]))})
+            if inferred_out:
+                ctx["inferred_links"] = inferred_out
+        except json.JSONDecodeError:
+            pass
     log_path = REPO / "log" / "log.md"
     if log_path.exists():
         slug = Path(rel).stem
@@ -4703,6 +4792,12 @@ def render_page_context(rel: str) -> str:
         lines.append("backlinks: " + ", ".join(ctx["backlinks"]))
     if ctx["outbound"]:
         lines.append("links to: " + ", ".join(ctx["outbound"]))
+    if ctx.get("inferred_links"):
+        lines.append("suggested (inferred, not authored): "
+                     + ", ".join(ctx["inferred_links"]))
+    if ctx.get("ambiguous"):
+        lines.append("provenance: AMBIGUOUS — low-confidence page the "
+                     "graph leans on (verify before trusting)")
     if ctx["affected_by"]:
         lines.append("affected by: " + ", ".join(ctx["affected_by"]))
     if ctx["consumed_by"]:

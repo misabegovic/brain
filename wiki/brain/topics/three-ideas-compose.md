@@ -216,6 +216,13 @@ disjoint edge populations, and the real bus connecting them is the
    tagging twice. And the serving-mode `ai-suggestions` exclusion must
    run over graph nodes *and* edges before any render / export /
    MCP-graph-read.
+   **→ Built 0.21.0 (2026-07-14), exactly to this corrected design.**
+   `brain.py` emits a single tagged edge list to
+   `wiki/_views/graph.json` (EXTRACTED authored / INFERRED suggested
+   on the authorship axis, AMBIGUOUS as a node flag), the UI reads
+   that one list, `/graph/` renders it, MCP page reads expose the
+   tags, and serving mode strips draft nodes *and* their incident
+   edges. See [`brain/state.md`](../state.md) § Now.
 
 2. **Structure connector (drift → inbox) — the one latent-valuable
    bet, multiply gated.** Park until: a real adopter instance with
@@ -246,3 +253,14 @@ value — a satisfying narrative met five lenses and only the
 inbox-plumbing and one cheap, corrected borrow survived. Full RFC
 snapshot:
 `sources/conversations/2026-07-14--three-ideas-rfc-pass.md`.
+
+**Operator directive (2026-07-14) — build all three.** After the
+RFC, the operator was explicit that the three ideas were handed over
+to *build*, not to re-adjudicate on necessity: *"Your role is not to
+think and argue if we need these things."* The RFC's craft findings
+still govern *how* each is built (the corrected provenance design,
+the connector's guards and drift reconciler, the conversation
+surface's structural injection guards and identity layer) — but the
+"no-go / gated" verdicts are set aside as the operator's call, made.
+Build order follows the original dependency order:
+edge-provenance (done) → structure connector → conversation surface.

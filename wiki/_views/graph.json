@@ -1,0 +1,936 @@
+{
+  "edges": [
+    {
+      "source": "index.md",
+      "target": "brain/adrs/connector-snapshot-contract.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/adrs/human-legible-presentation-layer.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/adrs/mcp-cli-surface.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/adrs/mcp-cli-terminal-surface.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/adrs/no-personal-data-in-public-artifacts.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/adrs/persona-playthrough-loop.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/adrs/queue-and-tend-inbox.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/adrs/sql-views-over-derived-index.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/adrs/workbench-pty-bridge.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/index.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/pitches/composable-role-views.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/pitches/harness-workbench.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/pitches/human-legible-presentation-layer.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/prds/composable-role-views.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/prds/harness-workbench.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/prds/human-legible-presentation-layer.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/prds/persona-playthrough-loop.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/roadmap.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/topics/chat-surface-necessity.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/topics/market-readiness-gaps.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/topics/one-point-oh-criteria.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "brain/topics/three-ideas-compose.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "insights/quickstart-third-command-fragility.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
+      "target": "org/index.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/adrs/chat-print-mode-bridge.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/adrs/connector-snapshot-contract.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/adrs/human-legible-presentation-layer.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/adrs/kernel-manifest-instancing.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/adrs/mcp-cli-surface.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/adrs/mcp-cli-terminal-surface.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/adrs/persona-playthrough-loop.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/adrs/queue-and-tend-inbox.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/adrs/single-image-serving-profile.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/adrs/sql-views-over-derived-index.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/adrs/workbench-pty-bridge.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/pitches/human-legible-presentation-layer.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/pitches/persona-playthrough-loop.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/prds/composable-role-views.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/prds/harness-workbench.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/prds/human-legible-presentation-layer.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/prds/persona-playthrough-loop.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/roadmap.md",
+      "target": "brain/topics/one-point-oh-criteria.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/authoring-adrs-and-prds.md",
+      "target": "brain/adrs/operator-lesson-pattern.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/authoring-adrs-and-prds.md",
+      "target": "brain/adrs/shape-deepdive-pre-flight.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/authoring-adrs-and-prds.md",
+      "target": "org/operator-lessons.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/state.md",
+      "target": "brain/adrs/mcp-cli-surface.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/state.md",
+      "target": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/state.md",
+      "target": "brain/roadmap.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/chat-print-mode-bridge.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/connector-snapshot-contract.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/home-content-shape.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/human-legible-presentation-layer.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/kernel-manifest-instancing.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/mcp-cli-surface.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/multi-prd-epic-shape.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/no-personal-data-in-public-artifacts.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/operator-lesson-pattern.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/parallel-efforts-on-request.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/parallel-execution-agent-teams.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/persona-playthrough-loop.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/queue-and-tend-inbox.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/shape-deepdive-pre-flight.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/shape-up-pitches.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/single-image-serving-profile.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/sql-views-over-derived-index.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/successor-ssg-for-ui.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/ui-auto-refresh-hook.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/workbench-pty-bridge.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/zoom-out-on-current-work.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/authoring-adrs-and-prds.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/pitches/chat-first-app.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/pitches/composable-role-views.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/pitches/harness-workbench.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/pitches/human-legible-presentation-layer.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/pitches/instance-birth.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/pitches/persona-playthrough-loop.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/prds/attention-calibration-operator-surface.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/prds/chat-first-app.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/prds/composable-role-views.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/prds/harness-workbench.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/prds/human-legible-presentation-layer.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/prds/instance-birth.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/prds/persona-playthrough-loop.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/prds/pm-view-reads-like-a-brief.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/prds/priya-trust-banner-render-proof.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/prds/producer-death-first-class-health.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/roadmap.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/state.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/topics/chat-surface-necessity.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/topics/market-readiness-gaps.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/topics/one-point-oh-criteria.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/topics/regenerative-schema-extensions.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/topics/three-ideas-compose.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "insights/ai-suggestions-exclusion-mcp-only.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "org/index.md",
+      "target": "org/methodology/index.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "org/index.md",
+      "target": "org/operator-lessons.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "org/operator-lessons.md",
+      "target": "brain/adrs/operator-lesson-pattern.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/prds/persona-playthrough-loop.md",
+      "target": "brain/pitches/persona-playthrough-loop.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/prds/composable-role-views.md",
+      "target": "brain/pitches/composable-role-views.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/prds/harness-workbench.md",
+      "target": "brain/pitches/harness-workbench.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/prds/human-legible-presentation-layer.md",
+      "target": "brain/pitches/human-legible-presentation-layer.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/shape-up-pitches.md",
+      "target": "brain/adrs/multi-prd-epic-shape.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/parallel-execution-agent-teams.md",
+      "target": "brain/adrs/parallel-efforts-on-request.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/parallel-execution-agent-teams.md",
+      "target": "brain/adrs/shape-deepdive-pre-flight.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/operator-lesson-pattern.md",
+      "target": "brain/adrs/multi-prd-epic-shape.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/operator-lesson-pattern.md",
+      "target": "org/operator-lessons.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/parallel-efforts-on-request.md",
+      "target": "brain/adrs/parallel-execution-agent-teams.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/multi-prd-epic-shape.md",
+      "target": "brain/adrs/zoom-out-on-current-work.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/successor-ssg-for-ui.md",
+      "target": "brain/adrs/home-content-shape.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/home-content-shape.md",
+      "target": "brain/adrs/successor-ssg-for-ui.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/zoom-out-on-current-work.md",
+      "target": "brain/adrs/successor-ssg-for-ui.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/shape-deepdive-pre-flight.md",
+      "target": "brain/adrs/multi-prd-epic-shape.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/shape-deepdive-pre-flight.md",
+      "target": "brain/adrs/parallel-efforts-on-request.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/ui-auto-refresh-hook.md",
+      "target": "brain/adrs/home-content-shape.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/ui-auto-refresh-hook.md",
+      "target": "brain/adrs/successor-ssg-for-ui.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/connector-snapshot-contract.md",
+      "target": "brain/adrs/queue-and-tend-inbox.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/topics/chat-surface-necessity.md",
+      "target": "brain/adrs/mcp-cli-surface.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/topics/chat-surface-necessity.md",
+      "target": "brain/adrs/mcp-cli-terminal-surface.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/topics/market-readiness-gaps.md",
+      "target": "brain/topics/one-point-oh-criteria.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/topics/three-ideas-compose.md",
+      "target": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/topics/three-ideas-compose.md",
+      "target": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/topics/three-ideas-compose.md",
+      "target": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/topics/three-ideas-compose.md",
+      "target": "brain/state.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "target": "brain/state.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "target": "brain/topics/three-ideas-compose.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/adrs/mcp-cli-surface.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/topics/chat-surface-necessity.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "org/methodology/index.md",
+      "target": "org/methodology/development-playbook.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "org/methodology/index.md",
+      "target": "org/methodology/regenerative-software.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "org/methodology/index.md",
+      "target": "org/methodology/superpowers.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "org/methodology/index.md",
+      "target": "org/methodology/way-of-working.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "target": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "target": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "target": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "target": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "target": "brain/prds/attention-calibration-operator-surface.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "target": "brain/prds/pm-view-reads-like-a-brief.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "target": "brain/prds/priya-trust-banner-render-proof.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "target": "brain/prds/producer-death-first-class-health.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "target": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "target": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "target": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "target": "brain/prds/attention-calibration-operator-surface.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "target": "brain/prds/pm-view-reads-like-a-brief.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "target": "brain/prds/priya-trust-banner-render-proof.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "target": "brain/prds/producer-death-first-class-health.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/prds/attention-calibration-operator-surface.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/prds/pm-view-reads-like-a-brief.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/prds/priya-trust-banner-render-proof.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/prds/producer-death-first-class-health.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "target": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "target": "brain/prds/attention-calibration-operator-surface.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "target": "brain/prds/pm-view-reads-like-a-brief.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "target": "brain/prds/priya-trust-banner-render-proof.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "target": "brain/prds/producer-death-first-class-health.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "target": "brain/prds/attention-calibration-operator-surface.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "target": "brain/prds/pm-view-reads-like-a-brief.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "target": "brain/prds/priya-trust-banner-render-proof.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "target": "brain/prds/producer-death-first-class-health.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/attention-calibration-operator-surface.md",
+      "target": "brain/prds/pm-view-reads-like-a-brief.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/attention-calibration-operator-surface.md",
+      "target": "brain/prds/priya-trust-banner-render-proof.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/attention-calibration-operator-surface.md",
+      "target": "brain/prds/producer-death-first-class-health.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/attention-calibration-operator-surface.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/pm-view-reads-like-a-brief.md",
+      "target": "brain/prds/priya-trust-banner-render-proof.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/pm-view-reads-like-a-brief.md",
+      "target": "brain/prds/producer-death-first-class-health.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/pm-view-reads-like-a-brief.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/priya-trust-banner-render-proof.md",
+      "target": "brain/prds/producer-death-first-class-health.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/priya-trust-banner-render-proof.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "inferred"
+    },
+    {
+      "source": "brain/prds/producer-death-first-class-health.md",
+      "target": "brain/prds/status-honest-generated-reading-lists.md",
+      "provenance": "inferred"
+    }
+  ],
+  "ambiguous_nodes": [
+    "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+    "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+    "brain/ai-suggestions/prds/edge-provenance-tags.md",
+    "brain/topics/market-readiness-gaps.md",
+    "brain/topics/three-ideas-compose.md"
+  ]
+}

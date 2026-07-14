@@ -18,6 +18,16 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Built: the link graph carries per-edge
+  provenance (0.21.0).** `brain.py` emits one tagged edge list to
+  `wiki/_views/graph.json` — authored links/`depends_on` are
+  EXTRACTED, machine-suggested links are INFERRED — with AMBIGUOUS
+  flags on low-confidence pages the graph leans on.
+  [`/graph/`](brain/topics/three-ideas-compose.md) renders solid vs
+  dashed edges and flags AMBIGUOUS nodes, the UI reads the one list
+  (no more two-implementation gap), MCP page reads expose the tags,
+  and serving mode strips draft nodes and their edges. First of the
+  three ingest-driven builds; the corrected design the RFC landed.
 - **2026-07-14** — **RFC: the "one loop" synthesis didn't survive
   review.** Five personas deepdived
   [the topic](brain/topics/three-ideas-compose.md); unanimous verdict:

@@ -73,24 +73,40 @@ function wikiFiles(dir = WIKI, out = []) {
 
 export function linkGraph() {
   const files = wikiFiles();
-  const set = new Set(files);
-  const edges = [];
-  for (const rel of files) {
-    const text = fs.readFileSync(path.join(WIKI, rel), 'utf8');
-    for (const m of text.matchAll(/\]\(([^)]+\.md)(#[^)]*)?\)/g)) {
-      const target = m[1];
-      if (/^(https?|mailto):/.test(target) || target.startsWith('~')) continue;
-      const resolved = path
-        .normalize(path.join(path.dirname(rel), target))
-        .replaceAll('\\', '/');
-      if (set.has(resolved) && resolved !== rel) {
-        edges.push([rel, resolved]);
+  // Read the provenance-tagged edge list brain.py emits (single source
+  // of truth); fall back to deriving authored links if it's absent.
+  const graphPath = path.join(WIKI, '_views', 'graph.json');
+  let edges;
+  let ambiguous = new Set();
+  if (fs.existsSync(graphPath)) {
+    const g = JSON.parse(fs.readFileSync(graphPath, 'utf8'));
+    const set = new Set(files);
+    edges = (g.edges || [])
+      .filter((e) => set.has(e.source) && set.has(e.target))
+      .map((e) => [e.source, e.target, e.provenance]);
+    ambiguous = new Set((g.ambiguous_nodes || []).filter((n) => set.has(n)));
+  } else {
+    const set = new Set(files);
+    edges = [];
+    for (const rel of files) {
+      const text = fs.readFileSync(path.join(WIKI, rel), 'utf8');
+      for (const m of text.matchAll(/\]\(([^)]+\.md)(#[^)]*)?\)/g)) {
+        const target = m[1];
+        if (/^(https?|mailto):/.test(target) || target.startsWith('~')) continue;
+        const resolved = path
+          .normalize(path.join(path.dirname(rel), target))
+          .replaceAll('\\', '/');
+        if (set.has(resolved) && resolved !== rel) {
+          edges.push([rel, resolved, 'extracted']);
+        }
       }
     }
   }
+  // Inbound counts only from EXTRACTED (authored) edges — an inferred
+  // suggestion shouldn't inflate a hub's degree.
   const inbound = Object.fromEntries(files.map((f) => [f, 0]));
-  for (const [, dst] of edges) inbound[dst]++;
-  return { files, edges, inbound };
+  for (const [, dst, prov] of edges) if (prov === 'extracted') inbound[dst]++;
+  return { files, edges, inbound, ambiguous };
 }
 
 // ---- audit-log activity (ops per day, last N days) -------------------

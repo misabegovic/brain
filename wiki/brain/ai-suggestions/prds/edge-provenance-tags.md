@@ -1,8 +1,9 @@
 ---
 title: "Give the brain's link graph per-edge provenance tags — push uncertainty from the page down to the relationship"
 kind: initiative
-status: suggested
+status: superseded
 ai_suggestion: true
+superseded_by: brain/state.md
 updated: 2026-07-14
 team: "(inferred)"
 division: "(inferred)"
@@ -26,12 +27,16 @@ sources:
 
 # Give the brain's link graph per-edge provenance tags — push uncertainty from the page down to the relationship
 
-> **AI-suggested PRD.** Does **not** reflect a human-approved
-> initiative and does **not** record committed work or upcoming
-> product changes. Agent-authored synthesis from a directed research
-> deepdive — a *suggestion* to review, iterate on, and either
-> graduate or supersede. Treat the shape and metrics as the agent's
-> hypothesis, not the team's commitment.
+> **Built (0.21.0, 2026-07-14) — superseded by
+> [`brain/state.md`](../../state.md) § Now.** The operator directed
+> this build; the corrected design from the
+> [three-ideas RFC](../../topics/three-ideas-compose.md) landed:
+> a single tagged edge list from `brain.py` (EXTRACTED authored /
+> INFERRED suggested on the *authorship* axis), AMBIGUOUS as a node
+> flag rather than an edge tag, the two graph implementations
+> reconciled, and serving-mode node+edge exclusion. This page is kept
+> as the shipped-suggestion record; the live capability is described
+> in `state.md`.
 
 ## Why the agent suggests this
 

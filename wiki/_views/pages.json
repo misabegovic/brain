@@ -466,8 +466,9 @@
       "path": "brain/ai-suggestions/prds/edge-provenance-tags.md",
       "title": "Give the brain's link graph per-edge provenance tags \u2014 push uncertainty from the page down to the relationship",
       "kind": "initiative",
-      "status": "suggested",
+      "status": "superseded",
       "ai_suggestion": true,
+      "superseded_by": "brain/state.md",
       "updated": "2026-07-14",
       "team": "(inferred)",
       "division": "(inferred)",
@@ -483,7 +484,7 @@
         "../../adrs/sql-views-over-derived-index.md",
         "../../adrs/queue-and-tend-inbox.md"
       ],
-      "tokens": 1747
+      "tokens": 1817
     },
     {
       "path": "brain/authoring-adrs-and-prds.md",
@@ -836,7 +837,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 2470
+      "tokens": 2731
     },
     {
       "path": "brain/topics/chat-surface-necessity.md",
@@ -908,7 +909,7 @@
         "../../../sources/research/2026-07-14--enola-deterministic-architecture-extractor.md",
         "../../../sources/research/2026-07-14--graphify-llm-knowledge-graph.md"
       ],
-      "tokens": 2877
+      "tokens": 3154
     },
     {
       "path": "insights/ai-suggestions-exclusion-mcp-only.md",

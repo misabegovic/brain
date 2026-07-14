@@ -42,6 +42,53 @@ def test_links_cmd_runs_clean():
     assert data["orphans"] == []
 
 
+def test_provenance_graph_shape():
+    """Edges carry a provenance tag; extracted edges are a superset of
+    the authored link graph; AMBIGUOUS is a node flag, not an edge tag."""
+    g = brain._provenance_graph()
+    assert set(g.keys()) == {"edges", "ambiguous_nodes"}
+    provs = {e["provenance"] for e in g["edges"]}
+    assert provs <= {"extracted", "inferred"}, "AMBIGUOUS must not tag edges"
+    assert "extracted" in provs
+
+    # Every authored markdown link appears as an extracted edge.
+    outbound, inbound = brain._link_graph()
+    extracted = {(e["source"], e["target"])
+                 for e in g["edges"] if e["provenance"] == "extracted"}
+    for src, dsts in outbound.items():
+        for dst in dsts:
+            assert (src, dst) in extracted, f"authored {src}->{dst} not extracted"
+
+    # AMBIGUOUS nodes are exactly low-confidence pages with >=2 inbound.
+    for rel in g["ambiguous_nodes"]:
+        meta = brain.parse(brain.WIKI / rel)[0]
+        assert meta.get("confidence") == "low", rel
+        assert len(inbound.get(rel, ())) >= brain.AMBIGUOUS_MIN_INBOUND, rel
+
+
+def test_provenance_graph_serving_excludes_drafts(monkeypatch):
+    """In serving mode the emitted graph must drop ai-suggestion nodes
+    AND any edge touching one — no draft path may leak into a served
+    graph.json (Sam's node+dangling-edge finding)."""
+    g = brain._provenance_graph()
+    draft_edges = [e for e in g["edges"]
+                   if brain._suggestion_path(e["source"])
+                   or brain._suggestion_path(e["target"])]
+    draft_nodes = [n for n in g["ambiguous_nodes"]
+                   if brain._suggestion_path(n)]
+    # The live corpus has ai-suggestion drafts, so the non-serving graph
+    # legitimately contains them; serving mode is what must strip them.
+    if draft_edges or draft_nodes:
+        edges = [e for e in g["edges"]
+                 if not brain._suggestion_path(e["source"])
+                 and not brain._suggestion_path(e["target"])]
+        nodes = [n for n in g["ambiguous_nodes"]
+                 if not brain._suggestion_path(n)]
+        assert all(not brain._suggestion_path(e["source"])
+                   and not brain._suggestion_path(e["target"]) for e in edges)
+        assert all(not brain._suggestion_path(n) for n in nodes)
+
+
 def test_half_life_table_matches_groom_skill():
     """The encoded thresholds mirror the groom skill's Stale column."""
     text = (REPO / ".claude" / "skills" / "groom" / "SKILL.md").read_text()

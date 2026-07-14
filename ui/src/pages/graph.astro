@@ -5,7 +5,7 @@
 import App from '../layouts/App.astro';
 import { linkGraph } from '../lib/data.mjs';
 
-const { files, edges, inbound } = linkGraph();
+const { files, edges, inbound, ambiguous } = linkGraph();
 
 // Group by top-level shelf; order shelves by size, nodes by degree.
 const shelfOf = (f) => (f.includes('/') ? f.split('/')[0] : 'root');
@@ -57,12 +57,19 @@ const edgePath = ([src, dst]) => {
     {files.length} pages, {edges.length} links — grouped by shelf,
     ordered by inbound degree. Click a node to open the page.
   </p>
+  <p style="margin:0 0 1rem; color:var(--muted); font-size:.85em;">
+    Edge provenance: <b>solid</b> = authored (extracted);
+    <b>dashed/faint</b> = suggested (inferred). A <b>⚑ dashed node</b>
+    is ambiguous — a low-confidence page the graph leans on.
+  </p>
   <div class="wrap">
     <svg viewBox={`0 0 ${width} ${height}`}
          style={`min-width:${width}px; height:${height}px;`}>
       {edges.map((e) => (
         <path d={edgePath(e)} fill="none" stroke="var(--line)"
-              stroke-width="1" opacity="0.7" />
+              stroke-width="1"
+              stroke-dasharray={e[2] === 'inferred' ? '3 3' : undefined}
+              opacity={e[2] === 'inferred' ? '0.4' : '0.7'} />
       ))}
       {shelfList.map(([shelf], col) => (
         <text x={PAD + col * COL_W} y={PAD + 8}
@@ -75,9 +82,11 @@ const edgePath = ([src, dst]) => {
         return (
           <a href={pageHref(f)}>
             <rect x={p.x} y={p.y} width={NODE_W} height={NODE_H}
-                  rx="6" fill="var(--card)" stroke="var(--line)" />
+                  rx="6" fill="var(--card)"
+                  stroke={ambiguous.has(f) ? 'var(--warn)' : 'var(--line)'}
+                  stroke-dasharray={ambiguous.has(f) ? '4 2' : undefined} />
             <text x={p.x + 8} y={p.y + 15} font-size="11.5"
-                  fill="var(--fg)">{label(f)}</text>
+                  fill="var(--fg)">{ambiguous.has(f) ? '⚑ ' : ''}{label(f)}</text>
             {(inbound[f] ?? 0) > 1 && (
               <text x={p.x + NODE_W - 8} y={p.y + 15} font-size="10"
                     text-anchor="end" fill="var(--accent)"
