@@ -1,0 +1,59 @@
+{
+  "channels": [
+    {
+      "path": "brain/topics/chat-surface-necessity.md",
+      "slug": "chat-surface-necessity",
+      "title": "Does the kernel need its own chat surface, or do MCP + CLI + the terminal cover it?",
+      "summary": "Settled twice in one week: the chat pane, then the embedded terminal, both failed the deletion test against MCP + CLI coverage. Surfaces settle at MCP + CLI.\n",
+      "status": "superseded",
+      "updated": "2026-07-12",
+      "pending_posts": 0,
+      "last_post": ""
+    },
+    {
+      "path": "brain/topics/market-readiness-gaps.md",
+      "slug": "market-readiness-gaps",
+      "title": "What stands between this repo and being a credible market entrant?",
+      "summary": "Six repo-verified gaps between the kernel and a credible market entry. License (MIT) and packaging closed; the product name and repo visibility remain operator calls.\n",
+      "status": "draft",
+      "updated": "2026-07-10",
+      "pending_posts": 0,
+      "last_post": ""
+    },
+    {
+      "path": "brain/topics/one-point-oh-criteria.md",
+      "slug": "one-point-oh-criteria",
+      "title": "What must be true before 1.0 \u2014 when is the tool ready to instance elsewhere?",
+      "summary": "The five 1.0 criteria: instance birth in the test suite (done), seven unattended days, a real-data loop in a born instance, a cold-start human test, all gates green at tag.\n",
+      "status": "living",
+      "updated": "2026-07-10",
+      "pending_posts": 0,
+      "last_post": ""
+    },
+    {
+      "path": "brain/topics/regenerative-schema-extensions.md",
+      "slug": "regenerative-schema-extensions",
+      "title": "How far should the brain adopt Phoenix-Architecture concepts into its schema?",
+      "summary": "Which further Phoenix-Architecture concepts (deletion test, provenance-over-diffs, regeneration drills) earn schema weight beyond constraints.md and implementation-memory.md. Open.\n",
+      "status": "living",
+      "updated": "2026-07-10",
+      "pending_posts": 0,
+      "last_post": ""
+    },
+    {
+      "path": "brain/topics/three-ideas-compose.md",
+      "slug": "three-ideas-compose",
+      "title": "How the three ideas compose \u2014 a conversational, provenance-aware knowledge graph grounded in deterministic facts",
+      "summary": "Original synthesis: the three ideas are \"one loop bound by provenance.\" A five-persona RFC (2026-07-14) rejected that framing as an overfit narrative \u2014 the pieces touch disjoint graphs and the real bus is the inbox, which already exists. Revised verdict: three independent bets, not an epic. The connector (drift) is the only latent-valuable one and is multiply gated; the conversation surface is a no-go (re-litigates a settled decision + completes a prompt-injection trifecta); provenance tags proceed standalone with a corrected design.\n",
+      "status": "living",
+      "updated": "2026-07-14",
+      "pending_posts": 0,
+      "last_post": ""
+    }
+  ],
+  "activity": {
+    "pending_posts": 0,
+    "threads_waiting": [],
+    "new_channels": []
+  }
+}

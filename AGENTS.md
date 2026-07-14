@@ -1326,7 +1326,13 @@ and pages carry *queue* and *comment* actions that POST to the
 local server's `/api/act`, which appends an inbox item
 (`produced_by: ui-action`) for the next tend session — the UI's
 only write surface is the inbox; the endpoint never mounts in
-serving mode. Build: `npm run build` (Astro + Pagefind; details in
+serving mode. **The conversation surface** (0.23.0): `/channels/`
+renders every topic as a channel and each topic page grows a Thread
+panel; a `post` action on `/api/act` queues a `channel_post` inbox
+item (server-stamped `author`, the message fenced as untrusted data),
+and the tend session replies in-thread by appending a dated topic
+entry — async message-passing, never live chat, inbox-only-write
+intact. Build: `npm run build` (Astro + Pagefind; details in
 `ui/README.md`). **Local-first** — sharing happens via the repo
 paths in `wiki/`, not a hosted URL. Mobile-native is a
 non-negotiable rule for any UI iteration.

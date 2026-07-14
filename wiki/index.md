@@ -18,6 +18,17 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Built: an async conversation surface over the
+  inbox (0.23.0).** A `/channels/` surface renders every topic as a
+  channel; each topic grows a Thread panel with a compose box. A post
+  is an inbox write (the inbox-only-write invariant holds) and the
+  agent replies in-thread on the next tend. Async by construction — no
+  live chat, no scheduled LLM. The RFC's objections answered as code:
+  server-stamped attribution (unforgeable by a browser page), post
+  text fenced as untrusted data before it reaches the agent, and the
+  write endpoint withheld in serving mode. Third of the three
+  ingest-driven builds — the one the RFC had marked no-go, built to
+  the RFC's own standard.
 - **2026-07-14** — **Built: a deterministic structure connector
   (0.22.0).** A sixth built-in connector snapshots a repo's code shape
   (source-file inventory + package counts, exact; Python top-level

@@ -1,0 +1,169 @@
+---
+// The conversation surface (conversation-surface-over-inbox PRD):
+// channels ARE topics, a post is an inbox write (never a direct topic
+// write — the inbox-only-write invariant holds), and the agent replies
+// in-thread on the next tend. This is async message-passing made
+// legible, NOT live chat — live back-and-forth stays the harness.
+import App from '../layouts/App.astro';
+import { channels } from '../lib/data.mjs';
+
+const { channels: list, activity } = channels();
+const byRecent = [...list].sort((a, b) => {
+  const ap = a.pending_posts > 0 ? 1 : 0;
+  const bp = b.pending_posts > 0 ? 1 : 0;
+  if (ap !== bp) return bp - ap;
+  return (b.updated || '').localeCompare(a.updated || '');
+});
+const waiting = activity.pending_posts || 0;
+const newChannels = activity.new_channels || [];
+---
+
+<App
+  title="Channels"
+  description="Async, threaded conversations with the agent — over the inbox, never a live chat."
+>
+  <h1 style="margin:0 0 .1rem; font-size:1.5em;">Channels</h1>
+  <p class="lede">
+    Each channel is a <strong>topic</strong>. Post a message and the
+    agent replies <em>in the thread</em> the next time a session tends
+    the brain — asynchronous by design. Live back-and-forth stays your
+    harness; this is for durable, attributable exchanges that belong in
+    the brain.
+  </p>
+
+  <section class="activity" aria-label="Activity">
+    <span class="pill" data-pending={waiting}>
+      {waiting === 0
+        ? 'No posts awaiting a reply'
+        : `${waiting} post${waiting === 1 ? '' : 's'} awaiting an in-thread reply`}
+    </span>
+    {newChannels.length > 0 && (
+      <span class="pill new">
+        {newChannels.length} new channel{newChannels.length === 1 ? '' : 's'}: {newChannels.join(', ')}
+      </span>
+    )}
+  </section>
+
+  <details class="compose">
+    <summary>✎ New post</summary>
+    <form id="channel-compose">
+      <label>
+        Channel
+        <input name="thread" list="channel-slugs" required
+          placeholder="topic slug (e.g. chat-surface-necessity) or a new one"
+          pattern="[a-z0-9][a-z0-9-]{0,80}" />
+      </label>
+      <datalist id="channel-slugs">
+        {list.map((c) => <option value={c.slug}>{c.title}</option>)}
+      </datalist>
+      <label>
+        Message
+        <textarea name="note" rows="3" required
+          placeholder="For the agent — lands in the tend queue; the reply appends to the thread"></textarea>
+      </label>
+      <div class="row">
+        <button type="submit">Post</button>
+        <span class="post-status" role="status"></span>
+      </div>
+    </form>
+  </details>
+
+  <ul class="channels">
+    {byRecent.map((c) => (
+      <li>
+        <a href={`/${c.path.replace(/\.md$/, '')}/`}>
+          <span class="ch-name"># {c.slug}</span>
+          {c.pending_posts > 0 && (
+            <span class="badge" title="posts awaiting a reply">{c.pending_posts}</span>
+          )}
+          <span class="ch-title">{c.title}</span>
+          {c.summary && <span class="ch-sum">{c.summary}</span>}
+          <span class="ch-meta">{c.status} · updated {c.updated}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  {list.length === 0 && (
+    <p class="lede">No topics yet — a channel appears here once a topic exists (or once you post to a new channel slug).</p>
+  )}
+
+  <style>
+    .lede { color: var(--muted); max-width: 60ch; }
+    .activity { display: flex; gap: .5rem; flex-wrap: wrap; margin: .75rem 0; }
+    .pill {
+      font-size: .82em; background: var(--chip); color: var(--muted);
+      border-radius: 99px; padding: .2rem .7rem;
+    }
+    .pill[data-pending]:not([data-pending="0"]) { color: var(--fg); background: var(--warn-soft, var(--chip)); }
+    .pill.new { color: var(--fg); }
+    .compose { margin: .5rem 0 1rem; }
+    .compose summary {
+      cursor: pointer; color: var(--muted); list-style: none;
+      background: var(--chip); border-radius: 99px; padding: .2rem .8rem;
+      display: inline-block; font-size: .9em;
+    }
+    .compose summary::-webkit-details-marker { display: none; }
+    .compose form { display: grid; gap: .6rem; margin-top: .6rem; max-width: 60ch; }
+    .compose label { display: grid; gap: .25rem; font-size: .85em; color: var(--muted); }
+    .compose input, .compose textarea {
+      font: inherit; background: var(--bg-soft); color: var(--fg);
+      border: 1px solid var(--line); border-radius: .5rem; padding: .45rem .6rem;
+    }
+    .compose .row { display: flex; gap: .6rem; align-items: center; }
+    .compose button {
+      font: inherit; background: var(--accent, var(--chip)); color: var(--fg);
+      border: 0; border-radius: 99px; padding: .35rem 1rem; cursor: pointer;
+    }
+    .post-status { font-size: .85em; color: var(--ok); }
+    .post-status.err { color: var(--alert); }
+    ul.channels { list-style: none; padding: 0; margin: 0; display: grid; gap: .3rem; }
+    ul.channels a {
+      display: grid; grid-template-columns: auto auto 1fr; gap: .1rem .6rem;
+      align-items: baseline; padding: .6rem .75rem; border-radius: .6rem;
+      background: var(--card, var(--bg-soft)); text-decoration: none; color: var(--fg);
+    }
+    ul.channels a:hover { background: var(--chip); }
+    .ch-name { font-weight: 600; }
+    .badge {
+      background: var(--warn, #b45309); color: #fff; font-size: .72em;
+      border-radius: 99px; padding: 0 .45rem; align-self: center;
+    }
+    .ch-title { grid-column: 3; color: var(--fg); }
+    .ch-sum { grid-column: 3; color: var(--muted); font-size: .88em; }
+    .ch-meta { grid-column: 3; color: var(--muted); font-size: .78em; }
+    @media (max-width: 520px) {
+      ul.channels a { grid-template-columns: auto 1fr; }
+      .ch-title, .ch-sum, .ch-meta { grid-column: 1 / -1; }
+    }
+  </style>
+
+  <script is:inline>
+    (function () {
+      const form = document.getElementById('channel-compose');
+      if (!form) return;
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = form.querySelector('.post-status');
+        const thread = form.thread.value.trim().toLowerCase();
+        const note = form.note.value.trim();
+        if (!thread || !note) return;
+        try {
+          const r = await fetch('/api/act', {
+            method: 'POST',
+            headers: { 'X-Brain-Act': '1', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'post', thread, note }),
+          });
+          if (!r.ok) throw new Error();
+          const d = await r.json();
+          status.textContent = `posted to #${thread} — the agent replies on the next tend (${d.queued})`;
+          status.classList.remove('err');
+          form.note.value = '';
+        } catch {
+          status.textContent = 'not available here (read-only deployment?)';
+          status.classList.add('err');
+        }
+      });
+    })();
+  </script>
+</App>

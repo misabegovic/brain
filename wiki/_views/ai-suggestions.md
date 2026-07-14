@@ -20,7 +20,7 @@ Aggregates every page with `ai_suggestion: true` across the brain's three scopes
 
 ### PRDs
 
-- [A conversation surface over the inbox — Slack-shaped channels for talking to the agent through the brain, asynchronously](../brain/ai-suggestions/prds/conversation-surface-over-inbox.md) — *suggested* — `brain/ai-suggestions/prds/conversation-surface-over-inbox.md`
+- [A conversation surface over the inbox — Slack-shaped channels for talking to the agent through the brain, asynchronously](../brain/ai-suggestions/prds/conversation-surface-over-inbox.md) — *superseded* — `brain/ai-suggestions/prds/conversation-surface-over-inbox.md`
 - [Ground the brain's architecture 'Now' against a deterministic structure extractor — Enola as reference implementation](../brain/ai-suggestions/prds/deterministic-structure-connector.md) — *superseded* — `brain/ai-suggestions/prds/deterministic-structure-connector.md`
 - [Give the brain's link graph per-edge provenance tags — push uncertainty from the page down to the relationship](../brain/ai-suggestions/prds/edge-provenance-tags.md) — *superseded* — `brain/ai-suggestions/prds/edge-provenance-tags.md`
 

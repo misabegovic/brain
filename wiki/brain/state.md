@@ -26,6 +26,24 @@ into the sections below.
 
 ## Now
 
+- **An async conversation surface ships over the inbox (0.23.0,
+  2026-07-14).** Channels ARE topics: a `/channels/` surface lists
+  every topic as a channel, and each topic page grows a Thread panel
+  with a compose box. A post is an **inbox write** — never a direct
+  topic write, so the inbox-only-write invariant holds — and the agent
+  replies *in the thread* on the next tend (a dated topic entry), then
+  the item clears. It is async by construction: no live chat, no
+  scheduled LLM. The RFC's craft objections are answered as code, not
+  prose: attribution is **server-stamped** from a machine identity (a
+  browser page cannot forge who posted), post text is **fenced as
+  untrusted data** before it reaches the write-capable tending agent
+  (with role-label injection lines flagged), the write endpoint never
+  mounts in serving mode, and "unread since last visit" lives in the
+  browser, not the git tree. Third of the three ingest-driven builds —
+  the surface the RFC had marked no-go, built to the standard the RFC
+  set. Ships behind the local server (`brain serve`); the static/
+  serving build shows channels read-only and withholds pending posts.
+
 - **A deterministic structure connector ships (0.22.0,
   2026-07-14).** A sixth built-in connector snapshots a target repo's
   code shape — the source-file inventory + package counts
