@@ -33,8 +33,10 @@ Run with the mempalace venv:
 from __future__ import annotations
 
 import argparse
+import ast
 import collections
 import datetime as dt
+import hashlib
 import http.server
 import json
 import os
@@ -5395,6 +5397,233 @@ def _connector_langfuse_pull() -> int:
     return 0
 
 
+# --- structure connector (0.21) — deterministic code-shape snapshots ----
+#
+# Per wiki/brain/ai-suggestions/prds/deterministic-structure-connector.md
+# and the three-ideas RFC craft findings. A vendor-neutral connector:
+# it reads a sibling repo with READ-ONLY git + file reads (no network,
+# no external binary, no LLM), writes an immutable structure snapshot
+# under sources/structure/, and diffs against the previous snapshot to
+# queue architectural-drift inbox items. The value is the *pattern* (a
+# deterministic structure snapshot as a cited "Now"), so nothing here
+# depends on any specific extractor binary — the brain computes the
+# facts itself. Drift is reconciled by citation: a drift item clears
+# once a wiki page cites the snapshot that raised it (the RFC's missing
+# reconciler). Guards (Sam): scrubbed env, read-only sibling with a
+# git-clean post-condition, secret-scan before the immutable write,
+# structural-only summaries, brain-computed filenames.
+
+STRUCTURE_SOURCE_EXTS = {
+    ".py": "python", ".js": "javascript", ".jsx": "javascript",
+    ".ts": "typescript", ".tsx": "typescript", ".go": "go",
+    ".rb": "ruby", ".rs": "rust", ".java": "java", ".mjs": "javascript",
+}
+STRUCTURE_SECRET_RE = re.compile(
+    r"(?i)(-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}|"
+    r"\b(?:secret|passwd|password|api[_-]?key|access[_-]?token)\b\s*[=:]\s*\S)")
+
+
+def _git_readonly(repo_root: Path, args: list[str]) -> subprocess.CompletedProcess:
+    """Run a read-only git command against a sibling with a scrubbed
+    environment — no inherited tokens reach the subprocess."""
+    env = {"PATH": os.environ.get("PATH", ""),
+           "HOME": os.environ.get("HOME", ""),
+           "GIT_TERMINAL_PROMPT": "0", "GIT_OPTIONAL_LOCKS": "0"}
+    return subprocess.run(["git", "-C", str(repo_root), *args],
+                          capture_output=True, text=True, env=env, timeout=60)
+
+
+def _extract_structure(repo_root: Path) -> dict:
+    """Deterministic code-shape facts for one repo: the tracked
+    source-file inventory + per-package counts (language-agnostic,
+    exact) and Python top-level symbols (exact via ast). No network,
+    no external binary. Non-Python languages get file-level drift only
+    — the honest accuracy tier."""
+    res = _git_readonly(repo_root, ["ls-files"])
+    tracked = sorted(line for line in res.stdout.splitlines() if line.strip())
+    modules = [f for f in tracked if Path(f).suffix in STRUCTURE_SOURCE_EXTS]
+    packages: dict[str, int] = {}
+    for f in modules:
+        top = f.split("/", 1)[0] if "/" in f else "."
+        packages[top] = packages.get(top, 0) + 1
+    symbols: dict[str, list[str]] = {}
+    for f in modules:
+        if not f.endswith(".py"):
+            continue
+        try:
+            src = (repo_root / f).read_text(encoding="utf-8", errors="replace")
+            tree = ast.parse(src, filename=f)
+        except (SyntaxError, ValueError, OSError):
+            continue
+        names = sorted(
+            n.name for n in tree.body
+            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef,
+                              ast.ClassDef)))
+        if names:
+            symbols[f] = names
+    return {"modules": modules,
+            "packages": dict(sorted(packages.items())),
+            "symbols": dict(sorted(symbols.items()))}
+
+
+def _structure_snapshot_id(facts: dict) -> str:
+    """Brain-computed dedup key: a stable hash over the canonical facts
+    (never derived from untrusted repo names directly)."""
+    canon = json.dumps(facts, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canon.encode()).hexdigest()[:6]
+
+
+def _structure_drift(prev: dict, cur: dict) -> list[str]:
+    """Structural-only drift lines (symbol names + counts, never code)."""
+    lines: list[str] = []
+    pm, cm = set(prev.get("modules", ())), set(cur.get("modules", ()))
+    for f in sorted(cm - pm):
+        lines.append(f"+ module {f}")
+    for f in sorted(pm - cm):
+        lines.append(f"- module {f}")
+    ps, cs = prev.get("symbols", {}), cur.get("symbols", {})
+    for f in sorted(set(ps) | set(cs)):
+        for s in sorted(set(cs.get(f, ())) - set(ps.get(f, ()))):
+            lines.append(f"+ {f} :: {s}")
+        for s in sorted(set(ps.get(f, ())) - set(cs.get(f, ()))):
+            lines.append(f"- {f} :: {s}")
+    return lines
+
+
+def _structure_targets() -> list[tuple[str, Path]]:
+    """(safe-name, checkout-path) pairs to snapshot: explicit config
+    paths plus active sibling repos. Empty → the connector no-ops."""
+    targets: list[tuple[str, Path]] = []
+    seen: set[str] = set()
+    for entry in _connector_config("structure").get("repos") or []:
+        p = Path(entry).expanduser()
+        if not p.is_absolute():
+            p = PROJECTS / entry
+        safe = re.sub(r"[^A-Za-z0-9._-]+", "-", p.name)
+        if (p / ".git").exists() and safe not in seen:
+            targets.append((safe, p)); seen.add(safe)
+    for repo in sorted(ACTIVE_REPOS):
+        p = PROJECTS / repo
+        safe = re.sub(r"[^A-Za-z0-9._-]+", "-", repo)
+        if (p / ".git").exists() and safe not in seen:
+            targets.append((safe, p)); seen.add(safe)
+    return targets
+
+
+def _reconcile_structure_drift() -> int:
+    """Clear structure-drift inbox items whose snapshot a wiki page now
+    cites — the deterministic auto-clear the RFC found missing. A drift
+    item means 'code moved, the wiki may be stale'; it is resolved once
+    a tend session synthesises the snapshot into the wiki (cites it)."""
+    cited = set()
+    for page in WIKI.rglob("*.md"):
+        parsed = parse(page)
+        if not parsed:
+            continue
+        for s in parsed[0].get("sources") or []:
+            m = re.search(r"sources/structure/[^\s)]+", str(s))
+            if m:
+                cited.add(m.group(0).lstrip("./"))
+    cleared = 0
+    for item in _inbox_items():
+        if item.get("produced_by") != "structure-pull":
+            continue
+        src = (item.get("source") or "").lstrip("./")
+        if src and src in cited:
+            (INBOX_DIR / f"{item['id']}.json").unlink(missing_ok=True)
+            cleared += 1
+    return cleared
+
+
+def _connector_structure_pull() -> int:
+    """Snapshot each target repo's deterministic code shape and queue a
+    drift item when it moved since the last snapshot."""
+    targets = _structure_targets()
+    if not targets:
+        print("structure-pull: no repos targeted (active_repos empty and "
+              "connectors.structure.repos unset) — nothing to pull")
+        return 0
+    reconciled = _reconcile_structure_drift()
+    cursors = _read_connector_cursors()
+    st_cursors = cursors.setdefault("structure", {})
+    today = today_utc().isoformat()
+    new_snaps = 0
+    for safe, root in targets:
+        # Read-only guard: capture the sibling's porcelain state and
+        # assert the extractor left it untouched (Sam's git-clean
+        # post-condition). Also record the git ref for the receipt.
+        before = _git_readonly(root, ["status", "--porcelain"]).stdout
+        head = _git_readonly(root, ["rev-parse", "HEAD"]).stdout.strip() or "unknown"
+        facts = _extract_structure(root)
+        after = _git_readonly(root, ["status", "--porcelain"]).stdout
+        if before != after:
+            print(f"structure-pull: {safe} tree changed during read — "
+                  f"skipping (read-only guard)", file=sys.stderr)
+            continue
+        snap_id = _structure_snapshot_id(facts)
+        rel = f"{safe}/snap--{snap_id}.md"
+        prev_path = st_cursors.get(safe, {}).get("snapshot")
+        facts_json = json.dumps(facts, indent=2, sort_keys=True)
+        n_mod = len(facts["modules"])
+        n_sym = sum(len(v) for v in facts["symbols"].values())
+        dirty = " (read from a dirty tree — may not match the commit)" \
+            if before.strip() else ""
+        body = (
+            f"Deterministic code-shape snapshot of `{safe}` at "
+            f"`{head[:12]}`{dirty}.\n\n"
+            f"- {n_mod} source module(s) across "
+            f"{len(facts['packages'])} package(s)\n"
+            f"- {n_sym} Python top-level symbol(s)\n\n"
+            f"```json\n{facts_json}\n```\n")
+        if STRUCTURE_SECRET_RE.search(body):
+            print(f"structure-pull: {safe} snapshot tripped the secret "
+                  f"scan — not writing", file=sys.stderr)
+            continue
+        wrote = _snapshot_write(
+            "structure", rel,
+            f"{safe} code structure @ {head[:12]}", body,
+            {"repo": safe, "git_ref": head, "snapshot_id": snap_id,
+             "modules": n_mod, "symbols": n_sym})
+        if wrote is None:
+            continue  # identical structure already snapshotted — no drift
+        new_snaps += 1
+        drift = []
+        if prev_path and (REPO / prev_path).exists():
+            prev_facts = _structure_snapshot_facts(REPO / prev_path)
+            drift = _structure_drift(prev_facts, facts)
+        if drift:
+            head_lines = "\n".join(drift[:12])
+            more = f"\n(+{len(drift) - 12} more)" if len(drift) > 12 else ""
+            inbox_add(
+                id=f"structure-drift-{safe}", kind="ingest",
+                summary=f"{safe}: {len(drift)} structural change(s) since "
+                        f"the last snapshot — architecture.md may be stale",
+                route=f"/in sources/structure/{rel}",
+                source=f"sources/structure/{rel}",
+                priority="normal", produced_by="structure-pull", update=True)
+            print(f"structure-pull: {safe} drift:\n{head_lines}{more}")
+        st_cursors[safe] = {"snapshot": f"sources/structure/{rel}",
+                            "snapshot_id": snap_id, "git_ref": head,
+                            "last_pull": today}
+    _write_connector_cursors(cursors)
+    print(f"structure-pull: {len(targets)} repo(s), {new_snaps} new "
+          f"snapshot(s), {reconciled} drift item(s) reconciled")
+    return 0
+
+
+def _structure_snapshot_facts(path: Path) -> dict:
+    """Parse the canonical facts JSON back out of a structure snapshot."""
+    parsed = parse(path)
+    body = parsed[1] if parsed else path.read_text()
+    m = re.search(r"```json\n(.*?)\n```", body, re.DOTALL)
+    if not m:
+        return {}
+    try:
+        return json.loads(m.group(1))
+    except json.JSONDecodeError:
+        return {}
+
+
 def _schedule_run_inbox_refresh() -> int:
     """Recompute the deterministic slice of the tend queue.
 
@@ -5930,6 +6159,7 @@ SCHEDULE_HANDLERS = {
     "slack-pull": _connector_slack_pull,
     "datadog-pull": _connector_datadog_pull,
     "langfuse-pull": _connector_langfuse_pull,
+    "structure-pull": _connector_structure_pull,
     "issues-pull": _schedule_run_issues_pull,
     "notion-walk": _schedule_run_notion_walk,
     "overlap-refresh": _schedule_run_overlap_refresh,

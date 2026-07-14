@@ -237,6 +237,14 @@ disjoint edge populations, and the real bus connecting them is the
    filenames). Express drift as its own indexed code-structure plane +
    a SQL view diffing it against the wiki — not a promotable per-edge
    state.
+   **→ Built 0.22.0 (2026-07-14).** Shipped vendor-neutral (the brain
+   computes structure facts itself from read-only git + `ast`, no
+   pre-1.0 binary dependency), with the citation-based drift
+   reconciler and the security guards landed as code. Ships off — no
+   active sibling repos on this instance — so the gating concern is
+   moot by construction rather than by veto. Snapshots index into the
+   existing `snapshots` FTS plane. See [`brain/state.md`](../state.md)
+   § Now.
 
 3. **Conversation surface — no-go for now.** Not a child of an epic.
    It re-opens a twice-settled decision, its need-owner is a synthetic

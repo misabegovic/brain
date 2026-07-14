@@ -26,6 +26,25 @@ into the sections below.
 
 ## Now
 
+- **A deterministic structure connector ships (0.22.0,
+  2026-07-14).** A sixth built-in connector snapshots a target repo's
+  code shape — the source-file inventory + package counts
+  (language-agnostic, exact) and Python top-level symbols (exact via
+  `ast`) — with no network, no external binary, and no LLM. It writes
+  an immutable snapshot to `sources/structure/`, diffs against the
+  previous snapshot, and queues an architectural-drift inbox item when
+  the code moved (`architecture.md` may be stale) — a strict upgrade
+  over the git-name-only cursor diff. Drift auto-clears by citation:
+  the item resolves once a wiki page cites the snapshot that raised it
+  (the reconciler the RFC found missing). Guards land as code:
+  scrubbed env, read-only git with a git-clean post-condition, a
+  secret-scan before the immutable write, structural-only summaries,
+  brain-computed filenames. Vendor-neutral by construction — the brain
+  computes the facts itself, so nothing depends on a pre-1.0 extractor
+  binary. Ships **off** (`connectors.structure.repos: []`); this
+  dogfooding instance has no active sibling repos to point at. Second
+  of the three ingest-driven builds (the Enola pattern).
+
 - **The link graph carries per-edge provenance (0.21.0,
   2026-07-14).** `brain.py` emits one tagged edge list to
   `wiki/_views/graph.json` — EXTRACTED for authored links and

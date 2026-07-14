@@ -44,3 +44,10 @@ connectors:
     # .env — Langfuse keys are write-capable (no read-only type):
     # use a dedicated project's keys or self-host.
     host: ""
+  structure:
+    # Deterministic code-shape snapshots + architectural-drift inbox
+    # items. No network, no external binary, no LLM — reads a sibling
+    # repo with read-only git and files. Active repos are covered
+    # automatically; list extra repo paths (absolute, or names under
+    # $BRAIN_PROJECTS_ROOT) here. Empty + no active repos = off.
+    repos: []
