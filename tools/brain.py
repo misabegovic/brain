@@ -3333,7 +3333,7 @@ AGENT_KEYS = WIKI / "_state" / "agent-keys.json"        # SECRETS — git-ignore
 EVENTS_DIR = WIKI / "_state" / "events"                 # append-only jsonl — git-ignored
 EVENT_CURSORS = WIKI / "_state" / "event-cursors.json"  # per-agent read cursors
 AGENT_ID_RE = re.compile(r"[a-z0-9][a-z0-9-]{0,63}")
-EVENT_KINDS = {"post", "drift", "release", "note", "subscribe"}
+EVENT_KINDS = {"post", "drift", "release", "note", "subscribe", "alert"}
 
 
 def hosted_mode() -> bool:
@@ -3540,6 +3540,42 @@ def events_since(agent_id: str, advance: bool = True) -> list[dict]:
 def cmd_agent_key(args) -> int:
     """Manage the per-agent keyring (identity for the hosted tier)."""
     op = args.op
+    if op == "provision":
+        # Wire a harness in as an event-tier participant: issue (or
+        # rotate) the key and emit everything the operator needs to make
+        # their harness a spoke — the env, the listener, and a
+        # subscription. The glue behind "work done from within".
+        existing = args.agent in _load_agent_keys()
+        secret = agent_key_issue(args.agent, rotate=existing)
+        hub = args.hub or os.environ.get("BRAIN_URL", "http://127.0.0.1:8765")
+        pattern = args.pattern or "repo:*"
+        block = (
+            f"# brain event-tier participation for agent {args.agent!r}.\n"
+            f"# Source this, run the listener, and subscribe — then the\n"
+            f"# agent is woken when a matching event lands.\n"
+            f"export BRAIN_URL={hub}\n"
+            f"export BRAIN_AGENT_ID={args.agent}\n"
+            f"export BRAIN_AGENT_SECRET={secret}\n"
+            f"\n# receive wakes (background it in your harness startup):\n"
+            f"#   python3 tools/brain-agent.py listen --port 9999\n"
+            f"# subscribe to what this agent cares about:\n"
+            f"#   python3 tools/brain-agent.py subscribe "
+            f"--pattern '{pattern}' --wake-url http://127.0.0.1:9999/wake\n")
+        if args.write:
+            envfile = REPO / ".brain-agent.env"
+            envfile.write_text(block)
+            try:
+                envfile.chmod(0o600)
+            except OSError:
+                pass
+            print(f"wrote {envfile.relative_to(REPO)} (git-ignored — holds "
+                  f"the secret). Source it, then listen + subscribe:")
+        else:
+            print(f"provisioned agent {args.agent!r} — participation block "
+                  f"(secret shown once; --write saves it to "
+                  f".brain-agent.env):\n")
+        print(block)
+        return 0
     if op == "issue" or op == "rotate":
         try:
             secret = agent_key_issue(args.agent, rotate=(op == "rotate"))
@@ -8399,6 +8435,17 @@ def main() -> int:
         help="per-agent identity keyring for the hosted tier "
              "(wiki/_state/agent-keys.json; git-ignored secrets)")
     ak_sub = ap_ak.add_subparsers(dest="op", required=True)
+    ak_prov = ak_sub.add_parser(
+        "provision", help="issue a key + emit the harness participation "
+                          "block (env + listener + subscribe)")
+    ak_prov.add_argument("agent")
+    ak_prov.add_argument("--hub", default="",
+                         help="hosted brain URL (default $BRAIN_URL or "
+                              "http://127.0.0.1:8765)")
+    ak_prov.add_argument("--pattern", default="",
+                         help="subscription pattern to suggest (default repo:*)")
+    ak_prov.add_argument("--write", action="store_true",
+                         help="save the block to .brain-agent.env (git-ignored)")
     ak_issue = ak_sub.add_parser("issue", help="issue a new per-agent key")
     ak_issue.add_argument("agent")
     ak_rotate = ak_sub.add_parser("rotate", help="rotate an agent's key")

@@ -26,6 +26,24 @@ into the sections below.
 
 ## Now
 
+- **Specialized agents + a local emulation of the whole loop (0.30.0,
+  2026-07-14).** The agentic future runs end to end on one machine, no
+  deployment. Two **specialized spoke agents** ship under `tools/agents/`
+  — a **drift-reconciler** (subscribes to repo drift; on wake queues a
+  `reconcile:<repo>` note for a tend session) and an
+  **observability-triage** agent (subscribes to `alert:*` from emulated
+  Sentry / Datadog / Langfuse producers; assigns severity and queues a
+  triage note). Both do **deterministic prep only** and emit a result
+  event — they never invoke an LLM, so the no-scheduled-LLM invariant
+  holds; the reasoning is queued for a harness. `tools/emulate-agentic.py`
+  is the **local hosting emulation**: it starts a real hosted hub,
+  issues keys, runs the real spoke agents as listeners, fires the
+  producers, and shows producers → wakes → agent reactions on a signed
+  stream. `agent-key provision <agent>` is the harness-participation
+  glue — it issues a key and emits the env + listener + subscribe block
+  so any harness becomes a spoke. Real, deployed observability agents
+  become connectors emitting these same alert events.
+
 - **The spoke client lands — hub-and-spoke, both halves (0.29.0,
   2026-07-14).** On the operator's hub-and-spoke direction (the brain is
   the coordination + memory hub; the harness stays the execution spoke),

@@ -18,6 +18,14 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Built (0.30.0): specialized agents + a local
+  emulation of the whole loop.** Two specialized spoke agents ship
+  (`tools/agents/`): a drift-reconciler and an observability-triage
+  agent (for emulated Sentry/Datadog/Langfuse), both deterministic —
+  they wake, prep, and queue, never invoke an LLM.
+  `tools/emulate-agentic.py` runs the entire agentic loop on one machine
+  (real hub + spoke agents + producers → wakes → reactions), and
+  `agent-key provision` wires any harness in as a spoke. No deployment.
 - **2026-07-14** — **Built (0.29.0): the spoke client — hub-and-spoke,
   both halves.** `tools/brain-agent.py` is the missing client half: an
   agent in any harness can `emit` / `pull` / `subscribe` / `listen`
