@@ -586,6 +586,11 @@
       "provenance": "inferred"
     },
     {
+      "source": "brain/epics/event-driven-agent-triggers.md",
+      "target": "brain/state.md",
+      "provenance": "extracted"
+    },
+    {
       "source": "brain/index.md",
       "target": "brain/adrs/acknowledge-recurring-tend-items.md",
       "provenance": "extracted"

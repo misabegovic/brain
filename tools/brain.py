@@ -36,12 +36,16 @@ import argparse
 import ast
 import collections
 import datetime as dt
+import fnmatch
 import hashlib
 import hmac
+import http.client
 import http.server
+import ipaddress
 import json
 import os
 import secrets
+import socket
 import re
 import shutil
 import socketserver
@@ -1815,6 +1819,12 @@ def cmd_serve(args) -> int:
                         return
                     event_seq = ev["seq"]
                     author = hagent
+                    # Wake subscribed owners off the request path: a
+                    # daemon thread POSTs the hints so a slow or dead
+                    # webhook never delays this response. The cursor is
+                    # the durable backstop if the thread's POSTs fail.
+                    threading.Thread(target=deliver_wakes, args=(ev,),
+                                     daemon=True).start()
                 elif action == "post":
                     author = _machine_author()  # local: server-stamped
 
@@ -3535,7 +3545,10 @@ def cmd_events(args) -> int:
         except (PermissionError, ValueError) as exc:
             print(f"events emit: {exc}", file=sys.stderr)
             return 1
-        print(f"appended event seq={ev['seq']} {ev['kind']} by {ev['agent']}")
+        woke = deliver_wakes(ev) if hosted_mode() else 0
+        note = f"; woke {woke} owner(s)" if hosted_mode() else ""
+        print(f"appended event seq={ev['seq']} {ev['kind']} "
+              f"by {ev['agent']}{note}")
         return 0
     if op == "since":
         evs = events_since(args.agent, advance=not args.no_advance)
@@ -3570,6 +3583,168 @@ def cmd_events(args) -> int:
     for f in forged[:20]:
         print(f"  ✗ {f}")
     return 1 if forged else 0
+
+
+# --- owner-subscription wake (0.28) — the headline agentic win ---------
+#
+# Implements wiki/brain/adrs/owner-subscription-wake.md, the epic's
+# second child, on top of the child-1 event stream. A subscription is a
+# signed `subscribe` event whose ref encodes a glob pattern + a wake URL;
+# the active set is the fold of those events. When a non-subscribe event
+# is appended on the hosted tier, matching owners are woken by a webhook
+# POST of a HINT — the event's seq + ref, signed with the subscriber's
+# own key, never a payload. Delivery is at-least-once and best-effort;
+# the per-agent cursor (child 1) is the durable backstop, so a failed or
+# blocked webhook is harmless. An SSRF guard vets every agent-supplied
+# URL, and fan-out is capped per event.
+
+WAKE_FANOUT_CAP = 32       # max owners woken per event (anti-storm)
+WAKE_TIMEOUT = 4           # seconds per webhook POST
+
+
+def subscribe(agent_id: str, pattern: str, wake_url: str) -> dict:
+    """Emit a signed subscribe event (an empty wake_url unsubscribes)."""
+    ref = json.dumps({"p": pattern, "u": wake_url},
+                     sort_keys=True, separators=(",", ":"))
+    return event_emit(agent_id, "subscribe", ref)
+
+
+def _active_subscriptions() -> list[dict]:
+    """Fold the verified subscribe events into the current set: the
+    latest event per (agent, pattern) wins; an empty URL removes it."""
+    subs: dict[tuple, str] = {}
+    for ev in event_read(0):
+        if ev.get("kind") != "subscribe":
+            continue
+        try:
+            d = json.loads(ev.get("ref", ""))
+        except (json.JSONDecodeError, TypeError):
+            continue
+        key = (ev["agent"], d.get("p", ""))
+        url = d.get("u", "")
+        if url:
+            subs[key] = url
+        else:
+            subs.pop(key, None)
+    return [{"agent": a, "pattern": p, "wake_url": u}
+            for (a, p), u in sorted(subs.items())]
+
+
+def _match_subscriptions(event: dict) -> list[dict]:
+    """Owners whose glob pattern matches this (non-subscribe) event's ref."""
+    if event.get("kind") == "subscribe":
+        return []
+    ref = event.get("ref", "")
+    return [s for s in _active_subscriptions()
+            if fnmatch.fnmatch(ref, s["pattern"])]
+
+
+def _wake_url_ok(url: str) -> bool:
+    """SSRF guard: http/https only, and no resolved address may be
+    loopback / private / link-local / reserved. Best-effort against DNS
+    rebinding — the wake carries only a seq + ref, so the blast radius of
+    a bypass is a leaked sequence number."""
+    try:
+        u = urllib.parse.urlparse(url)
+    except ValueError:
+        return False
+    if u.scheme not in ("http", "https") or not u.hostname:
+        return False
+    port = u.port or (443 if u.scheme == "https" else 80)
+    # Local-dev opt-in: an operator running agents on the same host wants
+    # LOOPBACK webhooks. It never relaxes anything else — link-local (the
+    # cloud-metadata endpoint), private LAN, reserved, and multicast stay
+    # blocked. On a hosted deployment the flag is off and loopback is an
+    # SSRF target too.
+    allow_loopback = os.environ.get("BRAIN_WAKE_ALLOW_LOOPBACK") == "1"
+    try:
+        infos = socket.getaddrinfo(u.hostname, port,
+                                   proto=socket.IPPROTO_TCP)
+    except (socket.gaierror, OSError, UnicodeError, ValueError):
+        return False
+    for info in infos:
+        try:
+            ip = ipaddress.ip_address(info[4][0])
+        except ValueError:
+            return False
+        if ip.is_loopback and allow_loopback:
+            continue
+        if (ip.is_loopback or ip.is_private or ip.is_link_local
+                or ip.is_reserved or ip.is_multicast or ip.is_unspecified):
+            return False
+    return True
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):  # noqa: D401
+        return None  # never follow a redirect on an outbound wake
+
+
+def _wake_sign(agent_id: str, seq: int, ref: str) -> str | None:
+    secret = _agent_secret(agent_id)
+    if secret is None:
+        return None
+    return hmac.new(bytes.fromhex(secret), f"wake:{seq}:{ref}".encode(),
+                    hashlib.sha256).hexdigest()
+
+
+def deliver_wakes(event: dict) -> int:
+    """POST a signed wake hint to each matching owner, capped and guarded.
+    Best-effort: a bad URL or failed POST is logged and dropped — the
+    subscriber's cursor catches it up. Returns the number delivered."""
+    delivered = 0
+    for s in _match_subscriptions(event)[:WAKE_FANOUT_CAP]:
+        sig = _wake_sign(s["agent"], event["seq"], event["ref"])
+        if sig is None:
+            continue
+        if not _wake_url_ok(s["wake_url"]):
+            print(f"wake: refusing unsafe url for {s['agent']}",
+                  file=sys.stderr)
+            continue
+        body = json.dumps({"seq": event["seq"], "ref": event["ref"],
+                           "sig": sig}).encode()
+        req = urllib.request.Request(
+            s["wake_url"], data=body, method="POST",
+            headers={"Content-Type": "application/json", "X-Brain-Wake": "1"})
+        try:
+            urllib.request.build_opener(_NoRedirect()).open(
+                req, timeout=WAKE_TIMEOUT)
+            delivered += 1
+        except (urllib.error.URLError, http.client.HTTPException,
+                OSError, ValueError) as exc:
+            print(f"wake: delivery to {s['agent']} failed ({exc}); the "
+                  f"cursor is the backstop", file=sys.stderr)
+    return delivered
+
+
+def cmd_subscribe(args) -> int:
+    """Subscribe an agent to a ref-pattern with a wake URL (a signed
+    subscribe event; empty --wake-url unsubscribes)."""
+    if args.wake_url and not _wake_url_ok(args.wake_url):
+        print("subscribe: wake url rejected by the SSRF guard "
+              "(http/https only, no loopback/private host)", file=sys.stderr)
+        return 1
+    try:
+        ev = subscribe(args.agent, args.pattern, args.wake_url)
+    except (PermissionError, ValueError) as exc:
+        print(f"subscribe: {exc}", file=sys.stderr)
+        return 1
+    verb = "unsubscribed" if not args.wake_url else "subscribed"
+    print(f"{verb} {args.agent} → {args.pattern!r} (event seq={ev['seq']})")
+    return 0
+
+
+def cmd_subscriptions(args) -> int:
+    subs = _active_subscriptions()
+    if args.json:
+        print(json.dumps(subs, indent=2))
+        return 0
+    if not subs:
+        print("no active subscriptions")
+        return 0
+    for s in subs:
+        print(f"  {s['agent']:20} {s['pattern']:24} → {s['wake_url']}")
+    return 0
 
 
 def cmd_inbox(args) -> int:
@@ -8220,6 +8395,24 @@ def main() -> int:
                           help="peek without advancing the cursor")
     ev_sub.add_parser("verify", help="integrity report over the whole stream")
     ap_ev.set_defaults(func=cmd_events)
+
+    ap_subc = sub.add_parser(
+        "subscribe",
+        help="subscribe an agent to a ref-pattern with a wake URL "
+             "(a signed subscribe event; owner-subscription wake)")
+    ap_subc.add_argument("--agent", required=True)
+    ap_subc.add_argument("--pattern", required=True,
+                         help="glob over event refs (e.g. 'channel:*', "
+                              "'repo:brain', 'producer:structure')")
+    ap_subc.add_argument("--wake-url", dest="wake_url", default="",
+                         help="webhook URL to POST a wake hint to "
+                              "(empty unsubscribes)")
+    ap_subc.set_defaults(func=cmd_subscribe)
+
+    ap_subs = sub.add_parser("subscriptions",
+                             help="list active owner subscriptions")
+    ap_subs.add_argument("--json", action="store_true")
+    ap_subs.set_defaults(func=cmd_subscriptions)
 
     ap_sc = sub.add_parser("sync-cursor",
                            help="manage sibling-repo sync cursors "
