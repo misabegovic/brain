@@ -115,8 +115,10 @@ In the umbrella:
   `wiki/_state/events`, per-agent cursors, and the hosted auth boundary
   (`BRAIN_HOSTED=1`) that rejects forged appends and verifies on read.
   The first dependency, done; the event-fan-out substrate is settled.
-- **Owner-subscription wake** — *not yet spawned* (built on identity;
-  the headline win) — now unblocked.
+- [Owner-subscription wake](../prds/owner-subscription-wake.md)
+  — *living* (PRD + [ADR](../adrs/owner-subscription-wake.md) landed;
+  the bet is signed subscribe events + guarded webhooks). The headline
+  win; awaiting the build.
 
 Children spawn via forward `/shape` with `parent_epic:
 event-driven-agent-triggers`; this list gains a link and a status as

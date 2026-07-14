@@ -18,6 +18,12 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Shaped (child 2): owner-subscription wake.** The
+  epic's headline win — subscribe to a thread/repo/producer and a
+  matching event wakes the owner. PRD + [ADR](brain/adrs/owner-subscription-wake.md)
+  landed on the operator's webhook pick: signed subscribe events + a
+  guarded webhook hint (seq + ref, never a payload), the cursor as the
+  at-least-once backstop. Build next — closes the loop.
 - **2026-07-14** — **Built (0.27.0): per-agent identity + a signed
   event stream.** The [event-driven epic's](brain/epics/event-driven-agent-triggers.md)
   first child ships — the agentic-future backbone. A hosted brain

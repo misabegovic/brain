@@ -15,7 +15,7 @@ Committed work, proposals awaiting a bet, patterns from feedback, and what's que
 
 ## Open initiatives
 
-No committed work in flight — a pitch on the briefing graduates here on a bet.
+- [Owner-subscription wake — the headline agentic win](/brain/prds/owner-subscription-wake/) — living · updated 2026-07-14
 
 ## Pitches awaiting a bet
 
