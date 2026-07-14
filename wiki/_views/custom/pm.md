@@ -19,7 +19,7 @@ No committed work in flight — a pitch on the briefing graduates here on a bet.
 
 ## Pitches awaiting a bet
 
-- [Event-driven triggers for multi-agent work — an agentic future for a hosted brain](/brain/pitches/event-driven-agent-triggers/) — **draft** · updated 2026-07-14
+No pitches waiting — the next 'let's explore X' lands one here.
 
 ## Insights
 

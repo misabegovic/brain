@@ -1,7 +1,8 @@
 ---
 title: "Event-driven triggers for multi-agent work — an agentic future for a hosted brain"
 kind: pitch
-status: draft
+status: superseded
+superseded_by: brain/epics/event-driven-agent-triggers.md
 updated: 2026-07-14
 team: brain kernel
 division: "(brain)"
@@ -18,11 +19,15 @@ sources:
 
 # Event-driven triggers for multi-agent work — an agentic future for a hosted brain
 
-Shape Up **pitch** — pre-bet, fat-marker fidelity. It graduates from
+> **Bet placed 2026-07-14 — superseded by the
+> [event-driven-agent-triggers epic](../epics/event-driven-agent-triggers.md).**
+> The betting table took this pitch; it graduated into an epic with
+> children in dependency order (per-agent identity first, then
+> owner-subscription wake). This page is kept as the pre-bet record.
+
+Shape Up **pitch** — pre-bet, fat-marker fidelity. It graduated from
 the [event-driven-multi-agent topic](../topics/event-driven-multi-agent.md),
-which a live four-agent session on the brain itself produced. On a bet
-this most likely becomes an **epic + children** (identity first, then
-owner-subscription wake), not a single PRD — see Appetite.
+which a live four-agent session on the brain itself produced.
 
 ## Problem
 
