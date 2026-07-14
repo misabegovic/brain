@@ -70,3 +70,5 @@ wiki/_state/inbox-acks.json
 wiki/_state/agent-keys.json
 wiki/_state/events/
 wiki/_state/event-cursors.json
+wiki/_state/.emulate-cursors.json
+.brain-agent.env

@@ -366,3 +366,40 @@ def test_spoke_client_round_trip(tmp_path):
         shutil.rmtree(brain.EVENTS_DIR, ignore_errors=True)
         for k in ("BRAIN_URL", "BRAIN_AGENT_ID", "BRAIN_AGENT_SECRET"):
             os.environ.pop(k, None)
+
+
+def test_agent_provision(monkeypatch, tmp_path, capsys):
+    _isolate(monkeypatch, tmp_path)
+
+    class _Args:
+        op = "provision"
+        agent = "harness-agent"
+        hub = "http://127.0.0.1:8765"
+        pattern = "repo:*"
+        write = False
+
+    assert brain.cmd_agent_key(_Args()) == 0
+    out = capsys.readouterr().out
+    assert "BRAIN_AGENT_ID=harness-agent" in out
+    assert "BRAIN_AGENT_SECRET=" in out
+    assert "brain-agent.py listen" in out
+    assert brain._agent_secret("harness-agent")  # key was issued
+
+
+def test_emulation_runs_the_whole_loop():
+    """The local emulation drives the real hub + spoke agents + handlers
+    end to end: producers fire, specialized agents wake, and their result
+    notes land on the stream."""
+    assert not brain.AGENT_KEYS.exists(), "test assumes no live keyring"
+    r = subprocess.run(
+        [sys.executable, str(REPO / "tools" / "emulate-agentic.py")],
+        capture_output=True, text=True, timeout=90)
+    out = r.stdout
+    assert r.returncode == 0, r.stderr[:400]
+    # The drift-reconciler and observability-triage reacted...
+    assert "reconcile:brain" in out
+    assert "triage:sentry:high:issue-4821" in out
+    assert "triage:datadog:medium:mon-77" in out
+    # ...and the loop was demonstrated + cleaned up.
+    assert "loop demonstrated" in out
+    assert not brain.AGENT_KEYS.exists(), "emulation must clean up its keyring"
