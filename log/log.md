@@ -307,3 +307,7 @@
    restricted-paths: false
    by: claude (fable 5)
 2026-07-14 shape — pitch → wiki/brain/prds/per-agent-identity.md (PM agent, child of event-driven-agent-triggers epic)
+2026-07-14 merge — PR #26: Phase 1 PRD: per-agent identity for a hosted brain (epic child 1)
+   diff: 5 files, +190/-6
+   restricted-paths: false
+   by: claude (fable 5)
