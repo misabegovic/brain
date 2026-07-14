@@ -284,3 +284,7 @@
    diff: 13 files, +369/-194
    restricted-paths: true
    by: claude (fable 5)
+2026-07-14 merge — PR #21: Lead topics with an executive brief, collapse the discussion
+   diff: 8 files, +99/-18
+   restricted-paths: false
+   by: claude (fable 5)
