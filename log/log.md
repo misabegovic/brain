@@ -272,3 +272,7 @@
    diff: 17 files, +1204/-40
    restricted-paths: true
    by: claude (fable 5)
+2026-07-14 merge — PR #18: Add a deterministic structure connector
+   diff: 18 files, +449/-18
+   restricted-paths: true
+   by: claude (fable 5)
