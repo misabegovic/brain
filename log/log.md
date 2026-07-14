@@ -327,3 +327,8 @@
    diff: 6 files, +180/-8
    restricted-paths: false
    by: claude (fable 5)
+2026-07-14 shape — built wiki/brain/prds/owner-subscription-wake.md @ PR #30 (Developer agent)
+2026-07-14 merge — PR #30: Build owner-subscription wake — close the event-driven loop
+   diff: 20 files, +407/-45
+   restricted-paths: true
+   by: claude (fable 5)
