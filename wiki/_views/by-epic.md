@@ -16,14 +16,14 @@ Aggregates every `kind: epic` umbrella with its children (`parent_epic:` reverse
 
 **1** epic(s) in flight.
 
-## [Event-driven triggers for multi-agent work](../brain/epics/event-driven-agent-triggers.md) — *living*
+## [Event-driven triggers for multi-agent work](../brain/epics/event-driven-agent-triggers.md) — *superseded*
 
 ### PRDs
 
-- [Owner-subscription wake — the headline agentic win](../brain/prds/owner-subscription-wake.md) — *living*
+- [Owner-subscription wake — the headline agentic win](../brain/prds/owner-subscription-wake.md) — *superseded*
 - [Per-agent identity for a hosted brain](../brain/prds/per-agent-identity.md) — *superseded*
 
 ### ADRs
 
-- [Owner-subscription wake via signed subscribe events and guarded webhooks](../brain/adrs/owner-subscription-wake.md) — *draft*
+- [Owner-subscription wake via signed subscribe events and guarded webhooks](../brain/adrs/owner-subscription-wake.md) — *living*
 - [Per-agent identity on a signed, append-only event stream](../brain/adrs/per-agent-identity.md) — *living*

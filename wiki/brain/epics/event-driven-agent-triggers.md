@@ -1,7 +1,8 @@
 ---
 title: "Event-driven triggers for multi-agent work"
 kind: epic
-status: living
+status: superseded
+superseded_by: brain/state.md
 updated: 2026-07-14
 team: brain kernel
 division: "(brain)"
@@ -24,6 +25,12 @@ sources:
 ---
 
 # Event-driven triggers for multi-agent work
+
+> **Complete 2026-07-14 — both children shipped; the loop is closed.**
+> Per-agent identity + the signed event stream (0.27.0) and
+> owner-subscription wake (0.28.0) are built. An agent's action now
+> wakes the agents who care, end to end, on the hosted tier — recorded
+> in [`brain/state.md`](../state.md) § Now. Kept as the umbrella record.
 
 Umbrella for the bet placed 2026-07-14 on the
 [event-driven-agent-triggers pitch](../pitches/event-driven-agent-triggers.md)
@@ -116,9 +123,10 @@ In the umbrella:
   (`BRAIN_HOSTED=1`) that rejects forged appends and verifies on read.
   The first dependency, done; the event-fan-out substrate is settled.
 - [Owner-subscription wake](../prds/owner-subscription-wake.md)
-  — *living* (PRD + [ADR](../adrs/owner-subscription-wake.md) landed;
-  the bet is signed subscribe events + guarded webhooks). The headline
-  win; awaiting the build.
+  — **built** 0.28.0 ([ADR](../adrs/owner-subscription-wake.md)): signed
+  subscribe events, glob matching, and a signed webhook hint through an
+  SSRF guard, capped per event, with the cursor as the backstop. The
+  headline win — **the loop is closed.**
 
 Children spawn via forward `/shape` with `parent_epic:
 event-driven-agent-triggers`; this list gains a link and a status as

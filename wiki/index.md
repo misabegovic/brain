@@ -18,6 +18,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-07-14** — **Built (0.28.0): owner-subscription wake — the loop
+  is closed.** The [event-driven epic](brain/epics/event-driven-agent-triggers.md)
+  is complete. Subscribe to a thread/repo/producer and a matching event
+  wakes the owner with a signed webhook hint (seq + ref, no payload)
+  through an SSRF guard, capped per event, with the cursor as the
+  at-least-once backstop. An agent's action now wakes the agents who
+  care, end to end.
 - **2026-07-14** — **Shaped (child 2): owner-subscription wake.** The
   epic's headline win — subscribe to a thread/repo/producer and a
   matching event wakes the owner. PRD + [ADR](brain/adrs/owner-subscription-wake.md)

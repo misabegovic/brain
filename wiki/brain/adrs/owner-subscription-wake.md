@@ -1,7 +1,7 @@
 ---
 title: "Owner-subscription wake via signed subscribe events and guarded webhooks"
 kind: decision
-status: draft
+status: living
 updated: 2026-07-14
 team: brain kernel
 division: "(brain)"
@@ -108,6 +108,33 @@ then graduates to `living` with build notes.
   is the guarantee), local-first untouched.
 - **Leaves** richer matching (beyond globs) and delivery analytics as
   later concerns, out of this appetite.
+
+## Build notes
+
+Shipped 0.28.0 (2026-07-14) in `tools/brain.py`, closing the epic.
+
+- **Subscriptions** are signed `subscribe` events whose ref is a small
+  JSON object of the glob pattern and wake URL; `_active_subscriptions`
+  folds them (latest per agent+pattern wins, empty URL removes). CLI:
+  `subscribe --agent --pattern --wake-url` and `subscriptions`.
+- **Matching** is `fnmatch` glob over the event ref.
+- **Delivery** POSTs `{seq, ref, sig}` — a hint, no payload — where the
+  sig is HMAC of `wake:<seq>:<ref>` with the subscriber's own key, so
+  the agent verifies the wake came from the boundary. Fired from a
+  daemon thread off the hosted `/api/act` write path (and from
+  `events emit` under `BRAIN_HOSTED`), so a slow webhook never delays
+  the response. Fan-out capped at 32/event; best-effort with no retry
+  queue.
+- **The SSRF guard** (`_wake_url_ok`) resolves the host and rejects any
+  loopback / private / link-local / reserved / multicast address, and
+  non-http(s) schemes. It refused the cloud-metadata endpoint
+  (`169.254.169.254`) in tests. A `BRAIN_WAKE_ALLOW_LOOPBACK=1` opt-in
+  relaxes **only** loopback for same-host dev — never link-local or
+  private.
+- **The cursor is the guarantee.** A refused or failed webhook is logged
+  and dropped; the subscriber still sees the event on its next
+  `/api/events` read. Local-first has no subscriptions and fires no
+  wakes.
 
 ## Linked PRD
 

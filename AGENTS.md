@@ -1162,8 +1162,13 @@ HMAC keys (`agent-key issue|rotate|revoke`); on this tier every
 `wiki/_state/events` (authored by the authenticated agent), and
 `GET /api/events?since=<seq>` is the authenticated read. The auth
 boundary rejects forged appends at write time and drops tampered lines
-on read. Off by default — local-first is byte-for-byte unchanged, with
-no keyring and no stream. **Datasette pilot**:
+on read. **Owner-subscription wake**: an agent `subscribe`s to a
+ref-pattern with a wake URL (a signed subscribe event); a matching
+append POSTs a signed hint (seq + ref, no payload) to the owner through
+an SSRF guard, capped per event, with the per-agent cursor as the
+at-least-once backstop — the wake never invokes the agent. Off by
+default — local-first is byte-for-byte unchanged, with no keyring, no
+stream, and no subscriptions. **Datasette pilot**:
 `tools/serve-datasette.sh` serves the derived index in immutable mode
 with canned queries (`tools/datasette/metadata.yml`) — the
 faceted-browse/SQL/JSON tier of the serving plane.

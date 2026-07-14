@@ -1,7 +1,8 @@
 ---
 title: "Owner-subscription wake — the headline agentic win"
 kind: initiative
-status: living
+status: superseded
+superseded_by: brain/state.md
 updated: 2026-07-14
 team: brain kernel
 division: "(brain)"
