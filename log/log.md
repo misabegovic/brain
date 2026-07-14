@@ -316,3 +316,8 @@
    diff: 16 files, +333/-22
    restricted-paths: true
    by: claude (fable 5)
+2026-07-14 shape — built wiki/brain/prds/per-agent-identity.md @ PR #28 (Developer agent)
+2026-07-14 merge — PR #28: Phase 3: build per-agent identity + a signed event stream
+   diff: 21 files, +735/-41
+   restricted-paths: true
+   by: claude (fable 5)
