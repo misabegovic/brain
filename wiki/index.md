@@ -466,10 +466,10 @@ start filling in as the slash-command surface runs.
 ## Recent decisions
 
 <!-- home-section; maintained-by: /shape -->
-- [Structure findings + verdict ledger](brain/adrs/structure-findings-and-verdict-ledger.md)
-  — the connector gains findings and a write-on-judgment ledger,
-  computed in-kernel rather than ported from an external graph
-  binary, decided 2026-08-02.
+- [Two tiers over the same repos](brain/adrs/structure-findings-and-verdict-ledger.md)
+  — an always-available in-kernel connector with findings and a
+  verdict ledger, plus an optional binary-backed graph for the
+  questions it cannot answer, decided 2026-08-02.
 - [SQL views over a derived index](brain/adrs/sql-views-over-derived-index.md)
   — the composable-views bet, decided 2026-07-10.
 - [MCP + CLI surface](brain/adrs/mcp-cli-surface.md) — the

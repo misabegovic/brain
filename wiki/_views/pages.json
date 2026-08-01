@@ -401,19 +401,19 @@
     },
     {
       "path": "brain/adrs/structure-findings-and-verdict-ledger.md",
-      "title": "The structure connector gains a findings layer and a write-on-judgment verdict ledger \u2014 computed in-kernel, never a ported extractor",
+      "title": "Two tiers over the same repos: an always-available in-kernel structure connector with findings and a verdict ledger, plus an optional binary-backed graph",
       "kind": "decision",
       "status": "accepted",
       "updated": "2026-08-02",
       "confidence": "medium",
-      "summary": "The structure connector extracted facts and computed no findings. It gains a deterministic findings layer (oversized-package, god-file, symbol-blindness) and a verdict ledger with no pending state, both computed in-kernel \u2014 rejecting a port of an external graph binary, which would contradict the connector's vendor-neutral position.\n",
+      "summary": "The structure connector extracted facts and computed no findings. It gains a deterministic findings layer (oversized-package, god-file, symbol-blindness) and a verdict ledger with no pending state, both computed in-kernel. The initial rejection of an external graph binary was overturned by the operator the same day: enola now ships as an optional second tier over the same repos, with the in-kernel connector as the always-available floor.\n",
       "sources": [
         "./connector-snapshot-contract.md",
         "../ai-suggestions/prds/deterministic-structure-connector.md",
         "../../../tools/brain.py",
         "../../../brain.config.yml"
       ],
-      "tokens": 1496
+      "tokens": 1980
     },
     {
       "path": "brain/adrs/successor-ssg-for-ui.md",

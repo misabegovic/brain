@@ -967,6 +967,48 @@ Four conventions are load-bearing:
 The wiki remains the sole synthesis layer: structure facts are cited,
 never bulk-pasted into prose.
 
+### The graph tier (enola) — optional, binary-backed
+
+Some structural questions need a call graph, and the connector above
+extracts top-level symbols rather than call edges. Where the
+[enola](https://github.com/enola-labs/enola) binary is installed, the
+brain adds a second tier over the same repos: `brain.py enola`
+generates a cluster snapshot, records per-repo receipts to
+`wiki/_state/enola/receipts.json`, reports drift, merges explainer
+findings, and answers `impact <symbol>` with fan-in, fan-out and named
+callers from the on-disk fact set.
+
+The two tiers are complements, not rivals, and the split is the point:
+
+- **The structure connector is the floor.** It needs nothing installed
+  and therefore always answers. Any workflow that *requires* an answer
+  must be able to run on it alone.
+- **The graph tier is the ceiling.** It answers questions the floor
+  cannot — call graphs, cross-repo edges, coupling — and it is allowed
+  to be absent. Nothing may depend on it being installed.
+
+The cluster is **generated from `brain.config.yml`**, never
+hand-written: `active_repos` plus `connectors.enola.repos`, so adopting
+a repo into the brain adopts it into the graph. The generated
+`mcp-arch.yaml` and every `.enola/` artifact directory are gitignored —
+only receipts and judgments are committed.
+
+The four conventions above apply unchanged, and two more are specific
+to this tier:
+
+- **Findings carry confidences between 0.4 and 1.0, and some
+  explainers are simply wrong for a given repo.** Record those with
+  `brain.py enola judge <signature> noise` once, rather than
+  re-deciding every session. Verdicts suppress a whole finding, so an
+  explainer that *aggregates* (one finding bundling many edges) cannot
+  have a single bad member silenced without hiding the good ones —
+  prefer leaving such a finding visible with its known-false member
+  documented.
+- **A graph-derived claim in the wiki cites its receipt**, using the
+  canonical grammar so `brain.py enola citations` can re-check it
+  mechanically and `/groom` can act when the graph moves past the
+  cited digest.
+
 ## Pulling from external planning sources (e.g. Notion)
 
 When the organisation keeps its product / planning / decision

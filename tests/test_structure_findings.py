@@ -141,3 +141,65 @@ def test_status_reports_no_unjudged_count():
     for line in result.stdout.splitlines():
         if line.startswith("schedule:"):
             assert "unjudged" not in line and "pending" not in line
+
+
+# --- enola: the binary-backed substrate beside the structure connector ---
+#
+# Everything here must hold on a machine with no binary and no cluster,
+# which is the condition CI runs under and the default for a fresh clone.
+
+
+def test_enola_cluster_config_is_generated_from_brain_config():
+    # The kernel is org-agnostic: the cluster cannot be a hand-written
+    # file listing somebody's repos.
+    src = (REPO / "tools" / "brain.py").read_text()
+    assert "_enola_write_cluster_config" in src
+    assert "brain.config.yml" in src
+
+
+def test_enola_cluster_file_is_not_committed():
+    # It is derived from brain.config.yml; committing it would give a
+    # cloned shell another operator's absolute paths.
+    assert not (REPO / "mcp-arch.yaml").exists() or \
+        "mcp-arch.yaml" in (REPO / ".gitignore").read_text()
+
+
+def test_enola_ops_exit_zero_without_a_binary_or_cluster():
+    for op in (["enola", "diff"], ["enola", "findings"],
+               ["enola", "impact", "NoSuchSymbol"]):
+        result = run(*op)
+        assert result.returncode == 0, f"{op}: {result.stderr}"
+        assert result.stdout.strip(), f"{op} said nothing — a silent skip"
+
+
+def test_enola_judge_rejects_a_verdict_outside_the_closed_set():
+    result = run("enola", "judge", "sig:r:x", "maybe", "--why", "n/a")
+    assert result.returncode == 1
+    assert "verdict must be one of" in result.stderr
+
+
+def test_enola_signature_survives_a_changing_title():
+    evidence = [{"symbol": "Thing", "file": "r/app/thing.py"}]
+    before = {"source": "god-class", "evidence": evidence,
+              "title": "High fan-in symbol: Thing (100 dependents)"}
+    after = {"source": "god-class", "evidence": evidence,
+             "title": "High fan-in symbol: Thing (140 dependents)"}
+    assert (brain._enola_finding_signature(before, "r")
+            == brain._enola_finding_signature(after, "r"))
+
+
+def test_enola_ledger_has_no_pending_state():
+    if not brain.ENOLA_VERDICTS.exists():
+        return
+    ledger = json.loads(brain.ENOLA_VERDICTS.read_text())
+    for entry in ledger["entries"]:
+        assert entry["verdict"] in brain.ENOLA_VERDICT_KINDS
+        assert not set(entry) & {"pending", "status", "todo", "due", "state"}
+
+
+def test_both_substrates_are_documented_in_the_contract():
+    agents = (REPO / "AGENTS.md").read_text().lower()
+    assert "structure" in agents
+    assert "enola" in agents, (
+        "the graph substrate ships in brain.py but AGENTS.md never names it"
+    )

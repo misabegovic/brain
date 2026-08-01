@@ -1,11 +1,11 @@
 ---
-title: "The structure connector gains a findings layer and a write-on-judgment verdict ledger — computed in-kernel, never a ported extractor"
+title: "Two tiers over the same repos: an always-available in-kernel structure connector with findings and a verdict ledger, plus an optional binary-backed graph"
 kind: decision
 status: accepted
 updated: 2026-08-02
 confidence: medium
 summary: >
-  The structure connector extracted facts and computed no findings. It gains a deterministic findings layer (oversized-package, god-file, symbol-blindness) and a verdict ledger with no pending state, both computed in-kernel — rejecting a port of an external graph binary, which would contradict the connector's vendor-neutral position.
+  The structure connector extracted facts and computed no findings. It gains a deterministic findings layer (oversized-package, god-file, symbol-blindness) and a verdict ledger with no pending state, both computed in-kernel. The initial rejection of an external graph binary was overturned by the operator the same day: enola now ships as an optional second tier over the same repos, with the in-kernel connector as the always-available floor.
 sources:
   - ./connector-snapshot-contract.md
   - ../ai-suggestions/prds/deterministic-structure-connector.md
@@ -13,7 +13,7 @@ sources:
   - ../../../brain.config.yml
 ---
 
-# The structure connector gains a findings layer and a write-on-judgment verdict ledger — computed in-kernel, never a ported extractor
+# Two tiers over the same repos: an always-available in-kernel structure connector with findings and a verdict ledger, plus an optional binary-backed graph
 
 **Decision.** The structure connector already produces deterministic
 *facts* — a tracked source-file inventory, per-package counts, and
@@ -136,3 +136,45 @@ and falls back to the stdlib path, since a uv-created venv has no pip
 at all; and `/shape` Phase 2 gains a scope-coverage check that
 confirms every PRD Scope bullet is carried into the ADR's How or
 dropped with a reason.
+
+## Amendments
+
+**2026-08-02 — the rejection is overturned; the graph tier ships as an
+optional second tier.** Operator direction, explicit and repeated after
+the reasoning below was put to them. The Alternatives section rejected
+porting an external graph binary on the grounds that it contradicts the
+connector's vendor-neutral position. That reasoning was sound about the
+*connector* and wrong about the *brain*: it treated "no external
+binary" as a property the whole kernel must hold, when it is a property
+that makes the connector a dependable **floor**. A floor does not
+forbid a ceiling.
+
+The shape that resolves it is two tiers over the same repos:
+
+- **The structure connector is the floor.** It needs nothing installed
+  and therefore always answers. Any workflow that *requires* an answer
+  runs on it alone.
+- **The graph tier is the ceiling.** `brain.py enola` adds cluster
+  snapshots, committed receipts, drift, merged explainer findings, and
+  `impact <symbol>` — a real call graph with fan-in, fan-out and named
+  callers, which is exactly the capability the original decision
+  declined to build in-kernel and correctly called a project rather
+  than an increment. It is allowed to be absent, and nothing depends on
+  it being installed.
+
+Two adaptations were load-bearing for a kernel rather than an instance.
+The cluster is **generated from `brain.config.yml`** rather than
+hand-written, so a cloned shell never inherits another operator's
+absolute paths and adopting a repo into the brain adopts it into the
+graph; the generated cluster file and all `.enola/` artifacts are
+gitignored, leaving receipts and judgments as the only committed state.
+And the port carried organisation-specific comments from its source —
+the kernel's own `denylist` detector caught them on the first run,
+which is the guard working exactly as intended.
+
+Verified end to end before the config was restored to empty: the
+generated cluster snapshotted this repo at 1,195 facts, produced 52
+findings across four explainers, and `impact` resolved a symbol to
+fan-in 11 with named callers. The blast-radius query the original
+decision declined now exists — because it arrived with the binary
+rather than being rebuilt.
