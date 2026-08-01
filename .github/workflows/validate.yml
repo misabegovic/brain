@@ -31,7 +31,7 @@ jobs:
         # per-page token counts as developers' local mempalace venv;
         # otherwise the views-up-to-date check would diff on tokens.
         # pytest is used by tests/ (PR D).
-        run: pip install --quiet pyyaml tiktoken pytest
+        run: pip install --quiet -r requirements-dev.txt
 
       - name: Validate frontmatter, sections, references
         run: python3 tools/brain.py validate

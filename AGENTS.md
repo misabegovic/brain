@@ -921,6 +921,52 @@ The wiki is the *output*; mempalace is part of the *retrieval*. Cite
 both: the wiki page proves a claim, mempalace gives you the verbatim
 passage.
 
+## Working with the structure substrate
+
+The brain's second retrieval substrate, beside mempalace. Where
+mempalace serves verbatim *text*, the structure connector serves code
+*shape*: the tracked source-file inventory, per-package counts, and
+Python top-level symbols for every repo in `brain.config.yml`
+(`active_repos` plus `connectors.structure.repos`).
+
+It is deliberately **vendor-neutral**: read-only git and file reads
+with a scrubbed environment, no network, no external binary, no LLM.
+The brain computes the facts itself, so nothing here depends on a
+particular extractor being installed. That is a real trade — file-level
+drift is exact for every language, but symbol visibility exists only
+for Python, and the substrate says so rather than implying coverage it
+does not have.
+
+**Reach for it before grep whenever the question is about shape** —
+*what does this repo contain*, *which package carries the weight*,
+*what moved since the last snapshot*. Snapshots are immutable under
+`sources/structure/`; drift between them queues inbox items, and a
+drift item clears when a wiki page cites the snapshot that raised it.
+
+Four conventions are load-bearing:
+
+- **Snapshots are immutable; the snapshot id is the citable handle.**
+  A claim taken from the substrate cites the snapshot it came from, so
+  a later reader can re-check it instead of trusting the author.
+- **Skip-when-absent, and say so.** No structure-dependent step may
+  fail, and none may pass silently either: `brain.py structure
+  findings` names every configured repo that has no snapshot rather
+  than quietly returning fewer results. *"No findings"* and *"not
+  looked"* must never read the same.
+- **Findings are candidates to verify, never verdicts.** They are
+  computed from thresholds, not judgment — an oversized package is a
+  coupling-density signal, not a defect. Confirm a finding against the
+  code before it grounds a claim, and record the judgment with
+  `brain.py structure judge` so the next session inherits it rather
+  than re-deciding.
+- **The ledger is write-on-judgment and has no pending state.**
+  Absence of an entry means unjudged, not queued. Nothing enumerates
+  the unjudged set as work, and no status row reports an unjudged
+  count — that is what keeps it a memory rather than a backlog.
+
+The wiki remains the sole synthesis layer: structure facts are cited,
+never bulk-pasted into prose.
+
 ## Pulling from external planning sources (e.g. Notion)
 
 When the organisation keeps its product / planning / decision

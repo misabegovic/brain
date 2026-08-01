@@ -71,10 +71,14 @@ REPO = Path(
 WIKI = REPO / "wiki"
 INDEX = WIKI / "index.md"
 TEMPLATES = REPO / "tools" / "templates"
+SOURCES = REPO / "sources"
 PROJECTS = Path(
     os.environ.get("BRAIN_PROJECTS_ROOT", str(Path.home() / "projects"))
 ).expanduser()
 SYNC_CURSORS = WIKI / "_state" / "sync-cursors.json"
+SCHEDULE_STATE = WIKI / "_state" / "schedule.json"
+STRUCTURE_VERDICTS = WIKI / "_state" / "structure" / "finding-verdicts.json"
+STRUCTURE_VERDICT_KINDS = ("accepted", "rejected", "noise")
 EFFORTS_DIR = WIKI / "_state" / "efforts"
 INBOX_DIR = WIKI / "_state" / "inbox"
 SUMMARY_EXPECTED_KINDS = {"pitch", "initiative", "decision", "epic",
@@ -530,7 +534,7 @@ def cmd_validate(_args) -> int:
     return 0
 
 
-def _classify_source(src: str) -> str:
+def _classify_source(src: str, page: Path | None = None) -> str:
     if src.startswith(("http://", "https://")):
         return "url"
     if src.startswith("~"):
@@ -539,6 +543,16 @@ def _classify_source(src: str) -> str:
         return "abs-path"
     if src.startswith(("sources/", "tools/", "wiki/", "log/", ".claude/",
                        "../")):
+        return "repo-path"
+    # Anything that actually resolves: repo-root files the prefix list
+    # never learned (SECURITY.md, brain.config.yml), top-level dirs added
+    # later (.github/, ui/), and page-relative citations. The prefix list
+    # stays ahead of this so a *missing* wiki/… path still reports broken
+    # rather than merely unclassifiable; this only rescues citations that
+    # are real and were flagged for their shape alone.
+    if (REPO / src).exists():
+        return "repo-path"
+    if page is not None and (page.parent / src).exists():
         return "repo-path"
     return "unknown"
 
@@ -655,7 +669,7 @@ def cmd_check(args) -> int:
             if not isinstance(src, str):
                 continue
             checked += 1
-            kind = _classify_source(src)
+            kind = _classify_source(src, page=p)
             if kind == "url":
                 if args.no_net:
                     continue
@@ -4940,6 +4954,35 @@ def cmd_status(_args) -> int:
     else:
         print("sync-cursors: absent")
 
+    # Scheduled-run health. The accumulation runner is a local timer per
+    # wiki/brain/adrs/queue-and-tend-inbox.md, which makes a silent
+    # failure *more* likely than under CI, not less: nothing goes red,
+    # the terminal scrolls away, and the brain looks healthy because the
+    # last successful run's state is still on disk.
+    if SCHEDULE_STATE.exists():
+        try:
+            sched = json.loads(SCHEDULE_STATE.read_text())
+            last = sched.get("last_run") or "?"
+            failed = sched.get("failed") or []
+            age = ""
+            try:
+                delta = (today_utc() - dt.date.fromisoformat(last)).days
+                if delta > 1:
+                    age = f", {delta}d stale"
+            except ValueError:
+                pass
+            if failed:
+                print(f"schedule: last run {last}{age} — "
+                      f"{len(failed)} FAILED: {', '.join(failed)}")
+            else:
+                print(f"schedule: last run {last}{age} — "
+                      f"{len(sched.get('operations') or {})} operations ok")
+        except json.JSONDecodeError:
+            print("schedule: state unparseable")
+    else:
+        print("schedule: no run recorded yet "
+              "(run `brain.py schedule run-due`)")
+
     # Efforts
     if EFFORTS_DIR.exists():
         records = list(EFFORTS_DIR.glob("*.json"))
@@ -6275,6 +6318,210 @@ def _extract_structure(repo_root: Path) -> dict:
             "symbols": dict(sorted(symbols.items()))}
 
 
+def _structure_findings(facts: dict, repo: str) -> list[dict]:
+    """Deterministic findings computed from the structure facts.
+
+    The connector extracts *facts*; nothing turned them into
+    *findings* — the "here is something worth a human look" layer. These
+    are computed, not inferred: same facts in, same findings out, no
+    network, no LLM, consistent with the connector's own no-external-
+    dependency position.
+
+    Findings are candidates to verify, never verdicts. Each is
+    deliberately conservative and carries the numbers that produced it,
+    so a reader can disagree with the threshold rather than the claim.
+    """
+    modules = facts.get("modules") or []
+    packages = facts.get("packages") or {}
+    symbols = facts.get("symbols") or {}
+    findings: list[dict] = []
+    if not modules:
+        return findings
+
+    # Oversized package — a coupling-density signal, not a defect. The
+    # thresholds are deliberately blunt: a quarter of the repo in one
+    # top-level package, and enough files that the ratio means something.
+    for pkg, count in packages.items():
+        share = count / len(modules)
+        if share >= 0.25 and count >= 20:
+            findings.append({
+                "signature": f"oversized-package:{repo}:{pkg}",
+                "explainer": "oversized-package", "repo": repo,
+                "title": f"Package {pkg} holds {count} of {len(modules)} "
+                         f"modules ({share:.0%})",
+                "confidence": 0.6,
+                "evidence": [{"fact": pkg,
+                              "detail": f"{count} modules of {len(modules)}"}],
+            })
+
+    # God-file — a Python file whose top-level symbol count is a long way
+    # above the repo's median. Python-only, because that is the only tier
+    # where the connector sees symbols at all; saying so is the point.
+    counts = sorted(len(v) for v in symbols.values())
+    if len(counts) >= 5:
+        median = counts[len(counts) // 2]
+        for path, names in sorted(symbols.items()):
+            if len(names) >= max(15, median * 3):
+                findings.append({
+                    "signature": f"god-file:{repo}:{path}",
+                    "explainer": "god-file", "repo": repo,
+                    "title": f"{path} declares {len(names)} top-level "
+                             f"symbols (repo median {median})",
+                    "confidence": 0.7,
+                    "evidence": [{"file": path,
+                                  "detail": f"{len(names)} symbols vs "
+                                            f"median {median}"}],
+                })
+
+    # Symbol blindness — how much of the repo the substrate cannot see
+    # past file level. This is a finding *about the evidence*, and it
+    # belongs beside the others: a reader weighing the two findings above
+    # deserves to know what share of the code they could not cover.
+    py = [m for m in modules if m.endswith(".py")]
+    unseen = len(modules) - len(py)
+    if modules and unseen / len(modules) >= 0.5:
+        findings.append({
+            "signature": f"symbol-blindness:{repo}:*",
+            "explainer": "symbol-blindness", "repo": repo,
+            "title": f"{unseen} of {len(modules)} modules "
+                     f"({unseen / len(modules):.0%}) get file-level drift "
+                     f"only — no symbol visibility",
+            "confidence": 1.0,
+            "evidence": [{"fact": "non-python modules",
+                          "detail": f"{unseen} of {len(modules)}"}],
+        })
+    return findings
+
+
+def _structure_load_findings() -> tuple[list[dict], list[str]]:
+    """(findings, repos with no snapshot) across every configured target.
+
+    Returning the unsnapshotted repos is not decoration: a caller must be
+    able to tell "this repo has no findings" from "this repo was never
+    looked at".
+    """
+    found: list[dict] = []
+    missing: list[str] = []
+    for safe, path in _structure_targets():
+        snaps = sorted((SOURCES / "structure").glob(f"{safe}--*.md")) \
+            if (SOURCES / "structure").exists() else []
+        if not snaps:
+            missing.append(safe)
+            continue
+        facts = _structure_snapshot_facts(snaps[-1])
+        if not facts:
+            missing.append(safe)
+            continue
+        found.extend(_structure_findings(facts, safe))
+    return found, missing
+
+
+def _structure_verdicts() -> dict:
+    """The judgment ledger — absence of an entry means unjudged.
+
+    No pending state by construction: nothing writes an entry until a
+    judgment is made, and nothing enumerates the unjudged set as work.
+    That is what keeps it a memory rather than a backlog.
+    """
+    if not STRUCTURE_VERDICTS.exists():
+        return {"entries": []}
+    try:
+        return json.loads(STRUCTURE_VERDICTS.read_text())
+    except (json.JSONDecodeError, OSError):
+        return {"entries": []}
+
+
+def _structure_verdict_for(finding: dict, ledger: dict) -> dict | None:
+    for entry in ledger.get("entries") or []:
+        if entry.get("signature") == finding["signature"]:
+            return entry
+    for entry in ledger.get("entries") or []:
+        match = entry.get("match") or {}
+        if not match:
+            continue
+        if match.get("explainer") and match["explainer"] != finding["explainer"]:
+            continue
+        if match.get("repo") and match["repo"] != finding["repo"]:
+            continue
+        return entry
+    return None
+
+
+def cmd_structure(args) -> int:
+    """Read the structure connector's findings, and judge them.
+
+    findings — deterministic findings across every configured target,
+               with anything already judged noise or rejected hidden
+               unless --all. Repos with no snapshot are named, never
+               silently omitted.
+    judge    — record a verdict (accepted / rejected / noise) for one
+               finding signature. Write-on-judgment: the ledger has no
+               pending state and nothing here enumerates unjudged
+               findings as work.
+    """
+    if args.op == "findings":
+        targets = _structure_targets()
+        if not targets:
+            print("structure: no repos configured "
+                  "(brain.config.yml → active_repos / connectors.structure) "
+                  "— skipping findings")
+            return 0
+        found, missing = _structure_load_findings()
+        ledger = _structure_verdicts()
+        rows = []
+        for finding in sorted(found, key=lambda f: (f["repo"], f["explainer"],
+                                                    f["title"])):
+            verdict = _structure_verdict_for(finding, ledger)
+            kind = (verdict or {}).get("verdict")
+            if not args.all and kind in ("noise", "rejected"):
+                continue
+            if args.repo and finding["repo"] != args.repo:
+                continue
+            if args.explainer and finding["explainer"] != args.explainer:
+                continue
+            rows.append((finding, verdict))
+        if args.json:
+            print(json.dumps([{**f, "verdict": v} for f, v in rows], indent=2))
+            return 0
+        for finding, verdict in rows:
+            mark = f" [{verdict['verdict']}]" if verdict else ""
+            print(f"{finding['repo']}  {finding['explainer']}  "
+                  f"conf={finding['confidence']}{mark}")
+            print(f"    {finding['title']}")
+            print(f"    sig: {finding['signature']}")
+        print(f"\n{len(rows)} finding(s) shown"
+              f"{' (including judged)' if args.all else ''}"
+              f" of {len(found)} across {len(targets)} target(s).")
+        if missing:
+            print(f"structure: no snapshot for {', '.join(sorted(missing))} "
+                  f"— not searched (run `brain.py snapshot`)")
+        return 0
+
+    if args.op == "judge":
+        if args.verdict not in STRUCTURE_VERDICT_KINDS:
+            print(f"verdict must be one of "
+                  f"{', '.join(STRUCTURE_VERDICT_KINDS)}", file=sys.stderr)
+            return 1
+        ledger = _structure_verdicts()
+        entries = [e for e in (ledger.get("entries") or [])
+                   if e.get("signature") != args.signature]
+        entry = {"signature": args.signature, "verdict": args.verdict,
+                 "why": args.why, "recorded": today_utc().isoformat()}
+        if args.cited_at:
+            entry["cited_at"] = args.cited_at
+        entries.append(entry)
+        ledger["entries"] = sorted(
+            entries, key=lambda e: (e.get("signature") or "",
+                                    str(e.get("match") or "")))
+        STRUCTURE_VERDICTS.parent.mkdir(parents=True, exist_ok=True)
+        STRUCTURE_VERDICTS.write_text(json.dumps(ledger, indent=2) + "\n")
+        print(f"recorded {args.verdict}: {args.signature}")
+        return 0
+
+    print(f"unknown structure op: {args.op}", file=sys.stderr)
+    return 2
+
+
 def _structure_snapshot_id(facts: dict) -> str:
     """Brain-computed dedup key: a stable hash over the canonical facts
     (never derived from untrusted repo names directly)."""
@@ -7032,23 +7279,45 @@ def cmd_schedule(args) -> int:
         return 1
 
     if op == "run-due":
-        # v1: run every enabled op (no last_run tracking yet).
-        # The runs.json tracker is part of the deferred runtime.
+        # Every enabled op runs; the outcome of each is recorded so a
+        # failing run is visible from inside the brain. Without this the
+        # only witness is a terminal that has scrolled away or a CI page
+        # nobody opens — a local timer failing is *less* visible than a
+        # red badge, not more.
         rc_total = 0
+        outcomes = {}
         for entry in config.get("operations") or []:
             if not entry.get("enabled"):
                 continue
             name = entry.get("name")
             print(f"# running: {name}", file=sys.stderr)
-            if name in SCHEDULE_HANDLERS:
-                rc = SCHEDULE_HANDLERS[name]()
-            else:
-                handler = entry.get("handler")
-                if not handler:
-                    continue
-                rc = subprocess.run(handler, shell=True, cwd=REPO).returncode
+            try:
+                if name in SCHEDULE_HANDLERS:
+                    rc = SCHEDULE_HANDLERS[name]()
+                else:
+                    handler = entry.get("handler")
+                    if not handler:
+                        continue
+                    rc = subprocess.run(handler, shell=True,
+                                        cwd=REPO).returncode
+                outcomes[name] = "ok" if rc == 0 else f"exit {rc}"
+            except Exception as exc:  # noqa: BLE001 — the record is the point
+                # A raising handler would otherwise abort the sweep with
+                # nothing written down about which op died.
+                outcomes[name] = f"{type(exc).__name__}: {exc}"
+                rc = 1
             if rc != 0:
                 rc_total = rc
+        failed = {k: v for k, v in outcomes.items() if v != "ok"}
+        SCHEDULE_STATE.parent.mkdir(parents=True, exist_ok=True)
+        SCHEDULE_STATE.write_text(json.dumps({
+            "last_run": today_utc().isoformat(),
+            "operations": outcomes,
+            "failed": sorted(failed),
+        }, indent=2) + "\n")
+        if failed:
+            print(f"# schedule: {len(failed)} operation(s) failed: "
+                  f"{', '.join(sorted(failed))}", file=sys.stderr)
         if rc_total == 0:
             _producer_touch()  # heartbeat: the accumulation loop is alive
         return rc_total
@@ -8204,6 +8473,104 @@ def cmd_reflection_check(args) -> int:
                     n += 1
         return n
 
+    def check_archived_liveness() -> int:
+        """Repos recorded archived whose remote is still being pushed to.
+
+        `archived` is written once and, without this, never re-checked.
+        A repo that comes back to life then looks exactly like one that
+        stayed dead, and its commits accumulate outside the corpus with
+        nothing to say so. Reads brain.config.yml's `archived_repos`, so
+        the kernel stays content-agnostic. Skips silently without `gh`
+        or without a configured owner, so CI and offline runs are
+        unaffected.
+        """
+        n = 0
+        if shutil.which("gh") is None or not ARCHIVED_REPOS:
+            return 0
+        # Owner comes from the archived repo's own checkout, matching the
+        # github connector's documented behaviour (owners are discovered
+        # from sibling checkouts' origin remotes), with the connector's
+        # explicit slugs as the fallback for repos not checked out.
+        configured = {}
+        for entry in _connector_config("github").get("repos") or []:
+            if "/" in str(entry):
+                owner, _, name = str(entry).partition("/")
+                configured[name] = owner
+        for repo in sorted(ARCHIVED_REPOS):
+            slug = None
+            remote = _git_readonly(PROJECTS / repo, ["remote", "get-url",
+                                                     "origin"])
+            if remote.returncode == 0:
+                m = re.search(r"[:/]([\w.-]+)/([\w.-]+?)(?:\.git)?$",
+                              remote.stdout.strip())
+                if m:
+                    slug = f"{m.group(1)}/{m.group(2)}"
+            if slug is None and repo in configured:
+                slug = f"{configured[repo]}/{repo}"
+            if slug is None:
+                continue  # owner unknown — say nothing rather than guess
+            try:
+                out = subprocess.run(
+                    ["gh", "api", f"repos/{slug}",
+                     "--jq", ".archived,.pushed_at"],
+                    capture_output=True, text=True, timeout=20)
+            except (subprocess.SubprocessError, OSError):
+                continue
+            if out.returncode != 0:
+                continue
+            parts = out.stdout.split()
+            if len(parts) >= 2 and parts[0] == "false":
+                findings.append(
+                    f"archived-liveness: {repo} is recorded archived in "
+                    f"brain.config.yml but the remote is not archived "
+                    f"(last push {parts[1][:10]}) — re-activate ingest or "
+                    f"record why not")
+                n += 1
+        return n
+
+    def check_ledger_hygiene() -> int:
+        """Structure verdicts whose finding no longer exists.
+
+        An `accepted` entry whose finding is gone is usually good news —
+        the thing got fixed — and any page citing it may now overclaim; a
+        `rejected` one that vanished can be dropped. `noise` entries
+        describe the explainer rather than the code and never go stale.
+        Judgment stays with /groom; this only finds the candidates.
+        """
+        n = 0
+        if not STRUCTURE_VERDICTS.exists():
+            return 0
+        try:
+            entries = json.loads(
+                STRUCTURE_VERDICTS.read_text()).get("entries") or []
+        except json.JSONDecodeError:
+            findings.append("ledger-hygiene: finding-verdicts.json unparseable")
+            return 1
+        found, missing = _structure_load_findings()
+        if not found:
+            return 0  # nothing snapshotted — judge nothing
+        live = {f["signature"] for f in found}
+        searched = {f["repo"] for f in found} - set(missing)
+        for entry in entries:
+            if entry.get("verdict") == "noise" or not entry.get("signature"):
+                continue
+            if entry["signature"] in live:
+                continue
+            # A verdict whose repo was never searched is unknown, not
+            # stale. Without this the detector reports every verdict for
+            # a repo whose snapshot is merely absent.
+            parts = entry["signature"].split(":")
+            if len(parts) > 1 and parts[1] not in searched:
+                continue
+            where = (f" (cited at {entry['cited_at']})"
+                     if entry.get("cited_at") else "")
+            findings.append(
+                f"ledger-hygiene: {entry['verdict']} verdict on "
+                f"{entry['signature']} but the finding is gone from the "
+                f"snapshot{where} — re-judge or drop")
+            n += 1
+        return n
+
     runners = {
         "links": check_links,
         "denylist": check_denylist,
@@ -8217,6 +8584,8 @@ def cmd_reflection_check(args) -> int:
         "sources-immutability": check_sources_immutability,
         "repo-claims": check_repo_claims,
         "internal-refs": check_internal_refs,
+        "archived-liveness": check_archived_liveness,
+        "ledger-hygiene": check_ledger_hygiene,
     }
 
     if which == "all":
@@ -8580,6 +8949,26 @@ def main() -> int:
     sub.add_parser("snapshot",
                    help="write a brain corpus snapshot to wiki/_views/snapshots/"
                    ).set_defaults(func=cmd_snapshot)
+
+    ap_st = sub.add_parser("structure",
+                          help="findings from the structure connector's "
+                               "snapshots, and the verdict ledger")
+    st_sub = ap_st.add_subparsers(dest="op", required=True)
+    st_find = st_sub.add_parser("findings",
+                               help="deterministic findings; noise and "
+                                    "rejections hidden unless --all")
+    st_find.add_argument("--repo", default=None)
+    st_find.add_argument("--explainer", default=None)
+    st_find.add_argument("--all", action="store_true")
+    st_find.add_argument("--json", action="store_true")
+    st_judge = st_sub.add_parser("judge",
+                                help="record a verdict for one finding")
+    st_judge.add_argument("signature")
+    st_judge.add_argument("verdict",
+                         help="one of " + ", ".join(STRUCTURE_VERDICT_KINDS))
+    st_judge.add_argument("--why", required=True)
+    st_judge.add_argument("--cited-at", default=None, dest="cited_at")
+    ap_st.set_defaults(func=cmd_structure)
 
     sub.add_parser("rotate-log",
                    help="rotate log/log.md to log/archive/ once it crosses the threshold"

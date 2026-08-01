@@ -14,7 +14,13 @@
 #   uses (pyyaml + tiktoken + pytest), so local preflight and CI
 #   converge.
 #
-# Idempotent: re-running upgrades pip and re-installs the deps.
+# Idempotent: re-running re-installs the deps against the existing venv.
+#
+# Two installers, because the stdlib path is not always available. A
+# uv-created venv ships without pip, and Debian/Ubuntu split ensurepip
+# into python3-venv — so on a machine with uv and a stock python3 the
+# pip path fails at both venv creation and dependency install while
+# everything else works fine. uv is preferred when present.
 #
 # Usage: tools/setup-local.sh
 
@@ -22,17 +28,27 @@ set -euo pipefail
 
 VENV=~/.local/share/mempalace-venv
 PY_SYS=${PYTHON:-python3}
+REQS="$(cd "$(dirname "$0")/.." && pwd)/requirements-dev.txt"
+
+if command -v uv >/dev/null 2>&1; then
+  INSTALLER=uv
+else
+  INSTALLER=pip
+fi
+echo "setup-local ▶ installer: $INSTALLER"
 
 if ! command -v "$PY_SYS" >/dev/null 2>&1; then
   echo "setup-local: $PY_SYS not found on PATH" >&2
   exit 1
 fi
 
-if ! "$PY_SYS" -c 'import ensurepip' 2>/dev/null; then
+if [ "$INSTALLER" = pip ] && ! "$PY_SYS" -c 'import ensurepip' 2>/dev/null; then
   cat >&2 <<EOF
 setup-local: $PY_SYS lacks ensurepip — venv creation will fail.
 
-On Debian/Ubuntu install the missing package:
+Either install uv (https://docs.astral.sh/uv/), which this script
+prefers and which needs no system packages, or install the missing
+Debian/Ubuntu package:
   sudo apt-get install -y python3-venv python3-pip
 
 Then re-run: tools/setup-local.sh
@@ -43,18 +59,24 @@ fi
 if [ ! -x "$VENV/bin/python3" ]; then
   echo "setup-local ▶ creating venv at $VENV"
   mkdir -p "$(dirname "$VENV")"
-  "$PY_SYS" -m venv "$VENV"
+  if [ "$INSTALLER" = uv ]; then
+    uv venv "$VENV"
+  else
+    "$PY_SYS" -m venv "$VENV"
+  fi
 else
   echo "setup-local ▶ venv exists at $VENV"
 fi
 
 VENV_PY="$VENV/bin/python3"
 
-echo "setup-local ▶ upgrading pip"
-"$VENV_PY" -m pip install --quiet --upgrade pip
-
-echo "setup-local ▶ installing pyyaml + tiktoken + pytest"
-"$VENV_PY" -m pip install --quiet pyyaml tiktoken pytest
+echo "setup-local ▶ installing from requirements-dev.txt"
+if [ "$INSTALLER" = uv ]; then
+  VIRTUAL_ENV="$VENV" uv pip install --quiet -r "$REQS"
+else
+  "$VENV_PY" -m pip install --quiet --upgrade pip
+  "$VENV_PY" -m pip install --quiet -r "$REQS"
+fi
 
 echo "setup-local ▶ verifying tiktoken"
 "$VENV_PY" -c 'import tiktoken; tiktoken.get_encoding("cl100k_base"); print("tiktoken OK", tiktoken.__version__)'

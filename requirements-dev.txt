@@ -1,0 +1,5 @@
+-r requirements.txt
+
+# Test-only. tests/ is run by .github/workflows/validate.yml and by
+# tools/setup-local.sh's venv; the scheduled workflow does not need it.
+pytest

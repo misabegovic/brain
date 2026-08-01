@@ -479,6 +479,16 @@ Steps:
 
 1. Read the input in full (PRD, Notion source, or sibling-repo
    source).
+1b. **Scope-coverage check (forward mode only).** Before writing
+   the ADR's `## How`, list the PRD's `## Scope` bullets and confirm
+   each one is either carried into the How or explicitly dropped
+   *with a reason recorded in the ADR*. Nothing else in the workflow
+   does this: the phase gates review each artefact on its own terms,
+   so a scope item quietly absent from the next phase survives to the
+   build unchallenged, and the build notes then faithfully describe
+   what was built rather than what was promised. Say the check ran,
+   in one line, even when nothing was dropped — a silent pass and a
+   skipped step look identical otherwise.
 2. Read the sibling repo's existing patterns at
    `~/projects/<repo>/`. Per `AGENTS.md` § Working inside a
    sibling repo rule 5, the Tech Lead's load-bearing job here is
@@ -729,6 +739,10 @@ trigger phase 3.
       [`wiki/brain/adrs/home-content-shape.md`](../../../wiki/brain/adrs/home-content-shape.md):
       every wiki/ edit must be paired with a wiki/index.md edit.
 - [ ] `python tools/brain.py validate` is clean.
+- [ ] **Phase 2 — scope-coverage check ran.** Every PRD `## Scope`
+      bullet is either carried into the ADR's `## How` or dropped with
+      a recorded reason, and the check is stated in one line even when
+      nothing was dropped.
 - [ ] **Phase 1 + Phase 2 — `/zoom-out` auto-fired at the
       respective boundaries.** Brief either rendered or skip-
       heuristic-skipped; outcome logged. If load-bearing concerns
