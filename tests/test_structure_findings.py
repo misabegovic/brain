@@ -203,3 +203,31 @@ def test_both_substrates_are_documented_in_the_contract():
     assert "enola" in agents, (
         "the graph substrate ships in brain.py but AGENTS.md never names it"
     )
+
+
+def test_symbol_blindness_fires_on_the_case_it_exists_for():
+    """A polyglot repo the substrate mostly cannot see past file level.
+
+    The kernel is Python-heavy, so this explainer never fires against its
+    own corpus — it was shipped untested against its actual purpose. A
+    Go-dominant repo is the shape it was written for: 93% of modules get
+    file-level drift only, and a findings layer that stayed silent about
+    that would be reporting on 7% of a repo while implying it covered it.
+    """
+    facts = _facts([f"src/a{i}.go" for i in range(40)]
+                   + [f"tools/b{i}.py" for i in range(3)],
+                   packages={"src": 40, "tools": 3},
+                   symbols={f"tools/b{i}.py": ["x", "y"] for i in range(3)})
+    hits = [f for f in brain._structure_findings(facts, "polyglot")
+            if f["explainer"] == "symbol-blindness"]
+    assert len(hits) == 1
+    assert hits[0]["confidence"] == 1.0
+    assert "93%" in hits[0]["title"]
+
+
+def test_symbol_blindness_stays_quiet_when_the_substrate_can_see_most_of_it():
+    facts = _facts([f"m{i}.py" for i in range(9)] + ["one.go"],
+                   packages={".": 10},
+                   symbols={f"m{i}.py": ["x"] for i in range(9)})
+    kinds = {f["explainer"] for f in brain._structure_findings(facts, "r")}
+    assert "symbol-blindness" not in kinds
