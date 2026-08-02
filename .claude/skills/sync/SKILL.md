@@ -33,6 +33,40 @@ Reports per-repo: commits since the last brain ingest/mine that named
 that repo, plus the first 5 commit subjects. Repos with > 0 new commits
 are candidates for `/in <repo>` after the sweep.
 
+### 1b. Architecture drift
+
+```bash
+python3 tools/brain.py snapshot                 # the always-available floor
+python3 tools/brain.py enola generate && python3 tools/brain.py enola diff
+```
+
+Step 1 reports *commit* churn; this reports *architecture* movement,
+which is a different question — a hundred commits that touch no
+structure and one that moves a module boundary look identical to a
+git-log sweep.
+
+Two tiers, and both skip cleanly when unavailable. The structure
+connector needs nothing installed and always answers. The graph tier
+needs the `enola` binary and a configured cluster; when either is
+absent it prints one skip line and exits 0 — **never treat that as a
+failure, and never let remote CI depend on it.**
+
+After reviewing drift, `enola generate` re-records receipts
+automatically; commit the updated `wiki/_state/enola/receipts.json` so
+the brain's record of *what architecture did we last synthesise
+against* advances alongside the sync cursors.
+
+Then report the **count** of findings, never the list:
+
+```bash
+python3 tools/brain.py enola findings | tail -2
+```
+
+A list of findings in a sweep's output is a backlog by another name.
+Findings are pulled by whoever is already reasoning about a change; a
+sharp move in the count is worth a sentence in the briefing, because
+it says the architecture moved.
+
 ### 2. Wiki lint
 
 Apply the `wiki-lint` skill in full:

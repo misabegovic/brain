@@ -81,6 +81,15 @@ If overlap is found, the plan must call it out — proceeding without
 acknowledging in-flight work is the duplication failure mode the brain
 exists to prevent.
 
+### 4b. Size the task against the code substrate
+
+When the task touches code, read its size rather than guessing it. `brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass.
+
+This is the difference between a plan that lists pages and a plan that
+knows what it is walking into: a change on a symbol with hundreds of
+callers is different work from one on a leaf, and the page graph cannot
+tell them apart.
+
 ### 5. Detect coverage gaps
 
 For each repo the task likely touches:

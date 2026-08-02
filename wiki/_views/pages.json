@@ -413,7 +413,7 @@
         "../../../tools/brain.py",
         "../../../brain.config.yml"
       ],
-      "tokens": 1980
+      "tokens": 2309
     },
     {
       "path": "brain/adrs/successor-ssg-for-ui.md",

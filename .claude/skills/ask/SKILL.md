@@ -17,6 +17,7 @@ skill when the phrasing matches:
 
 | Phrasing cue                                              | Skill          |
 |-----------------------------------------------------------|----------------|
+| "who calls X", "what depends on X", "what breaks if I change X", "how coupled is X", "what does repo Y contain" | the **code substrate first** — `brain.py structure findings` / `brain.py enola impact`, then `wiki-query` for the narrative around the answer |
 | "plan", "outline the work", "what do I need for X", "how should I approach X" | `wiki-plan`    |
 | "overlap", "duplicate", "stepping on", "anyone else doing X", "is anything similar in flight" | `wiki-overlap` |
 | "coverage", "what's missing in repo X", "how much do we know about repo X", "what isn't documented in X" | `wiki-coverage`|
@@ -27,6 +28,13 @@ of the candidate scoring system — is anyone else working on it?"). In
 that case run them in order: `wiki-plan` first, then `wiki-overlap` as
 part of step 4 of the plan protocol. Don't fork into parallel skills;
 chain them.
+
+The substrate row goes first when the question is structural because it
+answers *deterministically* where the wiki answers from synthesis: the
+wiki says why a thing exists, the substrate says what actually touches
+it. Where they disagree, the disagreement is the finding. Findings are
+candidates to verify, not verdicts, and both tiers skip cleanly when
+absent.
 
 ## Overrides
 

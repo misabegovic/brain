@@ -56,6 +56,13 @@ For each uncovered directory, decide:
 The mechanical pass does substring matching on dir names; it cannot
 distinguish these on its own.
 
+**Substrate-inventory pass.** Directory coverage is the floor, not the
+measure: a repo can have every top-level directory "mentioned" while its
+actual module or public surface goes undescribed. `brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass. Compare the wiki's
+claims against that inventory and report substrate-level gaps separately
+from directory gaps, citing the snapshot or receipt so the reader knows
+which state the assessment was made against.
+
 ### 3. Run mempalace search to validate
 
 For each "genuine gap" dir, run:

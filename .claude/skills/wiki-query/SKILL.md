@@ -40,6 +40,19 @@ Mention the search key in your answer so the user can rerun it. The palace
 is *not* refreshed automatically — mining is intentionally not part of the
 active workflow yet, so a miss is "not in the snapshot," not "doesn't exist."
 
+### 3b. Reach for the code substrate when the question is structural
+
+*"What does this repo contain"*, *"who calls X"*, *"what breaks if I
+change X"*, *"how coupled is X"* — the substrate answers these
+deterministically where the wiki answers them from synthesis. `brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass.
+
+Prefer the substrate *first* for these and the wiki for the narrative
+around the answer: the wiki says why a thing exists, the substrate says
+what actually touches it, and where they disagree the disagreement is
+itself the finding — surface it rather than picking a side. Findings are
+candidates to verify; never relay one as fact without confirming it
+against the code.
+
 ### 4. Answer with citations
 
 Every non-trivial claim cites either:

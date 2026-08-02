@@ -276,6 +276,20 @@ personal data, no boilerplate.
 | GitHub / Notion / Slack | ✅ pull connectors | Snapshot-writers: immutable files into `sources/`, inbox items out. Configure `connectors:` in `brain.config.yml` + read-only tokens in `.env`. |
 | Structure           | ✅ pull connector  | Deterministic code-shape snapshots (source inventory + Python symbols) → architectural-drift inbox items via baseline diff; drift auto-clears once a wiki page cites the snapshot. No network / binary / LLM; read-only git with a clean-tree guard. Configure `connectors.structure.repos`. `brain.py structure findings` turns those facts into conservative, computed findings (`oversized-package`, `god-file`, and `symbol-blindness`, which reports the share of a repo the substrate cannot see past file level — symbol visibility is Python-only). `brain.py structure judge` records accepted / rejected / noise into a write-on-judgment ledger with **no pending state**: absence means unjudged, not queued. Per [`wiki/brain/adrs/structure-findings-and-verdict-ledger.md`](wiki/brain/adrs/structure-findings-and-verdict-ledger.md). |
 | Architecture graph  | ⬜ optional tier   | `brain.py enola` — cluster snapshots over the same repos via the external [enola](https://github.com/enola-labs/enola) binary, with committed receipts in `wiki/_state/enola/`, drift reporting, merged explainer findings, a verdict ledger, and `impact <symbol>` (fan-in / fan-out / named callers) from the on-disk fact set. The **ceiling** to the structure connector's **floor**: it answers what in-kernel extraction cannot, and it is allowed to be absent — nothing may depend on it being installed. The cluster is generated from `brain.config.yml` (`active_repos` + `connectors.enola.repos`); the generated `mcp-arch.yaml` and all `.enola/` artifacts are gitignored. |
+
+**Twelve of the twenty-five skills consult these substrates**, and every
+one names both tiers in order — the structure connector first because it
+always answers, the graph tier second because it is allowed to be absent.
+`/sync` reports an architecture-drift step and the finding *count* (never
+the list — that would be a backlog by another name); `wiki-ingest`
+checks a structural claim as it is written, with the *no-signal* path as
+the default rather than the weak branch; `/shape` consults it in the
+Phase-1 deepdive and for blast radius in Phase 3; `/continue` before code
+leaves local; `/groom` gains contradicted-claim, ledger-hygiene and
+stale-citation triggers; and `/ask`, `wiki-query`, `wiki-plan`, `review`,
+`zoom-out`, `wiki-overlap` and `wiki-coverage` each gain the consultation
+their own judgment step was missing.
+
 | GitHub            | via `gh` CLI         | Pre-allowed in `.claude/settings.json`.                        |
 | MCP               | ✅ `tools/brain-mcp.py` | Read-only; stdio or `--http` (loopback Host + Origin checks); `BRAIN_SERVING=1` excludes ai-suggestion drafts across *every* read surface (MCP, serve JSON API, search CLI, static build) + query audit log. |
 | Hosted tier       | ✅ `BRAIN_HOSTED=1`  | Authenticated, writable multi-agent tier. Per-agent HMAC keys; `POST /api/events` is the agent write endpoint (any signed event kind) and `/api/act` writes are signed events too; `GET /api/events?since=<seq>` is the authenticated read; the auth boundary rejects forged appends at write time and drops tampered lines on read. **Owner-subscription wake**: subscribe to a ref-pattern with a wake URL, and a matching event POSTs a signed hint (seq + ref, no payload) through an SSRF guard, capped per event, with the cursor as the at-least-once backstop. Off by default — local-first is byte-for-byte unchanged. |

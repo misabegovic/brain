@@ -181,8 +181,18 @@ regardless.
 4. **Deepdive on load-bearing points.** Before drafting the PRD,
    identify the 2–4 load-bearing points in the pitch — the places
    where the decision pivots on constraints not yet known. For
-   each point, fetch the constraining context: read the affected
-   sibling-repo code, walk relevant `wiki/<scope>/permanent/`
+   each point, fetch the constraining context: **consult the code
+   substrate first when the question is structural** ("what does
+   this repo contain", "who calls X", "how coupled is Y") —
+   `brain.py structure findings --repo <repo>` always answers, and
+   `brain.py enola findings` / `enola impact <symbol>` add call
+   graphs where the binary is installed. Both answer
+   deterministically before a file is opened, and a claim taken
+   from either cites the snapshot or receipt it came from; skip
+   silently when a substrate is absent. A high-fan-in symbol on
+   the thing a pitch proposes to change is exactly the constraint
+   that pre-empts an alternative before it is written. Then read
+   the affected sibling-repo code, walk relevant `wiki/<scope>/permanent/`
    pages and prior ADRs/PRDs in scope, scan the target repo's git
    history (`git log -p --grep`) when a prior decision is
    suspected, search operator-memory rules under
@@ -633,6 +643,12 @@ phase-3 work:
    proceeding — a parallel pattern is a load-bearing decision
    that needs explicit justification (recorded in the ADR's
    `## Build notes` or the PR body).
+   **Ask the substrate for the blast radius before editing a
+   shared symbol** — `brain.py enola impact <symbol>` reports
+   fan-in, fan-out and named callers from the on-disk fact set, so
+   "how much does this touch" is answered rather than estimated.
+   `brain.py structure findings` is the fallback when the graph
+   tier is not installed. Both skip cleanly when absent.
 4. Plan the change as small commits within the appetite.
 5. Implement.
 6. **Reproduce CI gates locally before pushing (rule 4).** Run

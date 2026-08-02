@@ -75,6 +75,15 @@ and candidate is one of the aggregated source locations. Take the top
 For each pair, read both items in full. Don't judge from the snippet
 alone — the snippet is only the trigger.
 
+**Add coupling as a second candidate source.** mempalace finds overlap
+in *what people wrote*; the code substrate finds it in *what the code
+touches*. Two efforts that never share vocabulary can still sit on one
+symbol — the sharpest kind of overlap, and invisible to text search
+precisely because neither team knew about the other. `brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass. Treat a shared
+high-fan-in symbol as a promotion signal in its own right, even at low
+textual similarity, and state it in the pair's `## Overlap` section so
+a reader can check it.
+
 ### 4. LLM-as-judge
 
 For each pair, decide one of:
