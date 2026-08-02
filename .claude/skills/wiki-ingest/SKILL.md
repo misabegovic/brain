@@ -118,8 +118,8 @@ the PRD/ADR yourself.
 
 | Content shape                                                       | Shelf / route                                          |
 |---------------------------------------------------------------------|--------------------------------------------------------|
-| Code-shape facts (stack, modules, public surface)                   | `wiki/<repo>/permanent/architecture.md` (edit)         |
-| External contracts (HTTP, GraphQL, jobs, events, SDK API)           | `wiki/<repo>/permanent/interfaces.md` (edit)           |
+| Code-shape facts (stack, modules, public surface)                   | `wiki/<repo>/permanent/architecture.md` (edit) — **check the substrate first**, see below |
+| External contracts (HTTP, GraphQL, jobs, events, SDK API)           | `wiki/<repo>/permanent/interfaces.md` (edit) — **check the substrate first**, see below |
 | Style + pattern observations                                        | `wiki/<repo>/permanent/conventions.md` (edit)          |
 | Domain vocabulary / entities / concepts                             | `wiki/<repo>/permanent/domain.md` (edit / promote)     |
 | "What's true today" observation; new capability shipped             | `wiki/<repo>/state.md` § Now (edit)                    |
@@ -149,6 +149,45 @@ If a single source spans shelves (e.g. a Notion page that *both*
 describes architecture *and* states a forward pitch), split: edit
 `permanent/architecture.md` for the architecture facts; hand off
 the pitch to `/shape`.
+
+### 4b. Substrate-check the two code-shape rows
+
+Those two rows are where essentially every structural claim in the
+corpus is authored, and the brain has a deterministic inventory of
+exactly what they assert. Check the claim as you write it, not later:
+
+```bash
+python3 tools/brain.py structure findings --repo <repo>   # always available
+python3 tools/brain.py enola findings --repo <repo>       # if installed
+python3 tools/brain.py enola impact <symbol>
+```
+
+Verification is cheapest while the source is open, and a wrong claim
+ingested today is cited by a page tomorrow and reasoned from by an
+agent next week.
+
+**The default outcome is no-signal, and that is not a failure.** The
+structure connector sees symbols only for Python, the graph tier may
+not be installed at all, and a repo may not be in either config. Write
+the claim exactly as you would have anyway, with the existing
+*(unverified, YYYY-MM-DD)* hedge — and say the substrate was not asked,
+or had no answer, rather than leaving silence. *"It agreed"* and *"it
+was not consulted"* must never read the same.
+
+The other two outcomes:
+
+- **Confirmed** — the claim lands carrying a citation to the snapshot
+  or receipt it was checked against, so a later reader can re-check it
+  mechanically rather than trusting the author.
+- **Contradicted** — the claim still lands; **ingest never blocks**.
+  Mark the disagreement inline in the same style as the hedge, naming
+  what the substrate says and the date, and record it with
+  `brain.py structure judge` or `brain.py enola judge <sig> rejected
+  --why "…"` naming the page and the claim. The verdict is what stops
+  the next ingest rediscovering and re-arguing the same disagreement.
+
+Findings are candidates to verify, never verdicts. Confirm one against
+the code before it grounds a claim.
 
 ### 4a. Hand-off mechanics for `/shape`
 

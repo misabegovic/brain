@@ -63,6 +63,10 @@ relevant sibling repo where possible).
 `/groom` does **not** delete pages. Archive moves are reversible (just
 move back). Confidence demotions are reversible (next ingest can promote).
 
+| A page's structural claim contradicted by the code substrate (`brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass.) | Flag the contradiction for judgment — **never apply it**. A finding is a candidate to verify, not a verdict. Resolving it means reading the code, then either correcting the page or recording the finding as `rejected` with the reason. |
+| A verdict whose finding has left the snapshot (`brain.py reflection-check ledger-hygiene`) | Ledger hygiene. An `accepted` entry whose finding is gone is usually good news — the thing got fixed — and any page citing it may now overclaim; a `rejected` one that vanished can be dropped. `noise` entries describe the explainer, not the code, and never go stale. |
+| A receipt citation reported `stale` or `malformed` (`brain.py enola citations`) | Flag for *re-verification* — the graph moved past the cited digest, or the citation breaks the grammar. Never auto-edit; re-verifying is a judgment task. |
+
 ### 3. Reserved archive folder
 
 `wiki/_archive/` is a tooling-output folder like `_views` and

@@ -178,3 +178,28 @@ findings across four explainers, and `impact` resolved a symbol to
 fan-in 11 with named callers. The blast-radius query the original
 decision declined now exists — because it arrived with the binary
 rather than being rebuilt.
+
+**2026-08-02 — the consumption layer lands; the substrate is no longer
+wired to nothing.** The port shipped both substrates and zero skills
+consulting them, which recreated in this kernel exactly the gap the
+sibling instance had described as *"the explainers ran into a void"*.
+An operator question caught it — the tooling was at parity and the
+consumption at zero.
+
+Twelve of twenty-five skills now consult the substrates: `/sync` gains
+an architecture-drift step reporting the finding *count* and never the
+list (a list in a sweep's output is a backlog by another name);
+`wiki-ingest` gains a substrate-check on its two code-shape routing
+rows, with the no-signal path written as the default rather than the
+weak branch; `/shape` consults it in the Phase-1 deepdive and for blast
+radius in Phase 3; `/continue` before code leaves local; `/groom` gains
+three trigger rows (contradicted claims, ledger hygiene, stale receipt
+citations); and `/ask`, `wiki-query`, `wiki-plan`, `review`,
+`zoom-out`, `wiki-overlap` and `wiki-coverage` each gain the
+consultation their own judgment step was already missing.
+
+Every wiring names **both tiers**, in that order — the structure
+connector first because it always answers, the graph tier second
+because it is allowed to be absent. That ordering is the kernel-shaped
+difference from the sibling instance, where a single binary-backed
+substrate could be assumed present.
