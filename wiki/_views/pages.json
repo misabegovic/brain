@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-14",
+  "generated": "2026-08-02",
   "home_sections": [
     {
       "anchor": "what-changed",
@@ -398,6 +398,22 @@
         "../../../sources/research/2026-07-10--sqlite-index-prototype.md"
       ],
       "tokens": 1420
+    },
+    {
+      "path": "brain/adrs/structure-findings-and-verdict-ledger.md",
+      "title": "Two tiers over the same repos: an always-available in-kernel structure connector with findings and a verdict ledger, plus an optional binary-backed graph",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-08-02",
+      "confidence": "medium",
+      "summary": "The structure connector extracted facts and computed no findings. It gains a deterministic findings layer (oversized-package, god-file, symbol-blindness) and a verdict ledger with no pending state, both computed in-kernel. The initial rejection of an external graph binary was overturned by the operator the same day: enola now ships as an optional second tier over the same repos, with the in-kernel connector as the always-available floor.\n",
+      "sources": [
+        "./connector-snapshot-contract.md",
+        "../ai-suggestions/prds/deterministic-structure-connector.md",
+        "../../../tools/brain.py",
+        "../../../brain.config.yml"
+      ],
+      "tokens": 1980
     },
     {
       "path": "brain/adrs/successor-ssg-for-ui.md",

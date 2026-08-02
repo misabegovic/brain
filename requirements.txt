@@ -1,0 +1,8 @@
+# Runtime dependencies for tools/brain.py.
+#
+# tiktoken is not optional in practice: brain.py falls back to a
+# chars/4 token estimate without it, which produces a wiki/_views/
+# regen that differs from CI's on every page and fails the
+# views-up-to-date gate.
+pyyaml
+tiktoken

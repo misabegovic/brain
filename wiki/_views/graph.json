@@ -1282,6 +1282,11 @@
     },
     {
       "source": "index.md",
+      "target": "brain/adrs/structure-findings-and-verdict-ledger.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
       "target": "brain/adrs/workbench-pty-bridge.md",
       "provenance": "extracted"
     },

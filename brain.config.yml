@@ -44,6 +44,19 @@ connectors:
     # .env — Langfuse keys are write-capable (no read-only type):
     # use a dedicated project's keys or self-host.
     host: ""
+  enola:
+    # Architecture graph via the external `enola` binary (optional).
+    # Complements the vendor-neutral `structure` connector below: enola
+    # resolves call graphs and cross-repo edges that in-kernel extraction
+    # cannot, at the cost of a binary that must be installed. Everything
+    # skips-when-absent, so an unconfigured or uninstalled graph is a
+    # named no-op, never a failure. Active repos are covered
+    # automatically; list extra repo paths here. The cluster file
+    # (mcp-arch.yaml) is GENERATED from this config and gitignored.
+    repos: []
+    # Override the defaults if a repo needs it; empty = built-in set.
+    ignore: []
+    explainers: []
   structure:
     # Deterministic code-shape snapshots + architectural-drift inbox
     # items. No network, no external binary, no LLM — reads a sibling
