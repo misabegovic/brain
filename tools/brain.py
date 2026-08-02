@@ -6318,9 +6318,19 @@ def _enola_write_cluster_config() -> Path | None:
             paths.append(p); seen.add(str(p))
     if not paths:
         return None
+    # Dependency trees and build output are not this repo's architecture.
+    # The structure connector gets this for free by reading `git ls-files`
+    # — only tracked files — while enola walks the filesystem, so the
+    # ignore list is the only thing standing between the graph and a
+    # vendored library's internals. The Python entries matter most here:
+    # a .venv/ inside a repo yields hundreds of findings about somebody
+    # else's package.
     ignores = _connector_config("enola").get("ignore") or [
         "**/node_modules/**", "**/vendor/**", "**/dist/**", "**/build/**",
         "**/tmp/**", "**/log/**", "**/coverage/**", "**/.git/**",
+        "**/.venv/**", "**/venv/**", "**/site-packages/**",
+        "**/__pycache__/**", "**/.tox/**", "**/.mypy_cache/**",
+        "**/.pytest_cache/**", "**/.ruff_cache/**", "**/target/**",
     ]
     explainers = _connector_config("enola").get("explainers") or [
         "cycles", "layers", "crossrepo", "coverage", "hotspots",
@@ -7112,8 +7122,11 @@ def _structure_load_findings() -> tuple[list[dict], list[str]]:
     found: list[dict] = []
     missing: list[str] = []
     for safe, path in _structure_targets():
-        snaps = sorted((SOURCES / "structure").glob(f"{safe}--*.md")) \
-            if (SOURCES / "structure").exists() else []
+        # The connector writes sources/structure/<safe>/snap--<id>.md,
+        # one directory per repo. Globbing a flat <safe>--*.md found
+        # nothing and reported every repo as unsnapshotted.
+        snaps = sorted((SOURCES / "structure" / safe).glob("snap--*.md")) \
+            if (SOURCES / "structure" / safe).exists() else []
         if not snaps:
             missing.append(safe)
             continue
@@ -7203,7 +7216,7 @@ def cmd_structure(args) -> int:
               f" of {len(found)} across {len(targets)} target(s).")
         if missing:
             print(f"structure: no snapshot for {', '.join(sorted(missing))} "
-                  f"— not searched (run `brain.py snapshot`)")
+                  f"— not searched (run `brain.py schedule run --target structure-pull`)")
         return 0
 
     if args.op == "judge":
