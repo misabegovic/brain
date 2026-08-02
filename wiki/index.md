@@ -18,6 +18,28 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-08-02** — **The views gate is satisfiable again, and the first
+  verdict is on the record.** Three follow-ups. The custom-views design
+  call, left open yesterday, is settled the right way round: I had
+  assumed those views could be untracked, but the deployed UI links to
+  `/_views/custom/engineer/`, `/pm/` and `/operator/`, so they must stay
+  committed — which means the *render* has to be deterministic. The
+  derived index now takes **tracked inbox items only**, so a committed
+  view is a function of the repo rather than of one machine's queue, and
+  the CI exemption I added under pressure is **reverted** — the gate is
+  uniform again, with no special case. `brain.py inbox` reads the
+  directory directly and is untouched, so local tending keeps its full
+  queue. Second: the substrate's finding about the kernel's own code was
+  **judged** — `tools/brain.py` at 186 top-level symbols against a repo
+  median of 11, accepted with the reasoning that a single-file CLI is a
+  defensible shape for a tool meant to be copied into a clone, but is
+  the honest reason changes to it are hard to review. First real entry
+  in either ledger, and `ledger-hygiene` was exercised against it in
+  both directions. Third: `symbol-blindness` had shipped **untested
+  against its actual purpose** — the kernel is Python-heavy so it never
+  fires here; it now has tests on a Go-dominant repo where 93% of
+  modules get file-level drift only, which is the shape it was written
+  for.
 - **2026-08-02** — **The substrates get consumers: 12 of 25 skills now
   consult them.** The port had shipped both substrates and *zero* skills
   using them — recreating in this kernel exactly the gap the sibling
