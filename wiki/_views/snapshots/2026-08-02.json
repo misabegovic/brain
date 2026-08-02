@@ -1,0 +1,599 @@
+{
+  "generated": "2026-08-02",
+  "totals": {
+    "pages": 70,
+    "tokens": 97023
+  },
+  "by_kind": {
+    "decision": 27,
+    "initiative": 16,
+    "meta": 5,
+    "epic": 1,
+    "pitch": 7,
+    "reference": 6,
+    "topic": 6,
+    "insight": 2
+  },
+  "by_status": {
+    "accepted": 22,
+    "superseded": 29,
+    "living": 17,
+    "draft": 2
+  },
+  "by_team": {
+    "(none)": 55,
+    "brain kernel": 6,
+    "(inferred)": 6,
+    "brain": 3
+  },
+  "by_repo": {
+    "brain": 16
+  },
+  "by_confidence": {
+    "medium": 53,
+    "high": 7,
+    "low": 10
+  },
+  "pages": [
+    {
+      "path": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 1547
+    },
+    {
+      "path": "brain/adrs/chat-print-mode-bridge.md",
+      "kind": "decision",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1113
+    },
+    {
+      "path": "brain/adrs/connector-snapshot-contract.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1211
+    },
+    {
+      "path": "brain/adrs/home-content-shape.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1351
+    },
+    {
+      "path": "brain/adrs/human-legible-presentation-layer.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 1613
+    },
+    {
+      "path": "brain/adrs/kernel-manifest-instancing.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 814
+    },
+    {
+      "path": "brain/adrs/mcp-cli-surface.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 670
+    },
+    {
+      "path": "brain/adrs/mcp-cli-terminal-surface.md",
+      "kind": "decision",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 739
+    },
+    {
+      "path": "brain/adrs/multi-prd-epic-shape.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "high",
+      "updated": "2026-07-10",
+      "tokens": 1710
+    },
+    {
+      "path": "brain/adrs/no-personal-data-in-public-artifacts.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 689
+    },
+    {
+      "path": "brain/adrs/operator-lesson-pattern.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1516
+    },
+    {
+      "path": "brain/adrs/owner-subscription-wake.md",
+      "kind": "decision",
+      "status": "living",
+      "confidence": "medium",
+      "updated": "2026-07-14",
+      "tokens": 1391
+    },
+    {
+      "path": "brain/adrs/parallel-efforts-on-request.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1713
+    },
+    {
+      "path": "brain/adrs/parallel-execution-agent-teams.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1774
+    },
+    {
+      "path": "brain/adrs/per-agent-identity.md",
+      "kind": "decision",
+      "status": "living",
+      "confidence": "medium",
+      "updated": "2026-07-14",
+      "tokens": 1826
+    },
+    {
+      "path": "brain/adrs/persona-playthrough-loop.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 872
+    },
+    {
+      "path": "brain/adrs/queue-and-tend-inbox.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "high",
+      "updated": "2026-07-10",
+      "tokens": 1685
+    },
+    {
+      "path": "brain/adrs/sam-uniform-loopback-host-guard.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 1697
+    },
+    {
+      "path": "brain/adrs/shape-deepdive-pre-flight.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1764
+    },
+    {
+      "path": "brain/adrs/shape-up-pitches.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1199
+    },
+    {
+      "path": "brain/adrs/single-image-serving-profile.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1203
+    },
+    {
+      "path": "brain/adrs/sql-views-over-derived-index.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1420
+    },
+    {
+      "path": "brain/adrs/structure-findings-and-verdict-ledger.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-08-02",
+      "tokens": 2309
+    },
+    {
+      "path": "brain/adrs/successor-ssg-for-ui.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "high",
+      "updated": "2026-07-10",
+      "tokens": 1415
+    },
+    {
+      "path": "brain/adrs/ui-auto-refresh-hook.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1197
+    },
+    {
+      "path": "brain/adrs/workbench-pty-bridge.md",
+      "kind": "decision",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 1284
+    },
+    {
+      "path": "brain/adrs/zoom-out-on-current-work.md",
+      "kind": "decision",
+      "status": "accepted",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1756
+    },
+    {
+      "path": "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "low",
+      "updated": "2026-07-14",
+      "tokens": 2051
+    },
+    {
+      "path": "brain/ai-suggestions/prds/deterministic-structure-connector.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "low",
+      "updated": "2026-07-14",
+      "tokens": 1956
+    },
+    {
+      "path": "brain/ai-suggestions/prds/edge-provenance-tags.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "low",
+      "updated": "2026-07-14",
+      "tokens": 1817
+    },
+    {
+      "path": "brain/authoring-adrs-and-prds.md",
+      "kind": "meta",
+      "status": "living",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1861
+    },
+    {
+      "path": "brain/epics/event-driven-agent-triggers.md",
+      "kind": "epic",
+      "status": "superseded",
+      "confidence": "low",
+      "updated": "2026-07-14",
+      "tokens": 1388
+    },
+    {
+      "path": "brain/index.md",
+      "kind": "meta",
+      "status": "living",
+      "confidence": "high",
+      "updated": "2026-07-10",
+      "tokens": 3017
+    },
+    {
+      "path": "brain/pitches/chat-first-app.md",
+      "kind": "pitch",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 854
+    },
+    {
+      "path": "brain/pitches/composable-role-views.md",
+      "kind": "pitch",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1638
+    },
+    {
+      "path": "brain/pitches/event-driven-agent-triggers.md",
+      "kind": "pitch",
+      "status": "superseded",
+      "confidence": "low",
+      "updated": "2026-07-14",
+      "tokens": 1942
+    },
+    {
+      "path": "brain/pitches/harness-workbench.md",
+      "kind": "pitch",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 957
+    },
+    {
+      "path": "brain/pitches/human-legible-presentation-layer.md",
+      "kind": "pitch",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 1787
+    },
+    {
+      "path": "brain/pitches/instance-birth.md",
+      "kind": "pitch",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 383
+    },
+    {
+      "path": "brain/pitches/persona-playthrough-loop.md",
+      "kind": "pitch",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 821
+    },
+    {
+      "path": "brain/prds/attention-calibration-operator-surface.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 1184
+    },
+    {
+      "path": "brain/prds/chat-first-app.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 447
+    },
+    {
+      "path": "brain/prds/composable-role-views.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 697
+    },
+    {
+      "path": "brain/prds/harness-workbench.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 584
+    },
+    {
+      "path": "brain/prds/human-legible-presentation-layer.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 922
+    },
+    {
+      "path": "brain/prds/instance-birth.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 359
+    },
+    {
+      "path": "brain/prds/owner-subscription-wake.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-14",
+      "tokens": 1500
+    },
+    {
+      "path": "brain/prds/per-agent-identity.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-14",
+      "tokens": 1451
+    },
+    {
+      "path": "brain/prds/persona-playthrough-loop.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 689
+    },
+    {
+      "path": "brain/prds/pm-view-reads-like-a-brief.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 1267
+    },
+    {
+      "path": "brain/prds/priya-trust-banner-render-proof.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 1299
+    },
+    {
+      "path": "brain/prds/producer-death-first-class-health.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 1231
+    },
+    {
+      "path": "brain/prds/status-honest-generated-reading-lists.md",
+      "kind": "initiative",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 1222
+    },
+    {
+      "path": "brain/roadmap.md",
+      "kind": "meta",
+      "status": "living",
+      "confidence": "high",
+      "updated": "2026-07-10",
+      "tokens": 5155
+    },
+    {
+      "path": "brain/state.md",
+      "kind": "reference",
+      "status": "living",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 5033
+    },
+    {
+      "path": "brain/topics/chat-surface-necessity.md",
+      "kind": "topic",
+      "status": "superseded",
+      "confidence": "medium",
+      "updated": "2026-07-12",
+      "tokens": 671
+    },
+    {
+      "path": "brain/topics/event-driven-multi-agent.md",
+      "kind": "topic",
+      "status": "living",
+      "confidence": "low",
+      "updated": "2026-07-14",
+      "tokens": 1208
+    },
+    {
+      "path": "brain/topics/market-readiness-gaps.md",
+      "kind": "topic",
+      "status": "draft",
+      "confidence": "low",
+      "updated": "2026-07-10",
+      "tokens": 1010
+    },
+    {
+      "path": "brain/topics/one-point-oh-criteria.md",
+      "kind": "topic",
+      "status": "living",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 536
+    },
+    {
+      "path": "brain/topics/regenerative-schema-extensions.md",
+      "kind": "topic",
+      "status": "living",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 278
+    },
+    {
+      "path": "brain/topics/three-ideas-compose.md",
+      "kind": "topic",
+      "status": "living",
+      "confidence": "low",
+      "updated": "2026-07-14",
+      "tokens": 3415
+    },
+    {
+      "path": "insights/ai-suggestions-exclusion-mcp-only.md",
+      "kind": "insight",
+      "status": "superseded",
+      "confidence": "low",
+      "updated": "2026-07-12",
+      "tokens": 838
+    },
+    {
+      "path": "insights/quickstart-third-command-fragility.md",
+      "kind": "insight",
+      "status": "draft",
+      "confidence": "low",
+      "updated": "2026-07-12",
+      "tokens": 591
+    },
+    {
+      "path": "org/index.md",
+      "kind": "meta",
+      "status": "living",
+      "confidence": "high",
+      "updated": "2026-07-10",
+      "tokens": 116
+    },
+    {
+      "path": "org/methodology/development-playbook.md",
+      "kind": "reference",
+      "status": "living",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1834
+    },
+    {
+      "path": "org/methodology/index.md",
+      "kind": "meta",
+      "status": "living",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 268
+    },
+    {
+      "path": "org/methodology/regenerative-software.md",
+      "kind": "reference",
+      "status": "living",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 538
+    },
+    {
+      "path": "org/methodology/superpowers.md",
+      "kind": "reference",
+      "status": "living",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 3032
+    },
+    {
+      "path": "org/methodology/way-of-working.md",
+      "kind": "reference",
+      "status": "living",
+      "confidence": "medium",
+      "updated": "2026-07-10",
+      "tokens": 1282
+    },
+    {
+      "path": "org/operator-lessons.md",
+      "kind": "reference",
+      "status": "living",
+      "confidence": "high",
+      "updated": "2026-07-10",
+      "tokens": 416
+    }
+  ]
+}

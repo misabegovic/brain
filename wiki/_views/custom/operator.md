@@ -15,11 +15,7 @@ Everything pending, every cursor, every tracked deadline — the maintenance pic
 
 ## Tend queue (all)
 
-| id | kind | priority | summary |
-|---|---|---|---|
-| research-brain-state-md | research | normal | brain/state.md: confidence:medium but 6 pages link to it — deepen with cited research |
-| research-brain-adrs-mcp-cli-surface-md | research | normal | brain/adrs/mcp-cli-surface.md: confidence:medium but 6 pages link to it — deepen with cited research |
-| research-brain-adrs-per-agent-identity-md | research | normal | brain/adrs/per-agent-identity.md: confidence:medium but 6 pages link to it — deepen with cited research |
+Queue clear — nothing waiting to tend.
 
 ## Deadlines
 

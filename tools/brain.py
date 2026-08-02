@@ -37,6 +37,7 @@ import ast
 import collections
 import datetime as dt
 import fnmatch
+import functools
 import hashlib
 import hmac
 import http.client
@@ -3155,11 +3156,30 @@ def _is_acked(id: str, item: dict, acks: dict) -> bool:
     return (today_utc() - acked).days <= ACK_MAX_DAYS
 
 
-def _inbox_items() -> list[dict]:
+@functools.lru_cache(maxsize=1)
+def _tracked_inbox_files() -> frozenset:
+    res = subprocess.run(["git", "ls-files", "wiki/_state/inbox/"],
+                         cwd=REPO, capture_output=True, text=True)
+    if res.returncode != 0:
+        return frozenset()
+    return frozenset(Path(line).name for line in res.stdout.splitlines()
+                     if line.strip())
+
+
+def _inbox_items(tracked_only: bool = False) -> list[dict]:
+    """Every inbox item, or only the git-tracked ones.
+
+    `tracked_only` exists for artifacts that get committed: a render
+    built from untracked local state can never survive a clean-room
+    rebuild. Everything interactive wants the full queue.
+    """
     if not INBOX_DIR.exists():
         return []
+    tracked = _tracked_inbox_files() if tracked_only else None
     items = []
     for f in sorted(INBOX_DIR.glob("*.json")):
+        if tracked is not None and f.name not in tracked:
+            continue
         try:
             items.append(json.loads(f.read_text()))
         except json.JSONDecodeError:
@@ -5268,7 +5288,15 @@ def _build_index() -> dict:
         db.executemany("INSERT OR IGNORE INTO links VALUES(?,?)",
                        [(s, d) for s, ds in outbound.items() for d in ds])
 
-        for item in _inbox_items():
+        # Tracked inbox items only. wiki/_state/inbox/ is machine-local
+        # and untracked by design, but wiki/_views/custom/*.md render
+        # from this index and *are* committed — and the deployed UI links
+        # to them. Indexing untracked items made those renders a function
+        # of one machine's state, so a CI regen could never match and the
+        # views-up-to-date gate was unsatisfiable. `brain.py inbox` reads
+        # the directory directly and is unaffected: local tending keeps
+        # its full queue, the committed artifact stays deterministic.
+        for item in _inbox_items(tracked_only=True):
             db.execute("INSERT OR REPLACE INTO inbox VALUES(?,?,?,?,?,?,?,?)",
                        (item.get("id"), item.get("kind"),
                         item.get("priority"), item.get("summary"),

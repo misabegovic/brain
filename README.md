@@ -233,6 +233,8 @@ tools/install-timer.sh              # daily accumulation timer (systemd user / c
 pytest tests/                       # kernel invariants
 ```
 
+The inbox lives at `wiki/_state/inbox/` and is **machine-local and untracked** — it is one operator's queue, not shared state. The derived index therefore takes only *tracked* inbox items, so anything generated from it and committed (the `wiki/_views/custom/` audience views, which the UI links to) stays a function of the repo rather than of one machine. `brain.py inbox` reads the directory directly and always shows the full local queue.
+
 ### Pre-commit hook
 
 ```bash

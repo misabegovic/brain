@@ -1,0 +1,11 @@
+{
+  "entries": [
+    {
+      "signature": "god-file:brain:tools/brain.py",
+      "verdict": "accepted",
+      "why": "Verified 2026-08-02: tools/brain.py is 8,700+ lines declaring 186 top-level symbols against a repo median of 11 \u2014 an order of magnitude past every other module. Real, and the kernel's own substrate found it. Not a defect to fix reflexively (a single-file CLI is a defensible shape for a tool meant to be copied into a clone), but it is the honest reason changes to it are hard to review, and it belongs on the record rather than being re-discovered each session.",
+      "recorded": "2026-08-02",
+      "cited_at": "wiki/brain/adrs/structure-findings-and-verdict-ledger.md"
+    }
+  ]
+}
