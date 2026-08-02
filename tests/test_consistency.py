@@ -234,3 +234,30 @@ def _section_prefix(text: str, prefix: str) -> str:
     end_match = next_re.search(text, start + 1)
     end = end_match.start() if end_match else len(text)
     return text[start:end]
+
+
+def test_agents_md_documents_every_substrate_the_kernel_relies_on():
+    """A substrate the kernel ships must be described in the contract.
+
+    AGENTS.md is what every agent reads at session start. The structure
+    connector shipped with immutable snapshots, a drift reconciler and
+    an inbox producer while AGENTS.md mentioned it zero times, so a
+    fresh agent could only discover it by reading brain.py. The command
+    tables above catch drift for commands; this catches it for the
+    retrieval substrates underneath them.
+    """
+    agents = (REPO / "AGENTS.md").read_text().lower()
+    brain_py = (REPO / "tools" / "brain.py").read_text().lower()
+    substrates = {
+        "structure": ("the deterministic structure connector",
+                      "_extract_structure"),
+        "mempalace": ("the verbatim-recall palace", "mempalace"),
+    }
+    for token, (description, marker) in substrates.items():
+        if marker not in brain_py:
+            continue
+        assert token in agents, (
+            f"tools/brain.py ships {description} but AGENTS.md never "
+            f"mentions '{token}'. A substrate the kernel provides belongs "
+            f"in the contract, not only in the code that implements it."
+        )

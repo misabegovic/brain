@@ -18,6 +18,39 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-08-02** — **The structure connector gets findings, a verdict
+  ledger, and a line in the contract.** Prompted by a comparison against
+  a sibling brain that had adopted an external architecture-graph binary.
+  Porting it would have been the obvious move and the wrong one: this
+  kernel's connector deliberately chose *no network, no external binary,
+  no LLM*, so a binary-backed port would contradict a recorded position
+  rather than extend it. What travelled instead were the concepts — and
+  three of them the connector already had in its own form (a snapshot
+  fingerprint, drift against the previous snapshot, and a reconciler
+  where a drift item clears once a page cites the snapshot that raised
+  it). Three it lacked, and those landed: a deterministic **findings**
+  layer over the existing facts (`oversized-package`, `god-file`,
+  `symbol-blindness`), a **verdict ledger** that is write-on-judgment
+  with no pending state, and the discipline that a finding is a
+  candidate to verify rather than a verdict. First run against the
+  kernel's own tree found a true thing — `tools/brain.py` declares **167
+  top-level symbols** against a repo median of 10. `symbol-blindness` is
+  the explainer that matters most: it reports what share of a repo the
+  substrate *cannot* see past file level, because symbol visibility is
+  Python-only, and a findings layer that reported only what it could see
+  would be the more dangerous artefact. Deliberately **not** built: a
+  blast-radius query, which needs a call graph the connector does not
+  extract — pretending a symbol inventory could answer *what breaks if I
+  change this* would be worse than declining. Also landed:
+  `archived-liveness` and `ledger-hygiene` detectors (both red-green
+  verified), scheduled-run health in `brain.py status` (a local timer
+  failing is *less* visible than a red badge), a citation classifier that
+  resolves repo-root and page-relative paths, `uv` support in
+  `setup-local.sh` with requirements manifests, and a `/shape` Phase-2
+  scope-coverage check. And **AGENTS.md now documents the structure
+  substrate at all** — it mentioned it zero times while shipping it, the
+  same gap the sibling brain had with its own graph; a consistency test
+  now fails if any substrate the kernel ships goes undocumented.
 - **2026-07-14** — **Built (0.30.0): specialized agents + a local
   emulation of the whole loop.** Two specialized spoke agents ship
   (`tools/agents/`): a drift-reconciler and an observability-triage
@@ -433,6 +466,10 @@ start filling in as the slash-command surface runs.
 ## Recent decisions
 
 <!-- home-section; maintained-by: /shape -->
+- [Two tiers over the same repos](brain/adrs/structure-findings-and-verdict-ledger.md)
+  — an always-available in-kernel connector with findings and a
+  verdict ledger, plus an optional binary-backed graph for the
+  questions it cannot answer, decided 2026-08-02.
 - [SQL views over a derived index](brain/adrs/sql-views-over-derived-index.md)
   — the composable-views bet, decided 2026-07-10.
 - [MCP + CLI surface](brain/adrs/mcp-cli-surface.md) — the

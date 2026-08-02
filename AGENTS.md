@@ -921,6 +921,94 @@ The wiki is the *output*; mempalace is part of the *retrieval*. Cite
 both: the wiki page proves a claim, mempalace gives you the verbatim
 passage.
 
+## Working with the structure substrate
+
+The brain's second retrieval substrate, beside mempalace. Where
+mempalace serves verbatim *text*, the structure connector serves code
+*shape*: the tracked source-file inventory, per-package counts, and
+Python top-level symbols for every repo in `brain.config.yml`
+(`active_repos` plus `connectors.structure.repos`).
+
+It is deliberately **vendor-neutral**: read-only git and file reads
+with a scrubbed environment, no network, no external binary, no LLM.
+The brain computes the facts itself, so nothing here depends on a
+particular extractor being installed. That is a real trade — file-level
+drift is exact for every language, but symbol visibility exists only
+for Python, and the substrate says so rather than implying coverage it
+does not have.
+
+**Reach for it before grep whenever the question is about shape** —
+*what does this repo contain*, *which package carries the weight*,
+*what moved since the last snapshot*. Snapshots are immutable under
+`sources/structure/`; drift between them queues inbox items, and a
+drift item clears when a wiki page cites the snapshot that raised it.
+
+Four conventions are load-bearing:
+
+- **Snapshots are immutable; the snapshot id is the citable handle.**
+  A claim taken from the substrate cites the snapshot it came from, so
+  a later reader can re-check it instead of trusting the author.
+- **Skip-when-absent, and say so.** No structure-dependent step may
+  fail, and none may pass silently either: `brain.py structure
+  findings` names every configured repo that has no snapshot rather
+  than quietly returning fewer results. *"No findings"* and *"not
+  looked"* must never read the same.
+- **Findings are candidates to verify, never verdicts.** They are
+  computed from thresholds, not judgment — an oversized package is a
+  coupling-density signal, not a defect. Confirm a finding against the
+  code before it grounds a claim, and record the judgment with
+  `brain.py structure judge` so the next session inherits it rather
+  than re-deciding.
+- **The ledger is write-on-judgment and has no pending state.**
+  Absence of an entry means unjudged, not queued. Nothing enumerates
+  the unjudged set as work, and no status row reports an unjudged
+  count — that is what keeps it a memory rather than a backlog.
+
+The wiki remains the sole synthesis layer: structure facts are cited,
+never bulk-pasted into prose.
+
+### The graph tier (enola) — optional, binary-backed
+
+Some structural questions need a call graph, and the connector above
+extracts top-level symbols rather than call edges. Where the
+[enola](https://github.com/enola-labs/enola) binary is installed, the
+brain adds a second tier over the same repos: `brain.py enola`
+generates a cluster snapshot, records per-repo receipts to
+`wiki/_state/enola/receipts.json`, reports drift, merges explainer
+findings, and answers `impact <symbol>` with fan-in, fan-out and named
+callers from the on-disk fact set.
+
+The two tiers are complements, not rivals, and the split is the point:
+
+- **The structure connector is the floor.** It needs nothing installed
+  and therefore always answers. Any workflow that *requires* an answer
+  must be able to run on it alone.
+- **The graph tier is the ceiling.** It answers questions the floor
+  cannot — call graphs, cross-repo edges, coupling — and it is allowed
+  to be absent. Nothing may depend on it being installed.
+
+The cluster is **generated from `brain.config.yml`**, never
+hand-written: `active_repos` plus `connectors.enola.repos`, so adopting
+a repo into the brain adopts it into the graph. The generated
+`mcp-arch.yaml` and every `.enola/` artifact directory are gitignored —
+only receipts and judgments are committed.
+
+The four conventions above apply unchanged, and two more are specific
+to this tier:
+
+- **Findings carry confidences between 0.4 and 1.0, and some
+  explainers are simply wrong for a given repo.** Record those with
+  `brain.py enola judge <signature> noise` once, rather than
+  re-deciding every session. Verdicts suppress a whole finding, so an
+  explainer that *aggregates* (one finding bundling many edges) cannot
+  have a single bad member silenced without hiding the good ones —
+  prefer leaving such a finding visible with its known-false member
+  documented.
+- **A graph-derived claim in the wiki cites its receipt**, using the
+  canonical grammar so `brain.py enola citations` can re-check it
+  mechanically and `/groom` can act when the graph moves past the
+  cited digest.
+
 ## Pulling from external planning sources (e.g. Notion)
 
 When the organisation keeps its product / planning / decision

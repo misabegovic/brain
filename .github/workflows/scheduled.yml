@@ -32,7 +32,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install --quiet pyyaml tiktoken
+        run: pip install --quiet -r requirements.txt
 
       - name: Run scheduled operations
         run: python3 tools/brain.py schedule run-due

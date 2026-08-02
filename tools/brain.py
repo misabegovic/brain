@@ -71,10 +71,14 @@ REPO = Path(
 WIKI = REPO / "wiki"
 INDEX = WIKI / "index.md"
 TEMPLATES = REPO / "tools" / "templates"
+SOURCES = REPO / "sources"
 PROJECTS = Path(
     os.environ.get("BRAIN_PROJECTS_ROOT", str(Path.home() / "projects"))
 ).expanduser()
 SYNC_CURSORS = WIKI / "_state" / "sync-cursors.json"
+SCHEDULE_STATE = WIKI / "_state" / "schedule.json"
+STRUCTURE_VERDICTS = WIKI / "_state" / "structure" / "finding-verdicts.json"
+STRUCTURE_VERDICT_KINDS = ("accepted", "rejected", "noise")
 EFFORTS_DIR = WIKI / "_state" / "efforts"
 INBOX_DIR = WIKI / "_state" / "inbox"
 SUMMARY_EXPECTED_KINDS = {"pitch", "initiative", "decision", "epic",
@@ -530,7 +534,7 @@ def cmd_validate(_args) -> int:
     return 0
 
 
-def _classify_source(src: str) -> str:
+def _classify_source(src: str, page: Path | None = None) -> str:
     if src.startswith(("http://", "https://")):
         return "url"
     if src.startswith("~"):
@@ -539,6 +543,16 @@ def _classify_source(src: str) -> str:
         return "abs-path"
     if src.startswith(("sources/", "tools/", "wiki/", "log/", ".claude/",
                        "../")):
+        return "repo-path"
+    # Anything that actually resolves: repo-root files the prefix list
+    # never learned (SECURITY.md, brain.config.yml), top-level dirs added
+    # later (.github/, ui/), and page-relative citations. The prefix list
+    # stays ahead of this so a *missing* wiki/… path still reports broken
+    # rather than merely unclassifiable; this only rescues citations that
+    # are real and were flagged for their shape alone.
+    if (REPO / src).exists():
+        return "repo-path"
+    if page is not None and (page.parent / src).exists():
         return "repo-path"
     return "unknown"
 
@@ -655,7 +669,7 @@ def cmd_check(args) -> int:
             if not isinstance(src, str):
                 continue
             checked += 1
-            kind = _classify_source(src)
+            kind = _classify_source(src, page=p)
             if kind == "url":
                 if args.no_net:
                     continue
@@ -4940,6 +4954,71 @@ def cmd_status(_args) -> int:
     else:
         print("sync-cursors: absent")
 
+    # Architecture graph (enola) — machine-local artifacts, committed
+    # receipts. Absent binary or unconfigured cluster is a no-op.
+    if ENOLA_RECEIPTS.exists():
+        try:
+            receipts = json.loads(ENOLA_RECEIPTS.read_text())
+            dirty = sum(1 for e in receipts.values() if e.get("git_dirty"))
+            newest = max((e.get("generated_at") or ""
+                          for e in receipts.values()), default="?")
+            print(f"enola: {len(receipts)} repos receipted (newest {newest}"
+                  f"{f', {dirty} dirty' if dirty else ''}); "
+                  "drift via `brain.py enola diff`")
+        except json.JSONDecodeError:
+            print("enola: receipts unparseable")
+    elif _enola_bin() is None:
+        print("enola: binary absent (optional substrate; "
+              "`structure` covers the vendor-neutral tier)")
+    else:
+        print("enola: no receipts (configure connectors.enola.repos or "
+              "active_repos, then `brain.py enola generate`)")
+
+    # Finding verdicts across both substrates. Judged counts only,
+    # deliberately: an "N unjudged" row would be the enumeration both
+    # ledgers rule out.
+    for label, path, kinds in (
+            ("structure-verdicts", STRUCTURE_VERDICTS, STRUCTURE_VERDICT_KINDS),
+            ("enola-verdicts", ENOLA_VERDICTS, ENOLA_VERDICT_KINDS)):
+        if not path.exists():
+            continue
+        try:
+            entries = json.loads(path.read_text()).get("entries") or []
+            tally = collections.Counter(e.get("verdict") for e in entries)
+            print(f"{label}: "
+                  + ", ".join(f"{tally.get(k, 0)} {k}" for k in kinds))
+        except json.JSONDecodeError:
+            print(f"{label}: unparseable")
+
+    # Scheduled-run health. The accumulation runner is a local timer per
+    # wiki/brain/adrs/queue-and-tend-inbox.md, which makes a silent
+    # failure *more* likely than under CI, not less: nothing goes red,
+    # the terminal scrolls away, and the brain looks healthy because the
+    # last successful run's state is still on disk.
+    if SCHEDULE_STATE.exists():
+        try:
+            sched = json.loads(SCHEDULE_STATE.read_text())
+            last = sched.get("last_run") or "?"
+            failed = sched.get("failed") or []
+            age = ""
+            try:
+                delta = (today_utc() - dt.date.fromisoformat(last)).days
+                if delta > 1:
+                    age = f", {delta}d stale"
+            except ValueError:
+                pass
+            if failed:
+                print(f"schedule: last run {last}{age} — "
+                      f"{len(failed)} FAILED: {', '.join(failed)}")
+            else:
+                print(f"schedule: last run {last}{age} — "
+                      f"{len(sched.get('operations') or {})} operations ok")
+        except json.JSONDecodeError:
+            print("schedule: state unparseable")
+    else:
+        print("schedule: no run recorded yet "
+              "(run `brain.py schedule run-due`)")
+
     # Efforts
     if EFFORTS_DIR.exists():
         records = list(EFFORTS_DIR.glob("*.json"))
@@ -6206,6 +6285,679 @@ def _connector_langfuse_pull() -> int:
     return 0
 
 
+# --- enola architecture graph (binary-backed substrate) --------------
+
+ENOLA_CONFIG = REPO / "mcp-arch.yaml"
+ENOLA_RECEIPTS = WIKI / "_state" / "enola" / "receipts.json"
+ENOLA_VERDICTS = WIKI / "_state" / "enola" / "finding-verdicts.json"
+ENOLA_VERDICT_KINDS = ("accepted", "rejected", "noise")
+
+
+def _enola_write_cluster_config() -> Path | None:
+    """Generate mcp-arch.yaml from brain.config.yml.
+
+    The kernel is organisation-agnostic, so the cluster cannot be a
+    hand-written file listing somebody's repos. It is derived from
+    `active_repos` plus any explicit `connectors.enola.repos`, which
+    keeps the single registry in brain.config.yml and means adopting a
+    repo into the brain adopts it into the graph.
+
+    Returns the config path, or None when no repo resolves on disk —
+    the graph is machine-local and an absent checkout is not an error.
+    """
+    paths, seen = [], set()
+    for entry in _connector_config("enola").get("repos") or []:
+        p = Path(entry).expanduser()
+        if not p.is_absolute():
+            p = PROJECTS / entry
+        if (p / ".git").exists() and str(p) not in seen:
+            paths.append(p); seen.add(str(p))
+    for repo in sorted(ACTIVE_REPOS):
+        p = PROJECTS / repo
+        if (p / ".git").exists() and str(p) not in seen:
+            paths.append(p); seen.add(str(p))
+    if not paths:
+        return None
+    ignores = _connector_config("enola").get("ignore") or [
+        "**/node_modules/**", "**/vendor/**", "**/dist/**", "**/build/**",
+        "**/tmp/**", "**/log/**", "**/coverage/**", "**/.git/**",
+    ]
+    explainers = _connector_config("enola").get("explainers") or [
+        "cycles", "layers", "crossrepo", "coverage", "hotspots",
+        "god-class", "unused-routes", "dependency-depth",
+        "exported-surface", "complexity-outliers",
+    ]
+    lines = ["# GENERATED by `brain.py enola generate` from brain.config.yml.",
+             "# Edit brain.config.yml, not this file.", "repos:"]
+    lines += [f"  - {p}" for p in paths]
+    lines.append("ignore:")
+    lines += [f'  - "{g}"' for g in ignores]
+    lines.append("explainers:")
+    lines += [f"  - {e}" for e in explainers]
+    lines += ["renderers:", "  - llm_context",
+              "output:", "  dir: .enola", "  max_context_tokens: 16000"]
+    ENOLA_CONFIG.write_text("\n".join(lines) + "\n")
+    return ENOLA_CONFIG
+
+
+def _enola_bin() -> str | None:
+    found = shutil.which("enola")
+    if found:
+        return found
+    fallback = Path.home() / ".local" / "bin" / "enola"
+    return str(fallback) if fallback.exists() else None
+
+
+def _enola_repos() -> list[Path]:
+    """Repo paths from mcp-arch.yaml's `repos:` block (config-relative).
+
+    The cluster file is generated from brain.config.yml, so a missing one
+    is regenerated rather than treated as "no cluster" — the registry of
+    record is the brain config, never this derived file.
+    """
+    if not ENOLA_CONFIG.exists():
+        _enola_write_cluster_config()
+    if not ENOLA_CONFIG.exists():
+        return []
+    paths = []
+    in_repos = False
+    for line in ENOLA_CONFIG.read_text().splitlines():
+        if line.startswith("repos:"):
+            in_repos = True
+            continue
+        if in_repos:
+            m = re.match(r"\s+-\s+(\S+)", line)
+            if m:
+                paths.append((ENOLA_CONFIG.parent / m.group(1)).resolve())
+            elif line.strip() and not line.startswith(" "):
+                break
+    return paths
+
+
+def _enola_live_receipt(repo_path: Path) -> dict | None:
+    receipt = repo_path / ".enola" / "receipt.json"
+    if not receipt.exists():
+        return None
+    try:
+        return json.loads(receipt.read_text())
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _enola_entry(receipt: dict) -> dict:
+    git = receipt.get("git", {})
+    quality = receipt.get("quality", {})
+    return {
+        "snapshot_id": receipt.get("snapshot_id"),
+        "enola_version": receipt.get("enola_version"),
+        "generated_at": receipt.get("generated_at"),
+        "git_ref": git.get("ref"),
+        "git_commit": git.get("commit"),
+        "git_dirty": git.get("dirty"),
+        "fact_count": receipt.get("fact_count"),
+        "insight_count": receipt.get("insight_count"),
+        "files_parsed": quality.get("files_parsed"),
+        "parse_errors": quality.get("parse_errors"),
+    }
+
+
+def _enola_content_digests() -> dict:
+    """Per-repo order-insensitive digests over fact content.
+
+    Drift keys on this digest rather than upstream snapshot_id: the
+    2026-07-30 build found snapshot_id nondeterministic whenever the TS
+    resolver sees duplicate candidate paths for an import (the trigger
+    was a frontend tree carrying an ambient-declaration shadow
+    directory beside the real one, since excluded from the
+    cluster). Facts sort before hashing so parallel extraction order
+    can never re-introduce the problem.
+    """
+    repos = _enola_repos()
+    if not repos:
+        return {}
+    facts_path = repos[-1] / ".enola" / "facts.jsonl"
+    if not facts_path.exists():
+        return {}
+    per_repo: dict[str, list] = {}
+    with open(facts_path) as fh:
+        for line in fh:
+            try:
+                fact = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            per_repo.setdefault(fact.get("repo") or "(unlabeled)",
+                                []).append(json.dumps(fact, sort_keys=True))
+    return {
+        repo: "sha256:" + hashlib.sha256(
+            "\n".join(sorted(set(facts))).encode()
+        ).hexdigest()
+        for repo, facts in per_repo.items()
+    }
+
+
+def _enola_record() -> dict:
+    """Aggregate per-repo receipt.json files into the committed state."""
+    recorded = {}
+    digests = _enola_content_digests()
+    for repo_path in _enola_repos():
+        receipt = _enola_live_receipt(repo_path)
+        if receipt:
+            entry = _enola_entry(receipt)
+            entry["content_digest"] = digests.get(repo_path.name)
+            recorded[repo_path.name] = entry
+    ENOLA_RECEIPTS.parent.mkdir(parents=True, exist_ok=True)
+    ENOLA_RECEIPTS.write_text(json.dumps(recorded, indent=2) + "\n")
+    return recorded
+
+
+def _enola_symbol_repo_index() -> dict:
+    """Map module/symbol names to their owning repo from the fact set.
+
+    Findings whose evidence carries only a symbol (`exported-surface`
+    names `app/components/common.Carousel`, never a file) are otherwise
+    unattributable, and an unattributed finding cannot be narrowed by
+    repo — which is the whole point of the merged surface.
+    """
+    repos = _enola_repos()
+    if not repos:
+        return {}
+    facts_path = repos[-1] / ".enola" / "facts.jsonl"
+    if not facts_path.exists():
+        return {}
+    index = {}
+    with open(facts_path) as fh:
+        for line in fh:
+            try:
+                fact = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            name = fact.get("name")
+            if name and name not in index:
+                index[name] = fact.get("repo")
+    return index
+
+
+def _enola_finding_repo(finding: dict, repo_names: set,
+                        symbol_index: dict) -> str:
+    """Attribute a finding to the repo its evidence names.
+
+    Never to the file it was read from: the per-repo insights.json
+    files are cumulative in config order, so the file a finding appears
+    in says nothing about what it describes.
+    """
+    evidence = finding.get("evidence") or []
+    for item in evidence:
+        head = (item.get("file") or "").split("/")[0]
+        if head in repo_names:
+            return head
+    for item in evidence:
+        symbol = item.get("symbol") or ""
+        while symbol:
+            owner = symbol_index.get(symbol)
+            if owner:
+                return owner
+            symbol = symbol.rpartition(".")[0]
+    for item in evidence:
+        # Layer violations name an unprefixed path (`app/jobs/_coupling.rb`)
+        # where god-class names a prefixed one; walk up to the module.
+        path = (item.get("file") or "").rpartition("/")[0]
+        while path:
+            owner = symbol_index.get(path)
+            if owner:
+                return owner
+            path = path.rpartition("/")[0]
+    for item in evidence:
+        owner = symbol_index.get(item.get("fact") or "")
+        if owner:
+            return owner
+    title = finding.get("title") or ""
+    for name in sorted(repo_names, key=len, reverse=True):
+        if name in title:
+            return name
+    return "(unattributed)"
+
+
+def _enola_finding_anchor(finding: dict) -> str:
+    """The most stable identifier in a finding's evidence."""
+    for item in finding.get("evidence") or []:
+        for key in ("symbol", "file", "fact"):
+            value = item.get(key)
+            if value:
+                return value
+    return (finding.get("title") or "").strip()
+
+
+def _enola_finding_signature(finding: dict, repo: str) -> str:
+    """Identity that survives the finding's description changing.
+
+    Titles carry counts — the coupling-cluster title names 267 modules
+    today — so a title-keyed verdict would be orphaned by any code
+    change. Explainer plus owning repo plus primary evidence anchor is
+    stable across snapshots.
+    """
+    anchor = _enola_finding_anchor(finding)
+    if anchor.startswith(f"{repo}/"):
+        anchor = anchor[len(repo) + 1:]
+    return f"{finding.get('source')}:{repo}:{anchor}"
+
+
+def _enola_snapshotted_repos() -> tuple[set, set]:
+    """(repos with an insights.json, repos in the cluster without one).
+
+    Callers must be able to tell "this repo has no findings" from "this
+    repo was never looked at" — the ADR's binding no-silent-empty rule.
+    """
+    have, missing = set(), set()
+    for repo_path in _enola_repos():
+        target = have if (repo_path / ".enola" / "insights.json").exists() \
+            else missing
+        target.add(repo_path.name)
+    return have, missing
+
+
+def _enola_findings() -> list[dict]:
+    """Every distinct finding across the cluster, attributed and keyed.
+
+    Each explainer keeps a top-N over a graph that accumulates in
+    config order, so no single insights.json holds the cluster's whole
+    result set — reading only the newest silently drops findings from
+    every repo the monolith outweighs.
+    """
+    repo_paths = _enola_repos()
+    repo_names = {p.name for p in repo_paths}
+    symbol_index = _enola_symbol_repo_index()
+    merged = {}
+    for repo_path in repo_paths:
+        path = repo_path / ".enola" / "insights.json"
+        if not path.exists():
+            continue
+        try:
+            findings = json.loads(path.read_text())
+        except (json.JSONDecodeError, OSError):
+            continue
+        for finding in findings:
+            repo = _enola_finding_repo(finding, repo_names, symbol_index)
+            signature = _enola_finding_signature(finding, repo)
+            # Aggregate findings (crossrepo bundles every edge into one
+            # item) anchor on their *first* evidence entry, so a later,
+            # richer version of the same aggregate collides with a
+            # thinner one. First-seen-wins silently discarded the
+            # a genuine cross-repo edge because an earlier repo's
+            # snapshot carried the same anchor with fewer edges.
+            prior = merged.get(signature)
+            if prior and len(prior["evidence"]) >= len(finding.get("evidence") or []):
+                continue
+            merged[signature] = {
+                "signature": signature,
+                "repo": repo,
+                "explainer": finding.get("source"),
+                "title": finding.get("title"),
+                "confidence": finding.get("confidence"),
+                "description": finding.get("description"),
+                "evidence": finding.get("evidence") or [],
+            }
+    return sorted(merged.values(),
+                  key=lambda f: (f["repo"], f["explainer"] or "",
+                                 f["title"] or ""))
+
+
+def _enola_load_verdicts() -> dict:
+    """The judgment ledger — absence of an entry means unjudged.
+
+    There is no pending state by construction: nothing writes an entry
+    until a judgment is made, and nothing enumerates the unjudged set
+    as work. That is what keeps this a memory rather than a backlog.
+    """
+    if not ENOLA_VERDICTS.exists():
+        return {"entries": []}
+    try:
+        return json.loads(ENOLA_VERDICTS.read_text())
+    except (json.JSONDecodeError, OSError):
+        return {"entries": []}
+
+
+def _enola_verdict_for(finding: dict, ledger: dict) -> dict | None:
+    """Exact signature first, then class rules."""
+    for entry in ledger.get("entries") or []:
+        if entry.get("signature") == finding["signature"]:
+            return entry
+    for entry in ledger.get("entries") or []:
+        match = entry.get("match")
+        if not match:
+            continue
+        explainer = match.get("explainer")
+        if explainer and explainer != finding["explainer"]:
+            continue
+        prefix = match.get("title_prefix")
+        if prefix and not (finding["title"] or "").startswith(prefix):
+            continue
+        repo = match.get("repo")
+        if repo and repo != finding["repo"]:
+            continue
+        return entry
+    return None
+
+
+def _enola_impact(symbol: str) -> dict | None:
+    """Fan-in, fan-out and callers for a symbol, from the fact set.
+
+    Computed here rather than through the MCP server because MCP is
+    absent in headless and scheduled runs, and the call relations are
+    already on disk.
+    """
+    repos = _enola_repos()
+    if not repos:
+        return None
+    facts_path = repos[-1] / ".enola" / "facts.jsonl"
+    if not facts_path.exists():
+        return None
+    callers, callees, located = [], [], None
+    with open(facts_path) as fh:
+        for line in fh:
+            try:
+                fact = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            name = fact.get("name")
+            if name == symbol and located is None:
+                located = {"repo": fact.get("repo"), "file": fact.get("file"),
+                           "kind": fact.get("kind")}
+            for relation in fact.get("relations") or []:
+                if relation.get("kind") != "calls":
+                    continue
+                if relation.get("target") == symbol and name != symbol:
+                    callers.append(name)
+                elif name == symbol:
+                    callees.append(relation.get("target"))
+    if located is None and not callers and not callees:
+        return None
+    return {
+        "symbol": symbol,
+        "located": located,
+        "fan_in": len(set(callers)),
+        "fan_out": len(set(callees)),
+        "callers": sorted(set(c for c in callers if c)),
+        "callees": sorted(set(c for c in callees if c)),
+    }
+
+
+ENOLA_CITATION_RX = re.compile(
+    r"enola receipt (?P<repo>[\w.-]+) "
+    r"`sha256:(?P<digest>[0-9a-f]{12,})…?` "
+    r"@ `(?P<commit>[0-9a-f]{7,40})`, "
+    r"(?P<date>\d{4}-\d{2}-\d{2})"
+)
+
+
+def _enola_wiki_citations() -> list[dict]:
+    """Extract receipt citations from wiki prose and verdict them.
+
+    Grammar per wiki/brain/adrs/receipt-claim-verification.md. A
+    window around each occurrence is whitespace-normalized before
+    matching so citations wrapped across lines still parse. Windows
+    mentioning `enola receipt` without any `sha256:` nearby are prose
+    discussion, not citation attempts, and are ignored; with one,
+    grammar failure is verdict `malformed`.
+    """
+    recorded = {}
+    if ENOLA_RECEIPTS.exists():
+        try:
+            recorded = json.loads(ENOLA_RECEIPTS.read_text())
+        except json.JSONDecodeError:
+            pass
+    citations = []
+    for page in sorted(WIKI.rglob("*.md")):
+        rel = page.relative_to(WIKI)
+        if rel.parts[0] in ("_views", "_archive"):
+            continue
+        text = page.read_text()
+        lowered = text.lower()
+        start = 0
+        while True:
+            idx = lowered.find("enola receipt", start)
+            if idx == -1:
+                break
+            start = idx + 1
+            window = re.sub(r"\s+", " ", text[idx:idx + 300])
+            if "sha256:" not in window[:60]:
+                continue
+            lineno = text.count("\n", 0, idx) + 1
+            m = ENOLA_CITATION_RX.match(window)
+            if not m:
+                citations.append({"page": str(rel), "line": lineno,
+                                  "repo": None, "digest": None,
+                                  "verdict": "malformed"})
+                continue
+            repo, digest = m.group("repo"), m.group("digest")
+            entry = recorded.get(repo)
+            if entry is None:
+                verdict = "unknown-repo"
+            else:
+                current = (entry.get("content_digest") or "").removeprefix("sha256:")
+                verdict = "verified" if current.startswith(digest) else "stale"
+            citations.append({"page": str(rel), "line": lineno,
+                              "repo": repo, "digest": digest,
+                              "verdict": verdict})
+    return citations
+
+
+def cmd_enola(args) -> int:
+    """Wrap the enola architecture-graph tool for brain workflows.
+
+    Subcommands (via the `op` argument):
+      generate       — run `enola --generate mcp-arch.yaml`, then record
+                       every repo's receipt into
+                       wiki/_state/enola/receipts.json.
+      receipt [<repo>] — print recorded receipt entry/entries.
+      diff           — compare recorded receipts against each repo's live
+                       .enola/receipt.json; report drift at repo
+                       granularity with fact-count deltas. Skips (exit 0,
+                       one line) when the binary, config, or state is
+                       absent — remote CI never depends on enola.
+      findings       — the cluster's distinct explainer findings, merged
+                       across every repo's cumulative insights.json,
+                       attributed to the repo their evidence names, with
+                       anything already judged noise or rejected hidden
+                       unless --all.
+      judge          — record a verdict (accepted / rejected / noise) for
+                       one finding signature. Write-on-judgment: the
+                       ledger has no pending state, and nothing here
+                       enumerates unjudged findings as work.
+      impact         — fan-in / fan-out / callers for a symbol, read from
+                       the on-disk fact set rather than the MCP server so
+                       headless and scheduled runs keep working.
+
+    Per wiki/brain/adrs/architecture-graph-consumption.md.
+    """
+    op = args.op
+
+    if op == "generate":
+        binary = _enola_bin()
+        if binary is None:
+            print("enola binary not found (~/.local/bin/enola); "
+                  "install per wiki/brain/adrs/architecture-graph-substrate.md",
+                  file=sys.stderr)
+            return 1
+        if _enola_write_cluster_config() is None:
+            print("enola: no repo in brain.config.yml resolves on disk "
+                  "(active_repos / connectors.enola.repos) — nothing to "
+                  "snapshot", file=sys.stderr)
+            return 0
+        result = subprocess.run([binary, "--generate", str(ENOLA_CONFIG)],
+                                cwd=REPO, capture_output=True, text=True)
+        if result.returncode != 0:
+            print(result.stdout[-2000:] + result.stderr[-2000:],
+                  file=sys.stderr)
+            return result.returncode
+        recorded = _enola_record()
+        for name, entry in sorted(recorded.items()):
+            print(f"OK  {name}: {entry['fact_count']} facts @ "
+                  f"{(entry['git_commit'] or '')[:8]}"
+                  f"{' (dirty)' if entry['git_dirty'] else ''}")
+        return 0
+
+    if op == "receipt":
+        if not ENOLA_RECEIPTS.exists():
+            print("no recorded receipts (run: brain.py enola generate)",
+                  file=sys.stderr)
+            return 1
+        recorded = json.loads(ENOLA_RECEIPTS.read_text())
+        if args.repo:
+            entry = recorded.get(args.repo)
+            if not entry:
+                print(f"no receipt for {args.repo}", file=sys.stderr)
+                return 1
+            print(json.dumps(entry, indent=2))
+        else:
+            print(json.dumps(recorded, indent=2))
+        return 0
+
+    if op == "findings":
+        if not _enola_repos():
+            print("enola: no cluster config — skipping findings")
+            return 0
+        findings = _enola_findings()
+        if not findings:
+            print("enola: no snapshot artifacts on this machine — "
+                  "skipping findings (run `brain.py enola generate`)")
+            return 0
+        ledger = _enola_load_verdicts()
+        rows = []
+        for finding in findings:
+            verdict = _enola_verdict_for(finding, ledger)
+            kind = (verdict or {}).get("verdict")
+            if not args.all and kind in ("noise", "rejected"):
+                continue
+            if args.repo and finding["repo"] != args.repo:
+                continue
+            if args.explainer and finding["explainer"] != args.explainer:
+                continue
+            if (args.min_confidence is not None
+                    and (finding["confidence"] or 0) < args.min_confidence):
+                continue
+            rows.append((finding, verdict))
+        if args.json:
+            print(json.dumps([{**f, "verdict": v} for f, v in rows],
+                             indent=2))
+            return 0
+        for finding, verdict in rows:
+            mark = f" [{verdict['verdict']}]" if verdict else ""
+            print(f"{finding['repo']}  {finding['explainer']}  "
+                  f"conf={finding['confidence']}{mark}")
+            print(f"    {finding['title']}")
+            print(f"    sig: {finding['signature']}")
+        print(f"\n{len(rows)} finding(s) shown"
+              f"{' (including judged)' if args.all else ''}"
+              f" of {len(findings)} in the cluster.")
+        _, missing = _enola_snapshotted_repos()
+        if missing:
+            print(f"enola: no snapshot for {', '.join(sorted(missing))} — "
+                  f"not searched (regenerate to include)")
+        return 0
+
+    if op == "judge":
+        if args.verdict not in ENOLA_VERDICT_KINDS:
+            print(f"verdict must be one of {', '.join(ENOLA_VERDICT_KINDS)}",
+                  file=sys.stderr)
+            return 1
+        ledger = _enola_load_verdicts()
+        entries = [e for e in (ledger.get("entries") or [])
+                   if e.get("signature") != args.signature]
+        entry = {
+            "signature": args.signature,
+            "verdict": args.verdict,
+            "why": args.why,
+            "recorded": today_utc().isoformat(),
+        }
+        if args.cited_at:
+            entry["cited_at"] = args.cited_at
+        entries.append(entry)
+        ledger["entries"] = sorted(
+            entries, key=lambda e: (e.get("signature") or "",
+                                    str(e.get("match") or "")))
+        ENOLA_VERDICTS.parent.mkdir(parents=True, exist_ok=True)
+        ENOLA_VERDICTS.write_text(json.dumps(ledger, indent=2) + "\n")
+        print(f"recorded {args.verdict}: {args.signature}")
+        return 0
+
+    if op == "impact":
+        result = _enola_impact(args.symbol)
+        if result is None:
+            print(f"enola: no snapshot fact for {args.symbol!r} "
+                  "(absent graph, or the symbol is not extracted)")
+            return 0
+        located = result["located"] or {}
+        print(f"{result['symbol']}  fan-in {result['fan_in']}  "
+              f"fan-out {result['fan_out']}")
+        if located:
+            print(f"    {located.get('repo')}: {located.get('file')}")
+        for caller in result["callers"][:args.limit]:
+            print(f"    <- {caller}")
+        if len(result["callers"]) > args.limit:
+            print(f"    <- … {len(result['callers']) - args.limit} more")
+        return 0
+
+    if op == "diff":
+        if _enola_bin() is None or not ENOLA_CONFIG.exists():
+            print("enola: absent on this machine — skipping "
+                  "architecture drift check")
+            return 0
+        if not ENOLA_RECEIPTS.exists():
+            print("enola: no recorded receipts yet — run "
+                  "`brain.py enola generate` to baseline")
+            return 0
+        recorded = json.loads(ENOLA_RECEIPTS.read_text())
+        digests = _enola_content_digests()
+        for repo_path in _enola_repos():
+            name = repo_path.name
+            live = _enola_live_receipt(repo_path)
+            prior = recorded.get(name)
+            if live is None:
+                print(f"enola: {name}: no live snapshot "
+                      "(regenerate to compare)")
+                continue
+            if prior is None:
+                print(f"enola: {name}: unrecorded "
+                      f"({live.get('fact_count')} facts)")
+                continue
+            live_digest = digests.get(name)
+            if live_digest and prior.get("content_digest"):
+                if live_digest == prior["content_digest"]:
+                    print(f"enola: {name}: unchanged")
+                    continue
+            elif live.get("snapshot_id") == prior.get("snapshot_id"):
+                print(f"enola: {name}: unchanged")
+                continue
+            delta = (live.get("fact_count") or 0) - (prior.get("fact_count") or 0)
+            print(f"enola: {name}: DRIFTED "
+                  f"({prior.get('fact_count')} → {live.get('fact_count')} "
+                  f"facts, {'+' if delta >= 0 else ''}{delta}; "
+                  f"{(prior.get('git_commit') or '')[:8]} → "
+                  f"{(live.get('git', {}).get('commit') or '')[:8]})")
+        return 0
+
+    if op == "citations":
+        citations = _enola_wiki_citations()
+        if not ENOLA_RECEIPTS.exists():
+            print("enola: no recorded receipts — repo verdicts degrade "
+                  "to unknown-repo", file=sys.stderr)
+        for c in citations:
+            digest = f" sha256:{c['digest']}…" if c["digest"] else ""
+            repo = c["repo"] or "(unparsed)"
+            print(f"enola-citation: {c['verdict']:12s} "
+                  f"{c['page']}:{c['line']} {repo}{digest}")
+        counts = {}
+        for c in citations:
+            counts[c["verdict"]] = counts.get(c["verdict"], 0) + 1
+        print(f"# {len(citations)} citation(s): "
+              + (", ".join(f"{k}={v}" for k, v in sorted(counts.items()))
+                 or "none"), file=sys.stderr)
+        return 0
+
+    print(f"unknown enola op: {op!r}", file=sys.stderr)
+    return 1
+
+
 # --- structure connector (0.21) — deterministic code-shape snapshots ----
 #
 # Per wiki/brain/ai-suggestions/prds/deterministic-structure-connector.md
@@ -6273,6 +7025,210 @@ def _extract_structure(repo_root: Path) -> dict:
     return {"modules": modules,
             "packages": dict(sorted(packages.items())),
             "symbols": dict(sorted(symbols.items()))}
+
+
+def _structure_findings(facts: dict, repo: str) -> list[dict]:
+    """Deterministic findings computed from the structure facts.
+
+    The connector extracts *facts*; nothing turned them into
+    *findings* — the "here is something worth a human look" layer. These
+    are computed, not inferred: same facts in, same findings out, no
+    network, no LLM, consistent with the connector's own no-external-
+    dependency position.
+
+    Findings are candidates to verify, never verdicts. Each is
+    deliberately conservative and carries the numbers that produced it,
+    so a reader can disagree with the threshold rather than the claim.
+    """
+    modules = facts.get("modules") or []
+    packages = facts.get("packages") or {}
+    symbols = facts.get("symbols") or {}
+    findings: list[dict] = []
+    if not modules:
+        return findings
+
+    # Oversized package — a coupling-density signal, not a defect. The
+    # thresholds are deliberately blunt: a quarter of the repo in one
+    # top-level package, and enough files that the ratio means something.
+    for pkg, count in packages.items():
+        share = count / len(modules)
+        if share >= 0.25 and count >= 20:
+            findings.append({
+                "signature": f"oversized-package:{repo}:{pkg}",
+                "explainer": "oversized-package", "repo": repo,
+                "title": f"Package {pkg} holds {count} of {len(modules)} "
+                         f"modules ({share:.0%})",
+                "confidence": 0.6,
+                "evidence": [{"fact": pkg,
+                              "detail": f"{count} modules of {len(modules)}"}],
+            })
+
+    # God-file — a Python file whose top-level symbol count is a long way
+    # above the repo's median. Python-only, because that is the only tier
+    # where the connector sees symbols at all; saying so is the point.
+    counts = sorted(len(v) for v in symbols.values())
+    if len(counts) >= 5:
+        median = counts[len(counts) // 2]
+        for path, names in sorted(symbols.items()):
+            if len(names) >= max(15, median * 3):
+                findings.append({
+                    "signature": f"god-file:{repo}:{path}",
+                    "explainer": "god-file", "repo": repo,
+                    "title": f"{path} declares {len(names)} top-level "
+                             f"symbols (repo median {median})",
+                    "confidence": 0.7,
+                    "evidence": [{"file": path,
+                                  "detail": f"{len(names)} symbols vs "
+                                            f"median {median}"}],
+                })
+
+    # Symbol blindness — how much of the repo the substrate cannot see
+    # past file level. This is a finding *about the evidence*, and it
+    # belongs beside the others: a reader weighing the two findings above
+    # deserves to know what share of the code they could not cover.
+    py = [m for m in modules if m.endswith(".py")]
+    unseen = len(modules) - len(py)
+    if modules and unseen / len(modules) >= 0.5:
+        findings.append({
+            "signature": f"symbol-blindness:{repo}:*",
+            "explainer": "symbol-blindness", "repo": repo,
+            "title": f"{unseen} of {len(modules)} modules "
+                     f"({unseen / len(modules):.0%}) get file-level drift "
+                     f"only — no symbol visibility",
+            "confidence": 1.0,
+            "evidence": [{"fact": "non-python modules",
+                          "detail": f"{unseen} of {len(modules)}"}],
+        })
+    return findings
+
+
+def _structure_load_findings() -> tuple[list[dict], list[str]]:
+    """(findings, repos with no snapshot) across every configured target.
+
+    Returning the unsnapshotted repos is not decoration: a caller must be
+    able to tell "this repo has no findings" from "this repo was never
+    looked at".
+    """
+    found: list[dict] = []
+    missing: list[str] = []
+    for safe, path in _structure_targets():
+        snaps = sorted((SOURCES / "structure").glob(f"{safe}--*.md")) \
+            if (SOURCES / "structure").exists() else []
+        if not snaps:
+            missing.append(safe)
+            continue
+        facts = _structure_snapshot_facts(snaps[-1])
+        if not facts:
+            missing.append(safe)
+            continue
+        found.extend(_structure_findings(facts, safe))
+    return found, missing
+
+
+def _structure_verdicts() -> dict:
+    """The judgment ledger — absence of an entry means unjudged.
+
+    No pending state by construction: nothing writes an entry until a
+    judgment is made, and nothing enumerates the unjudged set as work.
+    That is what keeps it a memory rather than a backlog.
+    """
+    if not STRUCTURE_VERDICTS.exists():
+        return {"entries": []}
+    try:
+        return json.loads(STRUCTURE_VERDICTS.read_text())
+    except (json.JSONDecodeError, OSError):
+        return {"entries": []}
+
+
+def _structure_verdict_for(finding: dict, ledger: dict) -> dict | None:
+    for entry in ledger.get("entries") or []:
+        if entry.get("signature") == finding["signature"]:
+            return entry
+    for entry in ledger.get("entries") or []:
+        match = entry.get("match") or {}
+        if not match:
+            continue
+        if match.get("explainer") and match["explainer"] != finding["explainer"]:
+            continue
+        if match.get("repo") and match["repo"] != finding["repo"]:
+            continue
+        return entry
+    return None
+
+
+def cmd_structure(args) -> int:
+    """Read the structure connector's findings, and judge them.
+
+    findings — deterministic findings across every configured target,
+               with anything already judged noise or rejected hidden
+               unless --all. Repos with no snapshot are named, never
+               silently omitted.
+    judge    — record a verdict (accepted / rejected / noise) for one
+               finding signature. Write-on-judgment: the ledger has no
+               pending state and nothing here enumerates unjudged
+               findings as work.
+    """
+    if args.op == "findings":
+        targets = _structure_targets()
+        if not targets:
+            print("structure: no repos configured "
+                  "(brain.config.yml → active_repos / connectors.structure) "
+                  "— skipping findings")
+            return 0
+        found, missing = _structure_load_findings()
+        ledger = _structure_verdicts()
+        rows = []
+        for finding in sorted(found, key=lambda f: (f["repo"], f["explainer"],
+                                                    f["title"])):
+            verdict = _structure_verdict_for(finding, ledger)
+            kind = (verdict or {}).get("verdict")
+            if not args.all and kind in ("noise", "rejected"):
+                continue
+            if args.repo and finding["repo"] != args.repo:
+                continue
+            if args.explainer and finding["explainer"] != args.explainer:
+                continue
+            rows.append((finding, verdict))
+        if args.json:
+            print(json.dumps([{**f, "verdict": v} for f, v in rows], indent=2))
+            return 0
+        for finding, verdict in rows:
+            mark = f" [{verdict['verdict']}]" if verdict else ""
+            print(f"{finding['repo']}  {finding['explainer']}  "
+                  f"conf={finding['confidence']}{mark}")
+            print(f"    {finding['title']}")
+            print(f"    sig: {finding['signature']}")
+        print(f"\n{len(rows)} finding(s) shown"
+              f"{' (including judged)' if args.all else ''}"
+              f" of {len(found)} across {len(targets)} target(s).")
+        if missing:
+            print(f"structure: no snapshot for {', '.join(sorted(missing))} "
+                  f"— not searched (run `brain.py snapshot`)")
+        return 0
+
+    if args.op == "judge":
+        if args.verdict not in STRUCTURE_VERDICT_KINDS:
+            print(f"verdict must be one of "
+                  f"{', '.join(STRUCTURE_VERDICT_KINDS)}", file=sys.stderr)
+            return 1
+        ledger = _structure_verdicts()
+        entries = [e for e in (ledger.get("entries") or [])
+                   if e.get("signature") != args.signature]
+        entry = {"signature": args.signature, "verdict": args.verdict,
+                 "why": args.why, "recorded": today_utc().isoformat()}
+        if args.cited_at:
+            entry["cited_at"] = args.cited_at
+        entries.append(entry)
+        ledger["entries"] = sorted(
+            entries, key=lambda e: (e.get("signature") or "",
+                                    str(e.get("match") or "")))
+        STRUCTURE_VERDICTS.parent.mkdir(parents=True, exist_ok=True)
+        STRUCTURE_VERDICTS.write_text(json.dumps(ledger, indent=2) + "\n")
+        print(f"recorded {args.verdict}: {args.signature}")
+        return 0
+
+    print(f"unknown structure op: {args.op}", file=sys.stderr)
+    return 2
 
 
 def _structure_snapshot_id(facts: dict) -> str:
@@ -7032,23 +7988,45 @@ def cmd_schedule(args) -> int:
         return 1
 
     if op == "run-due":
-        # v1: run every enabled op (no last_run tracking yet).
-        # The runs.json tracker is part of the deferred runtime.
+        # Every enabled op runs; the outcome of each is recorded so a
+        # failing run is visible from inside the brain. Without this the
+        # only witness is a terminal that has scrolled away or a CI page
+        # nobody opens — a local timer failing is *less* visible than a
+        # red badge, not more.
         rc_total = 0
+        outcomes = {}
         for entry in config.get("operations") or []:
             if not entry.get("enabled"):
                 continue
             name = entry.get("name")
             print(f"# running: {name}", file=sys.stderr)
-            if name in SCHEDULE_HANDLERS:
-                rc = SCHEDULE_HANDLERS[name]()
-            else:
-                handler = entry.get("handler")
-                if not handler:
-                    continue
-                rc = subprocess.run(handler, shell=True, cwd=REPO).returncode
+            try:
+                if name in SCHEDULE_HANDLERS:
+                    rc = SCHEDULE_HANDLERS[name]()
+                else:
+                    handler = entry.get("handler")
+                    if not handler:
+                        continue
+                    rc = subprocess.run(handler, shell=True,
+                                        cwd=REPO).returncode
+                outcomes[name] = "ok" if rc == 0 else f"exit {rc}"
+            except Exception as exc:  # noqa: BLE001 — the record is the point
+                # A raising handler would otherwise abort the sweep with
+                # nothing written down about which op died.
+                outcomes[name] = f"{type(exc).__name__}: {exc}"
+                rc = 1
             if rc != 0:
                 rc_total = rc
+        failed = {k: v for k, v in outcomes.items() if v != "ok"}
+        SCHEDULE_STATE.parent.mkdir(parents=True, exist_ok=True)
+        SCHEDULE_STATE.write_text(json.dumps({
+            "last_run": today_utc().isoformat(),
+            "operations": outcomes,
+            "failed": sorted(failed),
+        }, indent=2) + "\n")
+        if failed:
+            print(f"# schedule: {len(failed)} operation(s) failed: "
+                  f"{', '.join(sorted(failed))}", file=sys.stderr)
         if rc_total == 0:
             _producer_touch()  # heartbeat: the accumulation loop is alive
         return rc_total
@@ -8204,6 +9182,153 @@ def cmd_reflection_check(args) -> int:
                     n += 1
         return n
 
+    def check_archived_liveness() -> int:
+        """Repos recorded archived whose remote is still being pushed to.
+
+        `archived` is written once and, without this, never re-checked.
+        A repo that comes back to life then looks exactly like one that
+        stayed dead, and its commits accumulate outside the corpus with
+        nothing to say so. Reads brain.config.yml's `archived_repos`, so
+        the kernel stays content-agnostic. Skips silently without `gh`
+        or without a configured owner, so CI and offline runs are
+        unaffected.
+        """
+        n = 0
+        if shutil.which("gh") is None or not ARCHIVED_REPOS:
+            return 0
+        # Owner comes from the archived repo's own checkout, matching the
+        # github connector's documented behaviour (owners are discovered
+        # from sibling checkouts' origin remotes), with the connector's
+        # explicit slugs as the fallback for repos not checked out.
+        configured = {}
+        for entry in _connector_config("github").get("repos") or []:
+            if "/" in str(entry):
+                owner, _, name = str(entry).partition("/")
+                configured[name] = owner
+        for repo in sorted(ARCHIVED_REPOS):
+            slug = None
+            remote = _git_readonly(PROJECTS / repo, ["remote", "get-url",
+                                                     "origin"])
+            if remote.returncode == 0:
+                m = re.search(r"[:/]([\w.-]+)/([\w.-]+?)(?:\.git)?$",
+                              remote.stdout.strip())
+                if m:
+                    slug = f"{m.group(1)}/{m.group(2)}"
+            if slug is None and repo in configured:
+                slug = f"{configured[repo]}/{repo}"
+            if slug is None:
+                continue  # owner unknown — say nothing rather than guess
+            try:
+                out = subprocess.run(
+                    ["gh", "api", f"repos/{slug}",
+                     "--jq", ".archived,.pushed_at"],
+                    capture_output=True, text=True, timeout=20)
+            except (subprocess.SubprocessError, OSError):
+                continue
+            if out.returncode != 0:
+                continue
+            parts = out.stdout.split()
+            if len(parts) >= 2 and parts[0] == "false":
+                findings.append(
+                    f"archived-liveness: {repo} is recorded archived in "
+                    f"brain.config.yml but the remote is not archived "
+                    f"(last push {parts[1][:10]}) — re-activate ingest or "
+                    f"record why not")
+                n += 1
+        return n
+
+    def check_receipt_citations() -> int:
+        """Receipt citations in wiki prose whose digest has moved.
+
+        A claim taken from the architecture graph cites the receipt it
+        came from; this is what makes it re-checkable instead of merely
+        asserted. `stale` means the graph moved past the cited digest;
+        `unknown-repo` and `malformed` mean the citation cannot be
+        resolved at all. Re-verifying is a judgment task — /groom owns
+        it; this only finds the candidates.
+        """
+        n = 0
+        for citation in _enola_wiki_citations():
+            verdict = citation.get("verdict")
+            if verdict in (None, "verified"):
+                continue
+            findings.append(
+                f"receipt-citations: {citation['page']}:{citation['line']} "
+                f"{verdict}")
+            n += 1
+        return n
+
+    def check_ledger_hygiene() -> int:
+        """Structure verdicts whose finding no longer exists.
+
+        An `accepted` entry whose finding is gone is usually good news —
+        the thing got fixed — and any page citing it may now overclaim; a
+        `rejected` one that vanished can be dropped. `noise` entries
+        describe the explainer rather than the code and never go stale.
+        Judgment stays with /groom; this only finds the candidates.
+        """
+        n = 0
+        if not STRUCTURE_VERDICTS.exists():
+            return 0
+        try:
+            entries = json.loads(
+                STRUCTURE_VERDICTS.read_text()).get("entries") or []
+        except json.JSONDecodeError:
+            findings.append("ledger-hygiene: finding-verdicts.json unparseable")
+            return 1
+        found, missing = _structure_load_findings()
+        if not found:
+            return 0  # nothing snapshotted — judge nothing
+        live = {f["signature"] for f in found}
+        searched = {f["repo"] for f in found} - set(missing)
+        for entry in entries:
+            if entry.get("verdict") == "noise" or not entry.get("signature"):
+                continue
+            if entry["signature"] in live:
+                continue
+            # A verdict whose repo was never searched is unknown, not
+            # stale. Without this the detector reports every verdict for
+            # a repo whose snapshot is merely absent.
+            parts = entry["signature"].split(":")
+            if len(parts) > 1 and parts[1] not in searched:
+                continue
+            where = (f" (cited at {entry['cited_at']})"
+                     if entry.get("cited_at") else "")
+            findings.append(
+                f"ledger-hygiene: {entry['verdict']} verdict on "
+                f"{entry['signature']} but the finding is gone from the "
+                f"snapshot{where} — re-judge or drop")
+            n += 1
+
+        # Same rule over the graph's ledger. Signatures there depend on a
+        # symbol index built from the last repo's fact file; without it
+        # attribution degrades and every signature shifts, so judge
+        # nothing rather than judge wrongly.
+        if ENOLA_VERDICTS.exists() and _enola_symbol_repo_index():
+            try:
+                gentries = json.loads(
+                    ENOLA_VERDICTS.read_text()).get("entries") or []
+            except json.JSONDecodeError:
+                findings.append("ledger-hygiene: enola finding-verdicts.json "
+                                "unparseable")
+                return n + 1
+            glive = {f["signature"] for f in _enola_findings()}
+            gsearched, _ = _enola_snapshotted_repos()
+            for entry in gentries:
+                if entry.get("verdict") == "noise" or not entry.get("signature"):
+                    continue
+                if entry["signature"] in glive:
+                    continue
+                parts = entry["signature"].split(":")
+                if len(parts) > 1 and parts[1] not in gsearched:
+                    continue
+                findings.append(
+                    f"ledger-hygiene: {entry['verdict']} verdict on "
+                    f"{entry['signature']} but the finding is gone from the "
+                    f"graph — re-judge or drop")
+                n += 1
+        return n
+
     runners = {
         "links": check_links,
         "denylist": check_denylist,
@@ -8217,6 +9342,9 @@ def cmd_reflection_check(args) -> int:
         "sources-immutability": check_sources_immutability,
         "repo-claims": check_repo_claims,
         "internal-refs": check_internal_refs,
+        "archived-liveness": check_archived_liveness,
+        "ledger-hygiene": check_ledger_hygiene,
+        "receipt-citations": check_receipt_citations,
     }
 
     if which == "all":
@@ -8580,6 +9708,60 @@ def main() -> int:
     sub.add_parser("snapshot",
                    help="write a brain corpus snapshot to wiki/_views/snapshots/"
                    ).set_defaults(func=cmd_snapshot)
+
+    ap_en = sub.add_parser("enola",
+                           help="architecture-graph substrate (binary-backed; "
+                                "receipts at wiki/_state/enola/)")
+    en_sub = ap_en.add_subparsers(dest="op", required=True)
+    en_sub.add_parser("generate",
+                      help="snapshot the cluster and record receipts")
+    en_receipt = en_sub.add_parser("receipt", help="print recorded receipt(s)")
+    en_receipt.add_argument("repo", nargs="?")
+    en_sub.add_parser("diff",
+                      help="report architecture drift vs recorded receipts")
+    en_sub.add_parser("citations",
+                      help="inventory receipt citations in wiki prose")
+    en_find = en_sub.add_parser("findings",
+                                help="merged explainer findings; noise and "
+                                     "rejections hidden unless --all")
+    en_find.add_argument("--repo", default=None)
+    en_find.add_argument("--explainer", default=None)
+    en_find.add_argument("--min-confidence", type=float, default=None,
+                         dest="min_confidence")
+    en_find.add_argument("--all", action="store_true")
+    en_find.add_argument("--json", action="store_true")
+    en_judge = en_sub.add_parser("judge", help="record a verdict")
+    en_judge.add_argument("signature")
+    en_judge.add_argument("verdict",
+                          help="one of " + ", ".join(ENOLA_VERDICT_KINDS))
+    en_judge.add_argument("--why", required=True)
+    en_judge.add_argument("--cited-at", default=None, dest="cited_at")
+    en_impact = en_sub.add_parser("impact",
+                                  help="fan-in / fan-out / callers for a "
+                                       "symbol, from the on-disk fact set")
+    en_impact.add_argument("symbol")
+    en_impact.add_argument("--limit", type=int, default=20)
+    ap_en.set_defaults(func=cmd_enola)
+
+    ap_st = sub.add_parser("structure",
+                          help="findings from the structure connector's "
+                               "snapshots, and the verdict ledger")
+    st_sub = ap_st.add_subparsers(dest="op", required=True)
+    st_find = st_sub.add_parser("findings",
+                               help="deterministic findings; noise and "
+                                    "rejections hidden unless --all")
+    st_find.add_argument("--repo", default=None)
+    st_find.add_argument("--explainer", default=None)
+    st_find.add_argument("--all", action="store_true")
+    st_find.add_argument("--json", action="store_true")
+    st_judge = st_sub.add_parser("judge",
+                                help="record a verdict for one finding")
+    st_judge.add_argument("signature")
+    st_judge.add_argument("verdict",
+                         help="one of " + ", ".join(STRUCTURE_VERDICT_KINDS))
+    st_judge.add_argument("--why", required=True)
+    st_judge.add_argument("--cited-at", default=None, dest="cited_at")
+    ap_st.set_defaults(func=cmd_structure)
 
     sub.add_parser("rotate-log",
                    help="rotate log/log.md to log/archive/ once it crosses the threshold"
