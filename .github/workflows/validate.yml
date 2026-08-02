@@ -42,12 +42,19 @@ jobs:
       # Optional sanity: regenerate views and confirm no diff vs committed.
       # If wiki/_views/pages.json drifts from what's in the repo, the
       # author forgot to run `brain.py views` before pushing.
+      # wiki/_views/custom/ is exempt on purpose. Those views render
+      # blocks sourced from wiki/_state/inbox/, which is machine-local
+      # and untracked by design, so a CI regen (empty inbox) can never
+      # match an operator's regen (populated inbox). Gating them made the
+      # check unsatisfiable rather than useful — a generated artifact
+      # whose content depends on local state cannot be compared against a
+      # clean-room rebuild. Everything deterministic stays gated.
       - name: Check views are up-to-date
         run: |
           python3 tools/brain.py views > /dev/null
-          if ! git diff --exit-code --quiet wiki/_views/; then
+          if ! git diff --exit-code --quiet wiki/_views/ ':!wiki/_views/custom/'; then
             echo "::error::wiki/_views/ is out of date. Run 'python3 tools/brain.py views' and commit the result."
-            git diff wiki/_views/
+            git diff wiki/_views/ ':!wiki/_views/custom/'
             exit 1
           fi
 
