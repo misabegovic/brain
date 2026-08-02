@@ -78,3 +78,7 @@ wiki/_state/.emulate-cursors.json
 # brain.config.yml by `brain.py enola generate`.
 .enola/
 mcp-arch.yaml
+
+# uv writes this as a side effect of `uv pip install`; the manifests
+# (requirements*.txt) are the declared dependency surface.
+uv.lock
