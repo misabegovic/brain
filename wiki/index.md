@@ -18,6 +18,28 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-08-02** — **The substrates get consumers: 12 of 25 skills now
+  consult them.** The port had shipped both substrates and *zero* skills
+  using them — recreating in this kernel exactly the gap the sibling
+  instance had described as "the explainers ran into a void". An operator
+  question caught it: tooling at parity, consumption at zero. `/sync`
+  gains an architecture-drift step that reports the finding **count** and
+  never the list, because a list in a sweep's output is a backlog by
+  another name. `wiki-ingest` gains a substrate-check on its two
+  code-shape routing rows — confirmed claims cite the snapshot they were
+  checked against, contradicted ones land annotated with a recorded
+  verdict, and **no-signal is written as the default rather than the weak
+  branch**, since the structure connector sees symbols only for Python
+  and the graph tier may not be installed at all. `/shape` consults it in
+  the Phase-1 deepdive and for blast radius in Phase 3, `/continue`
+  before code leaves local, `/groom` gains three trigger rows, and
+  `/ask`, `wiki-query`, `wiki-plan`, `review`, `zoom-out`,
+  `wiki-overlap` and `wiki-coverage` each gain the consultation their own
+  judgment step was already missing. Every wiring names **both tiers in
+  order** — the connector first because it always answers, the graph
+  second because it is allowed to be absent. That ordering is the
+  kernel-shaped difference from the sibling, where a single binary-backed
+  substrate could be assumed present.
 - **2026-08-02** — **The structure connector gets findings, a verdict
   ledger, and a line in the contract.** Prompted by a comparison against
   a sibling brain that had adopted an external architecture-graph binary.

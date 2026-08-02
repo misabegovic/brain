@@ -160,6 +160,7 @@ Read the diff with judgement:
 - Does it use the right `kind:` and corresponding required sections?
 - Are claims hedged where they should be (`(unverified, YYYY-MM-DD)`)?
 - Does it contradict any existing page? (Spot-check via mempalace
+- **Does it contradict the code substrate?** When the diff makes a structural claim — what contains what, how coupled something is — check it rather than taking the author's word. `brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass. This is the last gate before a claim becomes something later pages cite. A mismatch is **not** a merge blocker on its own — findings are candidates to verify — so raise it as a non-blocking comment unless the claim is load-bearing and plainly false.
   search or by reading adjacent pages.)
 - Is it within the spirit of the brain — synthesis, not narration?
 - If the PR touches **restricted paths** (per `AGENTS.md` § Path
