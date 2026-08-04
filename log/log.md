@@ -359,3 +359,5 @@
 2026-08-04 merge — PR #38: Adopt the full enola surface and fix the /sync ordering bug
    diff: 24 files, +439/-90
    restricted-paths: true
+2026-08-04 sync — siblings:0 moved (active_repos empty), lint:0 issues, check-sources:0 broken (182 across 70 pages), validate:ok, views:regenerated, reflection-check:0 findings across 14 detectors
+   landed 3 weeks of unclaimed scheduled output: 20 auto-refresh overlap scans (last committed 2026-07-14), wiki/_state/schedule.json, the inbox item set, and today's snapshot
