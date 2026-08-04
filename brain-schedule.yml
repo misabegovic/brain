@@ -163,6 +163,18 @@ operations:
     output: stdout
     enabled: true
 
+  # Architecture history is machine-local and unbounded — every
+  # snapshot records a revision, and `generate` runs on every sweep.
+  # gc with no flags removes only garbage, so this reclaims disk
+  # without discarding anything a reader could still reach. Skips
+  # cleanly on a shell with no graph tier installed.
+  - name: enola-history-gc
+    description: Reclaim architecture-history disk; report revision count and replayability.
+    cadence: weekly
+    handler: python3 tools/brain.py enola history gc
+    output: stdout (history lives in ~/.enola/graphs/, outside every repo)
+    enabled: true
+
 # How operations get fired (runner — separate ADR):
 #
 # - GitHub Actions cron (.github/workflows/scheduled.yml) is the

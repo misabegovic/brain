@@ -1,4 +1,86 @@
 {
+  "enabledMcpjsonServers": [
+    "brain"
+  ],
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "f=$(jq -r \".tool_input.file_path // .tool_response.filePath // empty\" 2\u003e/dev/null); if [ -n \"$f\" ] \u0026\u0026 echo \"$f\" | grep -q \"/wiki/\"; then python3 tools/brain.py lint-page \"$f\" 2\u003e/dev/null || true; fi",
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write"
+      },
+      {
+        "hooks": [
+          {
+            "command": "f=$(jq -r \".tool_input.file_path // .tool_response.filePath // empty\" 2\u003e/dev/null); if [ -n \"$f\" ] \u0026\u0026 echo \"$f\" | grep -q \"/wiki/\"; then bash tools/ui-build.sh; fi",
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write"
+      },
+      {
+        "hooks": [
+          {
+            "command": "bash tools/home-staleness.sh post",
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write|MultiEdit"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "cmd=$(jq -r '.tool_input.command // empty' 2\u003e/dev/null); case \"$cmd\" in *\"git push\"*|*\"gh pr create\"*) root=$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .); script=\"$root/tools/preflight.sh\"; if [ -x \"$script\" ]; then \"$script\" \u003e\u00262 || { echo \"preflight blocked: $cmd\" \u003e\u00262; exit 2; }; fi ;; esac; exit 0",
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "python3 tools/brain.py inbox summary 2\u003e/dev/null || true",
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "/home/muhamed/.local/bin/enola hook session-start",
+            "source": "enola",
+            "timeout": 60,
+            "type": "command"
+          }
+        ],
+        "matcher": "startup|resume"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "bash tools/home-staleness.sh stop",
+            "type": "command"
+          },
+          {
+            "command": "/home/muhamed/.local/bin/enola hook stop",
+            "source": "enola",
+            "timeout": 60,
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(mempalace search:*)",
@@ -39,71 +121,6 @@
       "mcp__claude_ai_Notion__notion-update-view",
       "mcp__claude_ai_Notion__notion-duplicate-page",
       "mcp__claude_ai_Notion__notion-move-pages"
-    ]
-  },
-  "enabledMcpjsonServers": [
-    "brain"
-  ],
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cmd=$(jq -r '.tool_input.command // empty' 2>/dev/null); case \"$cmd\" in *\"git push\"*|*\"gh pr create\"*) root=$(git rev-parse --show-toplevel 2>/dev/null || echo .); script=\"$root/tools/preflight.sh\"; if [ -x \"$script\" ]; then \"$script\" >&2 || { echo \"preflight blocked: $cmd\" >&2; exit 2; }; fi ;; esac; exit 0"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "f=$(jq -r \".tool_input.file_path // .tool_response.filePath // empty\" 2>/dev/null); if [ -n \"$f\" ] && echo \"$f\" | grep -q \"/wiki/\"; then python3 tools/brain.py lint-page \"$f\" 2>/dev/null || true; fi"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "f=$(jq -r \".tool_input.file_path // .tool_response.filePath // empty\" 2>/dev/null); if [ -n \"$f\" ] && echo \"$f\" | grep -q \"/wiki/\"; then bash tools/ui-build.sh; fi"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash tools/home-staleness.sh post"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash tools/home-staleness.sh stop"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 tools/brain.py inbox summary 2>/dev/null || true"
-          }
-        ]
-      }
     ]
   }
 }

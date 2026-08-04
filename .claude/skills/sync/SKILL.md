@@ -37,7 +37,9 @@ are candidates for `/in <repo>` after the sweep.
 
 ```bash
 python3 tools/brain.py snapshot                 # the always-available floor
-python3 tools/brain.py enola generate && python3 tools/brain.py enola diff
+python3 tools/brain.py enola diff               # drift FIRST — see below
+python3 tools/brain.py enola generate           # then re-record
+python3 tools/brain.py enola coverage           # which cross-repo edges resolved
 ```
 
 Step 1 reports *commit* churn; this reports *architecture* movement,
@@ -51,10 +53,22 @@ needs the `enola` binary and a configured cluster; when either is
 absent it prints one skip line and exits 0 — **never treat that as a
 failure, and never let remote CI depend on it.**
 
-After reviewing drift, `enola generate` re-records receipts
-automatically; commit the updated `wiki/_state/enola/receipts.json` so
-the brain's record of *what architecture did we last synthesise
-against* advances alongside the sync cursors.
+**Order matters, and chaining them the other way is a check that
+cannot fail.** `enola generate` re-records each repo's receipt as a
+side effect, so `generate && diff` compares a baseline against a
+snapshot taken seconds earlier and reports every repo `unchanged` by
+construction. Run `diff` first against the still-committed receipts,
+read the drift, *then* regenerate. Commit the updated
+`wiki/_state/enola/receipts.json` so the brain's record of *what
+architecture did we last synthesise against* advances alongside the
+sync cursors.
+
+`enola coverage` answers what a fact count cannot: **which cross-repo
+edges actually resolved**. A service reported `isolated` because
+nothing connects to it and one whose outbound edges simply could not
+be followed are indistinguishable in a total, and only the first is a
+finding about the architecture — the second is a finding about the
+snapshot. Report it as a line, not as a list of edges.
 
 Then report the **count** of findings, never the list:
 
