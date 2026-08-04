@@ -1,14 +1,21 @@
 ---
 title: An attention board — what deserves the operator's day, not what is left to do
 kind: initiative
-status: draft
+status: living
 updated: 2026-08-04
 team: brain
 division: "(inferred)"
 repos:
   - brain
 appetite: medium
-confidence: low
+confidence: medium
+summary: >-
+  The kernel collects and queues but has never triaged. A daily
+  /attention pass produces a capped, ranked board of what deserves the
+  operator's day, stored beside the inbox rather than inside it — cards
+  are dismissed, queue items are done. Channels and categories come from
+  brain.config.yml so a fresh shell gets an honest board that fills in
+  as connectors are configured.
 affects:
   - brain
 depends_on:

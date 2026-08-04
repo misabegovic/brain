@@ -18,6 +18,33 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-08-04** — **Phase 2: the board takes a bet against its own
+  safest option, and bounds the cost instead of arguing with it.**
+  [ADR](brain/adrs/attention-board.md) for the
+  [attention board](brain/prds/attention-board.md). Pre-flight found the
+  fact that reframed the choice: connectors already **queue an inbox item
+  per batch**, so the inbox is a uniform channel-agnostic surface over
+  heterogeneous systems, and a board reading only the inbox would be
+  channel-agnostic for free. The operator took the other bet — read
+  `sources/<connector>/` **directly** — because cross-channel joins are
+  the capability that makes a board better than a queue, and joins on
+  producer summaries are joins on someone else's compression. That
+  reintroduces per-channel coupling, which is the one thing this port
+  exists to remove, so the ADR bounds it rather than disputes it: a thin
+  reader per connector, every reader emitting **one** candidate shape,
+  and the inbox as a **universal fallback** so a connector without a
+  reader is shallow rather than invisible. Named failure test — if
+  readers start growing per-connector *scoring* or *categories*, the
+  containment failed and the decision is revisited, not patched.
+  Weights land in configuration (a bad weight should be a config error,
+  not a silent scoring bug) while the rationale and its dated revisions
+  stay prose on a page. **The design is unproven against live data**:
+  no connector is configured on this machine, so the reader interface
+  will first be exercised against internal producers alone, and the
+  first configured connector is the real test of whether one candidate
+  shape suffices. An unconfigured shell still gets a board and is told
+  how many connectors answered — "nothing found" and "nothing asked"
+  must never render alike. Phase 2 — awaiting approval.
 - **2026-08-04** — **The kernel collects and it queues; it has never
   triaged.** Phase 1 PRD for an [attention board](brain/prds/attention-board.md)
   — a daily capped, ranked briefing of what deserves the operator's

@@ -23,6 +23,14 @@ tooling, governance.
 Kernel decisions ported from the origin deployment on 2026-07-10,
 sanitized to organisation-agnostic form:
 
+- [The attention board is a ranked, capped store beside the inbox](adrs/attention-board.md)
+  — **accepted, unbuilt**: cards are dismissed, queue items are done, and
+  the two stores never merge. The groom reads connector snapshots through
+  a thin per-connector reader emitting one candidate shape, with the inbox
+  as the universal fallback so a connector without a reader is shallow
+  rather than invisible. Weights in configuration, rationale on a page;
+  an unconfigured shell still gets a board and is told how many
+  connectors answered.
 - [Owner-subscription wake via signed subscribe events and guarded webhooks](adrs/owner-subscription-wake.md)
   — **built 0.28.0** (child 2 of the [event-driven epic](epics/event-driven-agent-triggers.md)):
   subscriptions are signed subscribe events; a matching append POSTs a
