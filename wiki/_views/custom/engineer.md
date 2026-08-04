@@ -2,7 +2,7 @@
 title: "Engineer view"
 kind: meta
 status: living
-updated: 2026-08-02
+updated: 2026-08-04
 confidence: high
 sources:
   - ../../../views/engineer.yml
@@ -15,7 +15,7 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 
 ## Recent decisions
 
-- [Two tiers over the same repos: an always-available in-kernel structure connector with findings and a verdict ledger, plus an optional binary-backed graph](/brain/adrs/structure-findings-and-verdict-ledger/) — accepted · updated 2026-08-02
+- [Two tiers over the same repos: an always-available in-kernel structure connector with findings and a verdict ledger, plus an optional binary-backed graph](/brain/adrs/structure-findings-and-verdict-ledger/) — accepted · updated 2026-08-04
 - [Give recurring tend-queue items an operator acknowledgement path](/brain/adrs/acknowledge-recurring-tend-items/) — accepted · updated 2026-07-12
 - [The briefing is a build-time derivation; summaries live in frontmatter; attention verdicts live on inbox items](/brain/adrs/human-legible-presentation-layer/) — accepted · updated 2026-07-12
 - [The kernel's interaction surfaces are MCP and the CLI — the embedded terminal retires with the chat pane](/brain/adrs/mcp-cli-surface/) — accepted · updated 2026-07-12

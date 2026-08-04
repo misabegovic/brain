@@ -18,6 +18,31 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-08-04** — **The graph tier reaches parity with its own tool,
+  and a check that could not fail is retired.** `baseline`, `check`,
+  `coverage`, `explain`, `doctor` and a `history` family
+  (`log`/`show`/`diff`/`blame`/`gc`) now run through `brain.py enola`.
+  Every one degrades to a named skip — tested on a shell with no binary,
+  no cluster and no configured repos, the default state of a fresh
+  clone. `doctor` is exempt from the cluster guard on purpose: it asks
+  whether *this checkout's* hooks fire, which needs nothing configured,
+  and a fresh shell asking exactly that is the case it exists for.
+  **`check` reports and never gates** — the graph is the ceiling, never
+  the floor, so a gate fed by an optional tier would make every workflow
+  conditional on an install the kernel cannot guarantee; its exit 3
+  prints *treat as NOT ASKED, never as a pass*, held by two tests, one
+  asserting the wrapper's own exit code and one that both phrases
+  survive in source. **The defect found while wiring it is the better
+  half:** `/sync` ran `enola generate && enola diff`, but `generate`
+  re-records the receipts, so the diff compared a baseline against a
+  snapshot taken seconds earlier and reported every repo `unchanged`
+  **by construction**. Inherited from the parent instance, fixed there
+  on 2026-08-03, and here it had never once fired. Order reversed.
+  Session hooks are installed, which relaxes *pulled, never pushed* —
+  recorded on the ADR rather than smoothed over, because the argument
+  that won was that the alternative is a gate nobody remembers to run,
+  which is precisely what the `/sync` step had been. 160 tests pass.
+  LOCAL_FIRST — local until promoted.
 - **2026-08-02** — **The views gate is satisfiable again, and the first
   verdict is on the record.** Three follow-ups. The custom-views design
   call, left open yesterday, is settled the right way round: I had

@@ -166,10 +166,35 @@ def test_enola_cluster_file_is_not_committed():
 
 def test_enola_ops_exit_zero_without_a_binary_or_cluster():
     for op in (["enola", "diff"], ["enola", "findings"],
-               ["enola", "impact", "NoSuchSymbol"]):
+               ["enola", "impact", "NoSuchSymbol"],
+               ["enola", "baseline", "show"], ["enola", "check"],
+               ["enola", "coverage"], ["enola", "explain"],
+               ["enola", "doctor"], ["enola", "history", "log"]):
         result = run(*op)
         assert result.returncode == 0, f"{op}: {result.stderr}"
         assert result.stdout.strip(), f"{op} said nothing — a silent skip"
+
+
+def test_enola_check_is_reported_not_propagated():
+    """`check` exits 1 on a regression; the brain must not become a gate.
+
+    The graph is the ceiling and never the floor, so no caller may be
+    able to fail on its verdict. This asserts the wrapper's exit code
+    rather than the tool's, which is the whole of the guarantee.
+    """
+    result = run("enola", "check")
+    assert result.returncode == 0, result.stderr
+
+
+def test_enola_check_never_reports_a_declined_verdict_as_a_pass():
+    """Exit 3 means the snapshots were not comparable — not that it passed.
+
+    "The graph agreed" and "the graph was not asked" must never look the
+    same, which is the same rule the skip lines carry everywhere else.
+    """
+    src = (REPO / "tools" / "brain.py").read_text()
+    assert "declined — snapshots not comparable" in src
+    assert "treat as NOT ASKED, never as a pass" in src
 
 
 def test_enola_judge_rejects_a_verdict_outside_the_closed_set():

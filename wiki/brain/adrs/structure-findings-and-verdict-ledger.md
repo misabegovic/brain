@@ -2,7 +2,7 @@
 title: "Two tiers over the same repos: an always-available in-kernel structure connector with findings and a verdict ledger, plus an optional binary-backed graph"
 kind: decision
 status: accepted
-updated: 2026-08-02
+updated: 2026-08-04
 confidence: medium
 summary: >
   The structure connector extracted facts and computed no findings. It gains a deterministic findings layer (oversized-package, god-file, symbol-blindness) and a verdict ledger with no pending state, both computed in-kernel. The initial rejection of an external graph binary was overturned by the operator the same day: enola now ships as an optional second tier over the same repos, with the in-kernel connector as the always-available floor.
@@ -203,3 +203,56 @@ connector first because it always answers, the graph tier second
 because it is allowed to be absent. That ordering is the kernel-shaped
 difference from the sibling instance, where a single binary-backed
 substrate could be assumed present.
+
+**2026-08-04 — the graph tier reaches parity with its own tool, and
+the ordering bug in `/sync` is fixed.** Operator direction, mirroring
+the change made in the instance this kernel was extracted from. The
+port shipped seven of enola's capabilities; `baseline`, `check`,
+`coverage`, `explain`, `doctor` and a `history` family
+(`log`/`show`/`diff`/`blame`/`gc`) now all run through `brain.py
+enola`. `history` is grouped under one op rather than flattened,
+because enola's `diff` means *delta between two revisions* while the
+kernel's already means *drift against the committed receipts*, and two
+things called diff in one namespace is a trap rather than a
+convenience.
+
+**Every new op keeps the two-tier contract intact.** Each degrades to
+a named skip — verified by test on a shell with no binary, no cluster
+and no configured repos, which is the default state of a fresh clone.
+`doctor` is deliberately exempted from the cluster-config guard: it
+asks whether *this checkout's* session hooks fire, which is answerable
+with nothing configured at all, and a fresh shell wanting exactly that
+answer is the case it exists for.
+
+**`check` reports and never gates.** The tool exits 1 on an
+architectural regression and the kernel does not propagate it. The
+rule it would have broken is the older and more important one — the
+graph is the ceiling, never the floor — and a gate fed by an optional
+tier would make every workflow conditional on an install the kernel
+cannot guarantee. What the wrapper adds is a translated verdict
+carrying the distinction that matters: exit 3 means the snapshots were
+not comparable, and it prints **treat as NOT ASKED, never as a pass**.
+Two tests hold that line: one asserts the wrapper's own exit code is
+zero, the other that both phrases survive in the source.
+
+**A real defect surfaced while wiring `/sync`.** Its architecture-drift
+step ran `enola generate && enola diff`. `generate` re-records each
+repo's receipt as a side effect, so the `diff` that followed compared a
+baseline against a snapshot taken seconds earlier and reported every
+repo `unchanged` **by construction** — a check that could not fail.
+The order is now `diff` first against the still-committed receipts,
+then `generate`. This is the same defect the parent instance found and
+fixed on 2026-08-03; it was inherited here and had never fired.
+
+**Session hooks are installed, and that relaxes "pulled, never
+pushed".** `enola install --hooks` (targets `claude,agents` — the
+Cursor and Copilot files it offers are for tools a fresh shell need not
+assume) pins a baseline at session start and reports the architectural
+delta at session end *only* if the change introduced a regression. That
+is the graph speaking unasked. It is recorded rather than smoothed over
+because the invariant was real; the argument that won is that the
+alternative was a gate nobody remembered to run, which is precisely how
+the `/sync` step above spent its whole life reporting `unchanged`. The
+hook never blocks and never interrupts on failure, so the cost is a
+report nobody asked for rather than work nobody chose. A clone that
+does not want it runs `enola uninstall`.
