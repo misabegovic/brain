@@ -128,6 +128,14 @@ sanitized to organisation-agnostic form:
 
 ## PRDs
 
+- [An attention board](prds/attention-board.md)
+  — **draft**: a daily capped, ranked board of what deserves the
+  operator's day, grooming a store of its own beside the inbox and
+  reading the connector snapshots the brain already pulls. Channels
+  and categories come from `brain.config.yml` so a fresh shell gets
+  an honest empty board. Sits beside
+  [queue-and-tend-inbox](adrs/queue-and-tend-inbox.md) and must not
+  absorb it — the queue drains, the board discards.
 - [Owner-subscription wake](prds/owner-subscription-wake.md)
   — **superseded** (built 0.28.0; child 2 of the
   [event-driven epic](epics/event-driven-agent-triggers.md)): subscribe
