@@ -93,7 +93,8 @@ The **kernel** — mechanism, no content:
   the stdio MCP server, sibling-repo sync, local hooks, page
   templates.
 - **`.claude/`** — the full slash-command surface (`/in`, `/capture`,
-  `/ask`, `/sync`, `/groom`, `/shape`, `/continue`, `/zoom-out`,
+  `/ask`, `/sync`, `/groom`, `/attention`, `/shape`, `/continue`,
+  `/zoom-out`,
   `/rfc`, `/pr`, `/review`, `/spawn`, `/rebase`, …) as skills, plus
   the three agent personas (PM / Tech Lead / Developer) that drive
   Shape Up.
@@ -253,6 +254,7 @@ Gates: `brain.py validate` + auto-stages `wiki/_views/` regen +
 | `/ask <question>`            | Query. Default factual lookup; escalates to plan / overlap / coverage by phrasing.                |
 | `/sync`                      | Mechanical health sweep: sibling-repo fetch, lint, source-link check, schema validate, regen views. |
 | `/tend [<budget>]`           | Digest the inbox — pending synthesis work queued by the deterministic producers. Budget = count / time-box / kind / id. |
+| `/attention`                 | Groom the ranked shortlist of what deserves the day, built from connector snapshots + the inbox. Capped; cards are dismissed, not drained. |
 | `/groom`                     | Judgement sweep: confidence demotion, insight decay, supersede→archive transitions.                |
 | `/shape <scope> <pitch>`     | **The only path to ADRs/PRDs.** Manual by default — pauses at every load-bearing decision. `--auto`, `--pitch`, `--record`, `--epic`, `--rfc` modes. |
 | `/continue <slug-or-PR#>`    | Resume in-flight `/shape` work; detects phase from artifact state.                                |

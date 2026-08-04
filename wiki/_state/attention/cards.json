@@ -1,0 +1,111 @@
+{
+  "cards": [
+    {
+      "category": "",
+      "closed_at": "2026-08-04",
+      "closed_reason": "recorded decision, not attention-worthy",
+      "command": "",
+      "first_seen": "2026-08-04",
+      "id": "inbox-research-brain-adrs-mcp-cli-surface-md",
+      "last_seen": "2026-08-04",
+      "observed": "2026-07-20",
+      "origin": "inbox",
+      "repo": "",
+      "signals": {
+        "attention_verdict": null,
+        "inbox_id": "research-brain-adrs-mcp-cli-surface-md",
+        "kind": "research",
+        "priority": "normal",
+        "route": "deepdive wiki/brain/adrs/mcp-cli-surface.md, snapshot findings to sources/research/, earn the confidence bump"
+      },
+      "source": "wiki/brain/adrs/mcp-cli-surface.md",
+      "status": "dismissed",
+      "summary": "brain/adrs/mcp-cli-surface.md: confidence:medium but 6 pages link to it \u2014 deepen with cited research",
+      "tier": "untriaged",
+      "why": ""
+    },
+    {
+      "category": "",
+      "command": "",
+      "first_seen": "2026-08-04",
+      "id": "inbox-research-brain-adrs-per-agent-identity-md",
+      "last_seen": "2026-08-04",
+      "observed": "2026-07-21",
+      "origin": "inbox",
+      "repo": "",
+      "signals": {
+        "attention_verdict": null,
+        "inbox_id": "research-brain-adrs-per-agent-identity-md",
+        "kind": "research",
+        "priority": "normal",
+        "route": "deepdive wiki/brain/adrs/per-agent-identity.md, snapshot findings to sources/research/, earn the confidence bump"
+      },
+      "source": "wiki/brain/adrs/per-agent-identity.md",
+      "status": "new",
+      "summary": "brain/adrs/per-agent-identity.md: confidence:medium but 6 pages link to it \u2014 deepen with cited research",
+      "tier": "untriaged",
+      "why": ""
+    },
+    {
+      "category": "upkeep",
+      "command": "/tend inbox-research-brain-state-md",
+      "components": {
+        "confidence": 0.8,
+        "impact": 3,
+        "urgency": 1,
+        "value": 3,
+        "weight": 0.8
+      },
+      "first_seen": "2026-08-04",
+      "id": "inbox-research-brain-state-md",
+      "last_seen": "2026-08-04",
+      "observed": "2026-07-17",
+      "origin": "inbox",
+      "repo": "",
+      "score": 2.4,
+      "signals": {
+        "attention_verdict": null,
+        "inbox_id": "research-brain-state-md",
+        "kind": "research",
+        "priority": "normal",
+        "route": "deepdive wiki/brain/state.md, snapshot findings to sources/research/, earn the confidence bump"
+      },
+      "source": "wiki/brain/state.md",
+      "status": "active",
+      "summary": "brain/state.md: confidence:medium but 6 pages link to it \u2014 deepen with cited research",
+      "tier": "now",
+      "why": "6 pages depend on it and it is still medium-confidence"
+    }
+  ],
+  "channels": {
+    "datadog": {
+      "answered": false,
+      "reason": "no snapshots pulled yet"
+    },
+    "enola": {
+      "answered": false,
+      "reason": "no snapshots pulled yet"
+    },
+    "github": {
+      "answered": false,
+      "reason": "no snapshots pulled yet"
+    },
+    "langfuse": {
+      "answered": false,
+      "reason": "no snapshots pulled yet"
+    },
+    "notion": {
+      "answered": false,
+      "reason": "no snapshots pulled yet"
+    },
+    "slack": {
+      "answered": false,
+      "reason": "no snapshots pulled yet"
+    },
+    "structure": {
+      "answered": false,
+      "reason": "no snapshots pulled yet"
+    }
+  },
+  "refreshed": "2026-08-04"
+}

@@ -912,6 +912,7 @@ def cmd_views(_args) -> int:
     write_view("by-kind.md", "Index — by kind", by_kind)
     write_view("by-team.md", "Index — by team", by_team)
     write_view("by-repo.md", "Index — by repo", by_repo)
+    _render_attention_view(today)
     write_ai_suggestions_view(views_dir, entries, today)
     write_by_epic_view(views_dir, entries, today)
 
@@ -6313,6 +6314,513 @@ def _connector_langfuse_pull() -> int:
     return 0
 
 
+# --- attention board (0.4) — the ranked shortlist beside the inbox ------
+#
+# Contract per wiki/brain/adrs/attention-board.md. The board is a card
+# store of its own, beside the inbox: cards leave by being dismissed,
+# queue items leave by being done, and the two stores never merge. A
+# board that can only be emptied by doing everything on it is a second
+# backlog.
+#
+# The groom reads connector snapshots through a thin per-connector
+# reader, each emitting ONE candidate shape, with the inbox as the
+# universal fallback so a connector without a reader is shallow rather
+# than invisible. Readers normalise and nothing else — a reader that
+# grows scoring or categories has broken the containment the ADR names.
+#
+# Naming: `inbox judge --attention` is a different, older thing — a
+# per-item needs-operator verdict with its own grade calibration. The
+# board CONSUMES those verdicts as a scoring input; it does not replace
+# them.
+
+ATTENTION_DIR = WIKI / "_state" / "attention"
+ATTENTION_CARDS = ATTENTION_DIR / "cards.json"
+ATTENTION_TIERS = ("now", "next", "watch", "untriaged")
+ATTENTION_STATUSES = ("new", "active", "done", "dismissed", "gone")
+ATTENTION_EFFORTS = ("small", "medium", "large")
+ATTENTION_OFF_SURFACE = "off-surface"
+ATTENTION_DEFAULTS = {"now_tier_size": 5, "max_active": 25}
+
+
+def _attention_config() -> dict:
+    config_path = REPO / "brain.config.yml"
+    cfg = {}
+    if config_path.exists():
+        try:
+            cfg = (yaml.safe_load(config_path.read_text()) or {}).get(
+                "attention") or {}
+        except yaml.YAMLError:
+            cfg = {}
+    return {**ATTENTION_DEFAULTS, **cfg}
+
+
+def _attention_categories() -> dict[str, float]:
+    """Category name -> weight. Operator-declared; `off-surface` is
+    always available so signal outside the remit has somewhere honest
+    to go rather than being dropped."""
+    out: dict[str, float] = {}
+    for entry in _attention_config().get("categories") or []:
+        if isinstance(entry, dict) and entry.get("name"):
+            try:
+                out[str(entry["name"])] = float(entry.get("weight", 1.0))
+            except (TypeError, ValueError):
+                print(f"attention: category {entry['name']!r} has a "
+                      f"non-numeric weight; using 1.0", file=sys.stderr)
+                out[str(entry["name"])] = 1.0
+    out.setdefault(ATTENTION_OFF_SURFACE, 0.5)
+    return out
+
+
+def _attention_store() -> dict:
+    if not ATTENTION_CARDS.exists():
+        return {"cards": [], "channels": {}}
+    try:
+        store = json.loads(ATTENTION_CARDS.read_text())
+    except json.JSONDecodeError:
+        print("attention: cards.json unparseable; starting empty",
+              file=sys.stderr)
+        return {"cards": [], "channels": {}}
+    store.setdefault("cards", [])
+    store.setdefault("channels", {})
+    return store
+
+
+def _attention_write(store: dict) -> None:
+    ATTENTION_DIR.mkdir(parents=True, exist_ok=True)
+    ATTENTION_CARDS.write_text(
+        json.dumps(store, indent=2, sort_keys=True) + "\n")
+
+
+def _attention_slug(text: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    return slug[:80] or "item"
+
+
+def _attention_candidate(id: str, origin: str, summary: str, source: str,
+                         repo: str = "", observed: str = "",
+                         signals: dict | None = None) -> dict:
+    """The single shape every reader emits. Readers fill it in; nothing
+    downstream needs to know which connector produced it."""
+    return {
+        "id": id,
+        "origin": origin,
+        "summary": summary,
+        "source": source,
+        "repo": repo,
+        "observed": observed or today_utc().isoformat(),
+        "signals": signals or {},
+    }
+
+
+def _attention_snapshot_frontmatter(path: Path) -> dict:
+    """Every connector snapshot is written by _snapshot_write, so they
+    all carry title/connector/pulled plus per-connector extras. One
+    parser therefore serves every reader."""
+    try:
+        text = path.read_text()
+    except OSError:
+        return {}
+    if not text.startswith("---"):
+        return {}
+    end = text.find("\n---", 3)
+    if end == -1:
+        return {}
+    try:
+        return yaml.safe_load(text[3:end]) or {}
+    except yaml.YAMLError:
+        return {}
+
+
+def _attention_reader_generic(connector: str, path: Path, fm: dict) -> dict:
+    # Repo-relative where possible, but never at the cost of raising:
+    # one stray path must not take down the whole refresh.
+    try:
+        rel = path.relative_to(REPO).as_posix()
+    except ValueError:
+        rel = path.as_posix()
+    return _attention_candidate(
+        id=_attention_slug(f"{connector}-{path.stem}"),
+        origin=f"connector:{connector}",
+        summary=str(fm.get("title") or path.stem),
+        source=rel,
+        repo=str(fm.get("repo") or ""),
+        observed=str(fm.get("pulled") or ""),
+        signals={k: v for k, v in fm.items()
+                 if k not in ("title", "connector", "pulled")},
+    )
+
+
+def _attention_reader_github(connector: str, path: Path, fm: dict) -> dict:
+    cand = _attention_reader_generic(connector, path, fm)
+    slug = str(fm.get("repo") or "")
+    if slug:
+        cand["repo"] = slug
+        count = fm.get("count")
+        cand["summary"] = (f"{slug}: {cand['summary']}" if not
+                           cand["summary"].startswith(slug)
+                           else cand["summary"])
+        if count is not None:
+            cand["signals"]["count"] = count
+    return cand
+
+
+def _attention_reader_structure(connector: str, path: Path, fm: dict) -> dict:
+    cand = _attention_reader_generic(connector, path, fm)
+    cand["repo"] = str(fm.get("repo") or cand["repo"])
+    return cand
+
+
+# One reader per connector; anything without an entry falls through to
+# the generic reader, and anything the generic reader cannot make sense
+# of still reaches the board via its inbox item.
+ATTENTION_READERS = {
+    "github": _attention_reader_github,
+    "structure": _attention_reader_structure,
+}
+
+
+def _attention_connector_names() -> list[str]:
+    config_path = REPO / "brain.config.yml"
+    if not config_path.exists():
+        return []
+    try:
+        cfg = yaml.safe_load(config_path.read_text()) or {}
+    except yaml.YAMLError:
+        return []
+    return sorted((cfg.get("connectors") or {}).keys())
+
+
+def _attention_snapshot_candidates(days: int) -> tuple[list[dict], dict]:
+    """Read every configured connector's snapshots. Returns candidates
+    plus a per-channel record of what answered, so the briefing can say
+    'N of M answered' — 'nothing found' and 'nothing asked' must never
+    render alike."""
+    cutoff = today_utc() - dt.timedelta(days=days)
+    candidates, channels = [], {}
+    for connector in _attention_connector_names():
+        root = REPO / "sources" / connector
+        if not root.exists():
+            channels[connector] = {"answered": False,
+                                   "reason": "no snapshots pulled yet"}
+            continue
+        reader = ATTENTION_READERS.get(connector, _attention_reader_generic)
+        found = 0
+        for path in sorted(root.rglob("*.md")):
+            fm = _attention_snapshot_frontmatter(path)
+            if not fm:
+                continue
+            pulled = str(fm.get("pulled") or "")
+            try:
+                if dt.date.fromisoformat(pulled) < cutoff:
+                    continue
+            except ValueError:
+                continue
+            candidates.append(reader(connector, path, fm))
+            found += 1
+        channels[connector] = {"answered": True, "candidates": found} if found \
+            else {"answered": True, "candidates": 0,
+                  "reason": f"no snapshots newer than {cutoff.isoformat()}"}
+    return candidates, channels
+
+
+def _attention_inbox_candidates(covered: set[str]) -> list[dict]:
+    """The universal fallback. Every inbox item becomes a candidate,
+    except those produced by a connector whose reader already covered
+    the same ground — otherwise a connector with a reader would be
+    counted twice.
+
+    Tracked items only: the card store and its render are committed, so
+    a board built from untracked local state could never survive a
+    clean-room rebuild. Same rule the derived index already follows.
+    """
+    out = []
+    for item in _inbox_items(tracked_only=True):
+        producer = str(item.get("produced_by") or "")
+        connector = producer[:-5] if producer.endswith("-pull") else ""
+        if connector and connector in covered:
+            continue
+        out.append(_attention_candidate(
+            id=_attention_slug(f"inbox-{item['id']}"),
+            origin="inbox",
+            summary=str(item.get("summary") or item["id"]),
+            source=str(item.get("source") or ""),
+            observed=str(item.get("produced_at") or ""),
+            signals={"kind": item.get("kind"),
+                     "priority": item.get("priority"),
+                     "route": item.get("route"),
+                     "inbox_id": item["id"],
+                     # The older per-item verdict, consumed as a signal.
+                     "attention_verdict": item.get("attention")},
+        ))
+    return out
+
+
+def _attention_refresh(days: int) -> dict:
+    """Mechanical half: reconcile candidates into cards. Owns existence
+    and plumbing only — tier, category, why and score are the groom's
+    judgement and are never overwritten here."""
+    store = _attention_store()
+    by_id = {c["id"]: c for c in store["cards"]}
+    snap_cands, channels = _attention_snapshot_candidates(days)
+    covered = {c["origin"].split(":", 1)[1] for c in snap_cands
+               if c["origin"].startswith("connector:")}
+    candidates = snap_cands + _attention_inbox_candidates(covered)
+    seen = set()
+    today = today_utc().isoformat()
+
+    for cand in candidates:
+        seen.add(cand["id"])
+        existing = by_id.get(cand["id"])
+        if existing and existing.get("status") == "dismissed":
+            # A tombstone is a decision; the collector never resurrects.
+            existing["last_seen"] = today
+            continue
+        if existing:
+            existing.update({k: cand[k] for k in
+                             ("summary", "source", "repo", "signals")})
+            existing["last_seen"] = today
+            if existing.get("status") == "gone":
+                existing["status"] = "new"
+            continue
+        by_id[cand["id"]] = {
+            **cand,
+            "status": "new",
+            "tier": "untriaged",
+            "category": "",
+            "why": "",
+            "command": "",
+            "first_seen": today,
+            "last_seen": today,
+        }
+
+    for card in by_id.values():
+        if card["id"] not in seen and card.get("status") not in (
+                "dismissed", "done"):
+            card["status"] = "gone"
+
+    store["cards"] = sorted(by_id.values(), key=lambda c: c["id"])
+    store["channels"] = channels
+    store["refreshed"] = today
+    _attention_write(store)
+    return store
+
+
+def _attention_active(store: dict) -> list[dict]:
+    return [c for c in store["cards"]
+            if c.get("status") in ("new", "active")]
+
+
+def _attention_channel_line(store: dict) -> str:
+    channels = store.get("channels") or {}
+    answered = sum(1 for v in channels.values() if v.get("answered"))
+    return f"{answered} of {len(channels)} connector(s) answered"
+
+
+
+def _render_attention_view(today: str) -> None:
+    """Render the board so agents and humans read the same thing.
+
+    Always writes, even with an empty board: a missing file and an
+    empty board would be indistinguishable, and the whole point of the
+    channel line is that "nothing found" never reads like "nothing
+    asked".
+    """
+    store = _attention_store()
+    cards = _attention_active(store)
+    config = _attention_config()
+    lines = [
+        "---",
+        "title: Attention — what deserves the day",
+        "kind: meta",
+        "status: living",
+        f"updated: {today}",
+        "confidence: high",
+        "sources:",
+        "  - tools/brain.py",
+        "---",
+        "",
+        "# Attention — what deserves the day",
+        "",
+        "Auto-generated by `python tools/brain.py views`. Do not edit by "
+        "hand — the store is `wiki/_state/attention/cards.json`, groomed "
+        "by `/attention`.",
+        "",
+        f"*{_attention_channel_line(store)}. Last refreshed: "
+        f"{store.get('refreshed') or 'never'}.*",
+        "",
+    ]
+    if not cards:
+        lines += [
+            "The board is empty. That is a statement about the board, not "
+            "about the world — check the connector line above before "
+            "reading it as calm.",
+            "",
+        ]
+    for tier in ATTENTION_TIERS:
+        in_tier = sorted((c for c in cards if c.get("tier") == tier),
+                         key=lambda c: -float(c.get("score") or 0))
+        if not in_tier:
+            continue
+        lines.append(f"## {tier}")
+        if tier == "now":
+            lines.append("")
+            lines.append(f"Capped at {config['now_tier_size']}. A sixth "
+                         f"item means demoting one, never widening the "
+                         f"tier.")
+        lines.append("")
+        for card in in_tier:
+            bits = [f"**{card['id']}**"]
+            if card.get("category"):
+                bits.append(f"`{card['category']}`")
+            if card.get("score") is not None:
+                bits.append(f"score {card['score']}")
+            lines.append(f"- {' — '.join(bits)}")
+            lines.append(f"  - {card.get('why') or card['summary']}")
+            if card.get("command"):
+                lines.append(f"  - run: `{card['command']}`")
+            if card.get("source"):
+                lines.append(f"  - evidence: `{card['source']}`")
+            if card.get("override_reason"):
+                lines.append(f"  - moved off its ranked position: "
+                             f"{card['override_reason']}")
+        lines.append("")
+    untriaged = [c for c in cards if c.get("tier") == "untriaged"]
+    if untriaged:
+        lines.append(f"*{len(untriaged)} card(s) untriaged — a groomed "
+                     f"board has none.*")
+        lines.append("")
+    (WIKI / "_views" / "attention.md").write_text("\n".join(lines))
+
+def cmd_attention(args) -> int:
+    op = args.op
+    if op == "refresh":
+        store = _attention_refresh(args.days)
+        active = _attention_active(store)
+        untriaged = sum(1 for c in active if c.get("tier") == "untriaged")
+        print(f"attention: {len(active)} active card(s), {untriaged} "
+              f"untriaged — {_attention_channel_line(store)}")
+        cap = _attention_config()["max_active"]
+        if len(active) > cap:
+            print(f"attention: {len(active)} active exceeds max_active "
+                  f"{cap} — demote or dismiss; a growing board is a "
+                  f"failing board", file=sys.stderr)
+        return 0
+
+    store = _attention_store()
+
+    if op == "list":
+        cards = store["cards"] if args.all else _attention_active(store)
+        if args.tier:
+            cards = [c for c in cards if c.get("tier") == args.tier]
+        if args.json:
+            print(json.dumps(cards, indent=2))
+            return 0
+        if not cards:
+            print(f"attention: no cards — {_attention_channel_line(store)}")
+            return 0
+        order = {t: i for i, t in enumerate(ATTENTION_TIERS)}
+        for card in sorted(cards, key=lambda c: (
+                order.get(c.get("tier", "untriaged"), 9),
+                -float(c.get("score") or 0))):
+            score = card.get("score")
+            score_text = f" [{score}]" if score is not None else ""
+            print(f"{card.get('tier', '?'):9} {card['id']}{score_text}")
+            print(f"          {card.get('why') or card['summary']}")
+            if card.get("command"):
+                print(f"          $ {card['command']}")
+        print(f"-- {_attention_channel_line(store)}")
+        return 0
+
+    if op == "summary":
+        active = _attention_active(store)
+        now = sum(1 for c in active if c.get("tier") == "now")
+        print(f"attention: {now} now / {len(active)} active — "
+              f"{_attention_channel_line(store)}")
+        return 0
+
+    cards = {c["id"]: c for c in store["cards"]}
+
+    if op == "set":
+        card = cards.get(args.id)
+        if not card:
+            print(f"attention: no card {args.id!r}", file=sys.stderr)
+            return 1
+        categories = _attention_categories()
+        if args.category and args.category not in categories:
+            print(f"attention: category must be one of "
+                  f"{sorted(categories)}", file=sys.stderr)
+            return 1
+        if args.tier:
+            card["tier"] = args.tier
+        if args.category:
+            card["category"] = args.category
+        if args.why:
+            card["why"] = args.why
+        if args.command:
+            card["command"] = args.command
+        if args.score is not None:
+            card["score"] = args.score
+        if args.components:
+            try:
+                card["components"] = json.loads(args.components)
+            except json.JSONDecodeError:
+                print("attention: --components must be JSON",
+                      file=sys.stderr)
+                return 1
+        if args.override_reason:
+            card["override_reason"] = args.override_reason
+        if card.get("status") == "new":
+            card["status"] = "active"
+        # A rank nobody can explain is a rank nobody will trust.
+        if card.get("score") is not None and not card.get("components"):
+            print(f"attention: {args.id} has a score but no components — "
+                  f"store what produced it", file=sys.stderr)
+        _attention_write(store)
+        print(f"attention: {args.id} updated")
+        return 0
+
+    if op in ("dismiss", "done"):
+        card = cards.get(args.id)
+        if not card:
+            print(f"attention: no card {args.id!r}", file=sys.stderr)
+            return 1
+        if op == "dismiss" and not args.reason:
+            print("attention: dismiss needs --reason (a tombstone is a "
+                  "decision)", file=sys.stderr)
+            return 1
+        card["status"] = "dismissed" if op == "dismiss" else "done"
+        card["closed_at"] = today_utc().isoformat()
+        if args.reason:
+            card["closed_reason"] = args.reason
+        _attention_write(store)
+        print(f"attention: {args.id} {card['status']}")
+        return 0
+
+    if op == "prune":
+        today = today_utc()
+        kept, dropped = [], 0
+        for card in store["cards"]:
+            status = card.get("status")
+            stamp = card.get("closed_at") or card.get("last_seen") or ""
+            try:
+                age = (today - dt.date.fromisoformat(stamp)).days
+            except ValueError:
+                age = 0
+            if status in ("done", "gone") and age > 7:
+                dropped += 1
+                continue
+            if status == "dismissed" and age > 90:
+                dropped += 1
+                continue
+            kept.append(card)
+        store["cards"] = kept
+        _attention_write(store)
+        print(f"attention: pruned {dropped} card(s), {len(kept)} remain")
+        return 0
+
+    return 1
+
+
 # --- enola architecture graph (binary-backed substrate) --------------
 
 ENOLA_CONFIG = REPO / "mcp-arch.yaml"
@@ -8202,6 +8710,7 @@ KERNEL_COPY_PATHS = [
     # the brain team's feature backlog.
     "wiki/brain/adrs",
     "wiki/brain/authoring-adrs-and-prds.md",
+    "wiki/brain/attention-relevance-model.md",
     "wiki/org/methodology",
     "wiki/org/operator-lessons.md",
 ]
@@ -8296,6 +8805,7 @@ def _init_full(target: Path, org: str) -> int:
          "records.\n\n"
          "- [State](state.md)\n"
          "- [Authoring ADRs and PRDs](authoring-adrs-and-prds.md)\n"
+         "- [Attention relevance model](attention-relevance-model.md)\n"
          "\n## ADRs (kernel trail)\n\n"
          + "\n".join(adr_lines)
          + "\n\n## PRDs\n\n*(none yet)*")
@@ -9905,6 +10415,49 @@ def main() -> int:
     en_impact.add_argument("symbol")
     en_impact.add_argument("--limit", type=int, default=20)
     ap_en.set_defaults(func=cmd_enola)
+
+    ap_at = sub.add_parser(
+        "attention",
+        help="the ranked shortlist at wiki/_state/attention/ — refresh "
+             "collects candidates, the groom judges them")
+    at_sub = ap_at.add_subparsers(dest="op", required=True)
+    at_ref = at_sub.add_parser(
+        "refresh", help="mechanical pass: reconcile candidates from "
+                        "connector snapshots + the inbox into cards")
+    at_ref.add_argument("--days", type=int, default=7,
+                        help="how far back to read snapshots")
+    at_list = at_sub.add_parser("list", help="cards, tier-ordered")
+    at_list.add_argument("--json", action="store_true")
+    at_list.add_argument("--all", action="store_true",
+                         help="include done / dismissed / gone")
+    at_list.add_argument("--tier", choices=ATTENTION_TIERS)
+    at_sub.add_parser("summary",
+                      help="one-line count for session-start surfacing")
+    at_set = at_sub.add_parser(
+        "set", help="the groom's judgement: tier, category, why, command, "
+                    "score and the components behind it")
+    at_set.add_argument("id")
+    at_set.add_argument("--tier", choices=ATTENTION_TIERS)
+    at_set.add_argument("--category",
+                        help="one of the categories in brain.config.yml")
+    at_set.add_argument("--why", help="one line naming what changed")
+    at_set.add_argument("--command", help="copy-exact runnable command")
+    at_set.add_argument("--score", type=float)
+    at_set.add_argument("--components",
+                        help="JSON of the scoring components behind --score")
+    at_set.add_argument("--override-reason", dest="override_reason",
+                        help="required when judgement moves a card off its "
+                             "ranked position")
+    at_dis = at_sub.add_parser(
+        "dismiss", help="tombstone a card; the collector never resurrects it")
+    at_dis.add_argument("id")
+    at_dis.add_argument("--reason", required=True)
+    at_done = at_sub.add_parser("done", help="close a card that was acted on")
+    at_done.add_argument("id")
+    at_done.add_argument("--reason", default="")
+    at_sub.add_parser(
+        "prune", help="drop done/gone past 7 days, dismissed past 90")
+    ap_at.set_defaults(func=cmd_attention)
 
     ap_st = sub.add_parser("structure",
                           help="findings from the structure connector's "
