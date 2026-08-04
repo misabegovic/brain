@@ -15,6 +15,7 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 
 ## Recent decisions
 
+- [The attention board is a ranked, capped store beside the inbox: per-connector readers behind one card shape, weights in config and rationale on a page](/brain/adrs/attention-board/) — accepted · updated 2026-08-04
 - [Two tiers over the same repos: an always-available in-kernel structure connector with findings and a verdict ledger, plus an optional binary-backed graph](/brain/adrs/structure-findings-and-verdict-ledger/) — accepted · updated 2026-08-04
 - [Give recurring tend-queue items an operator acknowledgement path](/brain/adrs/acknowledge-recurring-tend-items/) — accepted · updated 2026-07-12
 - [The briefing is a build-time derivation; summaries live in frontmatter; attention verdicts live on inbox items](/brain/adrs/human-legible-presentation-layer/) — accepted · updated 2026-07-12
@@ -24,7 +25,6 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 - [Uniform loopback Host-header guard across both HTTP serving surfaces](/brain/adrs/sam-uniform-loopback-host-guard/) — accepted · updated 2026-07-12
 - [Connectors are pull-only snapshot-writers: immutable dedup-keyed files under sources/, cursors in state, inbox items out — never a wiki write](/brain/adrs/connector-snapshot-contract/) — accepted · updated 2026-07-10
 - [Home page is the wiki index as an agent-maintained dashboard](/brain/adrs/home-content-shape/) — accepted · updated 2026-07-10
-- [Instances are born by manifest: init --full copies the mechanism and the kernel's decision trail, scaffolds the rest fresh](/brain/adrs/kernel-manifest-instancing/) — accepted · updated 2026-07-10
 
 ## Research queue (deepening picks)
 

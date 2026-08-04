@@ -68,6 +68,26 @@
       "tokens": 1547
     },
     {
+      "path": "brain/adrs/attention-board.md",
+      "title": "The attention board is a ranked, capped store beside the inbox: per-connector readers behind one card shape, weights in config and rationale on a page",
+      "kind": "decision",
+      "status": "accepted",
+      "updated": "2026-08-04",
+      "confidence": "low",
+      "summary": "A daily attention board gets its own card store beside the inbox \u2014 cards are dismissed, queue items are done. The groom reads connector snapshots directly through a thin per-connector reader, each emitting one uniform candidate shape, with the inbox as the universal fallback so a connector without a reader is degraded rather than invisible. Category weights live in brain.config.yml; the reasoning and its dated revisions live on a wiki page. An unconfigured shell still produces a board from internal producers and names how many connectors answered.\n",
+      "depends_on": [
+        "brain/adrs/connector-snapshot-contract.md",
+        "brain/adrs/queue-and-tend-inbox.md"
+      ],
+      "sources": [
+        "../prds/attention-board.md",
+        "../../../brain.config.yml",
+        "../../../brain-schedule.yml",
+        ".claude/skills/tend/SKILL.md"
+      ],
+      "tokens": 2136
+    },
+    {
       "path": "brain/adrs/chat-print-mode-bridge.md",
       "title": "The chat is a per-harness print-mode bridge: conversation as the interface, terminal demoted to a toggle, bare `brain` opens the app",
       "kind": "decision",
@@ -95,7 +115,10 @@
         "../../../brain-schedule.yml",
         ".claude/skills/tend/SKILL.md"
       ],
-      "tokens": 1211
+      "tokens": 1211,
+      "consumed_by": [
+        "brain/adrs/attention-board.md"
+      ]
     },
     {
       "path": "brain/adrs/home-content-shape.md",
@@ -319,6 +342,7 @@
       ],
       "tokens": 1685,
       "consumed_by": [
+        "brain/adrs/attention-board.md",
         "brain/prds/attention-board.md"
       ]
     },
@@ -604,7 +628,7 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 3137,
+      "tokens": 3256,
       "affected_by": [
         "brain/prds/attention-board.md"
       ]
@@ -735,7 +759,7 @@
       "path": "brain/prds/attention-board.md",
       "title": "An attention board \u2014 what deserves the operator's day, not what is left to do",
       "kind": "initiative",
-      "status": "draft",
+      "status": "living",
       "updated": "2026-08-04",
       "team": "brain",
       "division": "(inferred)",
@@ -743,7 +767,8 @@
         "brain"
       ],
       "appetite": "medium",
-      "confidence": "low",
+      "confidence": "medium",
+      "summary": "The kernel collects and queues but has never triaged. A daily /attention pass produces a capped, ranked board of what deserves the operator's day, stored beside the inbox rather than inside it \u2014 cards are dismissed, queue items are done. Channels and categories come from brain.config.yml so a fresh shell gets an honest board that fills in as connectors are configured.",
       "affects": [
         "brain"
       ],
