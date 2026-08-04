@@ -373,3 +373,6 @@
    diff: 12 files, +303/-12
    restricted-paths: false
 2026-08-04 build — Phase 3: attention board shipped — brain.py attention (refresh/list/set/dismiss/done/prune), per-connector readers with inbox fallback, config-declared categories, relevance-model page, skill, view render, 21 tests (attention-board)
+2026-08-04 merge — PR #44: Phase 3: build the attention board
+   diff: 14 files, +1264/-1
+   restricted-paths: true
