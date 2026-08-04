@@ -18,6 +18,22 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-08-04** — **The sweep was clean; the backlog behind it was
+  three weeks deep.** `/sync` found nothing wrong — 182 sources across
+  70 pages with none broken, validate ok, and zero findings across all
+  fourteen reflection detectors. What it did find is that the scheduled
+  ops had been producing output nobody committed: auto-refresh cluster
+  scans stop at **2026-07-14 in git** and run to **2026-08-04 on
+  disk**, and neither `wiki/_state/schedule.json` nor the inbox item
+  set had ever been tracked at all. Twenty overlap scans, the schedule
+  state, the inbox set and today's snapshot now land. Tracking the
+  inbox items matters past tidiness: committed views are only
+  deterministic when the item set is tracked, which is exactly what
+  `_inbox_items(tracked_only=True)` assumes — so an untracked inbox
+  makes the views gate non-reproducible between machines. The shape of
+  this is familiar: an operation that runs, succeeds, writes its output
+  and is never landed leaves no red anywhere, which is why it ran for
+  three weeks. LOCAL_FIRST — local until promoted.
 - **2026-08-04** — **The graph tier reaches parity with its own tool,
   and a check that could not fail is retired.** `baseline`, `check`,
   `coverage`, `explain`, `doctor` and a `history` family

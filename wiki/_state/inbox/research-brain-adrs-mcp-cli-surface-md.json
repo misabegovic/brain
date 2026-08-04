@@ -1,0 +1,10 @@
+{
+  "id": "research-brain-adrs-mcp-cli-surface-md",
+  "kind": "research",
+  "summary": "brain/adrs/mcp-cli-surface.md: confidence:medium but 6 pages link to it \u2014 deepen with cited research",
+  "route": "deepdive wiki/brain/adrs/mcp-cli-surface.md, snapshot findings to sources/research/, earn the confidence bump",
+  "priority": "normal",
+  "source": "wiki/brain/adrs/mcp-cli-surface.md",
+  "produced_by": "inbox-refresh",
+  "produced_at": "2026-07-20"
+}
