@@ -218,4 +218,5 @@ content** — and what is the minimum a brand-new shell must have
 configured before `/attention` produces something worth reading
 rather than an empty page?
 
-The corresponding ADR will land at `wiki/brain/adrs/attention-board.md`.
+The corresponding ADR lands on the brain-scope `adrs/` shelf under
+this PRD's own slug, once Phase 1 is approved.

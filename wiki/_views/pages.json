@@ -759,7 +759,7 @@
         "~/projects/tt/brain/wiki/brain/adrs/attention-dashboard.md",
         "~/projects/tt/brain/wiki/brain/attention-relevance-model.md"
       ],
-      "tokens": 2169
+      "tokens": 2183
     },
     {
       "path": "brain/prds/attention-calibration-operator-surface.md",
