@@ -317,7 +317,10 @@
         ".claude/skills/tend/SKILL.md",
         "../../../brain-schedule.yml"
       ],
-      "tokens": 1685
+      "tokens": 1685,
+      "consumed_by": [
+        "brain/prds/attention-board.md"
+      ]
     },
     {
       "path": "brain/adrs/sam-uniform-loopback-host-guard.md",
@@ -601,7 +604,10 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 3017
+      "tokens": 3137,
+      "affected_by": [
+        "brain/prds/attention-board.md"
+      ]
     },
     {
       "path": "brain/pitches/chat-first-app.md",
@@ -724,6 +730,36 @@
         "../../org/operator-lessons.md"
       ],
       "tokens": 821
+    },
+    {
+      "path": "brain/prds/attention-board.md",
+      "title": "An attention board \u2014 what deserves the operator's day, not what is left to do",
+      "kind": "initiative",
+      "status": "draft",
+      "updated": "2026-08-04",
+      "team": "brain",
+      "division": "(inferred)",
+      "repos": [
+        "brain"
+      ],
+      "appetite": "medium",
+      "confidence": "low",
+      "affects": [
+        "brain"
+      ],
+      "depends_on": [
+        "brain/adrs/queue-and-tend-inbox.md"
+      ],
+      "sources": [
+        "~/projects/brain/brain.config.yml",
+        "~/projects/brain/brain-schedule.yml",
+        "~/projects/brain/.claude/skills/tend/SKILL.md",
+        "~/projects/brain/wiki/brain/adrs/queue-and-tend-inbox.md",
+        "~/projects/tt/brain/.claude/skills/attention/SKILL.md",
+        "~/projects/tt/brain/wiki/brain/adrs/attention-dashboard.md",
+        "~/projects/tt/brain/wiki/brain/attention-relevance-model.md"
+      ],
+      "tokens": 2183
     },
     {
       "path": "brain/prds/attention-calibration-operator-surface.md",
