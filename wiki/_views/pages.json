@@ -576,6 +576,20 @@
       "tokens": 1817
     },
     {
+      "path": "brain/attention-relevance-model.md",
+      "title": "Attention relevance model \u2014 how the board decides what deserves a day",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-08-04",
+      "confidence": "low",
+      "summary": "The metric the attention board ranks by: four components scored per card, multiplied by a category weight declared in brain.config.yml. This page owns the reasoning and its dated revisions; the numbers live in configuration so a bad weight is a config error rather than a silent scoring bug. The shipped weights are a starting position, not a finding.",
+      "sources": [
+        "../../brain.config.yml",
+        ".claude/skills/attention/SKILL.md"
+      ],
+      "tokens": 935
+    },
+    {
       "path": "brain/authoring-adrs-and-prds.md",
       "title": "Authoring ADRs and PRDs",
       "kind": "meta",

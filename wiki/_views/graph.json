@@ -1417,6 +1417,11 @@
     },
     {
       "source": "index.md",
+      "target": "brain/attention-relevance-model.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
       "target": "brain/epics/event-driven-agent-triggers.md",
       "provenance": "extracted"
     },

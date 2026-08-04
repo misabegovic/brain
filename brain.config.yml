@@ -64,3 +64,50 @@ connectors:
     # automatically; list extra repo paths (absolute, or names under
     # $BRAIN_PROJECTS_ROOT) here. Empty + no active repos = off.
     repos: []
+
+# Attention board — the daily ranked shortlist of what deserves your
+# day. Per wiki/brain/adrs/attention-board.md. The kernel ships the
+# mechanism; the categories and their weights are yours. Nothing here
+# needs credentials: the board reads what the connectors above already
+# pulled, plus the inbox.
+attention:
+  # How many cards may sit in the top tier. The board is a shortlist,
+  # not a backlog — if a sixth item genuinely belongs, the honest move
+  # is to demote one and say so, never to widen the tier.
+  now_tier_size: 5
+
+  # Hard ceiling on active cards. Past this the groom must demote or
+  # dismiss; a growing board is a failing board.
+  max_active: 25
+
+  # Categories are how two unlike items stay comparable: the weight
+  # multiplies the card's score, and the render groups by category.
+  # Every card takes exactly one — an item spanning categories takes
+  # the highest-weighted one it touches, never a blend.
+  #
+  # The defaults below are deliberately generic, chosen to discriminate
+  # in any organisation rather than to describe one. Replace them with
+  # your own remit; keep `off-surface` so signal outside your scope has
+  # somewhere honest to go rather than being silently dropped.
+  categories:
+    - name: breakage
+      weight: 1.5
+      # Something is failing now — an incident, a red pipeline, errors
+      # in production. Time-sensitive by nature.
+    - name: commitment
+      weight: 1.3
+      # Work already agreed to: a cycle item, an open review, a promise
+      # made to someone. Not urgent by itself, but owed.
+    - name: signal
+      weight: 1.1
+      # New information that may change a decision — research, a
+      # competitor move, customer feedback, a contradicted assumption.
+    - name: upkeep
+      weight: 0.8
+      # The brain's own hygiene: half-life crossings, link health,
+      # drift. Real work, rarely worth displacing a plan for.
+    - name: off-surface
+      weight: 0.5
+      # Outside this brain's remit. Kept visible so that a board full
+      # of off-surface cards tells you your real work is not reaching
+      # the channels — which is itself worth knowing.

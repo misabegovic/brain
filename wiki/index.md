@@ -656,5 +656,6 @@ start filling in as the slash-command surface runs.
 ## Where to find things
 
 - [Brain — meta level](brain/index.md)
+- [Attention relevance model](brain/attention-relevance-model.md) — the metric `/attention` ranks by; weights live in `brain.config.yml`, the reasoning lives here
 - [Org — methodology + cross-product](org/index.md)
 - Per-repo shelves arrive as you add them: `wiki/<repo>/index.md`
