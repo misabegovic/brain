@@ -81,6 +81,16 @@
       "provenance": "inferred"
     },
     {
+      "source": "brain/adrs/attention-board.md",
+      "target": "brain/adrs/connector-snapshot-contract.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/adrs/attention-board.md",
+      "target": "brain/adrs/queue-and-tend-inbox.md",
+      "provenance": "extracted"
+    },
+    {
       "source": "brain/adrs/connector-snapshot-contract.md",
       "target": "brain/adrs/queue-and-tend-inbox.md",
       "provenance": "extracted"
@@ -633,6 +643,11 @@
     {
       "source": "brain/index.md",
       "target": "brain/adrs/acknowledge-recurring-tend-items.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
+      "target": "brain/adrs/attention-board.md",
       "provenance": "extracted"
     },
     {
@@ -1322,6 +1337,11 @@
     },
     {
       "source": "index.md",
+      "target": "brain/adrs/attention-board.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "index.md",
       "target": "brain/adrs/connector-snapshot-contract.md",
       "provenance": "extracted"
     },
@@ -1532,12 +1552,12 @@
     }
   ],
   "ambiguous_nodes": [
+    "brain/adrs/attention-board.md",
     "brain/ai-suggestions/prds/conversation-surface-over-inbox.md",
     "brain/ai-suggestions/prds/deterministic-structure-connector.md",
     "brain/ai-suggestions/prds/edge-provenance-tags.md",
     "brain/epics/event-driven-agent-triggers.md",
     "brain/pitches/event-driven-agent-triggers.md",
-    "brain/prds/attention-board.md",
     "brain/topics/event-driven-multi-agent.md",
     "brain/topics/market-readiness-gaps.md",
     "brain/topics/three-ideas-compose.md"

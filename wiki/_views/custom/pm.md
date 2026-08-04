@@ -15,7 +15,7 @@ Committed work, proposals awaiting a bet, patterns from feedback, and what's que
 
 ## Open initiatives
 
-No committed work in flight — a pitch on the briefing graduates here on a bet.
+- [An attention board — what deserves the operator's day, not what is left to do](/brain/prds/attention-board/) — living · updated 2026-08-04
 
 ## Pitches awaiting a bet
 
