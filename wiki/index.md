@@ -18,6 +18,33 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-08-04** — **The kernel collects and it queues; it has never
+  triaged.** Phase 1 PRD for an [attention board](brain/prds/attention-board.md)
+  — a daily capped, ranked briefing of what deserves the operator's
+  day. The gap is precise: six `*-pull` connectors already snapshot
+  GitHub, Notion, Slack, Datadog, Langfuse and code shape, and
+  `wiki/_state/inbox/` already queues synthesis work for `/tend`. But
+  **a queue cannot say which of forty items is worth displacing today's
+  plan for** — its honest end state is empty, which makes it a good
+  record of what is outstanding and a poor answer to what matters now.
+  `/tend`'s own budget grammar (`/tend 3`, `/tend 15m`) is the tell:
+  operators already ask for a subset and the tool can only give them
+  the first N. The board therefore gets **its own store beside the
+  inbox, not inside it** — cards leave by being dismissed, queue items
+  leave by being done, and merging the two would trade away the
+  no-backlog invariant silently. A sibling brain has run this shape
+  daily long enough to learn what breaks, and the lessons that transfer
+  are the negative ones (a board that accepts everything becomes a
+  second backlog; an unexplained rank is untrustworthy; a channel that
+  fails quietly makes the board lie by omission). What does not
+  transfer is that brain's channel list, categories and weights — one
+  team's remit at one company — so channels and categories come from
+  `brain.config.yml`, whose connector registry is already the
+  org-agnostic abstraction this needs. Also caught in pre-flight:
+  `attention-calibration-operator-surface` is **not** prior art despite
+  the name — it is superseded and about verdict grading, a false
+  positive for anyone reading the shelf. Appetite medium; owner
+  `viktor-daily-operator`. Phase 1 — awaiting approval before the ADR.
 - **2026-08-04** — **The sweep was clean; the backlog behind it was
   three weeks deep.** `/sync` found nothing wrong — 182 sources across
   70 pages with none broken, validate ok, and zero findings across all

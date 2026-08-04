@@ -364,3 +364,4 @@
 2026-08-04 merge — PR #40: Land three weeks of unclaimed scheduled output
    diff: 29 files, +1301/-2
    restricted-paths: false
+2026-08-04 shape — Phase 1 PRD: attention board for the kernel — capped ranked triage beside the inbox, channels/categories from brain.config.yml (attention-board)
