@@ -344,3 +344,18 @@
    diff: 2 files, +60/-16
    restricted-paths: false
    by: claude (fable 5)
+2026-08-02 merge — PR #34: Structure findings, a verdict ledger, and the hygiene the sibling brain earned
+   diff: 25 files, +1866/-37
+   restricted-paths: true
+2026-08-02 merge — PR #35: Wire the code substrates into the twelve skills that make judgments
+   diff: 16 files, +215/-5
+   restricted-paths: true
+2026-08-02 merge — PR #36: Fix two defects the first real run against a repo exposed
+   diff: 2 files, +17/-4
+   restricted-paths: true
+2026-08-02 merge — PR #37: Deterministic committed views, the first judged finding, and symbol-blindness tested
+   diff: 9 files, +696/-21
+   restricted-paths: true
+2026-08-04 merge — PR #38: Adopt the full enola surface and fix the /sync ordering bug
+   diff: 24 files, +439/-90
+   restricted-paths: true
