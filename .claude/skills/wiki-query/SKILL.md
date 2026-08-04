@@ -46,6 +46,8 @@ active workflow yet, so a miss is "not in the snapshot," not "doesn't exist."
 change X"*, *"how coupled is X"* — the substrate answers these
 deterministically where the wiki answers them from synthesis. `brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass.
 
+*"When did X appear"*, *"which change introduced this cycle"* — these are **temporal**, and a snapshot cannot answer them however good it is. `brain.py enola history blame <name-or-path> <repo>` reports when something entered the architecture and when it left; `history log` walks the recorded revisions and `history show <rev>` expands one. Reach for these before `git log -S`, which reconstructs the same answer from text and misses the structural half. Experimental upstream — treat the output as a lead to confirm, not as a citable fact.
+
 Prefer the substrate *first* for these and the wiki for the narrative
 around the answer: the wiki says why a thing exists, the substrate says
 what actually touches it, and where they disagree the disagreement is

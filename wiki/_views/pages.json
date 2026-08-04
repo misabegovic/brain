@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-02",
+  "generated": "2026-08-04",
   "home_sections": [
     {
       "anchor": "what-changed",
@@ -404,7 +404,7 @@
       "title": "Two tiers over the same repos: an always-available in-kernel structure connector with findings and a verdict ledger, plus an optional binary-backed graph",
       "kind": "decision",
       "status": "accepted",
-      "updated": "2026-08-02",
+      "updated": "2026-08-04",
       "confidence": "medium",
       "summary": "The structure connector extracted facts and computed no findings. It gains a deterministic findings layer (oversized-package, god-file, symbol-blindness) and a verdict ledger with no pending state, both computed in-kernel. The initial rejection of an external graph binary was overturned by the operator the same day: enola now ships as an optional second tier over the same repos, with the in-kernel connector as the always-available floor.\n",
       "sources": [
@@ -413,7 +413,7 @@
         "../../../tools/brain.py",
         "../../../brain.config.yml"
       ],
-      "tokens": 2309
+      "tokens": 3049
     },
     {
       "path": "brain/adrs/successor-ssg-for-ui.md",

@@ -6992,8 +6992,101 @@ def cmd_enola(args) -> int:
                  or "none"), file=sys.stderr)
         return 0
 
+    if op in ("baseline", "check", "coverage", "doctor", "explain",
+              "history"):
+        return _enola_passthrough(op, args)
+
     print(f"unknown enola op: {op!r}", file=sys.stderr)
     return 1
+
+
+def _enola_target(args) -> str:
+    """Repo path for a per-repo op, or the cluster config for a whole-graph one.
+
+    enola resolves a directory as a repository and a file as a config, so
+    passing the generated cluster config is how an op speaks for every
+    configured repo rather than for whichever directory it started in.
+    """
+    repo = getattr(args, "repo", None)
+    if not repo:
+        return str(ENOLA_CONFIG)
+    for path in _enola_repos():
+        if path.name == repo:
+            return str(path)
+    return repo
+
+
+def _enola_repo_target(args) -> str:
+    """Repo path for ops that only mean something inside one checkout.
+
+    `doctor` asks whether this repository's session hooks fired, which a
+    cluster config cannot answer — it rejects a config path outright.
+    """
+    repo = getattr(args, "repo", None)
+    if repo:
+        for path in _enola_repos():
+            if path.name == repo:
+                return str(path)
+        return repo
+    return str(REPO)
+
+
+def _enola_passthrough(op: str, args) -> int:
+    """Run an enola subcommand and relay it, degrading rather than failing.
+
+    The graph is the ceiling, never the floor: a shell with no binary, no
+    configured repos, or no generated cluster config still works, and the
+    in-kernel structure connector answers the questions that must always
+    be answerable. So a missing binary or config is a named skip at exit
+    0, and the tool's own exit code is reported in words rather than
+    propagated — `check` grades a change without any caller being able to
+    treat the graph as a gate.
+    """
+    binary = _enola_bin()
+    if binary is None:
+        print(f"enola: skipped ({op}) — binary not installed on this machine")
+        return 0
+    # `doctor` asks about this checkout's hooks, which is answerable with
+    # no cluster and no configured repos at all — a fresh shell wanting to
+    # know whether its own session hooks fire is exactly the case for it.
+    if (op != "doctor" and not ENOLA_CONFIG.exists()
+            and not getattr(args, "repo", None)):
+        print(f"enola: skipped ({op}) — no cluster config; "
+              "run `brain.py enola generate` once repos are configured")
+        return 0
+
+    argv = [binary]
+    if op == "history":
+        sub = getattr(args, "history_op", None) or "log"
+        argv.append(sub)
+        pattern = getattr(args, "pattern", None)
+        if sub in ("blame", "show", "diff") and pattern:
+            argv.append(pattern)
+    elif op == "explain":
+        argv.append("--explain")
+    elif op == "baseline":
+        argv += ["baseline", getattr(args, "baseline_op", None) or "show"]
+    else:
+        argv.append(op)
+
+    argv.append(_enola_repo_target(args) if op == "doctor"
+                else _enola_target(args))
+
+    result = subprocess.run(argv, cwd=REPO, capture_output=True, text=True)
+    out = (result.stdout or "").rstrip()
+    if out:
+        print(out)
+    err = (result.stderr or "").rstrip()
+    if err and result.returncode != 0:
+        print(err[-2000:], file=sys.stderr)
+
+    if op == "check":
+        verdict = {0: "clean", 1: "regression", 2: "could not run",
+                   3: "declined — snapshots not comparable"}
+        print(f"enola check: {verdict.get(result.returncode, result.returncode)}")
+        if result.returncode == 3:
+            print("enola check: treat as NOT ASKED, never as a pass")
+    return 0
 
 
 # --- structure connector (0.21) — deterministic code-shape snapshots ----
@@ -9762,6 +9855,35 @@ def main() -> int:
                       help="report architecture drift vs recorded receipts")
     en_sub.add_parser("citations",
                       help="inventory receipt citations in wiki prose")
+    en_base = en_sub.add_parser("baseline",
+                                help="pin/show/clear the diff baseline a "
+                                     "check grades against")
+    en_base.add_argument("baseline_op", nargs="?", default="show",
+                         choices=["pin", "show", "clear"])
+    en_base.add_argument("repo", nargs="?")
+    en_check = en_sub.add_parser("check",
+                                 help="grade a change against the pinned "
+                                      "baseline — reported, never a gate")
+    en_check.add_argument("repo", nargs="?")
+    en_cov = en_sub.add_parser("coverage",
+                               help="which cross-repo edges resolved, so an "
+                                    "isolated service reads apart from an "
+                                    "unfollowable one")
+    en_cov.add_argument("repo", nargs="?")
+    en_sub.add_parser("doctor",
+                      help="report whether the session hooks are firing, "
+                           "not merely configured")
+    en_exp = en_sub.add_parser("explain",
+                               help="human-readable repository statistics")
+    en_exp.add_argument("repo", nargs="?")
+    en_hist = en_sub.add_parser("history",
+                                help="EXPERIMENTAL — when something entered "
+                                     "or left the architecture")
+    en_hist.add_argument("history_op", nargs="?", default="log",
+                         choices=["log", "show", "diff", "blame", "gc"])
+    en_hist.add_argument("pattern", nargs="?",
+                         help="revision for show/diff, name or path for blame")
+    en_hist.add_argument("repo", nargs="?")
     en_find = en_sub.add_parser("findings",
                                 help="merged explainer findings; noise and "
                                      "rejections hidden unless --all")

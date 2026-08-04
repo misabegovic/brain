@@ -648,10 +648,24 @@ phase-3 work:
    fan-in, fan-out and named callers from the on-disk fact set, so
    "how much does this touch" is answered rather than estimated.
    `brain.py structure findings` is the fallback when the graph
-   tier is not installed. Both skip cleanly when absent.
+   tier is not installed. Both skip cleanly when absent. When the
+   pitch turns on *how a thing got this way*, `brain.py enola
+   history blame <name-or-path> <repo>` dates it, and a constraint
+   with a date attached argues better than one without.
+   `brain.py enola baseline pin <repo>` here freezes the "before"
+   the change will be graded against.
 4. Plan the change as small commits within the appetite.
 5. Implement.
-6. **Reproduce CI gates locally before pushing (rule 4).** Run
+6. **Grade the architecture too, and read the grade yourself.**
+   `brain.py enola check <repo>` reports what the change did to
+   the structure the baseline froze in step 3. Unlike the CI gates
+   below it **reports and never blocks** — the graph is the
+   ceiling, never the floor — so a `regression` verdict is a reason
+   to look, not an automatic hold, and `declined — snapshots not
+   comparable` reads as *not asked* rather than as a pass. A real
+   regression belongs in the PR body or the ADR's `## Build notes`
+   beside the pattern-fit note.
+7. **Reproduce CI gates locally before pushing (rule 4).** Run
    the per-repo gate invocation captured in
    `wiki/<repo>/permanent/conventions.md` (e.g. a scoped test +
    coverage run against the changed files).
@@ -660,7 +674,7 @@ phase-3 work:
    isn't enough; the *absent* side needs a fixture too. Tests +
    lint of course also run; lint failures + spec failures gate
    the push the same way they always did.
-7. **Open a SHORT draft PR with brain backlinks in the
+8. **Open a SHORT draft PR with brain backlinks in the
    description.** Three non-negotiable rules:
    - **Draft.** `gh pr create --draft` — never ready-for-review
      on initial open, even when CI is green. The human marks it

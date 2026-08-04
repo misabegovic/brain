@@ -58,7 +58,7 @@ distinguish these on its own.
 
 **Substrate-inventory pass.** Directory coverage is the floor, not the
 measure: a repo can have every top-level directory "mentioned" while its
-actual module or public surface goes undescribed. `brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass. Compare the wiki's
+actual module or public surface goes undescribed. `brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass. `brain.py enola explain <repo>` prints the same inventory as statistics, and `brain.py enola coverage` reports which cross-repo edges resolved — a repo the graph calls `isolated` because nothing connects to it and one whose edges could not be followed are different coverage stories, and only the second is a gap in the *snapshot* rather than in the wiki. Compare the wiki's
 claims against that inventory and report substrate-level gaps separately
 from directory gaps, citing the snapshot or receipt so the reader knows
 which state the assessment was made against.
