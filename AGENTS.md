@@ -1162,6 +1162,26 @@ or any other direct work in that codebase. Five rules.
    next agent inheriting the area knows *why* a parallel pattern
    was warranted instead of an extension of the existing one.
 
+6. **Intent first.** Before code moves in a sibling repo, the
+   governing specs move — or are confirmed already aligned. Read
+   the trail with `brain.py enola govern <path>` (which names the
+   PRD/ADR/build-notes pages governing the code being touched) and
+   check the *intended* change against what those pages record. A
+   deviation is amended into the governing page **before** the
+   edit, not narrated into build notes afterwards; work nothing
+   governs is surfaced with the question of whether it should be
+   shaped. `tools/hooks/intent-first.sh` enforces both ends of the
+   loop mechanically. Entering: the first Edit/Write into each
+   sibling repo *per piece of work* is blocked once with the
+   file's governing trail injected into context, and the retry
+   proceeds — the gate re-arms on every user message. Leaving: a
+   Stop-time debt check blocks the turn's end once when sibling
+   code moved but no governing page did, demanding either the
+   spec amendment or an explicit statement of why the specs
+   already cover the change. The gates force the reading and the
+   accounting, never the verdict; an absent graph degrades to a
+   named skip.
+
 These rules apply equally to autonomous agent runs and to
 human-supervised ones. The brain agent operating in any sibling
 repo is a guest in that codebase; the host repo's conventions are

@@ -7,7 +7,7 @@
       {
         "hooks": [
           {
-            "command": "f=$(jq -r \".tool_input.file_path // .tool_response.filePath // empty\" 2\u003e/dev/null); if [ -n \"$f\" ] \u0026\u0026 echo \"$f\" | grep -q \"/wiki/\"; then python3 tools/brain.py lint-page \"$f\" 2\u003e/dev/null || true; fi",
+            "command": "f=$(jq -r \".tool_input.file_path // .tool_response.filePath // empty\" 2>/dev/null); if [ -n \"$f\" ] && echo \"$f\" | grep -q \"/wiki/\"; then python3 tools/brain.py lint-page \"$f\" 2>/dev/null || true; fi",
             "type": "command"
           }
         ],
@@ -16,7 +16,7 @@
       {
         "hooks": [
           {
-            "command": "f=$(jq -r \".tool_input.file_path // .tool_response.filePath // empty\" 2\u003e/dev/null); if [ -n \"$f\" ] \u0026\u0026 echo \"$f\" | grep -q \"/wiki/\"; then bash tools/ui-build.sh; fi",
+            "command": "f=$(jq -r \".tool_input.file_path // .tool_response.filePath // empty\" 2>/dev/null); if [ -n \"$f\" ] && echo \"$f\" | grep -q \"/wiki/\"; then bash tools/ui-build.sh; fi",
             "type": "command"
           }
         ],
@@ -30,24 +30,42 @@
           }
         ],
         "matcher": "Edit|Write|MultiEdit"
+      },
+      {
+        "hooks": [
+          {
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/tools/hooks/intent-first.sh\" record",
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write|MultiEdit"
       }
     ],
     "PreToolUse": [
       {
         "hooks": [
           {
-            "command": "cmd=$(jq -r '.tool_input.command // empty' 2\u003e/dev/null); case \"$cmd\" in *\"git push\"*|*\"gh pr create\"*) root=$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .); script=\"$root/tools/preflight.sh\"; if [ -x \"$script\" ]; then \"$script\" \u003e\u00262 || { echo \"preflight blocked: $cmd\" \u003e\u00262; exit 2; }; fi ;; esac; exit 0",
+            "command": "cmd=$(jq -r '.tool_input.command // empty' 2>/dev/null); case \"$cmd\" in *\"git push\"*|*\"gh pr create\"*) root=$(git rev-parse --show-toplevel 2>/dev/null || echo .); script=\"$root/tools/preflight.sh\"; if [ -x \"$script\" ]; then \"$script\" >&2 || { echo \"preflight blocked: $cmd\" >&2; exit 2; }; fi ;; esac; exit 0",
             "type": "command"
           }
         ],
         "matcher": "Bash"
+      },
+      {
+        "hooks": [
+          {
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/tools/hooks/intent-first.sh\" gate",
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write|MultiEdit"
       }
     ],
     "SessionStart": [
       {
         "hooks": [
           {
-            "command": "python3 tools/brain.py inbox summary 2\u003e/dev/null || true",
+            "command": "python3 tools/brain.py inbox summary 2>/dev/null || true",
             "type": "command"
           }
         ]
@@ -75,6 +93,24 @@
             "command": "/home/muhamed/.local/bin/enola hook stop",
             "source": "enola",
             "timeout": 60,
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/tools/hooks/intent-first.sh\" debt",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "\"${CLAUDE_PROJECT_DIR:-.}/tools/hooks/intent-first.sh\" reset",
             "type": "command"
           }
         ]

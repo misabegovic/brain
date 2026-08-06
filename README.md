@@ -249,6 +249,22 @@ re-derivation (only pages the stamp itself touched) and the
 commit — skip-when-absent; its voice is the non-blocking session
 hook.
 
+### Intent-first session hooks
+
+`tools/hooks/intent-first.sh` (four modes, registered in
+`.claude/settings.json`) is the mechanical half of AGENTS.md
+§ Working inside a sibling repo, rule 6. *Entering* a piece of
+work: the first Edit/Write into each sibling repo is blocked once,
+with the file's governing specs (`brain.py enola govern`) injected
+into context and the instruction to align the PRD/ADR/build-notes
+before the code moves; the gate re-arms on every user message.
+*Leaving* a turn: when sibling code moved and no wiki page did, the
+stop is blocked once and the agent must amend the governing page or
+state why the specs already cover the change. The gates force the
+reading and the accounting, never the verdict; an absent graph
+degrades to a named skip. Sibling detection honours
+`$BRAIN_PROJECTS_ROOT` (default `~/projects`).
+
 ## Workflow — slash commands
 
 | Command                      | What it does                                                                                       |
