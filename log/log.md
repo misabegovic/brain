@@ -379,3 +379,6 @@
 2026-08-06 merge — PR #45: Intent compilation arrives in the kernel (0.31.0)
    diff: 129 files, +2725/-121
    restricted-paths: true
+2026-08-06 merge — PR #47: Close the intent-port gaps the parity audit found
+   diff: 7 files, +55/-4
+   restricted-paths: true
