@@ -376,3 +376,6 @@
 2026-08-04 merge — PR #44: Phase 3: build the attention board
    diff: 14 files, +1264/-1
    restricted-paths: true
+2026-08-06 merge — PR #45: Intent compilation arrives in the kernel (0.31.0)
+   diff: 129 files, +2725/-121
+   restricted-paths: true
