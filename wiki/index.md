@@ -23,6 +23,7 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-08-06** — **The release gate opens: enola v0.3.9 carries the intent standard.** Upstream merged the intent work (enola-labs/enola#197) and cut v0.3.9, so verdict compilation is live for any instance whose pinned binary crosses it — regenerate the snapshot and the wiki is in the graph, exactly as [intent compilation](brain/topics/intent-compilation.md) § Release gate promised. README and the topic page now record the gate as opened rather than pending. (intent-compilation)
 - **2026-08-06** — **The standalone guarantee re-verified at zero.**
   A lineage sweep closed the denylist detector's three standing
   findings, all from the attention-board slice: the PRD's sources now
