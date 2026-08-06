@@ -14,8 +14,18 @@ sources:
   - ../../../brain.config.yml
   - ../../../brain-schedule.yml
   - .claude/skills/tend/SKILL.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - repo
+    relations:
+    - rel: depends-on
+      to: wiki/brain/adrs/connector-snapshot-contract.md
+    - rel: depends-on
+      to: wiki/brain/adrs/queue-and-tend-inbox.md
 ---
-
 # The attention board is a ranked, capped store beside the inbox: per-connector readers behind one card shape, weights in config and rationale on a page
 
 Phase 2 ADR for the attention-board PRD, which carries the same slug

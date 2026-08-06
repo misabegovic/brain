@@ -14,8 +14,14 @@ summary: >
 sources:
   - ../prds/human-legible-presentation-layer.md
   - ../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - other
+    - repo
 ---
-
 # The briefing is a build-time derivation; summaries live in frontmatter; attention verdicts live on inbox items
 
 **Decision.** Three bets, one per moving part. **Summaries:**

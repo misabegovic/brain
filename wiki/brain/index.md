@@ -6,8 +6,13 @@ updated: 2026-07-10
 confidence: high
 sources:
   - ../../AGENTS.md
+enola_intent:
+  page:
+    type: meta
+    status: living
+    origin:
+    - repo
 ---
-
 # Brain — meta level
 
 This shelf tracks how the brain itself operates: schema, conventions,
@@ -87,6 +92,12 @@ sanitized to organisation-agnostic form:
 
 ## Topics (discussions in flight)
 
+- [Intent compilation](topics/intent-compilation.md) — the wiki joins
+  the architecture graph: every page carries a derived `enola_intent:`
+  block, anchors join decisions to code, the reverse query answers
+  *which decisions govern this file*, and verdicts arrive when the
+  pinned enola release carries the intent standard. Read this before
+  touching the stamp machinery.
 - [Event-driven triggers for multi-agent work](topics/event-driven-multi-agent.md)
   — produced by a live 4-agent session ON the brain (three collaborators
   chat, a fourth runs it and pushes events). Agreed shape: read-side

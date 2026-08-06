@@ -8,8 +8,13 @@ summary: >
   Which further Phoenix-Architecture concepts (deletion test, provenance-over-diffs, regeneration drills) earn schema weight beyond constraints.md and implementation-memory.md. Open.
 sources:
   - ../../../sources/web/aicoding-fowler-phoenix--f0e11r.md
+enola_intent:
+  page:
+    type: topic
+    status: living
+    origin:
+    - web
 ---
-
 # How far should the brain adopt Phoenix-Architecture concepts into its schema?
 
 ## Question

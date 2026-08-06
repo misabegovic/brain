@@ -6,8 +6,13 @@ updated: 2026-07-10
 confidence: medium
 sources:
   - ../../../AGENTS.md
+enola_intent:
+  page:
+    type: reference
+    status: living
+    origin:
+    - repo
 ---
-
 # Development playbook — engineering standards
 
 The four-pillar standard for engineering work across the

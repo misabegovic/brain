@@ -14,8 +14,13 @@ summary: >
 sources:
   - ../../../AGENTS.md
   - ../../../CONTRIBUTING.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - repo
 ---
-
 # Public artifacts carry no personal data; a deterministic guard strips session URLs regardless of harness behaviour
 
 **Decision.** Public-facing artifacts the brain (or an agent working

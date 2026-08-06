@@ -10,8 +10,14 @@ sources:
   - ../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md
   - ../../../brain-schedule.yml
   - .claude/skills/tend/SKILL.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - other
+    - repo
 ---
-
 # Connectors are pull-only snapshot-writers: immutable dedup-keyed files under `sources/`, cursors in state, inbox items out — never a wiki write
 
 **Decision.** External systems (GitHub, Notion, Slack, and whatever the

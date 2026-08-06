@@ -11,8 +11,14 @@ sources:
   - ../../../AGENTS.md
   - ../../../ui/astro.config.mjs
   - ../../../ui/README.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - other
+    - repo
 ---
-
 Records the substrate bet behind the UI at `ui/`: Astro 5 with the
 Starlight docs preset and Pagefind for lexical client-side search.
 

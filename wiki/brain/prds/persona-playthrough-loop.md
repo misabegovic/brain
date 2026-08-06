@@ -11,8 +11,19 @@ summary: >
 sources:
   - ../pitches/persona-playthrough-loop.md
   - ../../../sources/conversations/2026-07-12--persona-playthrough-loop.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: supersedes
+      to: wiki/brain/pitches/persona-playthrough-loop.md
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Persona playthrough loop
 
 Graduated from the [pitch](../pitches/persona-playthrough-loop.md)

@@ -17,8 +17,17 @@ sources:
   - ../../../sources/research/2026-07-10--sqlite-index-prototype.md
   - ../adrs/connector-snapshot-contract.md
   - ../../../brain-schedule.yml
+enola_intent:
+  page:
+    type: pitch
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/prds/composable-role-views.md
 ---
-
 # Composable role-fit views
 
 Pre-bet pitch per the operator's 2026-07-10 direction: let anyone

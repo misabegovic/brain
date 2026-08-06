@@ -186,7 +186,14 @@ regardless.
    this repo contain", "who calls X", "how coupled is Y") —
    `brain.py structure findings --repo <repo>` always answers, and
    `brain.py enola findings` / `enola impact <symbol>` add call
-   graphs where the binary is installed. Both answer
+   graphs where the binary is installed. **Ask what already governs
+   the code before proposing to change it** — `brain.py enola govern
+   <path-or-symbol>` reports the compiled pages whose anchors cover
+   it, with their relation trails, so a prior decision on the same
+   file surfaces before a new one is authored: the answer is either
+   the decision this pitch extends, the one it contradicts (name
+   that in `## Alternatives`), or *asked, none governs* — itself a
+   finding worth recording. Both answer
    deterministically before a file is opened, and a claim taken
    from either cites the snapshot or receipt it came from; skip
    silently when a substrate is absent. A high-fan-in symbol on

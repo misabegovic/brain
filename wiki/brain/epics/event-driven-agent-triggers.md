@@ -22,8 +22,18 @@ sources:
   - ../topics/event-driven-multi-agent.md
   - ../adrs/queue-and-tend-inbox.md
   - ../adrs/connector-snapshot-contract.md
+enola_intent:
+  page:
+    type: epic
+    status: superseded
+    scope:
+    - brain
+    origin:
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Event-driven triggers for multi-agent work
 
 > **Complete 2026-07-14 — both children shipped; the loop is closed.**

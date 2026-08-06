@@ -11,8 +11,14 @@ sources:
   - ../../../sources/research/2026-07-10--sqlite-fts5-derived-index.md
   - ../../../sources/research/2026-07-10--composable-views-prior-art.md
   - ../../../sources/research/2026-07-10--sqlite-index-prototype.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - other
+    - repo
 ---
-
 # View specs are SQL over a derived, disposable SQLite index; shorthands compile to SQL; the index rides the views pipeline
 
 **Decision.** The composable-views PRD is delivered on three commitments.

@@ -11,8 +11,17 @@ sources:
   - ../../../sources/conversations/2026-07-10--chat-first-simplification.md
   - ../adrs/workbench-pty-bridge.md
   - ../adrs/queue-and-tend-inbox.md
+enola_intent:
+  page:
+    type: pitch
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/prds/chat-first-app.md
 ---
-
 # Chat-first app
 
 Pre-bet pitch per the operator's 2026-07-10 direction: simplify and

@@ -7,8 +7,14 @@ confidence: high
 sources:
   - ../../sources/research/2026-07-10--tend-sweep-2-verification.md
   - ../../.claude/skills/capture/SKILL.md
+enola_intent:
+  page:
+    type: reference
+    status: living
+    origin:
+    - other
+    - repo
 ---
-
 # Operator lessons
 
 Durable lessons the operator teaches the agent — corrections and

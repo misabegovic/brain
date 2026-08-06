@@ -11,8 +11,14 @@ sources:
   - ../../../AGENTS.md
   - .claude/skills/shape/SKILL.md
   - .claude/skills/zoom-out/SKILL.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - other
+    - repo
 ---
-
 # Epics are single-page umbrella artifacts with `parent_epic:` linkage, validator-enforced no-umbrella-ADR, epic-aware briefs, and a quiet-on-day-one promotion heuristic
 
 Brain-meta decision: initiatives too large for a single PRD/ADR pair — the "migrate framework A to framework B" or "adopt OAuth2 across all services" scale — get a first-class umbrella artifact, `kind: epic`, living as a single page at `wiki/<scope>/epics/<slug>.md`. The umbrella is PRD-shaped (Objective, Background, Affected personas, Scope, No-gos, Children, Success metrics) but pairs with **no ADR** — the validator enforces this, because the umbrella coordinates children rather than making engineering bets. Children (regular PRDs and ADRs) declare membership through a `parent_epic:` frontmatter field, a single string that must resolve to an existing epic page; the validator fails on dangling references. Reverse edges (`child_prds`, `child_adrs` split by kind) are computed by the views tooling through the same code path as the existing `affects:`/`affected_by:` loop, and a by-epic view is emitted alongside the other generated indices.

@@ -8,8 +8,13 @@ summary: >
   Six repo-verified gaps between the kernel and a credible market entry. License (MIT) and packaging closed; the product name and repo visibility remain operator calls.
 sources:
   - ../../../README.md
+enola_intent:
+  page:
+    type: topic
+    status: draft
+    origin:
+    - repo
 ---
-
 # What stands between this repo and being a credible market entrant?
 
 ## Question

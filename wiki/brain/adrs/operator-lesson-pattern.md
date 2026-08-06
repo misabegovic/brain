@@ -9,8 +9,13 @@ summary: >
 sources:
   - ../../../AGENTS.md
   - .claude/skills/capture/SKILL.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - repo
 ---
-
 # Operator lessons live as `## Lessons` subsections on conventions pages plus one cross-cutting org page
 
 **Decision.** Repo-bound operator lessons live as a `## Lessons` subsection

@@ -11,8 +11,19 @@ summary: >
 sources:
   - ../pitches/chat-first-app.md
   - ../../../sources/conversations/2026-07-10--chat-first-simplification.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: supersedes
+      to: wiki/brain/pitches/chat-first-app.md
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Chat-first app
 
 Graduated 2026-07-10 on the operator's explicit picks: per-harness

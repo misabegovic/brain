@@ -922,6 +922,11 @@
     },
     {
       "source": "brain/index.md",
+      "target": "brain/topics/intent-compilation.md",
+      "provenance": "extracted"
+    },
+    {
+      "source": "brain/index.md",
       "target": "brain/topics/market-readiness-gaps.md",
       "provenance": "extracted"
     },

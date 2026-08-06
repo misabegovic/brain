@@ -4,6 +4,30 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.31.0 — 2026-08-06
+- Intent compilation: every wiki page carries a derived `enola_intent:`
+  block (`brain.py intent stamp`, idempotent — kind → type, repos →
+  scope, relation fields → typed edges, repo citations → code anchors,
+  sources → origin channels), so the whole wiki compiles into the
+  architecture graph when the pinned enola release carries the intent
+  standard (enola-labs/enola#197). Annotated citations (a trailing
+  ` (…)` note) mark paths knowingly not current: the stamp retires
+  their anchors and `check` skips instead of breaking.
+- The reverse query: `brain.py enola govern <target>` answers *which
+  compiled pages govern this file or symbol* (with relation trails)
+  and, for a page, *which code its anchors cover* — headless, from the
+  on-disk fact union. Wired into eight skills at their natural moments
+  (shape deepdive, continue pre-push, query, ingest cursor-walk, plan
+  reading-list, review anchor-coverage, zoom-out trail, groom repair
+  table).
+- Gates: pre-commit auto-restamps (staging only pages the stamp itself
+  touched); `intent-page-block` and `intent-compile-drift` join the
+  reflection detectors; preflight gates the page-block check before
+  push. The enola binary itself never gates a commit (skip-when-absent).
+- Instance birth re-stamps the filtered wiki and the empty-sources
+  fallback now finds `sources:` mid-frontmatter (it anchored on
+  end-of-string, which the stamped block broke).
+
 ## 0.20.0 — 2026-07-12
 - Playthrough-sweep delivery: all eight three-persona suggestions
   built, merged, and graduated to the approved ADR/PRD shelves —

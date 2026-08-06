@@ -10,8 +10,17 @@ summary: >
 sources:
   - ../../../sources/conversations/2026-07-12--chat-surface-reconsidered.md
   - ../adrs/chat-print-mode-bridge.md
+enola_intent:
+  page:
+    type: topic
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/adrs/mcp-cli-surface.md
 ---
-
 # Does the kernel need its own chat surface, or do MCP + CLI + the terminal cover it?
 
 ## Question

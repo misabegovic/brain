@@ -23,8 +23,18 @@ sources:
   - ../adrs/queue-and-tend-inbox.md
   - ../adrs/connector-snapshot-contract.md
   - ../adrs/mcp-cli-surface.md
+enola_intent:
+  page:
+    type: decision
+    status: living
+    scope:
+    - brain
+    origin:
+    - repo
+    relations:
+    - rel: part-of
+      to: wiki/brain/epics/event-driven-agent-triggers.md
 ---
-
 # Per-agent identity on a signed, append-only event stream
 
 :::note[Part of Event-driven triggers for multi-agent work]

@@ -85,6 +85,8 @@ exists to prevent.
 
 When the task touches code, read its size rather than guessing it. `brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass.
 
+When the task names files, `brain.py enola govern <target>` *is* the reading list: the pages whose anchors cover those files are the smallest set the plan exists to identify.
+
 This is the difference between a plan that lists pages and a plan that
 knows what it is walking into: a change on a symbol with hundreds of
 callers is different work from one on a leaf, and the page graph cannot

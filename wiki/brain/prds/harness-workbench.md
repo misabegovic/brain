@@ -11,8 +11,19 @@ summary: >
 sources:
   - ../pitches/harness-workbench.md
   - ../../../sources/conversations/2026-07-10--harness-workbench-intent.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: supersedes
+      to: wiki/brain/pitches/harness-workbench.md
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Harness workbench
 
 Graduated from the [pitch](../pitches/harness-workbench.md) on the

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# brain pre-commit hook — `brain.py validate` + `views` regen + reflection-check links.
+# brain pre-commit hook — `brain.py validate` + intent stamp + `views` regen + reflection-check links.
 #
 # Install with:
 #   ln -s ../../tools/git-hooks/pre-commit .git/hooks/pre-commit
@@ -46,7 +46,26 @@ if ! "$PY" tools/brain.py validate >&2; then
   exit 1
 fi
 
-# 2. Views regen — auto-stage if anything changed.
+# 2. Intent stamp — auto-stage only the pages the stamp itself
+#    touched. Files already dirty before the stamp are someone's
+#    work in progress and stay unstaged; a file that is both is
+#    left alone too (the push-time intent-page-block check still
+#    guards it).
+dirty_before=$(git diff --name-only -- wiki/)
+"$PY" tools/brain.py intent stamp >/dev/null
+restamped=0
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  if ! printf '%s\n' "$dirty_before" | grep -qxF "$f"; then
+    git add "$f"
+    restamped=$((restamped + 1))
+  fi
+done < <(git diff --name-only -- wiki/)
+if [ "$restamped" -gt 0 ]; then
+  echo "  intent blocks re-stamped — auto-staged ${restamped} page(s)" >&2
+fi
+
+# 3. Views regen — auto-stage if anything changed.
 "$PY" tools/brain.py views >/dev/null
 if ! git diff --quiet wiki/_views/; then
   echo "  views regenerated — auto-staging wiki/_views/" >&2

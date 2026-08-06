@@ -6,8 +6,13 @@ updated: 2026-07-10
 confidence: high
 sources:
   - ../AGENTS.md
+enola_intent:
+  page:
+    type: meta
+    status: draft
+    origin:
+    - repo
 ---
-
 # Brain — home
 
 An empty brain shell — an LLM-maintained knowledge base awaiting its

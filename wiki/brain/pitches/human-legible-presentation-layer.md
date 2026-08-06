@@ -11,8 +11,17 @@ summary: >
 sources:
   - ../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md
   - ../../insights/quickstart-third-command-fragility.md
+enola_intent:
+  page:
+    type: pitch
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/prds/human-legible-presentation-layer.md
 ---
-
 # Human-legible presentation layer
 
 Pre-bet pitch per the operator's 2026-07-12 direction: the UI

@@ -15,8 +15,16 @@ summary: >
   behind a proxy, so impact is bounded; awaiting a human security confirm.
 sources:
   - sources/playthroughs/2026-07-12--sam-security-reviewer--serving-mode-guarantees.md
+enola_intent:
+  page:
+    type: insight
+    status: superseded
+    origin:
+    - other
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/adrs/sam-uniform-loopback-host-guard.md
 ---
-
 # Serving-mode ai-suggestions exclusion is enforced on the MCP surface only
 
 **Playthrough-born hypothesis** — synthetic finding from the Sam

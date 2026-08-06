@@ -10,8 +10,16 @@ summary: >
 sources:
   - ../prds/chat-first-app.md
   - ../adrs/workbench-pty-bridge.md
+enola_intent:
+  page:
+    type: decision
+    status: superseded
+    origin:
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/adrs/mcp-cli-terminal-surface.md
 ---
-
 # The chat is a per-harness print-mode bridge: conversation as the interface, terminal demoted to a toggle, bare `brain` opens the app
 
 **Decision.** The app's primary interaction is a chat pane whose backend

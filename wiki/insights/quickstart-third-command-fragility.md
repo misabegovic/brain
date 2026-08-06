@@ -10,8 +10,13 @@ summary: >
   Playthrough-born hypothesis: the README's third command (brain) depends on an optional PATH step and platform PATH conventions; a cold-start user can hit command-not-found with no fallback shown. Awaiting human confirmation.
 sources:
   - sources/playthroughs/2026-07-12--noor-cold-start-adopter--readme-quickstart.md
+enola_intent:
+  page:
+    type: insight
+    status: draft
+    origin:
+    - other
 ---
-
 # The quickstart's third command (`brain`) is fragile on cold-start machines
 
 **Playthrough-born hypothesis** — synthetic finding from the Noor

@@ -9,8 +9,14 @@ summary: >
 sources:
   - ../prds/persona-playthrough-loop.md
   - ../../../sources/conversations/2026-07-12--persona-playthrough-loop.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - other
+    - repo
 ---
-
 # Playthroughs are executed skills with immutable transcripts; synthetic findings are confidence-capped insights
 
 **Decision.** The playthrough loop lands as methodology, not

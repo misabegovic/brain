@@ -9,6 +9,10 @@ over MCP: modules, symbols, routes, storage, and how they depend on each other.
 Before changing code whose blast radius is not obvious:
 
 - `impact_analysis` — what transitively depends on this, before you touch it.
+- `governing_intent` — which knowledge pages govern this file or symbol, with
+  their relation trails (and, for a page, which code its anchors cover). Read
+  the decision trail BEFORE changing governed code — the ADR you are about to
+  contradict is one call away. Headless twin: `brain.py enola govern <target>`.
 - `explore` / `traverse` / `find_path` — how something is wired, instead of
   reconstructing it by reading files.
 - `set_baseline` — pin the architecture BEFORE you start editing, so the change can

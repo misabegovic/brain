@@ -11,8 +11,19 @@ summary: >
 sources:
   - ../topics/chat-surface-necessity.md
   - ../../../sources/conversations/2026-07-12--chat-surface-reconsidered.md
+enola_intent:
+  page:
+    type: decision
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: supersedes
+      to: wiki/brain/adrs/chat-print-mode-bridge.md
+    - rel: superseded-by
+      to: wiki/brain/adrs/mcp-cli-surface.md
 ---
-
 # The kernel's interaction surfaces are MCP, CLI, and the terminal — no first-party chat pane
 
 **Decision.** The kernel ships three interaction surfaces and no more:

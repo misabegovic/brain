@@ -10,8 +10,14 @@ sources:
   - ../prds/composable-role-views.md
   - ../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md
   - ../roadmap.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - other
+    - repo
 ---
-
 # Deployment is one infra-agnostic image with an env-selected surface; instances isolate by env ports and hashed unit names; Railway is a reference target, not a dependency
 
 **Decision.** The 0.7 hosting slice ships as one container image built

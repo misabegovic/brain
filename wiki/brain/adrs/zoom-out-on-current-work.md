@@ -10,8 +10,13 @@ sources:
   - ../../../AGENTS.md
   - .claude/skills/zoom-out/SKILL.md
   - .claude/skills/shape/SKILL.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - repo
 ---
-
 # zoom-out is a skill called as a step inside `/shape` and `/continue`, with conversation-first output and opt-in persistence as an aside-rendered `## Big-picture fit` section
 
 ## Context

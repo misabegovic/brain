@@ -13,8 +13,21 @@ sources:
   - ~/projects/brain/tools/brain.py
   - ~/projects/brain/tools/brain-mcp.py
   - SECURITY.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    scope:
+    - brain
+    origin:
+    - other
+    - repo
+    anchors:
+    - repo: brain
+      path: tools/brain-mcp.py
+    - repo: brain
+      path: tools/brain.py
 ---
-
 # Uniform loopback Host-header guard across both HTTP serving surfaces
 
 **Graduated + delivered 2026-07-12** — this began as an agent-authored suggestion from a persona playthrough and was reviewed, approved, and shipped in PR #8. The synthesis below (originally written in inference mode) is retained as the record of the finding; the fix is live on `main`.

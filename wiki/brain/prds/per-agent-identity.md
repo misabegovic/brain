@@ -24,8 +24,20 @@ sources:
   - ../pitches/event-driven-agent-triggers.md
   - ../adrs/mcp-cli-surface.md
   - ../adrs/queue-and-tend-inbox.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    scope:
+    - brain
+    origin:
+    - repo
+    relations:
+    - rel: part-of
+      to: wiki/brain/epics/event-driven-agent-triggers.md
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Per-agent identity for a hosted brain
 
 :::note[Part of Event-driven triggers for multi-agent work]

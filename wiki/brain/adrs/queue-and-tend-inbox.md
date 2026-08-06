@@ -11,8 +11,14 @@ sources:
   - ../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md
   - .claude/skills/tend/SKILL.md
   - ../../../brain-schedule.yml
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - other
+    - repo
 ---
-
 # Self-maintenance is queue-and-tend: deterministic producers accumulate a per-item inbox; synthesis digests in-session via `/tend` — never on a schedule
 
 **Decision.** The brain's self-maintenance loop splits along the

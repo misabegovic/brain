@@ -6,8 +6,13 @@ updated: 2026-07-10
 confidence: medium
 sources:
   - ../../../AGENTS.md
+enola_intent:
+  page:
+    type: reference
+    status: living
+    origin:
+    - repo
 ---
-
 # The way we work — the Shape Up cadence
 
 The organisation runs on a Shape Up adaptation: six-week cycles

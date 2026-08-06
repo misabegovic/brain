@@ -114,7 +114,7 @@ that own / describe it:
   `/ask coverage: <repo>` to find the right shelf."* — and
   stops.
 
-- **Coupling (when the target names code).** `brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass. This is the half of
+- **Coupling (when the target names code).** `brain.py structure findings --repo <repo>` always answers; `brain.py enola findings` / `enola impact <symbol>` add call graphs where the binary is installed. Both skip cleanly when absent — a named skip, never a silent pass. `brain.py enola govern <path>` adds the decision trail — the pages anchored to the files in play, read off the graph rather than reconstructed. This is the half of
   "how does this fit" that `pages.json` cannot answer: the wiki's edges
   run between *pages*, the substrate's between *symbols*, and a change
   that looks self-contained on the page graph can sit on a symbol with
