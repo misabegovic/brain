@@ -101,6 +101,7 @@ YYYY-MM-DD groom — walked <N> pages: <D> demoted, <A> archived,
 
 ```bash
 ~/.local/share/mempalace-venv/bin/python3 tools/brain.py validate
+~/.local/share/mempalace-venv/bin/python3 tools/brain.py intent stamp
 ~/.local/share/mempalace-venv/bin/python3 tools/brain.py views
 ```
 

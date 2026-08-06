@@ -65,6 +65,15 @@ if [ "$restamped" -gt 0 ]; then
   echo "  intent blocks re-stamped — auto-staged ${restamped} page(s)" >&2
 fi
 
+# 2b. Intent-compile drift — a config-side intent block is caught at
+#     commit rather than push. Sub-second, no enola binary: the graph
+#     itself never gates a commit (skip-when-absent doctrine).
+if ! "$PY" tools/brain.py reflection-check intent-compile-drift >/dev/null 2>&1; then
+  echo "" >&2
+  echo "✗ intent-compile-drift — a config-side intent block lingers; the wiki is the compile source. Run 'python3 tools/brain.py intent compile' for the diagnosis." >&2
+  exit 1
+fi
+
 # 3. Views regen — auto-stage if anything changed.
 "$PY" tools/brain.py views >/dev/null
 if ! git diff --quiet wiki/_views/; then
