@@ -23,6 +23,20 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-08-06** — **Intent compilation arrives in the kernel
+  (0.31.0).** Every wiki page now carries a derived `enola_intent:`
+  block — `brain.py intent stamp` maps the frontmatter pages already
+  carry onto knowledge nodes, typed relation edges, page-to-code
+  anchors, and origin channels, auto-restamped by the pre-commit
+  hook and gated by the `intent-page-block` detector and preflight.
+  `brain.py enola govern <target>` answers the reverse query —
+  *which compiled pages govern this file?* — in both directions,
+  and eight skills learn it at their natural moments. The verdict
+  half is release-gated on the upstream intent standard
+  (enola-labs/enola#197); until the pinned binary crosses it the
+  blocks compile forward-compatibly. Instance birth re-stamps its
+  filtered wiki, so adopters are born compiled. Read-first:
+  [intent compilation](brain/topics/intent-compilation.md).
 - **2026-08-04** — **Phase 2: the board takes a bet against its own
   safest option, and bounds the cost instead of arguing with it.**
   [ADR](brain/adrs/attention-board.md) for the

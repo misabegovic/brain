@@ -770,6 +770,24 @@ trigger phase 3.
       Lead phase completes.
 - [ ] `log/log.md` has phase-1 and phase-2 lines (and phase-3 when
       build is done).
+- [ ] `python3 tools/brain.py intent stamp` ran after the page writes
+      (every page carries a derived `enola_intent` block; the
+      pre-commit hook auto-repairs, the `intent-page-block` detector
+      and preflight both fail a drifted one).
+- [ ] **The decision compiled as measurably as it deserves.** The
+      stamp derives the `page:` half mechanically; the hand-authored
+      halves are authoring decisions this checklist owns: a decision
+      about a cross-repo seam declares it (`enola_intent.consumes:`),
+      a measurable stated fact rides as a `claims:` entry (a failed
+      claim is then a finding, not prose rot), a layer-order decision
+      carries `layers:`. Most pages need none — the question is asked
+      per shape, never defaulted to yes.
+- [ ] **Phase 3 — the landed code is cited by exact path**, so the
+      anchors compile from birth: `enola govern <path>` then answers
+      with this decision from day one, and a later file move surfaces
+      as a dangling anchor instead of silent rot. Annotate anything
+      knowingly branch-only with a trailing ` (…)` note so it never
+      compiles as a live anchor.
 - [ ] `wiki/index.md` § Open initiatives updated when a PRD lands
       (Phase 1); § Recent decisions updated when an ADR lands
       (Phase 2). Per
