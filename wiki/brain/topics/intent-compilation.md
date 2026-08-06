@@ -76,11 +76,11 @@ on, supersedes): `brain.py enola govern <target>` headlessly, or the
 
 ## Release gate
 
-The compile-and-verdict half requires an enola release carrying the
+Opened 2026-08-06: enola v0.3.9 is the first release carrying the
 intent standard (upstream PR #197: declarations, verdicts, anchors,
-the reverse query). Until the pinned binary crosses that release,
-every stamp-side gate runs and the blocks compile forward-compatibly;
-`govern` answers *no knowledge pages compiled* — a named skip, not
-an error — and verdicts simply do not exist yet. Nothing needs
-migrating at the flip: regenerate the snapshot and the wiki is in
-the graph.
+the reverse query), so a pinned binary at or past it compiles
+verdicts. Under an older binary every stamp-side gate still runs and
+the blocks compile forward-compatibly; `govern` answers *no knowledge
+pages compiled* — a named skip, not an error — and verdicts simply do
+not exist yet. Nothing needs migrating at the flip: regenerate the
+snapshot and the wiki is in the graph.
