@@ -7,8 +7,13 @@ confidence: medium
 sources:
   - ../../../sources/web/aicoding-fowler-phoenix--f0e11r.md
   - https://aicoding.leaflet.pub/
+enola_intent:
+  page:
+    type: reference
+    status: living
+    origin:
+    - web
 ---
-
 # Regenerative software (Phoenix Architecture)
 
 > Agent-authored synthesis of Chad Fowler's *The Phoenix

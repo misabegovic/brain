@@ -9,8 +9,16 @@ summary: >
   Superseded: the embedded terminal ran the operator's shell over a stdlib PTY-websocket bridge, loopback-only with token and Host checks. Removed 0.15.0 — layout was load-bearing, the component was not.
 sources:
   - ../prds/harness-workbench.md
+enola_intent:
+  page:
+    type: decision
+    status: superseded
+    origin:
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/adrs/mcp-cli-surface.md
 ---
-
 # The workbench is a loopback browser page over a stdlib PTY bridge; harness launches and config adapters are data tables; it never ships in serving mode
 
 **Decision.** The workbench lands as a page on the brain's existing local

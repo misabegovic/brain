@@ -21,8 +21,22 @@ sources:
   - sources/playthroughs/2026-07-12--viktor-daily-operator--daily-loop.md
   - ~/projects/brain/ui/src/pages/dashboard.astro
   - .claude/skills/tend/SKILL.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    scope:
+    - brain
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/state.md
+    anchors:
+    - repo: brain
+      path: ui/src/pages/dashboard.astro
 ---
-
 # Operator-side surface for attention calibration
 
 **Graduated + delivered 2026-07-12** — this began as an agent-authored suggestion from a persona playthrough and was reviewed, approved, and shipped in PR #9. The synthesis below (originally written in inference mode) is retained as the record of the finding; the fix is live on `main`.

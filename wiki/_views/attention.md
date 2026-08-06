@@ -2,7 +2,7 @@
 title: Attention — what deserves the day
 kind: meta
 status: living
-updated: 2026-08-04
+updated: 2026-08-06
 confidence: high
 sources:
   - tools/brain.py

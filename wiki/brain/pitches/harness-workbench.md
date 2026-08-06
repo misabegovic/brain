@@ -10,8 +10,17 @@ summary: >
 sources:
   - ../../../sources/conversations/2026-07-10--harness-workbench-intent.md
   - ../adrs/sql-views-over-derived-index.md
+enola_intent:
+  page:
+    type: pitch
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/prds/harness-workbench.md
 ---
-
 # Harness workbench
 
 Pre-bet pitch per the operator's 2026-07-10 direction: run a

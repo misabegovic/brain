@@ -10,8 +10,13 @@ sources:
   - ../../../AGENTS.md
   - ../../../tools/ui-build.sh
   - ../../../.claude/skills/sync/SKILL.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - repo
 ---
-
 Records where the UI rebuild trigger lives: two sites sharing one
 wrapper script, `tools/ui-build.sh`.
 

@@ -6,8 +6,13 @@ updated: 2026-07-10
 confidence: high
 sources:
   - ../../AGENTS.md
+enola_intent:
+  page:
+    type: meta
+    status: living
+    origin:
+    - repo
 ---
-
 # Org — methodology + cross-product
 
 Cross-organisation pages live here: ways of working, methodology,

@@ -860,6 +860,28 @@ genuinely independent.
   card-rendered kind (pitch / initiative / decision / epic / topic /
   insight / idea) at `living`/`accepted` lacks one; `/groom` checks
   drift.
+- **Every page carries a derived `enola_intent:` block — never author
+  the `page:` half by hand.** The whole wiki compiles into the
+  architecture graph: enola's mdintent extractor reads each page's
+  `enola_intent:` frontmatter and emits a knowledge node plus typed
+  relation edges. The `page:` sub-block is *derived* from the
+  frontmatter above — `kind` → type, `repos` → scope,
+  `depends_on`/`supersedes`/`superseded_by` → relations, sibling-repo
+  `sources:` citations (`~/projects/<repo>/<path>`) → `anchors`, the
+  page-to-code joins enola verdicts as dangling when a measurable
+  path goes untouched (unmeasurable file kinds and absent repos are
+  unasked, never dangling) — by running
+  `python3 tools/brain.py intent stamp` (idempotent) after authoring
+  or editing any page. The pre-commit hook auto-restamps; the
+  `intent-page-block` reflection detector re-derives and compares on
+  every check, and `tools/preflight.sh` gates it before push. A
+  trailing ` (…)` annotation on a citation marks the path knowingly
+  not current — the stamp skips it and `check` classifies it as
+  skipped, never broken. The hand-authored halves (`consumes:`,
+  `layers:`, `claims:`) live only on the pages that own those
+  decisions. Verdicts arrive when the pinned enola release carries
+  the mdintent extractor; until then the blocks compile forward
+  compatibly and every stamp-side gate runs.
 - **Cross-links:** relative markdown links between wiki pages.
 - **Dates:** absolute (`2026-04-29`), never relative.
 - **Voice:** present tense, declarative. Mark uncertainty explicitly with
@@ -1461,6 +1483,10 @@ over MCP: modules, symbols, routes, storage, and how they depend on each other.
 Before changing code whose blast radius is not obvious:
 
 - `impact_analysis` — what transitively depends on this, before you touch it.
+- `governing_intent` — which knowledge pages govern this file or symbol, with
+  their relation trails (and, for a page, which code its anchors cover). Read
+  the decision trail BEFORE changing governed code — the ADR you are about to
+  contradict is one call away. Headless twin: `brain.py enola govern <target>`.
 - `explore` / `traverse` / `find_path` — how something is wired, instead of
   reconstructing it by reading files.
 - `set_baseline` — pin the architecture BEFORE you start editing, so the change can

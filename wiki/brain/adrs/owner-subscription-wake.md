@@ -22,8 +22,18 @@ sources:
   - ../prds/owner-subscription-wake.md
   - ../adrs/per-agent-identity.md
   - ../epics/event-driven-agent-triggers.md
+enola_intent:
+  page:
+    type: decision
+    status: living
+    scope:
+    - brain
+    origin:
+    - repo
+    relations:
+    - rel: part-of
+      to: wiki/brain/epics/event-driven-agent-triggers.md
 ---
-
 # Owner-subscription wake via signed subscribe events and guarded webhooks
 
 :::note[Part of Event-driven triggers for multi-agent work]

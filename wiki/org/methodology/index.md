@@ -6,8 +6,13 @@ updated: 2026-07-10
 confidence: medium
 sources:
   - ../../../AGENTS.md
+enola_intent:
+  page:
+    type: meta
+    status: living
+    origin:
+    - repo
 ---
-
 # Methodology
 
 How the organisation works — Shape Up cycle discipline, agent

@@ -9,8 +9,13 @@ summary: >-
 sources:
   - ../../brain.config.yml
   - .claude/skills/attention/SKILL.md
+enola_intent:
+  page:
+    type: reference
+    status: living
+    origin:
+    - repo
 ---
-
 # Attention relevance model — how the board decides what deserves a day
 
 The board ranks cards so that two unlike things — a failing pipeline

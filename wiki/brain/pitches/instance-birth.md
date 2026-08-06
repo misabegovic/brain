@@ -10,8 +10,16 @@ summary: >
 sources:
   - ../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md
   - ../../../sources/conversations/2026-07-10--tool-repo-constraint.md
+enola_intent:
+  page:
+    type: pitch
+    status: superseded
+    origin:
+    - other
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/prds/instance-birth.md
 ---
-
 # Instance birth
 
 Pitch graduated in the same directive ("go on all"); kept as the

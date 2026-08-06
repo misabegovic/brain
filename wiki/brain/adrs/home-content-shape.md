@@ -10,8 +10,13 @@ sources:
   - ../../../AGENTS.md
   - ../../../tools/home-staleness.sh
   - ../../../.claude/skills/sync/SKILL.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - repo
 ---
-
 Records the decision that shaped the wiki home page contract: what
 the home page is, who maintains it, and how that maintenance is
 enforced.

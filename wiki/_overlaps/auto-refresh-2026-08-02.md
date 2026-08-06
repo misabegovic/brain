@@ -6,8 +6,14 @@ updated: 2026-08-02
 sources:
   - sources/notion/
   - wiki/_views/pages.json
+enola_intent:
+  page:
+    type: overlap
+    status: living
+    origin:
+    - notion
+    - repo
 ---
-
 # Auto-refreshed cluster scan 2026-08-02
 
 Output of `brain.py cluster` (TF-IDF + HDBSCAN clustering over the

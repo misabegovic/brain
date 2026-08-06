@@ -16,8 +16,13 @@ sources:
   - ../adrs/queue-and-tend-inbox.md
   - ../adrs/connector-snapshot-contract.md
   - ./chat-surface-necessity.md
+enola_intent:
+  page:
+    type: topic
+    status: living
+    origin:
+    - repo
 ---
-
 # Event-driven triggers for multi-agent work on a hosted brain
 
 ## Question

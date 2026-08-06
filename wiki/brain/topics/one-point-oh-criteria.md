@@ -8,8 +8,13 @@ summary: >
   The five 1.0 criteria: instance birth in the test suite (done), seven unattended days, a real-data loop in a born instance, a cold-start human test, all gates green at tag.
 sources:
   - ../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md
+enola_intent:
+  page:
+    type: topic
+    status: living
+    origin:
+    - other
 ---
-
 # What must be true before 1.0 — when is the tool ready to instance elsewhere?
 
 ## Question

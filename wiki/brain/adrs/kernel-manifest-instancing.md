@@ -9,8 +9,14 @@ summary: >
 sources:
   - ../prds/instance-birth.md
   - ../../../sources/conversations/2026-07-10--tool-repo-constraint.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - other
+    - repo
 ---
-
 # Instances are born by manifest: `init --full` copies the mechanism and the kernel's decision trail, scaffolds the rest fresh
 
 **Decision.** Instance birth is a CLI operation driven by an explicit

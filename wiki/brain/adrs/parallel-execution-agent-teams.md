@@ -10,8 +10,13 @@ sources:
   - ../../../AGENTS.md
   - .claude/skills/spawn/SKILL.md
   - .claude/skills/list-efforts/SKILL.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - repo
 ---
-
 # Parallel-first execution: every `/spawn` dispatches a background owner subagent (opt-out via `--no-owner`), helper fan-out is named in the skills, and the rule recurses to the parent session
 
 ## Context

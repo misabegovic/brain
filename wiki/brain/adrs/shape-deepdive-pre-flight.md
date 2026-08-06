@@ -10,8 +10,13 @@ sources:
   - ../../../AGENTS.md
   - .claude/skills/shape/SKILL.md
   - .claude/skills/continue/SKILL.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - repo
 ---
-
 # Deepdive on load-bearing points lands as a `/shape` pre-flight step; pace lands on the binding authoring playbook; the top-level schema is not extended
 
 Brain-meta decision on where two operator-raised discipline rules live — *"always do a deepdive on important points when shaping, to fetch relevant context"* and *"slow down, no need to rush"* — treated as two facets of one discipline: deliberateness in `/shape` Phase 1 pre-flight.

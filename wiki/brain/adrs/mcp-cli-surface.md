@@ -10,8 +10,17 @@ summary: >
 sources:
   - ../../../sources/conversations/2026-07-12--embedded-terminal-removal.md
   - ../topics/chat-surface-necessity.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: supersedes
+      to: wiki/brain/adrs/mcp-cli-terminal-surface.md
 ---
-
 # The kernel's interaction surfaces are MCP and the CLI — the embedded terminal retires with the chat pane
 
 **Decision.** The kernel ships two interaction surfaces: the **MCP

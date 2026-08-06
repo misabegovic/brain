@@ -10,8 +10,13 @@ sources:
   - ../../../AGENTS.md
   - .claude/skills/spawn/SKILL.md
   - .claude/skills/rebase/SKILL.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - repo
 ---
-
 # Opt-in parallel efforts via a `/spawn` skill that creates per-effort worktrees and a `wiki/_state/efforts/` registry, with existing skills becoming worktree-aware
 
 ## Context

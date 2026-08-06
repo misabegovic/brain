@@ -8,8 +8,14 @@ sources:
   - ../../../AGENTS.md
   - https://github.com/obra/superpowers
   - https://blog.fsck.com/2025/10/09/superpowers/
+enola_intent:
+  page:
+    type: reference
+    status: living
+    origin:
+    - repo
+    - web
 ---
-
 # Superpowers — the agent workflow
 
 A complete, composable workflow for coding agents, published
