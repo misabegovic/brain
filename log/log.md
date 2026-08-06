@@ -382,3 +382,6 @@
 2026-08-06 merge — PR #47: Close the intent-port gaps the parity audit found
    diff: 7 files, +55/-4
    restricted-paths: true
+2026-08-06 merge — PR #49: Scrub the origin client's lineage from the attention-board slice
+   diff: 4 files, +31/-22
+   restricted-paths: false
