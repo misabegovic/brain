@@ -25,9 +25,9 @@ sources:
   - ~/projects/brain/brain-schedule.yml
   - ~/projects/brain/.claude/skills/tend/SKILL.md
   - ~/projects/brain/wiki/brain/adrs/queue-and-tend-inbox.md
-  - ~/projects/tt/brain/.claude/skills/attention/SKILL.md
-  - ~/projects/tt/brain/wiki/brain/adrs/attention-dashboard.md
-  - ~/projects/tt/brain/wiki/brain/attention-relevance-model.md
+  - ~/projects/brain/.claude/skills/attention/SKILL.md
+  - ~/projects/brain/wiki/brain/adrs/attention-board.md
+  - ~/projects/brain/wiki/brain/attention-relevance-model.md
 enola_intent:
   page:
     type: initiative
@@ -43,19 +43,19 @@ enola_intent:
       to: wiki/brain/adrs/queue-and-tend-inbox.md
     anchors:
     - repo: brain
+      path: .claude/skills/attention/SKILL.md
+    - repo: brain
       path: .claude/skills/tend/SKILL.md
     - repo: brain
       path: brain-schedule.yml
     - repo: brain
       path: brain.config.yml
     - repo: brain
+      path: wiki/brain/adrs/attention-board.md
+    - repo: brain
       path: wiki/brain/adrs/queue-and-tend-inbox.md
-    - repo: tt
-      path: brain/.claude/skills/attention/SKILL.md
-    - repo: tt
-      path: brain/wiki/brain/adrs/attention-dashboard.md
-    - repo: tt
-      path: brain/wiki/brain/attention-relevance-model.md
+    - repo: brain
+      path: wiki/brain/attention-relevance-model.md
 ---
 # An attention board — what deserves the operator's day, not what is left to do
 
