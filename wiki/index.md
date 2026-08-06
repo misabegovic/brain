@@ -23,6 +23,13 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-08-06** — **The standalone guarantee re-verified at zero.**
+  A lineage sweep closed the denylist detector's three standing
+  findings, all from the attention-board slice: the PRD's sources now
+  cite this repo's own files (also the resolvable citation), and the
+  config leak-guard test assembles its guard terms from halves so the
+  guard never trips the denylist it serves. Detector and a raw
+  tracked-file sweep both read zero.
 - **2026-08-06** — **Intent compilation arrives in the kernel
   (0.31.0).** Every wiki page now carries a derived `enola_intent:`
   block — `brain.py intent stamp` maps the frontmatter pages already
