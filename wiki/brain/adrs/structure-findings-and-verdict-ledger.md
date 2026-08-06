@@ -11,8 +11,13 @@ sources:
   - ../ai-suggestions/prds/deterministic-structure-connector.md
   - ../../../tools/brain.py
   - ../../../brain.config.yml
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - repo
 ---
-
 # Two tiers over the same repos: an always-available in-kernel structure connector with findings and a verdict ledger, plus an optional binary-backed graph
 
 **Decision.** The structure connector already produces deterministic

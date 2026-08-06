@@ -1,8 +1,8 @@
 ---
-title: "Auto-refreshed cluster scan 2026-07-31"
+title: "Auto-refreshed cluster scan 2026-08-05"
 kind: overlap
 status: living
-updated: 2026-07-31
+updated: 2026-08-05
 sources:
   - sources/notion/
   - wiki/_views/pages.json
@@ -14,7 +14,7 @@ enola_intent:
     - notion
     - repo
 ---
-# Auto-refreshed cluster scan 2026-07-31
+# Auto-refreshed cluster scan 2026-08-05
 
 Output of `brain.py cluster` (TF-IDF + HDBSCAN clustering over the
 synthesis corpus). Run by `brain.py schedule run overlap-refresh`.

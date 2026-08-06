@@ -43,6 +43,9 @@ step "brain.py validate"
 step "brain.py check --no-net"
 "$PY" tools/brain.py check --no-net >/dev/null || fail "brain.py check --no-net failed — a sources: citation does not resolve. Fix or remove the line, then re-run."
 
+step "brain.py reflection-check intent-page-block"
+"$PY" tools/brain.py reflection-check intent-page-block >/dev/null || fail "a page's enola_intent block is missing or drifted from its frontmatter — run 'python3 tools/brain.py intent stamp', commit, re-run."
+
 step "brain.py views (regen + diff)"
 "$PY" tools/brain.py views >/dev/null || fail "brain.py views regeneration errored."
 if ! git diff --exit-code --quiet wiki/_views/; then

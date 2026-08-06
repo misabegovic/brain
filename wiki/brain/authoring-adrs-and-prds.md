@@ -7,8 +7,13 @@ confidence: medium
 sources:
   - ../../AGENTS.md
   - .claude/skills/shape/SKILL.md
+enola_intent:
+  page:
+    type: meta
+    status: living
+    origin:
+    - repo
 ---
-
 # Authoring ADRs and PRDs in the brain
 
 This page is the binding playbook for every ADR and PRD authored in the

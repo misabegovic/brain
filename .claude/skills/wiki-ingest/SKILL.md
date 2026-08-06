@@ -160,7 +160,10 @@ exactly what they assert. Check the claim as you write it, not later:
 python3 tools/brain.py structure findings --repo <repo>   # always available
 python3 tools/brain.py enola findings --repo <repo>       # if installed
 python3 tools/brain.py enola impact <symbol>
+python3 tools/brain.py enola govern <path>            # which pages govern this file
 ```
+
+**The cursor diff plus the reverse query names the pages to re-check.** For an incremental repo ingest, run each changed path through `enola govern` — the pages whose anchors cover a changed file are precisely the synthesis that may have drifted, so the walk starts from the governed pages instead of rediscovering them. A changed file no page governs is signal too: a gap the ingest may be about to fill.
 
 Verification is cheapest while the source is open, and a wrong claim
 ingested today is cited by a page tomorrow and reasoned from by an

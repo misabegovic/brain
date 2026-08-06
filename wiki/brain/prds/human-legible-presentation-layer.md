@@ -15,8 +15,19 @@ summary: >
 sources:
   - ../pitches/human-legible-presentation-layer.md
   - ../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: supersedes
+      to: wiki/brain/pitches/human-legible-presentation-layer.md
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Human-legible presentation layer
 
 Graduated from the

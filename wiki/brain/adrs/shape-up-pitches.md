@@ -9,8 +9,13 @@ summary: >
 sources:
   - ../../../AGENTS.md
   - .claude/skills/shape/SKILL.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    origin:
+    - repo
 ---
-
 # Adopt Shape Up pitches as a pre-bet brain artifact kind
 
 Brain-meta decision: introduce `kind: pitch` as a first-class artifact, sitting upstream of every other commitment-class artifact. A pitch lives at `wiki/<scope>/pitches/<slug>.md` and follows the Shape Up shape — Problem, Appetite, Solution (at fat-marker fidelity), Rabbit holes, and No-gos. Its defining privilege is that, unlike the epic and the PRD, a pitch is allowed to sketch the solution — including architecture and engineering shape — at deliberately rough fidelity. That is the whole point of a pitch: it shows enough of the shape to bet on without freezing the details an ADR would later commit.

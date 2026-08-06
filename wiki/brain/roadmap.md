@@ -9,8 +9,14 @@ sources:
   - ../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md
   - ../../AGENTS.md
   - ../../brain-schedule.yml
+enola_intent:
+  page:
+    type: meta
+    status: living
+    origin:
+    - other
+    - repo
 ---
-
 # Brain roadmap — the 0.x arc
 
 Operator intent (captured 2026-07-10): the brain self-maintains —

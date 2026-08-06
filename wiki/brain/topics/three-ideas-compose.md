@@ -21,8 +21,14 @@ sources:
   - ../ai-suggestions/prds/edge-provenance-tags.md
   - ../../../sources/research/2026-07-14--enola-deterministic-architecture-extractor.md
   - ../../../sources/research/2026-07-14--graphify-llm-knowledge-graph.md
+enola_intent:
+  page:
+    type: topic
+    status: living
+    origin:
+    - other
+    - repo
 ---
-
 # How the three ideas compose — a conversational, provenance-aware knowledge graph grounded in deterministic facts
 
 ## Question

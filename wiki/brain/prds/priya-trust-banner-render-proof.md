@@ -19,8 +19,18 @@ summary: >-
 sources:
   - sources/playthroughs/2026-07-12--priya-non-terminal-pm--agent-sweep.md
   - sources/playthroughs/2026-07-12--priya-non-terminal-pm--briefing-first-read.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    scope:
+    - brain
+    origin:
+    - other
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Render-prove the AI-draft trust chrome instead of waiting for the first real draft
 
 **Graduated + delivered 2026-07-12** — this began as an agent-authored suggestion from a persona playthrough and was reviewed, approved, and shipped in PR #7. The synthesis below (originally written in inference mode) is retained as the record of the finding; the fix is live on `main`.

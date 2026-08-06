@@ -13,8 +13,19 @@ sources:
   - ../../../sources/conversations/2026-07-10--composable-views-idea.md
   - ../../../sources/research/2026-07-10--composable-views-prior-art.md
   - ../../../sources/research/2026-07-10--sqlite-index-prototype.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: supersedes
+      to: wiki/brain/pitches/composable-role-views.md
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Composable role-fit views
 
 Graduated from the [pitch](../pitches/composable-role-views.md) on

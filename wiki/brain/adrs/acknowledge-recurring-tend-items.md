@@ -9,8 +9,15 @@ confidence: medium
 summary: The viktor-daily-operator playthrough demonstrated that a half-life tend item cleared with inbox done is re-added on the next producer run, and the only ways to silence it falsify page metadata. This suggests the queue needs an acknowledgement that sticks — a re-verified signal the producers respect — before the daily timer turns the inbox into a cries-wolf machine.
 sources:
   - sources/playthroughs/2026-07-12--viktor-daily-operator--agent-sweep.md
+enola_intent:
+  page:
+    type: decision
+    status: accepted
+    scope:
+    - brain
+    origin:
+    - other
 ---
-
 # Give recurring tend-queue items an operator acknowledgement path
 
 **Graduated + delivered 2026-07-12** — this began as an agent-authored suggestion from a persona playthrough and was reviewed, approved, and shipped in PR #9. The synthesis below (originally written in inference mode) is retained as the record of the finding; the fix is live on `main`.

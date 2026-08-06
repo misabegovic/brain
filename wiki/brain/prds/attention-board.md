@@ -28,8 +28,35 @@ sources:
   - ~/projects/tt/brain/.claude/skills/attention/SKILL.md
   - ~/projects/tt/brain/wiki/brain/adrs/attention-dashboard.md
   - ~/projects/tt/brain/wiki/brain/attention-relevance-model.md
+enola_intent:
+  page:
+    type: initiative
+    status: living
+    scope:
+    - brain
+    affects:
+    - brain
+    origin:
+    - repo
+    relations:
+    - rel: depends-on
+      to: wiki/brain/adrs/queue-and-tend-inbox.md
+    anchors:
+    - repo: brain
+      path: .claude/skills/tend/SKILL.md
+    - repo: brain
+      path: brain-schedule.yml
+    - repo: brain
+      path: brain.config.yml
+    - repo: brain
+      path: wiki/brain/adrs/queue-and-tend-inbox.md
+    - repo: tt
+      path: brain/.claude/skills/attention/SKILL.md
+    - repo: tt
+      path: brain/wiki/brain/adrs/attention-dashboard.md
+    - repo: tt
+      path: brain/wiki/brain/attention-relevance-model.md
 ---
-
 # An attention board — what deserves the operator's day, not what is left to do
 
 Product Requirements Document for `wiki/brain/prds/attention-board.md`.

@@ -13,8 +13,18 @@ confidence: medium
 summary: "The Priya playthrough suggests generated reading surfaces undercut the trust promise: the shelf-home Project overview lists superseded ADRs beside the current one with only date chips (two contradictory decision titles, nothing marking which is the record), and the trail's supersedes links render raw slugs as link text. Suggestion: every generated list row carries the page's status, and every cross-reference renders the target's human title."
 sources:
   - sources/playthroughs/2026-07-12--priya-non-terminal-pm--reading-journeys.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    scope:
+    - brain
+    origin:
+    - other
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Generated reading lists carry lifecycle status — titles and superseded markers, never bare slugs or undifferentiated rows
 
 **Graduated + delivered 2026-07-12** — this began as an agent-authored suggestion from a persona playthrough and was reviewed, approved, and shipped in PR #7. The synthesis below (originally written in inference mode) is retained as the record of the finding; the fix is live on `main`.

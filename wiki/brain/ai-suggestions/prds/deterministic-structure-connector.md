@@ -25,8 +25,20 @@ sources:
   - ../../adrs/connector-snapshot-contract.md
   - ../../adrs/queue-and-tend-inbox.md
   - ../../adrs/sql-views-over-derived-index.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    scope:
+    - brain
+    origin:
+    - other
+    - repo
+    - web
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Ground the brain's architecture 'Now' against a deterministic structure extractor — Enola as reference implementation
 
 > **Built (0.22.0, 2026-07-14) — superseded by

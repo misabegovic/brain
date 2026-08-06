@@ -11,8 +11,19 @@ summary: >
 sources:
   - ../pitches/instance-birth.md
   - ../../../sources/conversations/2026-07-10--tool-repo-constraint.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: supersedes
+      to: wiki/brain/pitches/instance-birth.md
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Instance birth
 
 ## What

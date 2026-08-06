@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-04",
+  "generated": "2026-08-06",
   "home_sections": [
     {
       "anchor": "what-changed",
@@ -65,6 +65,18 @@
       "sources": [
         "sources/playthroughs/2026-07-12--viktor-daily-operator--agent-sweep.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "other"
+          ]
+        }
+      },
       "tokens": 1547
     },
     {
@@ -85,6 +97,25 @@
         "../../../brain-schedule.yml",
         ".claude/skills/tend/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "depends-on",
+              "to": "wiki/brain/adrs/connector-snapshot-contract.md"
+            },
+            {
+              "rel": "depends-on",
+              "to": "wiki/brain/adrs/queue-and-tend-inbox.md"
+            }
+          ]
+        }
+      },
       "tokens": 2136
     },
     {
@@ -100,6 +131,21 @@
         "../prds/chat-first-app.md",
         "../adrs/workbench-pty-bridge.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "superseded",
+          "origin": [
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/adrs/mcp-cli-terminal-surface.md"
+            }
+          ]
+        }
+      },
       "tokens": 1113
     },
     {
@@ -115,6 +161,16 @@
         "../../../brain-schedule.yml",
         ".claude/skills/tend/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 1211,
       "consumed_by": [
         "brain/adrs/attention-board.md"
@@ -133,6 +189,15 @@
         "../../../tools/home-staleness.sh",
         "../../../.claude/skills/sync/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1351
     },
     {
@@ -147,6 +212,16 @@
         "../prds/human-legible-presentation-layer.md",
         "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 1613
     },
     {
@@ -161,6 +236,16 @@
         "../prds/instance-birth.md",
         "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 814
     },
     {
@@ -176,6 +261,22 @@
         "../../../sources/conversations/2026-07-12--embedded-terminal-removal.md",
         "../topics/chat-surface-necessity.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "supersedes",
+              "to": "wiki/brain/adrs/mcp-cli-terminal-surface.md"
+            }
+          ]
+        }
+      },
       "tokens": 670
     },
     {
@@ -192,6 +293,26 @@
         "../topics/chat-surface-necessity.md",
         "../../../sources/conversations/2026-07-12--chat-surface-reconsidered.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "supersedes",
+              "to": "wiki/brain/adrs/chat-print-mode-bridge.md"
+            },
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/adrs/mcp-cli-surface.md"
+            }
+          ]
+        }
+      },
       "tokens": 739
     },
     {
@@ -208,6 +329,16 @@
         ".claude/skills/shape/SKILL.md",
         ".claude/skills/zoom-out/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 1710
     },
     {
@@ -222,6 +353,15 @@
         "../../../AGENTS.md",
         "../../../CONTRIBUTING.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 689
     },
     {
@@ -236,6 +376,15 @@
         "../../../AGENTS.md",
         ".claude/skills/capture/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1516
     },
     {
@@ -257,6 +406,24 @@
         "../adrs/per-agent-identity.md",
         "../epics/event-driven-agent-triggers.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "living",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "part-of",
+              "to": "wiki/brain/epics/event-driven-agent-triggers.md"
+            }
+          ]
+        }
+      },
       "tokens": 1391
     },
     {
@@ -272,6 +439,15 @@
         ".claude/skills/spawn/SKILL.md",
         ".claude/skills/rebase/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1713
     },
     {
@@ -287,6 +463,15 @@
         ".claude/skills/spawn/SKILL.md",
         ".claude/skills/list-efforts/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1774
     },
     {
@@ -310,6 +495,24 @@
         "../adrs/connector-snapshot-contract.md",
         "../adrs/mcp-cli-surface.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "living",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "part-of",
+              "to": "wiki/brain/epics/event-driven-agent-triggers.md"
+            }
+          ]
+        }
+      },
       "tokens": 1826
     },
     {
@@ -324,6 +527,16 @@
         "../prds/persona-playthrough-loop.md",
         "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 872
     },
     {
@@ -340,6 +553,16 @@
         ".claude/skills/tend/SKILL.md",
         "../../../brain-schedule.yml"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 1685,
       "consumed_by": [
         "brain/adrs/attention-board.md",
@@ -364,6 +587,29 @@
         "~/projects/brain/tools/brain-mcp.py",
         "SECURITY.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "anchors": [
+            {
+              "repo": "brain",
+              "path": "tools/brain-mcp.py"
+            },
+            {
+              "repo": "brain",
+              "path": "tools/brain.py"
+            }
+          ]
+        }
+      },
       "tokens": 1697
     },
     {
@@ -379,6 +625,15 @@
         ".claude/skills/shape/SKILL.md",
         ".claude/skills/continue/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1764
     },
     {
@@ -393,6 +648,15 @@
         "../../../AGENTS.md",
         ".claude/skills/shape/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1199
     },
     {
@@ -408,6 +672,16 @@
         "../../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
         "../roadmap.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 1203
     },
     {
@@ -424,6 +698,16 @@
         "../../../sources/research/2026-07-10--composable-views-prior-art.md",
         "../../../sources/research/2026-07-10--sqlite-index-prototype.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 1420
     },
     {
@@ -440,6 +724,15 @@
         "../../../tools/brain.py",
         "../../../brain.config.yml"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 3049
     },
     {
@@ -456,6 +749,16 @@
         "../../../ui/astro.config.mjs",
         "../../../ui/README.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 1415
     },
     {
@@ -471,6 +774,15 @@
         "../../../tools/ui-build.sh",
         "../../../.claude/skills/sync/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1197
     },
     {
@@ -485,6 +797,21 @@
       "sources": [
         "../prds/harness-workbench.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "superseded",
+          "origin": [
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/adrs/mcp-cli-surface.md"
+            }
+          ]
+        }
+      },
       "tokens": 1284
     },
     {
@@ -500,6 +827,15 @@
         ".claude/skills/zoom-out/SKILL.md",
         ".claude/skills/shape/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "decision",
+          "status": "accepted",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1756
     },
     {
@@ -524,6 +860,25 @@
         "../../topics/chat-surface-necessity.md",
         "../../adrs/human-legible-presentation-layer.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "repo",
+            "slack"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 2051
     },
     {
@@ -549,6 +904,26 @@
         "../../adrs/queue-and-tend-inbox.md",
         "../../adrs/sql-views-over-derived-index.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "other",
+            "repo",
+            "web"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 1956
     },
     {
@@ -573,6 +948,25 @@
         "../../adrs/sql-views-over-derived-index.md",
         "../../adrs/queue-and-tend-inbox.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 1817
     },
     {
@@ -587,6 +981,15 @@
         "../../brain.config.yml",
         ".claude/skills/attention/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "reference",
+          "status": "living",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 935
     },
     {
@@ -600,6 +1003,15 @@
         "../../AGENTS.md",
         ".claude/skills/shape/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "meta",
+          "status": "living",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1861
     },
     {
@@ -622,6 +1034,24 @@
         "../adrs/queue-and-tend-inbox.md",
         "../adrs/connector-snapshot-contract.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "epic",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 1388,
       "child_prds": [
         "brain/prds/owner-subscription-wake.md",
@@ -642,7 +1072,16 @@
       "sources": [
         "../../AGENTS.md"
       ],
-      "tokens": 3256,
+      "enola_intent": {
+        "page": {
+          "type": "meta",
+          "status": "living",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
+      "tokens": 3338,
       "affected_by": [
         "brain/prds/attention-board.md"
       ]
@@ -661,6 +1100,22 @@
         "../adrs/workbench-pty-bridge.md",
         "../adrs/queue-and-tend-inbox.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "pitch",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/prds/chat-first-app.md"
+            }
+          ]
+        }
+      },
       "tokens": 854
     },
     {
@@ -683,6 +1138,22 @@
         "../adrs/connector-snapshot-contract.md",
         "../../../brain-schedule.yml"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "pitch",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/prds/composable-role-views.md"
+            }
+          ]
+        }
+      },
       "tokens": 1638
     },
     {
@@ -705,6 +1176,24 @@
         "../adrs/connector-snapshot-contract.md",
         "../adrs/mcp-cli-surface.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "pitch",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/epics/event-driven-agent-triggers.md"
+            }
+          ]
+        }
+      },
       "tokens": 1942
     },
     {
@@ -720,6 +1209,22 @@
         "../../../sources/conversations/2026-07-10--harness-workbench-intent.md",
         "../adrs/sql-views-over-derived-index.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "pitch",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/prds/harness-workbench.md"
+            }
+          ]
+        }
+      },
       "tokens": 957
     },
     {
@@ -736,6 +1241,22 @@
         "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md",
         "../../insights/quickstart-third-command-fragility.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "pitch",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/prds/human-legible-presentation-layer.md"
+            }
+          ]
+        }
+      },
       "tokens": 1787
     },
     {
@@ -751,6 +1272,21 @@
         "../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md",
         "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "pitch",
+          "status": "superseded",
+          "origin": [
+            "other"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/prds/instance-birth.md"
+            }
+          ]
+        }
+      },
       "tokens": 383
     },
     {
@@ -767,6 +1303,22 @@
         "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md",
         "../../org/operator-lessons.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "pitch",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/prds/persona-playthrough-loop.md"
+            }
+          ]
+        }
+      },
       "tokens": 821
     },
     {
@@ -798,6 +1350,57 @@
         "~/projects/tt/brain/wiki/brain/adrs/attention-dashboard.md",
         "~/projects/tt/brain/wiki/brain/attention-relevance-model.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "living",
+          "scope": [
+            "brain"
+          ],
+          "affects": [
+            "brain"
+          ],
+          "origin": [
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "depends-on",
+              "to": "wiki/brain/adrs/queue-and-tend-inbox.md"
+            }
+          ],
+          "anchors": [
+            {
+              "repo": "brain",
+              "path": ".claude/skills/tend/SKILL.md"
+            },
+            {
+              "repo": "brain",
+              "path": "brain-schedule.yml"
+            },
+            {
+              "repo": "brain",
+              "path": "brain.config.yml"
+            },
+            {
+              "repo": "brain",
+              "path": "wiki/brain/adrs/queue-and-tend-inbox.md"
+            },
+            {
+              "repo": "tt",
+              "path": "brain/.claude/skills/attention/SKILL.md"
+            },
+            {
+              "repo": "tt",
+              "path": "brain/wiki/brain/adrs/attention-dashboard.md"
+            },
+            {
+              "repo": "tt",
+              "path": "brain/wiki/brain/attention-relevance-model.md"
+            }
+          ]
+        }
+      },
       "tokens": 2183
     },
     {
@@ -820,6 +1423,31 @@
         "~/projects/brain/ui/src/pages/dashboard.astro",
         ".claude/skills/tend/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ],
+          "anchors": [
+            {
+              "repo": "brain",
+              "path": "ui/src/pages/dashboard.astro"
+            }
+          ]
+        }
+      },
       "tokens": 1184
     },
     {
@@ -836,6 +1464,26 @@
         "../pitches/chat-first-app.md",
         "../../../sources/conversations/2026-07-10--chat-first-simplification.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "supersedes",
+              "to": "wiki/brain/pitches/chat-first-app.md"
+            },
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 447
     },
     {
@@ -854,6 +1502,26 @@
         "../../../sources/research/2026-07-10--composable-views-prior-art.md",
         "../../../sources/research/2026-07-10--sqlite-index-prototype.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "supersedes",
+              "to": "wiki/brain/pitches/composable-role-views.md"
+            },
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 697
     },
     {
@@ -870,6 +1538,26 @@
         "../pitches/harness-workbench.md",
         "../../../sources/conversations/2026-07-10--harness-workbench-intent.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "supersedes",
+              "to": "wiki/brain/pitches/harness-workbench.md"
+            },
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 584
     },
     {
@@ -886,6 +1574,26 @@
         "../pitches/human-legible-presentation-layer.md",
         "../../../sources/conversations/2026-07-12--ui-rethink-and-rewrite-question.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "supersedes",
+              "to": "wiki/brain/pitches/human-legible-presentation-layer.md"
+            },
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 922
     },
     {
@@ -902,6 +1610,26 @@
         "../pitches/instance-birth.md",
         "../../../sources/conversations/2026-07-10--tool-repo-constraint.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "supersedes",
+              "to": "wiki/brain/pitches/instance-birth.md"
+            },
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 359
     },
     {
@@ -925,6 +1653,28 @@
         "../adrs/per-agent-identity.md",
         "../topics/event-driven-multi-agent.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "part-of",
+              "to": "wiki/brain/epics/event-driven-agent-triggers.md"
+            },
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 1500
     },
     {
@@ -949,6 +1699,28 @@
         "../adrs/mcp-cli-surface.md",
         "../adrs/queue-and-tend-inbox.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "part-of",
+              "to": "wiki/brain/epics/event-driven-agent-triggers.md"
+            },
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 1451
     },
     {
@@ -965,6 +1737,26 @@
         "../pitches/persona-playthrough-loop.md",
         "../../../sources/conversations/2026-07-12--persona-playthrough-loop.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "supersedes",
+              "to": "wiki/brain/pitches/persona-playthrough-loop.md"
+            },
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 689
     },
     {
@@ -985,6 +1777,24 @@
       "sources": [
         "sources/playthroughs/2026-07-12--priya-non-terminal-pm--reading-journeys.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "other"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 1267
     },
     {
@@ -1005,6 +1815,24 @@
         "sources/playthroughs/2026-07-12--priya-non-terminal-pm--agent-sweep.md",
         "sources/playthroughs/2026-07-12--priya-non-terminal-pm--briefing-first-read.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "other"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 1299
     },
     {
@@ -1026,6 +1854,25 @@
         "sources/playthroughs/2026-07-12--viktor-daily-operator--daily-loop.md",
         "tools/brain.py"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 1231
     },
     {
@@ -1046,6 +1893,24 @@
       "sources": [
         "sources/playthroughs/2026-07-12--priya-non-terminal-pm--reading-journeys.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "initiative",
+          "status": "superseded",
+          "scope": [
+            "brain"
+          ],
+          "origin": [
+            "other"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/state.md"
+            }
+          ]
+        }
+      },
       "tokens": 1222
     },
     {
@@ -1061,6 +1926,16 @@
         "../../AGENTS.md",
         "../../brain-schedule.yml"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "meta",
+          "status": "living",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 5155
     },
     {
@@ -1073,6 +1948,15 @@
       "sources": [
         "../../AGENTS.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "reference",
+          "status": "living",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 5033
     },
     {
@@ -1088,6 +1972,22 @@
         "../../../sources/conversations/2026-07-12--chat-surface-reconsidered.md",
         "../adrs/chat-print-mode-bridge.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "topic",
+          "status": "superseded",
+          "origin": [
+            "other",
+            "repo"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/adrs/mcp-cli-surface.md"
+            }
+          ]
+        }
+      },
       "tokens": 671
     },
     {
@@ -1103,7 +2003,39 @@
         "../adrs/connector-snapshot-contract.md",
         "./chat-surface-necessity.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "topic",
+          "status": "living",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1208
+    },
+    {
+      "path": "brain/topics/intent-compilation.md",
+      "title": "Intent compilation \u2014 the wiki joins the architecture graph",
+      "kind": "reference",
+      "status": "living",
+      "updated": "2026-08-06",
+      "confidence": "medium",
+      "sources": [
+        "tools/brain.py",
+        "https://github.com/enola-labs/enola/pull/197"
+      ],
+      "enola_intent": {
+        "page": {
+          "type": "reference",
+          "status": "living",
+          "origin": [
+            "repo",
+            "web"
+          ]
+        }
+      },
+      "tokens": 825
     },
     {
       "path": "brain/topics/market-readiness-gaps.md",
@@ -1116,6 +2048,15 @@
       "sources": [
         "../../../README.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "topic",
+          "status": "draft",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1010
     },
     {
@@ -1129,6 +2070,15 @@
       "sources": [
         "../../../sources/conversations/2026-07-10--instancing-and-one-point-oh.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "topic",
+          "status": "living",
+          "origin": [
+            "other"
+          ]
+        }
+      },
       "tokens": 536
     },
     {
@@ -1142,6 +2092,15 @@
       "sources": [
         "../../../sources/web/aicoding-fowler-phoenix--f0e11r.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "topic",
+          "status": "living",
+          "origin": [
+            "web"
+          ]
+        }
+      },
       "tokens": 278
     },
     {
@@ -1160,6 +2119,16 @@
         "../../../sources/research/2026-07-14--enola-deterministic-architecture-extractor.md",
         "../../../sources/research/2026-07-14--graphify-llm-knowledge-graph.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "topic",
+          "status": "living",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 3415
     },
     {
@@ -1177,6 +2146,21 @@
       "sources": [
         "sources/playthroughs/2026-07-12--sam-security-reviewer--serving-mode-guarantees.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "insight",
+          "status": "superseded",
+          "origin": [
+            "other"
+          ],
+          "relations": [
+            {
+              "rel": "superseded-by",
+              "to": "wiki/brain/adrs/sam-uniform-loopback-host-guard.md"
+            }
+          ]
+        }
+      },
       "tokens": 838
     },
     {
@@ -1193,6 +2177,15 @@
       "sources": [
         "sources/playthroughs/2026-07-12--noor-cold-start-adopter--readme-quickstart.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "insight",
+          "status": "draft",
+          "origin": [
+            "other"
+          ]
+        }
+      },
       "tokens": 591
     },
     {
@@ -1205,6 +2198,15 @@
       "sources": [
         "../../AGENTS.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "meta",
+          "status": "living",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 116
     },
     {
@@ -1217,6 +2219,15 @@
       "sources": [
         "../../../AGENTS.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "reference",
+          "status": "living",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1834
     },
     {
@@ -1229,6 +2240,15 @@
       "sources": [
         "../../../AGENTS.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "meta",
+          "status": "living",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 268
     },
     {
@@ -1242,6 +2262,15 @@
         "../../../sources/web/aicoding-fowler-phoenix--f0e11r.md",
         "https://aicoding.leaflet.pub/"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "reference",
+          "status": "living",
+          "origin": [
+            "web"
+          ]
+        }
+      },
       "tokens": 538
     },
     {
@@ -1256,6 +2285,16 @@
         "https://github.com/obra/superpowers",
         "https://blog.fsck.com/2025/10/09/superpowers/"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "reference",
+          "status": "living",
+          "origin": [
+            "repo",
+            "web"
+          ]
+        }
+      },
       "tokens": 3032
     },
     {
@@ -1268,6 +2307,15 @@
       "sources": [
         "../../../AGENTS.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "reference",
+          "status": "living",
+          "origin": [
+            "repo"
+          ]
+        }
+      },
       "tokens": 1282
     },
     {
@@ -1281,6 +2329,16 @@
         "../../sources/research/2026-07-10--tend-sweep-2-verification.md",
         "../../.claude/skills/capture/SKILL.md"
       ],
+      "enola_intent": {
+        "page": {
+          "type": "reference",
+          "status": "living",
+          "origin": [
+            "other",
+            "repo"
+          ]
+        }
+      },
       "tokens": 416
     }
   ]

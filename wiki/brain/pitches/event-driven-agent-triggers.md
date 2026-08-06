@@ -15,8 +15,18 @@ sources:
   - ../adrs/queue-and-tend-inbox.md
   - ../adrs/connector-snapshot-contract.md
   - ../adrs/mcp-cli-surface.md
+enola_intent:
+  page:
+    type: pitch
+    status: superseded
+    scope:
+    - brain
+    origin:
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/epics/event-driven-agent-triggers.md
 ---
-
 # Event-driven triggers for multi-agent work — an agentic future for a hosted brain
 
 > **Bet placed 2026-07-14 — superseded by the

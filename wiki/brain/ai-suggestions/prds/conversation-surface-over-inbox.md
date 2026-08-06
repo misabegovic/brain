@@ -23,8 +23,19 @@ sources:
   - ../../adrs/mcp-cli-surface.md
   - ../../topics/chat-surface-necessity.md
   - ../../adrs/human-legible-presentation-layer.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    scope:
+    - brain
+    origin:
+    - repo
+    - slack
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # A conversation surface over the inbox — Slack-shaped channels for talking to the agent through the brain, asynchronously
 
 > **Built (0.23.0, 2026-07-14) — superseded by

@@ -23,8 +23,20 @@ sources:
   - ../epics/event-driven-agent-triggers.md
   - ../adrs/per-agent-identity.md
   - ../topics/event-driven-multi-agent.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    scope:
+    - brain
+    origin:
+    - repo
+    relations:
+    - rel: part-of
+      to: wiki/brain/epics/event-driven-agent-triggers.md
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Owner-subscription wake — the headline agentic win
 
 :::note[Part of Event-driven triggers for multi-agent work]

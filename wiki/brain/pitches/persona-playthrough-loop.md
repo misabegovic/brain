@@ -11,8 +11,17 @@ summary: >
 sources:
   - ../../../sources/conversations/2026-07-12--persona-playthrough-loop.md
   - ../../org/operator-lessons.md
+enola_intent:
+  page:
+    type: pitch
+    status: superseded
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/prds/persona-playthrough-loop.md
 ---
-
 # Persona playthrough loop
 
 Pre-bet pitch per the operator's 2026-07-12 question: should

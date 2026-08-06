@@ -23,8 +23,19 @@ sources:
   - ../../adrs/human-legible-presentation-layer.md
   - ../../adrs/sql-views-over-derived-index.md
   - ../../adrs/queue-and-tend-inbox.md
+enola_intent:
+  page:
+    type: initiative
+    status: superseded
+    scope:
+    - brain
+    origin:
+    - other
+    - repo
+    relations:
+    - rel: superseded-by
+      to: wiki/brain/state.md
 ---
-
 # Give the brain's link graph per-edge provenance tags — push uncertainty from the page down to the relationship
 
 > **Built (0.21.0, 2026-07-14) — superseded by
