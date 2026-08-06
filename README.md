@@ -242,8 +242,12 @@ The inbox lives at `wiki/_state/inbox/` and is **machine-local and untracked** �
 ln -s ../../tools/git-hooks/pre-commit .git/hooks/pre-commit
 ```
 
-Gates: `brain.py validate` + auto-stages `wiki/_views/` regen +
-`brain.py reflection-check links`.
+Gates: `brain.py validate`, auto-stages the `intent stamp`
+re-derivation (only pages the stamp itself touched) and the
+`wiki/_views/` regen, `reflection-check intent-compile-drift`, and
+`reflection-check links`. The enola binary itself never gates a
+commit — skip-when-absent; its voice is the non-blocking session
+hook.
 
 ## Workflow — slash commands
 
