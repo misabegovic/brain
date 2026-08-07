@@ -23,6 +23,7 @@ start filling in as the slash-command surface runs.
 ## What changed
 
 <!-- home-section; maintained-by: /shape -->
+- **2026-08-07** — **Producers back on schedule after a 60-hour timer gap.** `doctor` flagged dead producers; `schedule run-due` by hand refreshed the state (overlap auto-refresh, zoom-out digest, suggestion grooming) and restored the doctor suite to green. The machine timer remains the real fix. Note for the gate: `wiki/_state/` outputs tripped home-pairing — tooling surfaces arguably belong on its exempt list. (operations)
 - **2026-08-06** — **The release gate opens: enola v0.3.9 carries the intent standard.** Upstream merged the intent work (enola-labs/enola#197) and cut v0.3.9, so verdict compilation is live for any instance whose pinned binary crosses it — regenerate the snapshot and the wiki is in the graph, exactly as [intent compilation](brain/topics/intent-compilation.md) § Release gate promised. README and the topic page now record the gate as opened rather than pending. (intent-compilation)
 - **2026-08-06** — **The standalone guarantee re-verified at zero.**
   A lineage sweep closed the denylist detector's three standing

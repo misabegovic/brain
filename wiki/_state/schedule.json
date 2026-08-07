@@ -1,5 +1,5 @@
 {
-  "last_run": "2026-08-04",
+  "last_run": "2026-08-06",
   "operations": {
     "reflection-check": "ok",
     "sync-siblings": "ok",
@@ -18,7 +18,8 @@
     "overlap-refresh": "ok",
     "zoom-out-digest": "ok",
     "ai-suggestion-grooming": "ok",
-    "brain-repo-truth-verification": "ok"
+    "brain-repo-truth-verification": "ok",
+    "enola-history-gc": "ok"
   },
   "failed": []
 }
