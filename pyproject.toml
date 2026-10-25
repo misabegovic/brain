@@ -17,6 +17,12 @@ dynamic = ["version"]
 cluster = ["scikit-learn"]
 full = ["tiktoken", "datasette", "pytest", "scikit-learn"]
 
+[project.urls]
+Homepage = "https://github.com/misabegovic/tended"
+Repository = "https://github.com/misabegovic/tended"
+Changelog = "https://github.com/misabegovic/tended/blob/main/CHANGELOG.md"
+Issues = "https://github.com/misabegovic/tended/issues"
+
 [project.scripts]
 tended = "tended.cli:main"
 
