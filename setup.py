@@ -27,7 +27,7 @@ def manifest() -> list[str]:
 class BuildPy(build_py):
     def run(self):
         super().run()
-        dest = Path(self.build_lib) / "tended"
+        dest = Path(self.build_lib) / "tended" / "kernel"
         for rel in manifest() + EXTRA_PATHS:
             src, dst = ROOT / rel, dest / rel
             dst.parent.mkdir(parents=True, exist_ok=True)

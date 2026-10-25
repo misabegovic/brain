@@ -12,8 +12,9 @@ HERE = Path(__file__).resolve().parent
 
 
 def kernel_root() -> Path:
-    if (HERE / "tools" / "brain.py").exists():
-        return HERE
+    bundled = HERE / "kernel"
+    if (bundled / "tools" / "brain.py").exists():
+        return bundled
     checkout = HERE.parent
     if (checkout / "tools" / "brain.py").exists():
         return checkout
