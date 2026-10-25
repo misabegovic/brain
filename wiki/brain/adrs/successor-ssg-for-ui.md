@@ -3,7 +3,7 @@ title: "Adopt Astro + Starlight + Pagefind as the successor SSG for the UI"
 kind: decision
 status: accepted
 updated: 2026-07-10
-confidence: high
+confidence: medium
 summary: >
   Astro is the UI substrate (originally Astro + Starlight): content collections over the symlinked wiki, static build, mobile-native. The 2026-07-12 presentation-layer rewrite retired Starlight; Astro stays.
 sources:

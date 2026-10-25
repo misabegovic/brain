@@ -3,7 +3,7 @@ title: "Brain (meta level)"
 kind: meta
 status: living
 updated: 2026-07-10
-confidence: high
+confidence: medium
 sources:
   - ../../AGENTS.md
 enola_intent:
