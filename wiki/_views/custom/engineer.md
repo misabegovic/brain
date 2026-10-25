@@ -2,7 +2,7 @@
 title: "Engineer view"
 kind: meta
 status: living
-updated: 2026-08-07
+updated: 2026-10-25
 confidence: high
 sources:
   - ../../../views/engineer.yml
@@ -38,13 +38,13 @@ What changed in the decision trail, what the brain wants deepened, and the produ
 
 | path | confidence | inbound |
 |---|---|---|
+| brain/state.md | medium | 7 |
 | brain/adrs/mcp-cli-surface.md | medium | 6 |
 | brain/adrs/per-agent-identity.md | medium | 6 |
-| brain/state.md | medium | 6 |
-| brain/adrs/queue-and-tend-inbox.md | high | 5 |
-| brain/adrs/multi-prd-epic-shape.md | high | 4 |
+| brain/adrs/queue-and-tend-inbox.md | medium | 5 |
+| brain/adrs/multi-prd-epic-shape.md | medium | 4 |
 | brain/adrs/owner-subscription-wake.md | medium | 4 |
-| brain/adrs/successor-ssg-for-ui.md | high | 4 |
+| brain/adrs/successor-ssg-for-ui.md | medium | 4 |
 | brain/topics/one-point-oh-criteria.md | medium | 4 |
 | brain/adrs/connector-snapshot-contract.md | medium | 3 |
 | brain/adrs/home-content-shape.md | medium | 3 |

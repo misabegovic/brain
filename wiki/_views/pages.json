@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-07",
+  "generated": "2026-10-25",
   "home_sections": [
     {
       "anchor": "what-changed",
@@ -321,7 +321,7 @@
       "kind": "decision",
       "status": "accepted",
       "updated": "2026-07-10",
-      "confidence": "high",
+      "confidence": "medium",
       "summary": "Umbrella-scale work gets a kind: epic page with children spawned as regular PRDs linked via parent_epic; epics carry no engineering bets and no umbrella ADR.\n",
       "sources": [
         "../../../sources/research/2026-07-10--tend-sweep-2-verification.md",
@@ -545,7 +545,7 @@
       "kind": "decision",
       "status": "accepted",
       "updated": "2026-07-10",
-      "confidence": "high",
+      "confidence": "medium",
       "summary": "No LLM ever runs on a schedule: deterministic producers accumulate inbox items (cursor diffs, half-life crossings, link health); interactive sessions digest them via /tend. Amended twice: research-picker damping; one-runner enforcement.\n",
       "sources": [
         "../../../sources/research/2026-07-10--hub-adr-verification.md",
@@ -741,7 +741,7 @@
       "kind": "decision",
       "status": "accepted",
       "updated": "2026-07-10",
-      "confidence": "high",
+      "confidence": "medium",
       "summary": "Astro is the UI substrate (originally Astro + Starlight): content collections over the symlinked wiki, static build, mobile-native. The 2026-07-12 presentation-layer rewrite retired Starlight; Astro stays.\n",
       "sources": [
         "../../../sources/research/2026-07-10--hub-adr-verification.md",
@@ -1068,7 +1068,7 @@
       "kind": "meta",
       "status": "living",
       "updated": "2026-07-10",
-      "confidence": "high",
+      "confidence": "medium",
       "sources": [
         "../../AGENTS.md"
       ],
@@ -1918,8 +1918,8 @@
       "title": "Brain roadmap \u2014 0.x arc toward a self-maintaining, servable brain",
       "kind": "meta",
       "status": "living",
-      "updated": "2026-07-10",
-      "confidence": "high",
+      "updated": "2026-10-25",
+      "confidence": "medium",
       "sources": [
         "../../sources/research/2026-07-10--tend-sweep-2-verification.md",
         "../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md",
@@ -1936,14 +1936,14 @@
           ]
         }
       },
-      "tokens": 5155
+      "tokens": 5596
     },
     {
       "path": "brain/state.md",
       "title": "Brain \u2014 state",
       "kind": "reference",
       "status": "living",
-      "updated": "2026-07-10",
+      "updated": "2026-10-25",
       "confidence": "medium",
       "sources": [
         "../../AGENTS.md"
@@ -1957,7 +1957,7 @@
           ]
         }
       },
-      "tokens": 5033
+      "tokens": 5208
     },
     {
       "path": "brain/topics/chat-surface-necessity.md",
@@ -2194,7 +2194,7 @@
       "kind": "meta",
       "status": "living",
       "updated": "2026-07-10",
-      "confidence": "high",
+      "confidence": "medium",
       "sources": [
         "../../AGENTS.md"
       ],
@@ -2324,7 +2324,7 @@
       "kind": "reference",
       "status": "living",
       "updated": "2026-07-10",
-      "confidence": "high",
+      "confidence": "medium",
       "sources": [
         "../../sources/research/2026-07-10--tend-sweep-2-verification.md",
         "../../.claude/skills/capture/SKILL.md"

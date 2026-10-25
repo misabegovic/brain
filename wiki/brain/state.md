@@ -2,7 +2,7 @@
 title: "Brain — state"
 kind: reference
 status: living
-updated: 2026-07-10
+updated: 2026-10-25
 confidence: medium
 sources:
   - ../../AGENTS.md
@@ -34,13 +34,13 @@ into the sections below.
 - **Specialized agents + a local emulation of the whole loop (0.30.0,
   2026-07-14).** The agentic future runs end to end on one machine, no
   deployment. Two **specialized spoke agents** ship under `tools/agents/`
-  — a **drift-reconciler** (subscribes to repo drift; on wake queues a
-  `reconcile:<repo>` note for a tend session) and an
+  — a **drift-reconciler** (subscribes to repo drift; on wake emits a
+  `reconcile:<repo>` note on the event stream) and an
   **observability-triage** agent (subscribes to `alert:*` from emulated
-  Sentry / Datadog / Langfuse producers; assigns severity and queues a
-  triage note). Both do **deterministic prep only** and emit a result
+  Sentry / Datadog / Langfuse producers; assigns severity and emits a
+  triage note on the stream). Both do **deterministic prep only** and emit a result
   event — they never invoke an LLM, so the no-scheduled-LLM invariant
-  holds; the reasoning is queued for a harness. `tools/emulate-agentic.py`
+  holds; the reasoning is left to a harness. `tools/emulate-agentic.py`
   is the **local hosting emulation**: it starts a real hosted hub,
   issues keys, runs the real spoke agents as listeners, fires the
   producers, and shows producers → wakes → agent reactions on a signed
@@ -353,20 +353,30 @@ into the sections below.
 
 ## Perceived
 
-*(no Now-vs-Perceived gaps recorded yet)*
+Gaps recorded at the 0.31.1 polish (2026-10-25), each now stated in the
+docs rather than implied:
+
+- The event stream reads as "signed, append-only, authenticated". The
+  keys are symmetric, so the hub can sign as any agent; there is no
+  replay or clock check; revoking or rotating a key makes that agent's
+  past events fail verification and vanish from reads.
+- Spoke agents emit `note` events on the stream; nothing copies them
+  into `wiki/_state/inbox/`, which is what `/tend` digests.
+- The hosted tier has no deploy story.
 
 ## Target
 
-
-
 - Adopt for a project: fill `brain.config.yml`, author team/user
   personas, run the first `/in` ingest.
-- The 0.x arc per [roadmap.md](roadmap.md) (operator intent captured
-  2026-07-10): scheduled autonomy (0.2) → connector snapshot-writers
-  for Slack / Notion / GitHub (0.3) → pruning + deepening with a
-  research loop (0.4) → a read-only grounded chat plane for people
-  outside the product (0.5) → the self-hosting profile that carries
-  it (0.6). Local-first stays the default operating mode throughout.
+- The 0.2 to 0.6 arc in [roadmap.md](roadmap.md) (scheduled autonomy,
+  connectors, pruning, serving) shipped in July 2026 and has been
+  extended through 0.31.1; the roadmap's last section is the current
+  record. There is no active feature roadmap.
+- Not done, and not scheduled (stated limits as of 2026-10-25): deploying
+  the hosted agentic tier (no deploy story exists; `deploy/` serves the
+  read-only surfaces), the 1.0 gate's criteria 2 to 4, asymmetric keys
+  for the event stream, and moving spoke-agent notes into the tend
+  inbox. Local-first stays the default operating mode.
 
 ## Open threads
 
