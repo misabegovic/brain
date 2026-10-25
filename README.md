@@ -88,10 +88,20 @@ The **kernel** — mechanism, no content:
   layers (sources → wiki → schema), three levels (brain / org /
   repo), page kinds, governance, the `/shape` workflow,
   `ai_suggestion` discipline.
-- **`tools/`** — `brain.py` (validate / check / views / search /
-  stats / status / schedule / sync-cursor / install-sibling / init),
-  the stdio MCP server, sibling-repo sync, local hooks, page
-  templates.
+- **`tools/`**: `brain.py`, one CLI with 42 subcommands (`brain.py
+  --help` lists them): the corpus gates (`validate`, `check`,
+  `reflection-check`, `check-home-fresh`, `check-readme-fresh`,
+  `check-no-notion-writes`, `check-no-personal-data`), reading and
+  views (`views`, `stats`, `coverage`, `search`, `index`, `query`,
+  `page`, `links`, `lint-page`, `verify-claims`, `personas`, `cluster`),
+  the queue and operations (`inbox`, `attention`, `schedule`, `doctor`,
+  `status`, `setup`, `serve`, `rotate-log`, `efforts`, `rebase`,
+  `promote`, `snapshot`), connectors and the graph (`structure`,
+  `enola`, `intent`, `sync-cursor`), the hosted tier (`agent-key`,
+  `events`, `subscribe`, `subscriptions`) and birth and reach (`init`,
+  `install-agent`, `install-sibling`). Beside it: the stdio MCP server,
+  the spoke client, specialized agents, sibling-repo sync, local hooks
+  and page templates.
 - **`.claude/`** — the full slash-command surface (`/in`, `/capture`,
   `/ask`, `/sync`, `/groom`, `/attention`, `/shape`, `/continue`,
   `/zoom-out`,
@@ -301,7 +311,16 @@ personal data, no boilerplate.
 | Structure           | ✅ pull connector  | Deterministic code-shape snapshots (source inventory + Python symbols) → architectural-drift inbox items via baseline diff; drift auto-clears once a wiki page cites the snapshot. No network / binary / LLM; read-only git with a clean-tree guard. Configure `connectors.structure.repos`. `brain.py structure findings` turns those facts into conservative, computed findings (`oversized-package`, `god-file`, and `symbol-blindness`, which reports the share of a repo the substrate cannot see past file level — symbol visibility is Python-only). `brain.py structure judge` records accepted / rejected / noise into a write-on-judgment ledger with **no pending state**: absence means unjudged, not queued. Per [`wiki/brain/adrs/structure-findings-and-verdict-ledger.md`](wiki/brain/adrs/structure-findings-and-verdict-ledger.md). |
 | Architecture graph  | ⬜ optional tier   | `brain.py enola` — cluster snapshots over the same repos via the external [enola](https://github.com/enola-labs/enola) binary, with committed receipts in `wiki/_state/enola/`, drift reporting, merged explainer findings, a verdict ledger, `impact <symbol>` (fan-in / fan-out / named callers) from the on-disk fact set, `baseline` + `check` (grades a change against a pinned before — **reports, never gates**; its `declined` verdict means the snapshots were not comparable and reads as *not asked*, never as a pass), `coverage` (which cross-repo edges resolved, so a genuinely isolated service reads apart from one whose edges could not be followed), `explain`, `doctor` (whether the session hooks are *firing*, not merely configured), and an experimental `history` family (`log` / `show` / `diff` / `blame` / `gc`) that answers *when* something entered the architecture — a question a snapshot structurally cannot. The wiki itself compiles into this graph: every page carries a derived `enola_intent:` block (`brain.py intent stamp`, auto-restamped by the pre-commit hook, gated by the `intent-page-block` detector and preflight), repo citations become page-to-code anchors, and `enola govern <target>` answers the reverse query — *which compiled pages govern this file or symbol* (with relation trails), or, for a page path, *which code its anchors cover*. Verdict compilation went live with enola v0.3.9 (2026-08-06, the first release carrying the upstream intent standard from enola-labs/enola#197); under an older pinned binary the blocks still compile forward-compatibly and `govern` answers *no knowledge pages compiled* — a named skip, never an error. See [`wiki/brain/topics/intent-compilation.md`](wiki/brain/topics/intent-compilation.md). Session hooks are available via `enola install --hooks`: a baseline pinned at session start and a regression reported at session end, which is the one place the graph speaks unasked. The **ceiling** to the structure connector's **floor**: it answers what in-kernel extraction cannot, and it is allowed to be absent — nothing may depend on it being installed. Note the trade the other way: the connector reads `git ls-files` and therefore sees only *tracked* files, while enola walks the filesystem — so the ignore list is the only thing between the graph and a vendored dependency tree. The defaults exclude `.venv`, `site-packages`, `node_modules`, build output and the usual caches; extend them per repo via `connectors.enola.ignore`. The cluster is generated from `brain.config.yml` (`active_repos` + `connectors.enola.repos`); the generated `mcp-arch.yaml` and all `.enola/` artifacts are gitignored. |
 
-**Twelve of the twenty-five skills consult these substrates**, and every
+| GitHub            | via `gh` CLI         | Pre-allowed in `.claude/settings.json`.                        |
+| MCP               | ✅ `tools/brain-mcp.py` | Read-only; stdio or `--http` (loopback Host + Origin checks); `BRAIN_SERVING=1` excludes ai-suggestion drafts across *every* read surface (MCP, serve JSON API, search CLI, static build) + query audit log. |
+| Hosted tier       | ✅ `BRAIN_HOSTED=1` (runs locally; no deploy story) | Authenticated, writable multi-agent tier. Per-agent symmetric HMAC keys (the hub can sign as any agent; see the trust notes in the agentic-tier section); `POST /api/events` is the agent write endpoint (any signed event kind) and `/api/act` writes are signed events too; `GET /api/events?since=<seq>` is the authenticated read; the auth boundary rejects appends with a mismatched signature at write time and drops lines that fail verification on read. **Owner-subscription wake**: subscribe to a ref-pattern with a wake URL, and a matching event POSTs a signed hint (seq + ref, no payload) through an SSRF guard, capped per event, with the cursor as the at-least-once backstop. Off by default — local-first is byte-for-byte unchanged. |
+| Spoke client      | ✅ `tools/brain-agent.py` | The harness-side half: an agent in any harness runs it to `emit` / `pull` / `subscribe` / `listen` against a hosted brain, mirroring the server's signing. Config via `BRAIN_URL` / `BRAIN_AGENT_ID` / `BRAIN_AGENT_SECRET`. The brain is the hub; the harness stays the execution spoke. `agent-key provision <agent>` emits the env + listener + subscribe block to wire a harness in. |
+| Specialized agents | ✅ `tools/agents/`  | Spoke agents that subscribe + react deterministically (wake → prep → emit a result note on the event stream, never an LLM; the note is not copied into the tend inbox): a drift-reconciler and an observability-triage agent (Sentry/Datadog/Langfuse-shaped alerts). Real observability integrations become connectors emitting the same alert events. |
+| Local emulation   | ✅ `tools/emulate-agentic.py` | Runs the whole agentic loop on one machine — real hub + real spoke agents + emulated producers → wakes → reactions on a signed stream. No deployment; a live smoke test of the real code paths. It uses this repository's own keyring and event stream paths, so it refuses to start where either exists; run it in a throwaway checkout. |
+| Datasette         | ✅ pilot             | `tools/serve-datasette.sh` — faceted browse + SQL + JSON API over the derived index (immutable mode). |
+| mempalace         | optional             | Verbatim / semantic-recall layer.                              |
+
+**Twelve of the twenty-six skills consult these substrates**, and every
 one names both tiers in order — the structure connector first because it
 always answers, the graph tier second because it is allowed to be absent.
 `/sync` reports an architecture-drift step and the finding *count* (never
@@ -314,15 +333,6 @@ stale-citation triggers; and `/ask`, `wiki-query`, `wiki-plan`, `review`,
 `zoom-out`, `wiki-overlap` and `wiki-coverage` each gain the consultation
 their own judgment step was missing.
 
-| GitHub            | via `gh` CLI         | Pre-allowed in `.claude/settings.json`.                        |
-| MCP               | ✅ `tools/brain-mcp.py` | Read-only; stdio or `--http` (loopback Host + Origin checks); `BRAIN_SERVING=1` excludes ai-suggestion drafts across *every* read surface (MCP, serve JSON API, search CLI, static build) + query audit log. |
-| Hosted tier       | ✅ `BRAIN_HOSTED=1`  | Authenticated, writable multi-agent tier. Per-agent HMAC keys; `POST /api/events` is the agent write endpoint (any signed event kind) and `/api/act` writes are signed events too; `GET /api/events?since=<seq>` is the authenticated read; the auth boundary rejects forged appends at write time and drops tampered lines on read. **Owner-subscription wake**: subscribe to a ref-pattern with a wake URL, and a matching event POSTs a signed hint (seq + ref, no payload) through an SSRF guard, capped per event, with the cursor as the at-least-once backstop. Off by default — local-first is byte-for-byte unchanged. |
-| Spoke client      | ✅ `tools/brain-agent.py` | The harness-side half: an agent in any harness runs it to `emit` / `pull` / `subscribe` / `listen` against a hosted brain, mirroring the server's signing. Config via `BRAIN_URL` / `BRAIN_AGENT_ID` / `BRAIN_AGENT_SECRET`. The brain is the hub; the harness stays the execution spoke. `agent-key provision <agent>` emits the env + listener + subscribe block to wire a harness in. |
-| Specialized agents | ✅ `tools/agents/`  | Spoke agents that subscribe + react deterministically (wake → prep → queue a result note, never an LLM): a drift-reconciler and an observability-triage agent (Sentry/Datadog/Langfuse-shaped alerts). Real observability integrations become connectors emitting the same alert events. |
-| Local emulation   | ✅ `tools/emulate-agentic.py` | Runs the whole agentic loop on one machine — real hub + real spoke agents + emulated producers → wakes → reactions on a signed stream. No deployment; a live smoke test of the real code paths. |
-| Datasette         | ✅ pilot             | `tools/serve-datasette.sh` — faceted browse + SQL + JSON API over the derived index (immutable mode). |
-| mempalace         | optional             | Verbatim / semantic-recall layer.                              |
-
 ## The agentic tier — hub-and-spoke (advanced, off by default)
 
 The brain is **not** a harness and never runs your agents — but it can
@@ -331,9 +341,10 @@ harnesses. Turn on the hosted tier (`BRAIN_HOSTED=1`) and:
 
 - Each agent gets a **per-agent identity** (`agent-key issue`) — an HMAC
   key that signs everything it writes.
-- Agents write to a **signed, append-only event stream** and read it
-  from a per-agent cursor. The auth boundary rejects forged appends at
-  write time and drops tampered lines on read.
+- Agents write to a **signed event stream** (append-only by
+  convention) and read it from a per-agent cursor. The auth boundary
+  rejects appends whose signature does not match the claimed agent's key
+  and drops lines that fail verification on read.
 - An agent **subscribes** to what it cares about (a repo, a thread, a
   producer) and is **woken** when a matching event lands — a webhook
   hint (seq + ref, no payload) through an SSRF guard, with the cursor as
@@ -345,14 +356,35 @@ harnesses. Turn on the hosted tier (`BRAIN_HOSTED=1`) and:
   in.
 - **Specialized agents** (`tools/agents/`) subscribe and react
   *deterministically* — a drift-reconciler, an observability-triage
-  agent — waking, prepping, and queuing work for a tend session, never
-  invoking an LLM.
+  agent, waking, prepping, and emitting a `note` event with the result,
+  never invoking an LLM. Those notes live on the event stream (read them
+  with `events since`); nothing copies them into the tend inbox
+  (`wiki/_state/inbox/`) that `/tend` digests.
 
 See the whole loop without deploying anything:
 
 ```bash
 python3 tools/emulate-agentic.py   # real hub + real agents + emulated producers, on one machine
+                                   # (run in a throwaway checkout; refuses if a keyring or stream exists)
 ```
+
+**What the signatures do and do not prove.** Keys are symmetric
+(HMAC-SHA256), so the hub holds every agent's secret and can sign as any
+of them, and so can anyone who can read the keyring (`agent-keys.json`,
+git-ignored, mode 0600). A valid signature means "a holder of this
+agent's key wrote it", not "only this agent could have". There is no
+replay or timestamp check. Nothing enforces append-only beyond the code
+path (the files can be edited). Verification runs against the current
+keyring, so revoking or rotating a key makes that agent's earlier events
+fail verification and vanish from every read. Appends are serialized so
+each event gets a unique `seq`. Asymmetric keys would fix the forgery
+limit; they are not built.
+
+**There is no deploy story for this tier.** `deploy/` ships the three
+read-only surfaces only; the hosted tier is run and tested locally
+(`tools/emulate-agentic.py`, which starts a hub on loopback). Deploying
+a hub (hosting, TLS, key distribution, an identity-aware proxy) is
+open and unplanned.
 
 With the tier off, **local-first is byte-for-byte unchanged** — no
 keyring, no stream, no daemon, no subscriptions. The two settled
