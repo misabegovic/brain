@@ -73,7 +73,7 @@
       {
         "hooks": [
           {
-            "command": "~/.local/bin/enola hook session-start",
+            "command": "command -v enola >/dev/null 2>&1 && enola hook session-start || true",
             "source": "enola",
             "timeout": 60,
             "type": "command"
@@ -90,7 +90,7 @@
             "type": "command"
           },
           {
-            "command": "~/.local/bin/enola hook stop",
+            "command": "command -v enola >/dev/null 2>&1 && enola hook stop || true",
             "source": "enola",
             "timeout": 60,
             "type": "command"
@@ -126,7 +126,6 @@
       "Bash(mempalace wake-up:*)",
       "Bash(mempalace mine:*)",
       "Bash(mempalace split:*)",
-      "Bash(~/.local/share/mempalace-venv/bin/python3 tools/brain.py:*)",
       "Bash(python3 tools/brain.py:*)",
       "Bash(python tools/brain.py:*)",
       "Bash(tools/brain:*)",

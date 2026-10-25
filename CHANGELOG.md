@@ -4,6 +4,45 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.31.1, 2026-10-25
+Final polish: documentation made to match the code, and defects that
+could mislead or hurt a user fixed. No new features.
+- Scheduling: `schedule run-due` now honours `cadence:` (daily, weekly,
+  monthly; last runs are recorded under `ran` in
+  `wiki/_state/schedule.json`) and takes `--force` to run everything. It
+  writes the producer heartbeat after every completed run and records
+  which jobs failed in it, so `doctor` and the app strip report a failing
+  job as failing and a running producer as running (a new `failing`
+  state beside `current`, `stalled`, `never`). Before, one failing job
+  withheld the heartbeat and the producers read as dead.
+- `overlap-refresh` no longer writes `No module named 'sklearn'` into a
+  report and records `ok`. Without scikit-learn it writes nothing and
+  records a named `skipped`; a failing cluster run records a failure.
+  scikit-learn is declared as the optional `cluster` extra.
+- Event stream: `seq` assignment and append are now one locked step
+  (thread lock plus a file lock where `flock` exists). The docs and the
+  code comments state the real trust model: symmetric keys (the hub can
+  sign as any agent), no replay or clock check, append-only by
+  convention, and a revoked or rotated key makes that agent's history
+  fail verification and vanish from reads.
+- `tools/emulate-agentic.py` refuses to start when the repository
+  already has a keyring, cursors or event stream, instead of deleting
+  them.
+- `.claude/settings.json` calls `enola` from `PATH` and skips the hook
+  when it is absent, rather than a machine-specific absolute path that
+  `init --full` copied into every instance. The machine-specific
+  permission entry is gone too.
+- Specialized agents say they emit a note on the event stream; nothing
+  moves those notes into the tend inbox, and the docs now say so.
+- Seven wiki pages that claimed `confidence: high` with a 2026-07-10
+  `updated:` date were demoted to `medium`: `reflection-check` failed on
+  them every day, and so did a freshly born instance.
+- Contribution policy: no AI attribution in commits or pull requests.
+- Documentation: this changelog gains 0.21.0 to 0.30.0 (reconstructed,
+  see the note there); the roadmap, state page, README, CONTRIBUTING
+  and `AGENTS.md` corrected for skill count, subcommands, dependencies
+  and the hosted tier's missing deploy story.
+
 ## 0.31.0 — 2026-08-06
 - Intent compilation: every wiki page carries a derived `enola_intent:`
   block (`brain.py intent stamp`, idempotent — kind → type, repos →
@@ -27,6 +66,64 @@ narrative; the ADR shelf holds the decisions).
 - Instance birth re-stamps the filtered wiki and the empty-sources
   fallback now finds `sources:` mid-frontmatter (it anchored on
   end-of-string, which the stamped block broke).
+
+## 0.30.0, 2026-07-14
+*0.21.0 to 0.30.0 were reconstructed on 2026-10-25 from git history
+(`VERSION` bumps, one per merged pull request) and
+`wiki/brain/state.md`; they were not written at release time, and only
+`v0.20.0` and `v0.31.0` were tagged.*
+- Specialized spoke agents under `tools/agents/` (a drift-reconciler and
+  an observability-triage agent) that subscribe, do deterministic prep
+  and emit a note on the event stream; never an LLM.
+- `tools/emulate-agentic.py`: the whole hub-and-spoke loop on one
+  machine (real hub, real agents, emulated producers).
+- `agent-key provision <agent>` prints the env, listener and subscribe
+  block that wires a harness in.
+
+## 0.29.0, 2026-07-14
+- Spoke client `tools/brain-agent.py` (`emit`, `pull`, `subscribe`,
+  `listen`), stdlib-only, mirroring the server's signing; `POST
+  /api/events` is the matching authenticated agent write endpoint.
+
+## 0.28.0, 2026-07-14
+- Owner-subscription wake: `subscribe --agent --pattern --wake-url`; a
+  matching event sends a signed webhook hint (seq and ref, no payload)
+  through an SSRF guard, capped at 32 per event, with the per-agent
+  cursor as the at-least-once backstop.
+
+## 0.27.0, 2026-07-14
+- Per-agent identity and a signed event stream for the hosted tier
+  (`BRAIN_HOSTED=1`): `agent-key issue|rotate|revoke`, `events
+  emit|since|verify`, `GET /api/events?since=<seq>`. Keys and the stream
+  are git-ignored runtime state. Local-first is unchanged.
+
+## 0.26.0, 2026-07-14
+- Graph provenance and drift shown as page trust signals: a "pages rely
+  on this" chip and an "uncertain but load-bearing" banner.
+
+## 0.25.0, 2026-07-14
+- Topics lead with an executive brief and collapse the discussion; the
+  compose form stays hidden until opened.
+
+## 0.24.0, 2026-07-14
+- One collaboration control on every card, page and thread (comment,
+  queue, post, plus edit and remove of your own pending items);
+  `/api/act` gains `edit` and `remove`, `/api/pending` lists them.
+
+## 0.23.0, 2026-07-14
+- Async conversation surface over the inbox: `/channels/`, a Thread
+  panel on each topic, server-stamped attribution, post text fenced as
+  untrusted data.
+
+## 0.22.0, 2026-07-14
+- Deterministic structure connector (source inventory and Python
+  symbols, no network or LLM) writing snapshots to `sources/structure/`
+  and queueing drift inbox items; ships off.
+
+## 0.21.0, 2026-07-14
+- Per-edge provenance on the link graph (`wiki/_views/graph.json`:
+  extracted, inferred, ambiguous), rendered at `/graph/` and surfaced in
+  MCP page reads.
 
 ## 0.20.0 — 2026-07-12
 - Playthrough-sweep delivery: all eight three-persona suggestions

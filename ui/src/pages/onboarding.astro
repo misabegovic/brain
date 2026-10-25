@@ -171,7 +171,7 @@ const slides: Slide[] = [
     title: 'The brain as a coordination hub for many agents.',
     body: 'Off by default and local-first-preserving. Turn on the hosted tier and the brain coordinates many agents that run in their own harnesses — it is never a harness itself.',
     bullets: [
-      'Each agent has a signed identity. Agents write a signed, append-only event stream and read it from a per-agent cursor; forged or tampered events are rejected.',
+      'Each agent has a signed identity. Agents write a signed, append-only event stream and read it from a per-agent cursor; forged or tampered events are rejected (keys are symmetric, so the hub itself can sign as any agent).',
       'An agent subscribes to what it cares about — a repo, a thread, a producer — and is woken when a matching event lands. A wake is a hint, never an invocation; the agent reacts on its own next tend.',
       'Specialized agents (a drift-reconciler; an observability-triage agent for Sentry / Datadog / Langfuse) subscribe and react deterministically. See the whole loop locally, no deployment: run tools/emulate-agentic.py.',
     ],

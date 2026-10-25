@@ -109,18 +109,15 @@ git commit -m "<imperative summary, ≤72 chars>"
 If multiple coherent changes, multiple commits. If a single change
 spans many files, one commit is fine.
 
-Co-author footer (Claude Code already adds this when committing on
-the agent's behalf — preserve it):
+**No AI attribution.** No `Co-Authored-By` line naming an assistant,
+no "generated with" line, no session link, in the commit message or
+the PR body. If your harness adds one by default, strip it before the
+commit lands.
 
-```
-Co-Authored-By: Claude <noreply@anthropic.com>
-```
-
-**No personal data in the commit message or the PR body.** Model
-attribution (`Co-Authored-By`) is fine; **session URLs, private
-chat links, tokens, emails, and other account-tied identifiers are
-not** — this is a shared and potentially public repo. If your
-harness appends a session URL by default, strip it. The commit-msg
+**No personal data in the commit message or the PR body.** Session
+URLs, private chat links, tokens, emails, and other account-tied
+identifiers never appear: this is a shared and potentially public
+repo. If your harness appends a session URL by default, strip it. The commit-msg
 git hook (`brain.py check-no-personal-data`) rejects a commit whose
 message carries a session URL; run the same check on the PR body
 before creating:

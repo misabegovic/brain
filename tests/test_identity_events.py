@@ -386,6 +386,42 @@ def test_agent_provision(monkeypatch, tmp_path, capsys):
     assert brain._agent_secret("harness-agent")  # key was issued
 
 
+def test_concurrent_appends_get_unique_seqs(monkeypatch, tmp_path):
+    """seq assignment and append are one locked step: threaded appends
+    never share a seq."""
+    import threading
+    _isolate(monkeypatch, tmp_path)
+    brain.agent_key_issue("racer")
+    results = []
+
+    def emit():
+        for _ in range(10):
+            results.append(brain.event_emit("racer", "note", "r")["seq"])
+
+    threads = [threading.Thread(target=emit) for _ in range(8)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert sorted(results) == list(range(80))
+
+
+def test_emulation_refuses_where_a_keyring_exists(monkeypatch, tmp_path):
+    """The emulation deletes the keyring and stream it finds, so it must
+    refuse to start when a live one exists."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "emulate_agentic", REPO / "tools" / "emulate-agentic.py")
+    emu = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(emu)
+    _isolate(monkeypatch, tmp_path)
+    assert emu._live_state() == []
+    brain.agent_key_issue("precious")
+    assert emu._live_state() == [brain.AGENT_KEYS]
+    assert emu.main() == 2
+    assert brain.AGENT_KEYS.exists(), "refusal must leave the keyring alone"
+
+
 def test_emulation_runs_the_whole_loop():
     """The local emulation drives the real hub + spoke agents + handlers
     end to end: producers fire, specialized agents wake, and their result

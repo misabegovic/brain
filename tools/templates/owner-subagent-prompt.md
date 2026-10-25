@@ -106,8 +106,8 @@ The default Phase-shape for `{{phase}}` is:
    (`AGENTS.md` / `.claude/skills/**` / `tools/**` / etc.):
    `~/.local/share/mempalace-venv/bin/python3 tools/brain.py check-readme-fresh --base origin/main`
    The CI gate enforces the same — fix locally first.
-5. **Commit + push.** Standard `Co-Authored-By: Claude Opus 4.7
-   <noreply@anthropic.com>` footer. `git push -u origin HEAD`.
+5. **Commit + push.** No AI attribution in the commit message (no
+   `Co-Authored-By` naming an assistant, no session link). `git push -u origin HEAD`.
 6. **Open PR.** Executive-summary body, under 200 words, no H2
    scaffolding (per `.claude/skills/pr/SKILL.md` § PR body shape).
    `gh pr edit --body` is silently broken on this account —

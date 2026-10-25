@@ -3,7 +3,7 @@ title: "Epics are single-page umbrella artifacts with parent_epic linkage, valid
 kind: decision
 status: accepted
 updated: 2026-07-10
-confidence: high
+confidence: medium
 summary: >
   Umbrella-scale work gets a kind: epic page with children spawned as regular PRDs linked via parent_epic; epics carry no engineering bets and no umbrella ADR.
 sources:

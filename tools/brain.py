@@ -35,6 +35,7 @@ from __future__ import annotations
 import argparse
 import ast
 import collections
+import contextlib
 import datetime as dt
 import fnmatch
 import functools
@@ -92,21 +93,25 @@ PRODUCER_HEARTBEAT = WIKI / "_state" / "producer-heartbeat.json"
 PRODUCER_STALE_HOURS = 36  # a daily timer past this is stalled, not calm
 
 
-def _producer_touch() -> None:
-    """Heartbeat written by `schedule run-due` (what the timer runs)
-    so producer freshness is observable without depending on any one
-    OS (Viktor producer-death finding, 2026-07-12)."""
+def _producer_touch(failed=None) -> None:
+    """Heartbeat written by every completed `schedule run-due` (what the
+    timer runs), whether or not its operations passed: the heartbeat says
+    the loop ran, `failed` says which jobs did not. Producer freshness is
+    observable without depending on any one OS (Viktor producer-death
+    finding, 2026-07-12)."""
     import time
     PRODUCER_HEARTBEAT.parent.mkdir(parents=True, exist_ok=True)
     PRODUCER_HEARTBEAT.write_text(json.dumps(
         {"last_run": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-         "epoch": int(time.time())}, indent=2) + "\n")
+         "epoch": int(time.time()),
+         "failed": sorted(failed or [])}, indent=2) + "\n")
 
 
 def _producer_health() -> dict:
-    """state: 'current' (ran within the window), 'stalled' (heartbeat
-    older than the window — producers likely dead), 'never' (no
-    heartbeat yet — fresh install or hand-run only)."""
+    """state: 'current' (ran within the window, every job passed),
+    'failing' (ran within the window, some jobs failed; `failed` names
+    them), 'stalled' (heartbeat older than the window, producers likely
+    dead), 'never' (no heartbeat yet, fresh install or hand-run only)."""
     import time
     if not PRODUCER_HEARTBEAT.exists():
         return {"state": "never", "hours": None}
@@ -115,8 +120,14 @@ def _producer_health() -> dict:
         age_h = (int(time.time()) - int(data["epoch"])) / 3600
     except (ValueError, KeyError, OSError):
         return {"state": "never", "hours": None}
-    return {"state": "current" if age_h <= PRODUCER_STALE_HOURS
-            else "stalled", "hours": round(age_h, 1)}
+    failed = data.get("failed") or []
+    if age_h > PRODUCER_STALE_HOURS:
+        state = "stalled"
+    elif failed:
+        state = "failing"
+    else:
+        state = "current"
+    return {"state": state, "hours": round(age_h, 1), "failed": failed}
 
 
 def serving_mode() -> bool:
@@ -1372,6 +1383,7 @@ def render_app_page(views: list | None = None) -> str:
      // silence, not calm (Viktor producer-death finding).
      const queue = s.inbox ? s.inbox + ' to tend'
        : (s.producers === 'stalled' ? '⚠ producers stalled (queue may be stale)'
+          : s.producers === 'failing' ? '⚠ producers running, some jobs failing'
           : 'queue clear');
      document.getElementById('strip').textContent =
        (s.fails ? '✗ ' + s.fails + ' failing · ' :
@@ -2398,7 +2410,8 @@ def cmd_check_no_personal_data(args) -> int:
         for pat in hits:
             print(f"  - matched forbidden pattern: {pat}", file=sys.stderr)
         print("  Strip session URLs and account-tied links. Model "
-              "attribution (Co-Authored-By) is fine.", file=sys.stderr)
+              "attribution (Co-Authored-By naming an assistant) is "
+              "not allowed by policy.", file=sys.stderr)
         return 1
     return 0
 
@@ -2821,6 +2834,11 @@ def _doctor_checks() -> list[dict]:
             "check the timer/service: systemctl --user status "
             f"{timer_unit.replace('.timer', '.service')} — or run "
             "`brain.py schedule run-due` by hand")
+    elif ph["state"] == "failing":
+        add("producers", "producer freshness", "fail",
+            f"accumulation ran {ph['hours']}h ago and is running, but "
+            f"{len(ph['failed'])} job(s) failed: {', '.join(ph['failed'])}",
+            "brain.py schedule run --target <job> to see the error")
     elif ph["state"] == "current":
         add("producers", "producer freshness", "ok",
             f"accumulation ran {ph['hours']}h ago")
@@ -3366,6 +3384,18 @@ def _channels_data() -> dict:
 #      unsigned append at WRITE time; event_read VERIFIES attribution on
 #      READ and drops anything that fails. Per-agent cursors (reusing the
 #      connector-cursor shape) track each reader's position.
+#
+# Trust model, stated plainly. Keys are SYMMETRIC (HMAC-SHA256): the hub
+# holds every agent's secret, so it can sign as any agent, and anyone who
+# reads the keyring can too. The signature proves "someone holding this
+# agent's key wrote it", not "only this agent could have". There is no
+# replay or timestamp check (`ts` is signed but not compared to a clock,
+# and a captured signed request can be sent again). The stream is
+# append-only by convention, not by enforcement: nothing stops an
+# operator editing the files. Verification happens at read time against
+# the CURRENT keyring, so revoking or rotating an agent's key makes its
+# past events fail verification and vanish from every read. Asymmetric
+# keys would fix the forgery and attribution limits and are out of scope.
 # Local-first is untouched: with no keyring and no hosted tier, none of
 # this runs and the machine-stamped author stays the default. The legacy
 # "operator" principal is honoured — see _machine_author.
@@ -3474,6 +3504,24 @@ def _event_period() -> str:
     return today_utc().isoformat()[:7]  # YYYY-MM
 
 
+_EVENT_APPEND_LOCK = threading.Lock()
+
+
+@contextlib.contextmanager
+def _event_file_lock():
+    try:
+        import fcntl
+    except ImportError:  # no flock (Windows): the thread lock alone
+        yield
+        return
+    with (EVENTS_DIR / ".append.lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
+
+
 def event_append(agent_id: str, kind: str, ref: str, ts: str,
                  sig: str) -> dict:
     """WRITE-time auth boundary: reject an append whose signature does
@@ -3487,11 +3535,16 @@ def event_append(agent_id: str, kind: str, ref: str, ts: str,
     if not hmac.compare_digest(
             _event_sign(secret, agent_id, kind, ref, ts), sig):
         raise PermissionError("signature rejected")
-    event = {"seq": _event_count(), "ts": ts, "agent": agent_id,
-             "kind": kind, "ref": ref, "sig": sig}
     EVENTS_DIR.mkdir(parents=True, exist_ok=True)
-    with (EVENTS_DIR / f"{_event_period()}.jsonl").open("a") as fh:
-        fh.write(json.dumps(event, sort_keys=True) + "\n")
+    # seq is "how many events exist": counting and appending must be one
+    # step, or two threaded-server requests share a seq. The thread lock
+    # covers one process; the file lock covers a second process (the CLI
+    # emitting while the hub runs) where flock exists.
+    with _EVENT_APPEND_LOCK, _event_file_lock():
+        event = {"seq": _event_count(), "ts": ts, "agent": agent_id,
+                 "kind": kind, "ref": ref, "sig": sig}
+        with (EVENTS_DIR / f"{_event_period()}.jsonl").open("a") as fh:
+            fh.write(json.dumps(event, sort_keys=True) + "\n")
     return event
 
 
@@ -5027,6 +5080,7 @@ def cmd_status(_args) -> int:
             sched = json.loads(SCHEDULE_STATE.read_text())
             last = sched.get("last_run") or "?"
             failed = sched.get("failed") or []
+            skipped = sched.get("skipped") or []
             age = ""
             try:
                 delta = (today_utc() - dt.date.fromisoformat(last)).days
@@ -5038,8 +5092,12 @@ def cmd_status(_args) -> int:
                 print(f"schedule: last run {last}{age} — "
                       f"{len(failed)} FAILED: {', '.join(failed)}")
             else:
+                n_ok = sum(1 for v in (sched.get("operations") or {}).values()
+                           if v == "ok")
+                note = (f", {len(skipped)} skipped: {', '.join(skipped)}"
+                        if skipped else "")
                 print(f"schedule: last run {last}{age} — "
-                      f"{len(sched.get('operations') or {})} operations ok")
+                      f"{n_ok} operations ok{note}")
         except json.JSONDecodeError:
             print("schedule: state unparseable")
     else:
@@ -8805,14 +8863,32 @@ def _schedule_run_notion_walk() -> int:
     return 0
 
 
+SCHEDULE_SKIPPED = 75  # an in-process handler's "named skip": not ok, not failed
+
+
 def _schedule_run_overlap_refresh() -> int:
-    """Re-run the cluster command and dump output to wiki/_overlaps/."""
+    """Re-run the cluster command and dump output to wiki/_overlaps/.
+
+    Clustering needs scikit-learn (the optional `cluster` extra). Without
+    it the job writes no report and returns SCHEDULE_SKIPPED, so the run
+    records a named skip rather than an empty report marked ok.
+    """
+    import importlib.util
+    if importlib.util.find_spec("sklearn") is None:
+        print("overlap-refresh: skipped, scikit-learn is not installed "
+              "(pip install scikit-learn, or `pip install -e .[cluster]`)",
+              file=sys.stderr)
+        return SCHEDULE_SKIPPED
     overlap_path = WIKI / "_overlaps" / f"auto-refresh-{today_utc().isoformat()}.md"
     overlap_path.parent.mkdir(exist_ok=True)
     res = subprocess.run(
         [sys.executable, str(REPO / "tools" / "brain.py"), "cluster"],
         capture_output=True, text=True, timeout=60, cwd=REPO,
     )
+    if res.returncode != 0:
+        print(f"overlap-refresh: cluster failed (exit {res.returncode}): "
+              f"{(res.stdout or res.stderr).strip()[:300]}", file=sys.stderr)
+        return res.returncode
     today = today_utc().isoformat()
     body = f"""---
 title: "Auto-refreshed cluster scan {today}"
@@ -8974,11 +9050,29 @@ SCHEDULE_HANDLERS = {
 }
 
 
+CADENCE_DAYS = {"daily": 1, "weekly": 7, "monthly": 30}
+
+
+def _cadence_elapsed(cadence, last_ran) -> bool:
+    """True when an operation with this cadence is due. No recorded run,
+    an unknown cadence or an unparseable date all mean due."""
+    days = CADENCE_DAYS.get(str(cadence or "").lower())
+    if days is None or not last_ran:
+        return True
+    try:
+        last = dt.date.fromisoformat(str(last_ran))
+    except ValueError:
+        return True
+    return (today_utc() - last).days >= days
+
+
 def cmd_schedule(args) -> int:
     """Manage the declarative schedule at brain-schedule.yml.
 
-    This v1 ships the config + listing only; the runner is a
-    separate decision.
+    `list` prints the operations, `run --target <op>` runs one, and
+    `run-due` runs every enabled operation whose cadence (daily, weekly
+    or monthly) has elapsed since it last ran; `run-due --force` ignores
+    cadence. The OS timer (tools/install-timer.sh) calls `run-due`.
     """
     config_path = REPO / "brain-schedule.yml"
     if not config_path.exists():
@@ -9036,10 +9130,23 @@ def cmd_schedule(args) -> int:
         # red badge, not more.
         rc_total = 0
         outcomes = {}
+        try:
+            prior = json.loads(SCHEDULE_STATE.read_text())
+        except (OSError, ValueError):
+            prior = {}
+        ran = dict(prior.get("ran") or {})
+        force = bool(getattr(args, "force", False))
         for entry in config.get("operations") or []:
             if not entry.get("enabled"):
                 continue
             name = entry.get("name")
+            if not force and not _cadence_elapsed(
+                    entry.get("cadence"), ran.get(name)):
+                print(f"# not due: {name} ({entry.get('cadence')}, "
+                      f"last ran {ran.get(name)})", file=sys.stderr)
+                if name in (prior.get("operations") or {}):
+                    outcomes[name] = prior["operations"][name]
+                continue
             print(f"# running: {name}", file=sys.stderr)
             try:
                 if name in SCHEDULE_HANDLERS:
@@ -9050,26 +9157,37 @@ def cmd_schedule(args) -> int:
                         continue
                     rc = subprocess.run(handler, shell=True,
                                         cwd=REPO).returncode
-                outcomes[name] = "ok" if rc == 0 else f"exit {rc}"
+                if rc == 0:
+                    outcomes[name] = "ok"
+                elif rc == SCHEDULE_SKIPPED and name in SCHEDULE_HANDLERS:
+                    outcomes[name] = "skipped"
+                else:
+                    outcomes[name] = f"exit {rc}"
+                if outcomes[name] != "skipped":
+                    ran[name] = today_utc().isoformat()
             except Exception as exc:  # noqa: BLE001 — the record is the point
                 # A raising handler would otherwise abort the sweep with
                 # nothing written down about which op died.
                 outcomes[name] = f"{type(exc).__name__}: {exc}"
                 rc = 1
-            if rc != 0:
+            if rc != 0 and outcomes.get(name) != "skipped":
                 rc_total = rc
-        failed = {k: v for k, v in outcomes.items() if v != "ok"}
+        failed = {k: v for k, v in outcomes.items()
+                  if v not in ("ok", "skipped")}
+        skipped = sorted(k for k, v in outcomes.items() if v == "skipped")
         SCHEDULE_STATE.parent.mkdir(parents=True, exist_ok=True)
         SCHEDULE_STATE.write_text(json.dumps({
             "last_run": today_utc().isoformat(),
             "operations": outcomes,
             "failed": sorted(failed),
+            "skipped": skipped,
+            "ran": ran,
         }, indent=2) + "\n")
         if failed:
             print(f"# schedule: {len(failed)} operation(s) failed: "
                   f"{', '.join(sorted(failed))}", file=sys.stderr)
-        if rc_total == 0:
-            _producer_touch()  # heartbeat: the accumulation loop is alive
+        # The heartbeat says the loop ran; the failed list says what broke.
+        _producer_touch(failed)
         return rc_total
 
     print(f"unknown schedule op: {op}", file=sys.stderr)
@@ -11005,6 +11123,9 @@ def main() -> int:
                           help="list (default) | run --target <op> | run-due")
     ap_sched.add_argument("--target",
                           help="operation name when op=run")
+    ap_sched.add_argument("--force", action="store_true",
+                          help="with run-due: ignore cadence and run every "
+                               "enabled operation")
     ap_sched.set_defaults(func=cmd_schedule)
 
     ap_init = sub.add_parser(

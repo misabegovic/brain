@@ -385,3 +385,6 @@
 2026-08-06 merge — PR #49: Scrub the origin client's lineage from the attention-board slice
    diff: 4 files, +31/-22
    restricted-paths: false
+2026-10-25 commit — 91c8aa8: Final polish 0.31.1 (docs true to code, health, cadence, trust model, attribution policy)
+   diff: 38 files, +547/-144
+   restricted-paths: true

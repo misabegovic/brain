@@ -1,15 +1,16 @@
 # brain-schedule.yml — declarative recurring operations.
 #
-# This config is portable (cron / GitHub Actions / Claude Code's
-# ScheduleWakeup all consume the same shape). The runtime that
-# executes is separate; v1 ships the config + listing only.
+# `cadence:` (daily, weekly or monthly) is honoured by `run-due`: an
+# operation runs only when that many days have passed since it last
+# ran (recorded under `ran` in wiki/_state/schedule.json). `run --target`
+# always runs one operation; `run-due --force` ignores cadence.
 #
 # `brain.py schedule list` prints these.
-# `brain.py schedule run <op>` invokes a single op.
-# `brain.py schedule run-due` invokes every op whose `next_run` is
-# past. The runner that fires on cron lives in
-# .github/workflows/scheduled.yml (proposed) or as a Claude Code
-# /loop routine (proposed) — separate decision.
+# `brain.py schedule run --target <op>` invokes a single op.
+# `brain.py schedule run-due` invokes every enabled op that is due.
+# The runner that fires it is the OS timer installed by
+# tools/install-timer.sh (systemd user timer); scheduled.yml is a
+# manual-only GitHub Actions dispatch for a one-off CI-side refresh.
 
 version: 1
 

@@ -3,9 +3,11 @@
 
 Subscribes to repo structure-drift events. On wake it does deterministic
 prep — identifies the repo whose code shape moved — and emits a
-`reconcile:<repo>` note, so a tend session in a harness updates that
-repo's architecture.md against the snapshot. It never reasons itself;
-it turns a drift event into queued, attributable reconciliation work.
+`reconcile:<repo>` note on the event stream, which a session in a
+harness can read (`events since`) and act on by updating that repo's
+architecture.md against the snapshot. It never reasons itself; it turns
+a drift event into an attributable note. Nothing moves that note into
+the tend inbox (`wiki/_state/inbox/`) today; the stream is its queue.
 
 Run as: brain-agent listen --on-wake "python3 tools/agents/drift_reconciler.py"
 (with the agent's BRAIN_URL / BRAIN_AGENT_ID / BRAIN_AGENT_SECRET set).
@@ -27,7 +29,7 @@ def main() -> int:
     repo = ev.get("ref", "").split(":", 1)[-1] or "unknown"
     spoke().emit("note", f"reconcile:{repo}")
     print(f"drift-reconciler: {repo} drifted (event seq {ev.get('seq')}) — "
-          f"queued reconcile:{repo} for the next tend")
+          f"emitted reconcile:{repo} note on the event stream")
     return 0
 
 

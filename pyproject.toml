@@ -16,7 +16,8 @@ dependencies = ["pyyaml>=6"]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-full = ["tiktoken", "datasette", "pytest"]
+cluster = ["scikit-learn"]
+full = ["tiktoken", "datasette", "pytest", "scikit-learn"]
 
 [project.scripts]
 brain = "tools.brain:main"

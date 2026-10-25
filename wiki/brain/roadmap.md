@@ -2,8 +2,8 @@
 title: "Brain roadmap — 0.x arc toward a self-maintaining, servable brain"
 kind: meta
 status: living
-updated: 2026-07-10
-confidence: high
+updated: 2026-10-25
+confidence: medium
 sources:
   - ../../sources/research/2026-07-10--tend-sweep-2-verification.md
   - ../../sources/conversations/2026-07-10--self-hosting-roadmap-intent.md
@@ -408,6 +408,31 @@ content (standalone guarantee); README points at the deck; every
 shelf home renders a generated Project overview (reading path, open
 work, recent decisions, freshness, honest gaps) per the
 presentation-layer ADR's second amendment.
+
+## 0.20.0 to 0.31.0: the agentic tier, graph, intent (**shipped 2026-07-12 to 2026-08-06**)
+
+Summarised here from [`CHANGELOG.md`](../../CHANGELOG.md) (the
+authoritative per-version record; 0.21 to 0.30 were reconstructed from
+git history on 2026-10-25) and [state.md](state.md).
+
+- **0.20.0 (2026-07-12)**: the playthrough-sweep delivery and public
+  repository hygiene; the public history starts here.
+- **0.21.0 to 0.26.0 (2026-07-14)**: per-edge provenance on the link
+  graph, the structure connector, an async conversation surface over the
+  inbox, one collaboration control, topics that lead with a brief, and
+  page trust signals.
+- **0.27.0 to 0.30.0 (2026-07-14)**: the agentic tier. Per-agent
+  identity and a signed event stream (0.27), owner-subscription wake
+  (0.28), the spoke client (0.29), specialized agents and the local
+  emulation (0.30). Off by default; local-first is unchanged. It has no
+  deploy story yet: `deploy/` serves the three read-only surfaces only.
+- **0.31.0 (2026-08-06)**: intent compilation (`enola_intent:` blocks,
+  `brain.py enola govern`), with the attention board, structure findings
+  and the enola tier carried across in the weeks before it.
+- **0.31.1 (2026-10-25)**: final polish, no features. The project is
+  left standalone and maintained as is; the 1.0 gate
+  ([one-point-oh-criteria](topics/one-point-oh-criteria.md)) is not met
+  (criteria 2 to 4 need calendar time and a real adoption).
 
 ## Standing ideas (unversioned)
 

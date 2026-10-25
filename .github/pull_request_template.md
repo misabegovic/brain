@@ -6,5 +6,5 @@ Link where the work comes from inline (the decision, the discussion,
 the issue, the source page).
 
 Keep it out of the public record: no session URLs, private links,
-tokens, or emails.
+tokens, or emails, and no AI attribution lines.
 -->
