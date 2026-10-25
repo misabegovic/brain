@@ -9277,6 +9277,14 @@ def _init_full(target: Path, org: str) -> int:
                 p.unlink()
 
     (target / "CLAUDE.md").symlink_to("AGENTS.md")
+    # A wheel cannot carry the UI's link to the wiki, so a kernel installed
+    # from one arrives without it (or with the link followed into a copy).
+    docs = target / "ui" / "src" / "content" / "docs"
+    if not docs.is_symlink():
+        if docs.exists():
+            shutil.rmtree(docs)
+        docs.parent.mkdir(parents=True, exist_ok=True)
+        docs.symlink_to(Path("..") / ".." / ".." / "wiki")
     (target / "sources").mkdir(exist_ok=True)
     shutil.copy2(src_root / "sources" / "README.md",
                  target / "sources" / "README.md")

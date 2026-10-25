@@ -309,6 +309,7 @@ def test_birth_from_read_only_kernel_is_writable(tmp_path):
             shutil.copytree(src, dst, symlinks=True, ignore=skip)
         else:
             shutil.copyfile(src, dst)
+    (kernel / "ui" / "src" / "content" / "docs").unlink()
     for p in [kernel, *kernel.rglob("*")]:
         if not p.is_symlink():
             p.chmod(p.stat().st_mode & ~0o222)
@@ -324,6 +325,8 @@ def test_birth_from_read_only_kernel_is_writable(tmp_path):
                   target / "wiki" / "brain" / "adrs",
                   target / "sources" / "README.md"):
             assert p.stat().st_mode & 0o200, f"not writable: {p}"
+        docs = target / "ui" / "src" / "content" / "docs"
+        assert docs.is_symlink() and docs.resolve() == (target / "wiki").resolve()
     finally:
         for p in [kernel, *kernel.rglob("*")]:
             if not p.is_symlink():

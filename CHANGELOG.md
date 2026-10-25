@@ -9,7 +9,7 @@ Published on PyPI as `tended`, so `uvx tended init my-wiki` creates a
 working instance anywhere.
 - The wheel carries the kernel manifest (every path in
   `KERNEL_COPY_PATHS`, plus `sources/README.md` and `brain.config.yml`)
-  inside the `tended` package, copied at build time by `setup.py`. The
+  under `tended/kernel/` in the package, copied at build time by `setup.py`. The
   top-level `tools` package is no longer shipped, so it cannot collide in
   site-packages. Checkout use is unchanged.
 - New `tended` command: `tended init <dir> [--org X]` births a full
@@ -20,6 +20,9 @@ working instance anywhere.
 - `init --full` now makes every copied file and directory writable by the
   new owner, so an instance born from a read-only install (a wheel in
   site-packages) can be edited and its seeded ADR filter can run.
+- `init --full` recreates the UI's `ui/src/content/docs` link to `wiki/`,
+  which a wheel cannot carry, and the source package ships the kernel too
+  so the wheel builds from it.
 - README leads with `uvx tended init my-wiki`; the clone route is the
   contributor path. Nothing inside an instance is renamed.
 
