@@ -1,11 +1,9 @@
-# Packaging for the brain kernel. The repo itself is the artifact —
-# a brain lives as a checkout (or a born instance) because the CLI
-# resolves everything relative to the repository root. This manifest
-# makes `pip install -e .` provide the `brain` console script per
-# checkout (editable installs only, by design), and gives releases
-# canonical metadata.
+# Packaging for tended (formerly the brain kernel). The wheel carries
+# the kernel manifest as data inside the package (copied at build time
+# by setup.py) and a `tended` command that births an instance from it.
+# Inside a checkout or an instance, tools/brain.py is run directly.
 [project]
-name = "brain-kernel"
+name = "tended"
 description = "An LLM-maintained knowledge substrate: governed markdown wiki, queue-and-tend self-maintenance, connectors, composable SQL views, MCP serving, and a chat-first workbench."
 readme = "README.md"
 license = "MIT"
@@ -20,10 +18,10 @@ cluster = ["scikit-learn"]
 full = ["tiktoken", "datasette", "pytest", "scikit-learn"]
 
 [project.scripts]
-brain = "tools.brain:main"
+tended = "tended.cli:main"
 
 [tool.setuptools]
-packages = ["tools"]
+packages = ["tended"]
 
 [tool.setuptools.dynamic]
 version = { file = "VERSION" }

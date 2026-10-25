@@ -9233,6 +9233,16 @@ KERNEL_COPY_PATHS = [
 ]
 
 
+def _make_owner_writable(path: Path) -> None:
+    """Copies keep the source's modes; a read-only source (an installed
+    package) would otherwise birth an instance its owner cannot edit."""
+    paths = [path]
+    if path.is_dir() and not path.is_symlink():
+        paths += [p for p in path.rglob("*") if not p.is_symlink()]
+    for p in paths:
+        p.chmod(p.stat().st_mode | 0o200 | (0o100 if p.is_dir() else 0))
+
+
 def _init_full(target: Path, org: str) -> int:
     """Birth a working instance: manifest copy + fresh scaffold."""
     src_root = REPO
@@ -9253,6 +9263,7 @@ def _init_full(target: Path, org: str) -> int:
                     "dist", "*.pyc", ".pytest_cache"))
         else:
             shutil.copy2(src, dst)
+        _make_owner_writable(dst)
 
     # Drop the brain's own initiative children from the seeded ADR trail:
     # an ADR carrying parent_epic dangles without its epic (intentionally
@@ -9269,6 +9280,7 @@ def _init_full(target: Path, org: str) -> int:
     (target / "sources").mkdir(exist_ok=True)
     shutil.copy2(src_root / "sources" / "README.md",
                  target / "sources" / "README.md")
+    _make_owner_writable(target / "sources" / "README.md")
     (target / "log").mkdir(exist_ok=True)
     (target / "log" / "log.md").write_text("")
     for d in ("_views", "_archive", "_overlaps", "_state",

@@ -290,3 +290,54 @@ def test_internal_refs_scans_ui_source_strings():
             "internal-refs missed a dangling path in ui/src source")
     finally:
         rogue.unlink()
+
+
+# ---------- tended packaging ----------------------------------------------
+
+def test_birth_from_read_only_kernel_is_writable(tmp_path):
+    """A read-only source (an installed wheel) births an owned instance."""
+    import os
+    import shutil
+    import subprocess
+    kernel = tmp_path / "kernel"
+    skip = shutil.ignore_patterns("node_modules", "__pycache__", "*.pyc")
+    for rel in [*brain.KERNEL_COPY_PATHS, "sources/README.md",
+                "brain.config.yml"]:
+        src, dst = REPO / rel, kernel / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if src.is_dir():
+            shutil.copytree(src, dst, symlinks=True, ignore=skip)
+        else:
+            shutil.copyfile(src, dst)
+    for p in [kernel, *kernel.rglob("*")]:
+        if not p.is_symlink():
+            p.chmod(p.stat().st_mode & ~0o222)
+    target = tmp_path / "instance"
+    env = {**os.environ, "BRAIN_DIR": str(kernel)}
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(kernel / "tools" / "brain.py"), "init",
+             str(target), "--full", "--org", "T"],
+            env=env, capture_output=True, text=True, timeout=180)
+        assert proc.returncode == 0, proc.stderr[:800]
+        for p in (target / "tools" / "brain.py",
+                  target / "wiki" / "brain" / "adrs",
+                  target / "sources" / "README.md"):
+            assert p.stat().st_mode & 0o200, f"not writable: {p}"
+    finally:
+        for p in [kernel, *kernel.rglob("*")]:
+            if not p.is_symlink():
+                p.chmod(p.stat().st_mode | 0o700)
+
+
+def test_tended_command_refuses_other_verbs():
+    import subprocess
+    run = lambda *a: subprocess.run(
+        [sys.executable, "-m", "tended.cli", *a], cwd=REPO,
+        capture_output=True, text=True)
+    version = run("--version")
+    assert version.returncode == 0
+    assert (REPO / "VERSION").read_text().strip() in version.stdout
+    other = run("search", "x")
+    assert other.returncode != 0
+    assert "python3 tools/brain.py search" in other.stderr
