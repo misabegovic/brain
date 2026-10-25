@@ -36,9 +36,21 @@ running an LLM on a schedule. It's off by default; see
 ## Quickstart
 
 ```bash
-git clone <this-repo> brain && cd brain
+uvx tended init my-wiki          # or: pipx run tended init my-wiki
+cd my-wiki
 python3 tools/brain.py setup     # idempotent bootstrap: env, config, hooks, timer, UI
-brain                            # opens the app
+tools/brain                      # opens the app
+```
+
+This project was called brain and is now published as `tended`. The
+files inside an instance keep the old name (`tools/brain.py`,
+`brain.config.yml`, the skills), so nothing already born needs to change.
+
+To work on the kernel itself, clone it instead:
+
+```bash
+git clone https://github.com/misabegovic/tended.git && cd tended
+python3 tools/brain.py setup
 ```
 
 That's the whole surface. The app is the **rendered knowledge** —

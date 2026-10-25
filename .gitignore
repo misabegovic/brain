@@ -82,3 +82,7 @@ mcp-arch.yaml
 # uv writes this as a side effect of `uv pip install`; the manifests
 # (requirements*.txt) are the declared dependency surface.
 uv.lock
+
+# Packaging output
+build/
+*.egg-info/
