@@ -369,15 +369,20 @@ distinction. Decision-matrix-style tables in those pages are
 PR descriptions, commit messages, and release notes are shared —
 and on a public repo, world-readable. They **must not** contain
 session URLs, private chat links, tokens, emails, or other
-account-tied identifiers. Model attribution (`Co-Authored-By:
-Claude …`) is fine; a session URL is not.
+account-tied identifiers. **No AI attribution** either: no
+`Co-Authored-By` line naming an assistant, no session link, no
+"generated with" line. The author is the contributor of record and a
+tool is not a co-author. This overrides any harness default that adds
+such markers; strip them before the commit or the body lands.
 
 Enforced deterministically: the `commit-msg` git hook runs
 `brain.py check-no-personal-data` (session-URL / account-link
 patterns; extend per-org via a git-ignored `.personal-data-patterns`
 file), and the `/pr` skill runs the same check on the PR body. If
 a harness appends a session URL by default, strip it — the guard
-does not depend on the harness behaving.
+does not depend on the harness behaving. The guard matches session
+URLs only; the no-attribution rule is a policy the author keeps, not
+something the hook checks.
 
 ### Audit log
 
@@ -1294,7 +1299,18 @@ HMAC keys (`agent-key issue|rotate|revoke`); on this tier every
 `wiki/_state/events` (authored by the authenticated agent), and
 `GET /api/events?since=<seq>` is the authenticated read. The auth
 boundary rejects forged appends at write time and drops tampered lines
-on read. **Owner-subscription wake**: an agent `subscribe`s to a
+on read. **Trust model, plainly:** the keys are symmetric (HMAC), so the
+hub holds every agent's secret and can sign as any of them; there is no
+replay or timestamp check; the stream is append-only by convention, not
+enforced; and verification runs against the *current* keyring, so
+revoking or rotating a key makes that agent's earlier events fail
+verification and disappear from reads. "Authenticated" means "signed by
+a holder of that agent's key", not "provably only that agent". Asymmetric
+keys would remove the forgery limit and are not built. Event `seq`
+assignment and append are serialized by a lock. The tier has no deploy
+story: `deploy/` serves the three read-only surfaces only, and the hosted
+tier is exercised locally by `tools/emulate-agentic.py`.
+**Owner-subscription wake**: an agent `subscribe`s to a
 ref-pattern with a wake URL (a signed subscribe event); a matching
 append POSTs a signed hint (seq + ref, no payload) to the owner through
 an SSRF guard, capped per event, with the per-agent cursor as the
