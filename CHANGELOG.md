@@ -4,6 +4,13 @@ All notable changes to the brain kernel. Versions correspond to
 shipped roadmap slices (`wiki/brain/roadmap.md` holds the full
 narrative; the ADR shelf holds the decisions).
 
+## 0.31.3, 2026-10-25
+The PyPI page reads as the published project.
+- The README is titled `tended`, carries a PyPI badge, and links its
+  screenshot and wiki pages by absolute URL so they resolve on PyPI.
+- `pyproject.toml` declares the project URLs (repository, changelog,
+  issues), so PyPI links back to GitHub.
+
 ## 0.31.2, 2026-10-25
 Published on PyPI as `tended`, so `uvx tended init my-wiki` creates a
 working instance anywhere.
