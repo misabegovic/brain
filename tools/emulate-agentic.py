@@ -6,7 +6,9 @@ this machine, issues keys, starts specialized spoke agents as listeners,
 fires emulated producers (a structure-drift event and Sentry / Datadog /
 Langfuse alerts), and shows each agent get woken and emit its result —
 the complete loop end to end. Everything is torn down and the runtime
-state (git-ignored) is cleaned up on exit.
+state (git-ignored) is cleaned up on exit. It writes its keyring and event
+stream into the repository it runs in, so it refuses to start when that
+repository already has either; use a throwaway checkout.
 
     python3 tools/emulate-agentic.py
 
@@ -53,15 +55,35 @@ def _banner(msg):
     print(f"\n\033[1m{msg}\033[0m")
 
 
+def _live_state() -> list[str]:
+    """Paths of real hosted-tier state in this repository. The emulation
+    issues its own keys and removes the keyring, cursors and event stream
+    on exit, so it must not start where any of them already exist."""
+    found = []
+    if brain.AGENT_KEYS.exists() and brain._load_agent_keys():
+        found.append(brain.AGENT_KEYS)
+    if brain.EVENT_CURSORS.exists():
+        found.append(brain.EVENT_CURSORS)
+    if brain.EVENTS_DIR.exists() and any(brain.EVENTS_DIR.glob("*.jsonl")):
+        found.append(brain.EVENTS_DIR)
+    return found
+
+
 def main() -> int:
+    live = _live_state()
+    if live:
+        print("emulate-agentic: refusing to run, this repository has live "
+              "hosted-tier state that the emulation would delete:",
+              file=sys.stderr)
+        for path in live:
+            print(f"  {path}", file=sys.stderr)
+        print("Run it in a throwaway checkout (or after moving that state "
+              "aside).", file=sys.stderr)
+        return 2
     ba = _spoke()
     tmp_cursors = REPO / "wiki" / "_state" / ".emulate-cursors.json"
     os.environ["BRAIN_AGENT_CURSORS"] = str(tmp_cursors)
 
-    # Clean any prior emulation state.
-    brain.AGENT_KEYS.unlink(missing_ok=True)
-    brain.EVENT_CURSORS.unlink(missing_ok=True)
-    shutil.rmtree(brain.EVENTS_DIR, ignore_errors=True)
     tmp_cursors.unlink(missing_ok=True)
 
     _banner("1. issue keys — producers + specialized agents")

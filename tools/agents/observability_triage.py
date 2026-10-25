@@ -5,8 +5,9 @@ Subscribes to alerts from observability producers (Sentry, Datadog,
 Langfuse — emulated locally, real ones would be connectors). On wake it
 triages deterministically: parses the source and level, assigns a
 severity by a simple heuristic, and emits a `triage:<source>:<severity>`
-note for a tend session to act on. No LLM — deterministic prep only; the
-severity call is a lookup, and the reasoning is queued for a harness.
+note on the event stream for a harness session to read and act on (it is
+not copied into the tend inbox). No LLM, deterministic prep only; the
+severity call is a lookup, and the reasoning is left to a harness.
 
 Alert ref shape: alert:<source>:<level>:<id>
   e.g. alert:sentry:error:issue-4821 · alert:datadog:warning:mon-77
@@ -40,7 +41,7 @@ def main() -> int:
     severity = SEVERITY.get(level.lower(), "low")
     spoke().emit("note", f"triage:{source}:{severity}:{ident}")
     print(f"observability-triage: {source} {level} ({ident}) → "
-          f"severity {severity} — queued triage note")
+          f"severity {severity}, emitted triage note on the event stream")
     return 0
 
 

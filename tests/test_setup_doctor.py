@@ -87,8 +87,9 @@ def test_producer_health_states(tmp_path, monkeypatch):
 
 
 def test_check_no_personal_data_rejects_session_url(tmp_path):
-    """The commit-msg guard rejects session URLs but passes clean
-    messages (incl. Co-Authored-By model attribution)."""
+    """The commit-msg guard rejects session URLs and passes other
+    messages. It matches session URLs only: the no-AI-attribution rule
+    is contribution policy, not something the hook checks."""
     import subprocess
     import sys
     from pathlib import Path
@@ -101,3 +102,29 @@ def test_check_no_personal_data_rejects_session_url(tmp_path):
     assert run("fix\n\nClaude-Session: https://claude.ai/code/session_ABC") == 1
     assert run("fix\n\nCo-Authored-By: Claude <noreply@anthropic.com>") == 0
     assert run("a normal message") == 0
+
+
+def test_producer_heartbeat_reports_failed_jobs(tmp_path, monkeypatch):
+    """A completed run touches the heartbeat even when a job failed; the
+    health reads as failing (running, jobs broken), never as stalled."""
+    monkeypatch.setattr(brain, "PRODUCER_HEARTBEAT", tmp_path / "hb.json")
+    brain._producer_touch(["overlap-refresh"])
+    health = brain._producer_health()
+    assert health["state"] == "failing"
+    assert health["failed"] == ["overlap-refresh"]
+    brain._producer_touch([])
+    assert brain._producer_health()["state"] == "current"
+
+
+def test_cadence_elapsed():
+    today = brain.today_utc()
+    iso = lambda days: (today - __import__("datetime").timedelta(days=days)).isoformat()
+    assert brain._cadence_elapsed("daily", None)
+    assert brain._cadence_elapsed("daily", iso(1))
+    assert not brain._cadence_elapsed("daily", iso(0))
+    assert not brain._cadence_elapsed("weekly", iso(3))
+    assert brain._cadence_elapsed("weekly", iso(7))
+    assert not brain._cadence_elapsed("monthly", iso(29))
+    assert brain._cadence_elapsed("monthly", iso(30))
+    assert brain._cadence_elapsed("fortnightly", iso(0))
+    assert brain._cadence_elapsed("daily", "not-a-date")
