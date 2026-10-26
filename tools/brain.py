@@ -172,6 +172,22 @@ def today_utc() -> dt.date:
     """
     return dt.datetime.now(dt.timezone.utc).date()
 
+
+def views_date(entries: list[dict]) -> str:
+    """The date a generated view carries: the latest `updated:` among
+    the pages it is built from, so regenerating an unchanged tree on
+    any day writes identical bytes and the "views are up to date" gate
+    holds on a fresh clone. Falls back to today only for a wiki with no
+    dated page, which has no inputs to derive from."""
+    dates = []
+    for e in entries:
+        u = e.get("updated")
+        if isinstance(u, dt.date):
+            u = u.isoformat()
+        if isinstance(u, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", u):
+            dates.append(u)
+    return max(dates) if dates else today_utc().isoformat()
+
 VALID_KINDS = {
     "reference", "initiative", "decision", "entity", "meta", "overlap",
     "insight", "epic", "idea", "pitch", "topic",
@@ -898,7 +914,7 @@ def cmd_views(_args) -> int:
         for r in entry.get("repos") or []:
             by_repo[r].append(rec)
 
-    today = today_utc().isoformat()
+    today = views_date(entries)
 
     def write_view(name: str, title: str, groups: dict):
         lines = [
@@ -973,7 +989,7 @@ def cmd_views(_args) -> int:
     # Derived index + custom views ride the same regeneration, per
     # the sql-views-over-derived-index ADR.
     stats = _build_index()
-    custom = _render_custom_views()
+    custom = _render_custom_views(today)
     print(f"  index: {stats['pages']} pages + {stats['snapshots']} "
           f"snapshots ({stats['size_kb']} KB)"
           + (f"; custom views: {', '.join(custom)}" if custom else ""))
@@ -5546,11 +5562,13 @@ def _render_rows(cols: list[str], rows: list) -> str:
     return out
 
 
-def _render_custom_views() -> list[str]:
+def _render_custom_views(stamp: str | None = None) -> list[str]:
     """Render every spec in views/ to wiki/_views/custom/<name>.md.
     Deterministic: specs must ORDER BY; rows are capped per block."""
     if not VIEWS_SPEC_DIR.exists():
         return []
+    if stamp is None:
+        stamp = views_date(collect_pages_data())
     specs = sorted(VIEWS_SPEC_DIR.glob("*.yml")) + sorted(
         VIEWS_SPEC_DIR.glob("*.yaml"))
     if not specs:
@@ -5573,7 +5591,7 @@ def _render_custom_views() -> list[str]:
             f'title: "{spec.get("title", name)}"',
             "kind: meta",
             "status: living",
-            f"updated: {today_utc().isoformat()}",
+            f"updated: {stamp}",
             "confidence: high",
             "sources:",
             f"  - ../../../views/{spec_path.name}",

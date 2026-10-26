@@ -110,3 +110,29 @@ def test_custom_views_are_deterministic(index):
 def test_new_connectors_noop_when_unconfigured():
     assert brain._connector_datadog_pull() == 0
     assert brain._connector_langfuse_pull() == 0
+
+
+def _views_bytes():
+    root = REPO / "wiki" / "_views"
+    return {str(p.relative_to(root)): p.read_bytes()
+            for p in sorted(root.rglob("*")) if p.is_file()}
+
+
+def test_views_do_not_depend_on_the_clock(monkeypatch):
+    import datetime as dt
+    before = _views_bytes()
+    root = REPO / "wiki" / "_views"
+    try:
+        monkeypatch.setattr(brain, "today_utc", lambda: dt.date(2031, 1, 1))
+        assert brain.cmd_views(None) == 0
+        first = _views_bytes()
+        monkeypatch.setattr(brain, "today_utc", lambda: dt.date(2031, 1, 2))
+        assert brain.cmd_views(None) == 0
+        second = _views_bytes()
+    finally:
+        for rel in set(_views_bytes()) - set(before):
+            (root / rel).unlink()
+        for rel, data in before.items():
+            (root / rel).write_bytes(data)
+    assert first == second
+    assert b"2031-01" not in b"".join(second.values())
