@@ -12,7 +12,24 @@ sys.path.insert(0, str(REPO / "tools"))
 import brain  # noqa: E402
 
 
-def test_doctor_checks_shape():
+def _healthy_instance(tmp_path, monkeypatch):
+    import json
+    import time
+
+    (tmp_path / ".git").mkdir()
+    (tmp_path / "wiki" / "_state").mkdir(parents=True)
+    (tmp_path / "brain.config.yml").write_text(
+        "org: Doctor Org\nactive_repos: []\n")
+    heartbeat = tmp_path / "wiki" / "_state" / "producer-heartbeat.json"
+    heartbeat.write_text(json.dumps({"epoch": int(time.time()),
+                                     "failed": []}))
+    monkeypatch.setattr(brain, "REPO", tmp_path)
+    monkeypatch.setattr(brain, "WIKI", tmp_path / "wiki")
+    monkeypatch.setattr(brain, "PRODUCER_HEARTBEAT", heartbeat)
+
+
+def test_doctor_checks_shape(tmp_path, monkeypatch):
+    _healthy_instance(tmp_path, monkeypatch)
     checks = brain._doctor_checks()
     assert len(checks) >= 8
     for c in checks:
@@ -20,7 +37,7 @@ def test_doctor_checks_shape():
         assert c["label"] and c["detail"]
         if c["status"] != "ok":
             assert c["hint"], f"{c['id']}: non-ok check needs a fix hint"
-    # The live shell must never be in a failing state.
+    # A healthy shell must never be in a failing state.
     assert not [c for c in checks if c["status"] == "fail"]
 
 

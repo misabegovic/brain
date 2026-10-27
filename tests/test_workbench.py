@@ -116,11 +116,18 @@ def test_app_page_serves_locally():
         proc.wait(timeout=5)
 
 
-def test_ui_route_serves_rendered_wiki():
+def test_ui_route_serves_rendered_wiki(tmp_path):
     port = 8992
+    site = tmp_path / "ui" / ".build-cache"
+    (site / "brain" / "roadmap").mkdir(parents=True)
+    (site / "index.html").write_text("<html><body>home</body></html>")
+    (site / "brain" / "roadmap" / "index.html").write_text(
+        "<html><body><h1>Roadmap</h1></body></html>")
+    (tmp_path / "wiki").mkdir()
     proc = subprocess.Popen(
         [sys.executable, str(REPO / "tools" / "brain.py"),
-         "serve", "--port", str(port)], stderr=subprocess.PIPE)
+         "serve", "--port", str(port)], stderr=subprocess.PIPE,
+        env={**os.environ, "BRAIN_DIR": str(tmp_path)})
     try:
         import urllib.error
         import urllib.request
